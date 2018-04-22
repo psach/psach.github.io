@@ -1,0 +1,23 @@
+<html !doctype>
+
+
+	<script>
+	function loadPage(url) {
+    var xmlhttp = new XMLHttpRequest();
+
+    // Callback function when XMLHttpRequest is ready
+    xmlhttp.onreadystatechange=function(){
+        if (xmlhttp.readyState === 4){
+            if (xmlhttp.status === 200) {
+                document.getElementById('html').innerHTML = xmlhttp.responseText;
+            }
+        }
+    };
+    xmlhttp.open("GET", url , true);
+    xmlhttp.send();
+}
+	</script>
+	
+ <body onLoad='loadPage("remote-level1.html")' >
+ </body>
+</html>
