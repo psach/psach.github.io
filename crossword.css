@@ -1,0 +1,280 @@
+html{
+  
+  padding: 1px 1px;
+  border: 1px solid #ff3358;
+  border-radius: 0px;
+  -webkit-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
+  -moz-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
+  box-shadow: inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
+  background-color: pink;
+  background: linear-gradient(to bottom right, #ff99ac, #ff3358),
+  linear-gradient(to top right ,  #ff3358,#ff99ac); 
+  -webkit-backface-visibility: hidden;
+}
+
+#cwd-container {
+    font-family: tahoma;
+}
+
+#cwd-grid {
+    border: solid 1px black;
+	
+}
+
+
+@media (min-width:400px){
+    #cwd-grid{
+        width: 100%;
+		height: 80%;
+}
+}
+
+
+@media (min-width:400px){
+    .word-container{
+     padding-top:50%;
+}
+}
+
+
+#cwd-grid td.cwd-tile-highlight
+{
+    background-color: Yellow !important;
+}
+
+
+#cwd-grid td.red
+{
+    background-color: Red !important;
+	color: White !important;
+}
+
+.d3 {
+  box-sizing: border-box;
+
+  height:100%;
+  margin: 0px;
+ 
+  padding-top: 0px;
+  background: pink;
+  border: 0px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  -ms-transition: all 0.3s ease-out;
+  -webkit-animation: all 0.3s ease-out;
+  -o-animation: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+   text-align: center;
+   box-shadow:
+    inset 0 5px 0 rgba(255,255,255,0.5),
+    0 2px 10px rgba(0,0,0,1),
+    0 0 0px 1px rgba(0,0,0,1);
+
+ }
+
+ .d3word {
+  box-sizing: border-box;
+  width:100%;
+  
+  margin: 0px;
+  padding: 0px 0px;
+  background: pink;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  -ms-transition: all 0.3s ease-out;
+  -webkit-animation: all 0.3s ease-out;
+  -o-animation: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+   vertical-align: center;
+   box-shadow:
+    inset 0 5px 0 rgba(255,255,255,0.5),
+    0 2px 2px rgba(0,0,0,1),
+    0 0 0px 1px rgba(0,0,0,1);
+
+ }
+
+
+#cwd-grid td.green
+{
+    background-color: Green !important;
+	color: White !important;
+}
+
+
+
+#cwd-grid td.cwd-tile-cursor
+{
+    border-color: White !important;
+    background-color: darkgray !important;
+    color: white;
+}
+
+#cwd-grid td.cwd-tile-correct
+{
+    background-color: Lime !important;
+}
+
+#cwd-grid td.cwd-tile-incorrect
+{
+    border-color: Red !important; 
+	border: solid 1px Red;
+}
+
+
+.A, .J, .R {
+	background: DodgerBlue ;
+	/* background-image: url("a.png");*/
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	/*color: transparent;*/	
+}
+
+
+
+
+.B, .K, .S {
+	background: Yellow;
+	/*background-image: url("d.gif");*/
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	/*color: transparent;*/	
+}
+
+.C , .L, .T {
+	background: HotPink;
+	/*color: transparent;*/	
+}
+
+
+.D ,.M, .U {
+	background: GreenYellow;
+	/*color: transparent;*/	
+}
+
+
+.E, .N , .W {
+	background: Orange ;
+	/* background-image: url("a.png");*/
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	/*color: transparent;*/	
+}
+
+.F,.O , .X {
+	background: MediumPurple ;
+	/*background-image: url("d.gif");*/
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	/*color: transparent;*/	
+}
+
+.I,.P , .Y {
+	background: Gold;
+	/*color: transparent;*/	
+}
+
+
+.J , .Q, .Z{
+	background: Cyan;
+	/*color: transparent;*/	
+}
+
+
+.cwd-tile-active{
+	background: LightYellow;
+	border-radius: 0px;
+
+}
+
+.cwd-tile-inactive{
+	background: Black;
+	border-radius: 2px;
+}
+
+
+.cwd-tile {
+    width: 21px;
+    height: 21px;
+
+    border: solid 0.07em black;
+    padding: 0;
+    vertical-align: center;
+}
+
+.cwd-tile-word {
+    width: 21px;
+    height: 21px;
+    border: solid 0px black;
+    padding: 0;
+
+}
+
+
+.cwd-tile-letter {
+    text-align: center;
+    font-size: 13px; 
+	line-height: 150%;
+}
+
+.red {
+    text-align: center;
+    font-size: 13px; 
+}
+
+
+.green {
+    text-align: center;
+    font-size: 13px; 
+}
+
+#cwd-clue-box {
+    padding: 5px;
+    margin-top: 5px;
+    border: solid 1px black;
+    font-size: 105%;
+    font-weight: bold;
+    height: 50px;
+}
+
+.cwd-clue-highlight
+{
+    font-weight: bold;
+}
+
+.cwd-clues-header {
+    font-size: 105%;
+    font-weight: bold;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.cwd-clue div {
+    display: table-cell;
+}
+
+.cwd-clue-no {
+    width: 25px;
+}
+
+.cwd-clue-text {
+    cursor: pointer;
+}
+
+
+.inner{
+    outline: 0px solid #333;
+    float: left;
+    width: 100%;
+}
+
+@media (min-width:400px){
+    .inner{
+        width: 50%;
+
+}
+}

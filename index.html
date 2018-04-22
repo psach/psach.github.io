@@ -1,23 +1,33 @@
 <html !doctype>
+  <head>
+  
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-54J43ZF');</script>
+<!-- End Google Tag Manager -->
 
 
-	<script>
-	function loadPage(url) {
-    var xmlhttp = new XMLHttpRequest();
 
-    // Callback function when XMLHttpRequest is ready
-    xmlhttp.onreadystatechange=function(){
-        if (xmlhttp.readyState === 4){
-            if (xmlhttp.status === 200) {
-                document.getElementById('html').innerHTML = xmlhttp.responseText;
-            }
-        }
-    };
-    xmlhttp.open("GET", url , true);
-    xmlhttp.send();
-}
-	</script>
-	
- <body onLoad='loadPage("remote-level1.html")' >
- </body>
+
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Crossword</title>
+    <link href="crossword.css" rel="stylesheet" type="text/css">
+
+</head>
+
+  <body>
+   <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-54J43ZF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div class='outer'  align='center' style='height:50%' >
+<img src='splashgif1.gif' />
+<br/><br/>
+<div class="play d3 " style="padding-left: 3px;padding-right: 3px; width:41px; height:21px ; align:center;" align="center" > Play </div>
+	</div>
+  </body>
 </html>
