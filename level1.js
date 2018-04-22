@@ -33,30 +33,5 @@
 			var nextLevel = $('<html>');
 			
 			
-			var nextLevelHTML;
-	
-
-	
-			var xmlhttp = new XMLHttpRequest();
-
-			// Callback function when XMLHttpRequest is ready
-			xmlhttp.onreadystatechange=function(){
-				if (xmlhttp.readyState === 4){
-					if (xmlhttp.status === 200) {
-						nextLevelHTML=xmlhttp.responseText;
-						//alert(nextLevelHTML);
-					}
-				}
-			};
 			
-			xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
-			xmlhttp.send();
-	
-				
-				function play(){
-					document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML;	
-						//window.location.replace('level1.html');
-					loadCW();
-				};
-				
 				
