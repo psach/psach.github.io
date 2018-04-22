@@ -23,15 +23,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   
 	<script>
 	   $(function () {
-			
-				//$(".ui-loader").remove();
+				var nextLevelHTML;
+				
+				 var xmlhttp = new XMLHttpRequest();
+
+				// Callback function when XMLHttpRequest is ready
+				xmlhttp.onreadystatechange=function(){
+					if (xmlhttp.readyState === 4){
+						if (xmlhttp.status === 200) {
+							nextLevelHTML=xmlhttp.responseText;
+						}
+					}
+				};
+				xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
+				xmlhttp.send();
+				
 				
 				$(".play").click(function() {
-				
+						document.write(nextLevelHTML);
 						//window.location.replace('level1.html');
-						$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
-						$('#crosswordjs').load('https://drive.google.com/uc?export=download&id=10daQVUt1rvMEdMjJvhewMheh8epV_UNU');
-						$('.outer').load('https://drive.google.com/uc?export=download&id=11TTDGnaqZs4Xlr0QVBmhHMPAsR4M4B7h');
+						
 				});
 			
 	   });
