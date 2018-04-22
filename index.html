@@ -102,6 +102,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 						if (xmlhttp.status === 200) {
 							nextLevelHTML[i]=xmlhttp.responseText;
 							//alert(nextLevelHTML);
+							if(i==levels-1) document.getElementsByClassName("play").style.visibility=visible;
 						}
 					}
 				};
@@ -150,7 +151,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
   </head>
   
-  
 
   <body>
    <!-- Google Tag Manager (noscript) -->
@@ -160,7 +160,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class='outer'  align='center' style='height:50%' >
 <img src='splashgif1.gif' />
 <br/><br/>
-<div class="play d3 " style="padding-left: 3px;padding-right: 3px; width:41px; height:21px ; align:center;" align="center" onclick='play()' > Play </div>
+<div class="play d3 " style="padding-left: 3px;padding-right: 3px; width:41px; height:21px ; align:center;visibility:hidden;" align="center" onclick='play()' > Play </div>
 	</div>
   </body>
 </html>
