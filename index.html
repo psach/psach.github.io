@@ -26,9 +26,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 		
 		<script>
 			
-			var nextLevelHTML;
-			var tbody;
-			var words = ["ONE","TWO","THREE","FOUR","FIVE","EIGHTY","REID","MUGGER","MOGTTGER","FETU","EAT"];
+			var nextLevelHTML=[];
+			var levelCorrectAns=[];
+			var levelMoreWords=[];
+			var levelStartCell=[];
+			var levelEndCell=[];
+			
+			
 			var correctAns =[["RIMA","RANGE","APPLEPIE","LITTLEMAN","EXAM"],["DIAL","EIGHT","ALPHABET","ALCOHOLIC","EXAM"]];
 			
 			
@@ -39,54 +43,94 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			["TAXI","HINDI","MARATHI"],["BANGLA","ENGLISH","APPLE"],["NIGHTY","DOWN","CLOWN"],["BITBIG","SMALL","OSSBSSAO"]
 			
 			];
-			var activeSet;
-	
-			var id, clueid;
 			
-			//var startCell = ["[row=10][col=0]","[row=0][col=6]"];
-			//var endCell=["[row=0][col=6]","[row=10][col=0]"];
 			var startCell = [[10,0],[0,6]];
 			var endCell=[[0,6],[10,0]];
 			
-			var moreCount=1;
-			var insertCorrect=0;
-			var levelAnswered=0;
-			var currLevel=0;
-			var stringCorrect ="";
-			var selectionTillLast=[];
-			var greenChar, redChar;
-			var start,end;
-			var activeId;
-			var randomString='';
+			levelMoreWords.push(moreWords);
+			levelCorrectAns.push(correctAns);
+			levelStartCell.push(startCell);
+			levelEndCell.push(endCell);
+			
+			
+			correctAns =[["TIME","ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"],
+			["GOOGLE","LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"]];
+				
+			 moreWords =[
+			["SIN","TWO","THREE"],["FOUR","HIKE","EIGHTY"],["REID","MUGGER","MOGTTGER"],["FETU","EAT","HUGE"],
+			["RANGE","LIME","THRICE"],["BIGWORD","RAMPART","LIKE"],["GOAL","CRICKETR","LITTLE"],["MYCOUPONS","DANCE","GAME"],
+			["RIGHT","KITE","JOCKEY"],["DONKEY","TALKATIVE","COORG"],["JOKER","JIKES","TELEVISION"],["SINGER","JUMPER","RISK"],
+			["KANNADA","HINDI","MARATHI"],["BANGLA","ENGLISH","TOWN"],["GOWN","DOWN","CLOWN"],["BITBIG","SMALL","JUST"]
+			];
+			
+			startCell = [[12,2],[12,10]];
+     		endCell=[[0,10],[0,0]];
+			
+			
+			levelMoreWords.push(moreWords);
+			levelCorrectAns.push(correctAns);
+			levelStartCell.push(startCell);
+			levelEndCell.push(endCell);
+			
+			var levels=levelMoreWords.length;
+			
+			
+			for(int i=0; i<levels;i++){
+				var xmlhttp = new XMLHttpRequest();
 
-			
-			
-			
-			var xmlhttp = new XMLHttpRequest();
-
-			// Callback function when XMLHttpRequest is ready
-			xmlhttp.onreadystatechange=function(){
-				if (xmlhttp.readyState === 4){
-					if (xmlhttp.status === 200) {
-						nextLevelHTML=xmlhttp.responseText;
-						//alert(nextLevelHTML);
+				// Callback function when XMLHttpRequest is ready
+				xmlhttp.onreadystatechange=function(){
+					if (xmlhttp.readyState === 4){
+						if (xmlhttp.status === 200) {
+							nextLevelHTML[i]=xmlhttp.responseText;
+							//alert(nextLevelHTML);
+						}
 					}
-				}
-			};
-			
-			xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
-			xmlhttp.send();
-			
+				};
+				
+				xmlhttp.open("GET", 'https://psach.github.io/remote-level'+(i+1)+'.html' , true);
+				xmlhttp.send();
+			}
 				
 
-	
+			
 			
 	
 				
 			function play(){
-					document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML;	
+					if(level==levels)level=0;
+					
+					var tbody;
+					
+					var correctAns =levelCorrectAns[level];
+					
+					
+					var moreWords =levelMoreWords[level];
+					
+					var activeSet;
+			
+					var id, clueid;
+					
+					//var startCell = ["[row=10][col=0]","[row=0][col=6]"];
+					//var endCell=["[row=0][col=6]","[row=10][col=0]"];
+					var startCell = levelStartCell[level];
+					var endCell=levelEndCell[level];
+					
+					var moreCount=1;
+					var insertCorrect=0;
+					var levelAnswered=0;
+					var currLevel=0;
+					var stringCorrect ="";
+					var selectionTillLast=[];
+					var greenChar, redChar;
+					var start,end;
+					var activeId;
+					var randomString='';
+					
+					document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
 						//window.location.replace('level1.html');
 					loadCW();
+					level++;
 			};
 				
 		

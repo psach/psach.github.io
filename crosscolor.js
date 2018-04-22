@@ -114,9 +114,8 @@ function popWords(words){
 						randomString='';
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
+						play();
 						
-						document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML;	
-						loadCW();
 						 // this will load a full screen ad on startup
 						  AdMob.prepareInterstitial({
 							adId: admobid.interstitial,
