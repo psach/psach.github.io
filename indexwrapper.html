@@ -15,7 +15,8 @@
     xmlhttp.onreadystatechange=function(){
         if (xmlhttp.readyState === 4){
             if (xmlhttp.status === 200) {
-                document.write(xmlhttp.responseText);
+               // document.write(xmlhttp.responseText);
+			   document.getElementsByTagName('html')[0].innerHTML=xmlhttp.responseText;	
             }
         }
     };

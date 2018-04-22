@@ -33,20 +33,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
 
 	
-	var xmlhttp = new XMLHttpRequest();
+		var xmlhttp = new XMLHttpRequest();
 
-	// Callback function when XMLHttpRequest is ready
-	xmlhttp.onreadystatechange=function(){
-		if (xmlhttp.readyState === 4){
-			if (xmlhttp.status === 200) {
-				nextLevelHTML=xmlhttp.responseText;
-				//alert(nextLevelHTML);
+		// Callback function when XMLHttpRequest is ready
+		xmlhttp.onreadystatechange=function(){
+			if (xmlhttp.readyState === 4){
+				if (xmlhttp.status === 200) {
+					nextLevelHTML=xmlhttp.responseText;
+					//alert(nextLevelHTML);
+				}
 			}
-		}
-	};
-	
-	xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
-	xmlhttp.send();
+		};
+		
+		xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
+		xmlhttp.send();
 	
 				
 				function play(){
