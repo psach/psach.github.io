@@ -31,6 +31,4 @@
 			var randomString='';
 
 			var nextLevel = $('<html>');
-			$(function () {
-				nextLevel.load('https://drive.google.com/uc?export=download&id=1tYhbSI7aPlaI89MRewsdcy4aQ4_TjRKF');
-			});
+			
