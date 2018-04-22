@@ -32,7 +32,34 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			var levelStartCell=[];
 			var levelEndCell=[];
 			var level=0;
+			var tbody;
 			
+			var correctAns =levelCorrectAns[level];
+			
+			
+			var moreWords =levelMoreWords[level];
+			
+			var activeSet;
+	
+			var id, clueid;
+			
+			//var startCell = ["[row=10][col=0]","[row=0][col=6]"];
+			//var endCell=["[row=0][col=6]","[row=10][col=0]"];
+			var startCell = levelStartCell[level];
+			var endCell=levelEndCell[level];
+			
+			var moreCount=1;
+			var insertCorrect=0;
+			var levelAnswered=0;
+			var currLevel=0;
+			var stringCorrect ="";
+			var selectionTillLast=[];
+			var greenChar, redChar;
+			var start,end;
+			var activeId;
+			var randomString='';
+			
+					
 			var correctAns =[["RIMA","RANGE","APPLEPIE","LITTLEMAN","EXAM"],["DIAL","EIGHT","ALPHABET","ALCOHOLIC","EXAM"]];
 			
 			
@@ -99,33 +126,27 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 				
 			function play(){
 					if(level==levels)level=0;
+					correctAns =levelCorrectAns[level];
 					
-					var tbody;
-					
-					var correctAns =levelCorrectAns[level];
-					
-					
-					var moreWords =levelMoreWords[level];
-					
-					var activeSet;
+					moreWords =levelMoreWords[level];
+				
+					activeSet;
 			
-					var id, clueid;
+					id, clueid;
 					
-					//var startCell = ["[row=10][col=0]","[row=0][col=6]"];
-					//var endCell=["[row=0][col=6]","[row=10][col=0]"];
-					var startCell = levelStartCell[level];
-					var endCell=levelEndCell[level];
+					startCell = levelStartCell[level];
+					endCell=levelEndCell[level];
 					
-					var moreCount=1;
-					var insertCorrect=0;
-					var levelAnswered=0;
-					var currLevel=0;
-					var stringCorrect ="";
-					var selectionTillLast=[];
-					var greenChar, redChar;
-					var start,end;
-					var activeId;
-					var randomString='';
+					moreCount=1;
+					insertCorrect=0;
+					levelAnswered=0;
+					currLevel=0;
+					stringCorrect ="";
+					selectionTillLast=[];
+					greenChar, redChar;
+					start,end;
+					activeId;
+					randomString='';
 					
 					document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
 						//window.location.replace('level1.html');
