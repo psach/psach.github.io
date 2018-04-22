@@ -42,8 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
 				
 				function play(){
-						document.write('');
-						document.write(nextLevelHTML);
+					document.getElementsByTagName('html')[0].innerHTML(nextLevelHTML);
 						//window.location.replace('level1.html');
 						
 				};
