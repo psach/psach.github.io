@@ -266,6 +266,38 @@ function popWords(words){
 			}
 			
 			function loadCW() {
+				
+				// TODO: replace the following ad units with your own
+				if( /(android)/i.test(navigator.userAgent) ) {
+				  admobid = { // for Android
+					banner: 'ca-app-pub-3940256099942544/6300978111',
+					interstitial: 'ca-app-pub-3940256099942544/1033173712',
+					rewardvideo: 'ca-app-pub-3940256099942544/5224354917',
+				  };
+				} else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
+				  admobid = { // for iOS
+					banner: 'ca-app-pub-3940256099942544/4480807092',
+					interstitial: 'ca-app-pub-3940256099942544/4411468910',
+					rewardvideo: 'ca-app-pub-3940256099942544/1712485313',
+				  };
+				} else {
+				  admobid = { // for Windows Phone
+					banner: 'ca-app-pub-6869992474017983/8878394753',
+					interstitial: 'ca-app-pub-6869992474017983/1355127956',
+					rewardvideo: '',
+				  };
+				}
+
+				
+				
+				if(( /(ipad|iphone|ipod|android|windows phone)/i.test(navigator.userAgent) )) {
+					document.addEventListener('deviceready', initApp, false);
+				} else {
+					initApp();
+				}
+
+
+
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
 			//$.mobile.loading().hide();
 			//$('head').append('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
@@ -377,26 +409,7 @@ function popWords(words){
 		
 var admobid = {};
 
-// TODO: replace the following ad units with your own
-if( /(android)/i.test(navigator.userAgent) ) {
-  admobid = { // for Android
-    banner: 'ca-app-pub-3940256099942544/6300978111',
-    interstitial: 'ca-app-pub-3940256099942544/1033173712',
-    rewardvideo: 'ca-app-pub-3940256099942544/5224354917',
-  };
-} else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
-  admobid = { // for iOS
-    banner: 'ca-app-pub-3940256099942544/4480807092',
-    interstitial: 'ca-app-pub-3940256099942544/4411468910',
-    rewardvideo: 'ca-app-pub-3940256099942544/1712485313',
-  };
-} else {
-  admobid = { // for Windows Phone
-    banner: 'ca-app-pub-6869992474017983/8878394753',
-    interstitial: 'ca-app-pub-6869992474017983/1355127956',
-    rewardvideo: '',
-  };
-}
+
 
 function initApp() {
   if (! AdMob ) { alert( 'admob plugin not ready' ); return; }
@@ -412,12 +425,6 @@ function initApp() {
   } );
 
  
-}
-
-if(( /(ipad|iphone|ipod|android|windows phone)/i.test(navigator.userAgent) )) {
-    document.addEventListener('deviceready', initApp, false);
-} else {
-    initApp();
 }
 
 			
