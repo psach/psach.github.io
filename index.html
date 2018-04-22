@@ -165,7 +165,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						//window.location.replace('level1.html');
 					loadCW();
 					level++;
-					
+					 // this will create a banner on startup
+					  AdMob.createBanner( {
+						adId: admobid.banner,
+						position: AdMob.AD_POSITION.TOP_CENTER,
+						isTesting: true, // TODO: remove this line when release
+						overlap: false,
+						offsetTopBar: false,
+						bgColor: 'black'
+					  } );
 
 			};
 				
