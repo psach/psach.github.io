@@ -40,6 +40,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </body>
   
   <script>
+  
+		 var admobid = {};
+
+		// TODO: replace the following ad units with your own
+		if( /(android)/i.test(navigator.userAgent) ) {
+		  admobid = { // for Android
+			banner: 'ca-app-pub-3940256099942544/6300978111',
+			interstitial: 'ca-app-pub-3940256099942544/1033173712',
+			rewardvideo: 'ca-app-pub-3940256099942544/5224354917',
+		  };
+		} 
+
 			
 			var nextLevelHTML=[];
 			var levelCorrectAns=[];
@@ -159,6 +171,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						//window.location.replace('level1.html');
 					loadCW();
 					level++;
+					AdMob.createBanner( {
+						adId: admobid.banner,
+						position: AdMob.AD_POSITION.BOTTOM_CENTER,
+						isTesting: true, // TODO: remove this line when release
+						overlap: false,
+						offsetTopBar: false,
+						bgColor: 'black'
+					  } );
+
+
 			};
 				
 		
