@@ -14,32 +14,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
     <title>Crossword</title>
   
 
-    <script src="jquery-2.1.4.min.js"></script>
-	<!-- <script src="jquery.mobile-1.4.5.min.js"></script> -->
-	
-	<script type="text/javascript" src="admob.js"></script>
+  
 	<!-- <script type="text/javascript" src="admobindex.js"></script> -->
   </head>
 	<script>
-		var host= 'https://psach.github.io/';
-		
-	   $(function () {
-			
-				//$(".ui-loader").remove();
-				
-				var nextLevel = $('<body>');
-				//nextLevel.load('/backup/index.html');
-				nextLevel.load(host+'remote-level1.html');
-				//nextLevel.load('index.html');
-				//var head=$('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
-				$('body').replaceWith(nextLevel);
-				
-				
-			
-	   });
+	function loadPage(url) {
+    var xmlhttp = new XMLHttpRequest();
 
+    // Callback function when XMLHttpRequest is ready
+    xmlhttp.onreadystatechange=function(){
+        if (xmlhttp.readyState === 4){
+            if (xmlhttp.status === 200) {
+                document.getElementById('html').innerHTML = xmlhttp.responseText;
+            }
+        }
+    };
+    xmlhttp.open("GET", url , true);
+    xmlhttp.send();
+}
 	</script>
 	
- <body>
+ <body onLoad='loadPage("remote-level1.html")' >
  </body>
 </html>
