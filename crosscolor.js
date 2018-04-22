@@ -265,7 +265,7 @@ function popWords(words){
 			
 			}
 			
-			$(function () {
+			function loadCW() {
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
 			//$.mobile.loading().hide();
 			//$('head').append('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
@@ -373,7 +373,7 @@ function popWords(words){
 			
 			
 			
-		});
+		}
 			
         
 		   
