@@ -2,6 +2,9 @@
 
 
 	<script>
+	
+	var nextLevelHTML;
+	
 	function loadPage(url) {
     var xmlhttp = new XMLHttpRequest();
 
@@ -16,6 +19,22 @@
     xmlhttp.open("GET", url , true);
     xmlhttp.send();
 	
+	
+	
+	var xmlhttp = new XMLHttpRequest();
+
+	// Callback function when XMLHttpRequest is ready
+	xmlhttp.onreadystatechange=function(){
+		if (xmlhttp.readyState === 4){
+			if (xmlhttp.status === 200) {
+				nextLevelHTML=xmlhttp.responseText;
+				//alert(nextLevelHTML);
+			}
+		}
+	};
+	xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
+	xmlhttp.send();
+				
 }
 	</script>
 	
