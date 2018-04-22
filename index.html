@@ -20,7 +20,7 @@
             }
         }
     };
-    xmlhttp.open("GET", url , true);
+    xmlhttp.open("GET", url +Math.random(), true);
     xmlhttp.send();
 	
 	
@@ -30,6 +30,6 @@
 }
 	</script>
 	
- <body onLoad='loadPage("https://psach.github.io/indexmain.html?'+Math.random()+'")' >
+ <body onLoad='loadPage("https://psach.github.io/indexmain.html?")' >
  </body>
 </html>
