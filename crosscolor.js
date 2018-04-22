@@ -116,7 +116,7 @@ function popWords(words){
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
 						
 						document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML;	
-						
+						loadCW();
 						 // this will load a full screen ad on startup
 						  AdMob.prepareInterstitial({
 							adId: admobid.interstitial,
