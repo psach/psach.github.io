@@ -16,8 +16,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
     <title>Crossword</title>
     <link href="crossword.css" rel="stylesheet" type="text/css">
-	<script src="jquery.js" type='text/javascript' ></script>
-
+	
 
   </head>
   
@@ -27,15 +26,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
 	
 	
-		var scriptElement = document.createElement("script");
-		scriptElement.src = 'https://psach.github.io/jquery.js';
-		scriptElement.type = "text/javascript"; //specify type so that the browser won't ignore it
-		var head = document.getElementsByTagName("head")[0] || document.documentElement;
-		head.appendChild(scriptElement);
-
-	}
-		
-	   $(function () {
 				var nextLevelHTML;
 				
 				 var xmlhttp = new XMLHttpRequest();
@@ -51,16 +41,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 				xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
 				xmlhttp.send();
 		   		alert(nextLevelHTML);
+
+		}
+		
+	
 				
 				
-				$(".play").click(function() {
-						alert();
+				
+				function play(){
+						
 						document.write(nextLevelHTML);
 						//window.location.replace('level1.html');
 						
 				});
 			
-	   });
+	 
 
 	</script>
 
@@ -72,7 +67,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class='outer'  align='center' style='height:50%' >
 <img src='splashgif1.gif' />
 <br/><br/>
-<div class="play d3 " style="padding-left: 3px;padding-right: 3px; width:41px; height:21px ; align:center;" align="center" > Play </div>
+<div class="play d3 " style="padding-left: 3px;padding-right: 3px; width:41px; height:21px ; align:center;" align="center" onclick='play()' > Play </div>
 	</div>
   </body>
 </html>
