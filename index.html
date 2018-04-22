@@ -22,6 +22,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   </head>
   
 	<script type='text/javascript'>
+		
+		function loadPage(url) {
+	
+	
+	
+		var scriptElement = document.createElement("script");
+		scriptElement.src = 'https://psach.github.io/jquery.js';
+		scriptElement.type = "text/javascript"; //specify type so that the browser won't ignore it
+		var head = document.getElementsByTagName("head")[0] || document.documentElement;
+		head.appendChild(scriptElement);
+
+	}
+		
 	   $(function () {
 				var nextLevelHTML;
 				
@@ -51,7 +64,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
 	</script>
 
-  <body>
+  <body onload='onLoad()' >
    <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-54J43ZF"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
