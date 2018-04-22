@@ -407,7 +407,7 @@ function popWords(words){
 			
 		}
 		
-var admobid = {};
+
 
 
 
