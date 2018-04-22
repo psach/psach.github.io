@@ -102,7 +102,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 						if (xmlhttp.status === 200) {
 							nextLevelHTML[i]=xmlhttp.responseText;
 							//alert(nextLevelHTML);
-							if(i==levels-1) document.getElementsByClassName("play").style.visibility='visible';
+							if(i==levels-1) document.querySelectorAll('.play').style.visibility='visible';
 						}
 					}
 				};
