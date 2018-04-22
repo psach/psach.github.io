@@ -33,12 +33,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 					if (xmlhttp.readyState === 4){
 						if (xmlhttp.status === 200) {
 							nextLevelHTML=xmlhttp.responseText;
+							alert(nextLevelHTML);
 						}
 					}
 				};
 				xmlhttp.open("GET", 'https://psach.github.io/remote-level1.html' , true);
 				xmlhttp.send();
-		   		alert(nextLevelHTML);
+		   		
 
 		}
 		
