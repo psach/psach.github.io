@@ -280,3 +280,16 @@ html{
 
 }
 }
+
+.inner-top{
+    
+    padding-top: 55px;
+}
+
+@media (min-width:400px){
+    .inner-top{
+	
+        padding-top: 45px;
+
+}
+}
