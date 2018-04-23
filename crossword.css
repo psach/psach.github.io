@@ -275,6 +275,7 @@ html{
 
 @media (min-width:400px){
     .inner{
+	padding-top: 35px;
         width: 50%;
 
 }
