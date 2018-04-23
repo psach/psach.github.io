@@ -267,7 +267,7 @@ html{
 
 
 .inner{
-    padding-top: 55px;
+    
     outline: 0px solid #333;
     float: left;
     width: 100%;
@@ -275,7 +275,7 @@ html{
 
 @media (min-width:400px){
     .inner{
-	padding-top: 35px;
+	
         width: 50%;
 
 }
