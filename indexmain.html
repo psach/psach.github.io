@@ -166,6 +166,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					
 					//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
 					$('html').html(nextLevelHTML[level]);
+					
+					$('html').filter('script').each(function(){
+						$.globalEval(this.text || this.textContent || this.innerHTML || '');
+					});
+		
 						//window.location.replace('level1.html');
 					loadCW();
 					level++;
