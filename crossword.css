@@ -298,7 +298,7 @@ html{
 .frame {
     height: 90%;      /* equals max image height */
     width: 100%;
-
+    align: center;
     white-space: nowrap;
     
     text-align: center; margin: 1em 0;
