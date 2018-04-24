@@ -264,7 +264,7 @@ function popWords(words){
 				
 				gridClone.appendTo(gridParent);
 				gridParent.fadeIn('slow');
-				
+				gridParent.css('display','block');
 	
 			
 			}
