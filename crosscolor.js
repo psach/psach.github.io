@@ -261,8 +261,8 @@ function popWords(words){
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				
-				gridClone.appendTo(gridParent).fadeIn('slow');
-				
+				gridClone.appendTo(gridParent).fadeOut('slow').fadeIn('slow');
+				gridParent.trigger('click');
 	
 			
 			}
@@ -363,7 +363,7 @@ function popWords(words){
 			});
 			 */
 			$("#crossword").find(".cwd-tile-active").dblclick(function() {
-				alert(activeSet.text().trim());
+				//alert(activeSet.text().trim());
 				//if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
 			});
 			
