@@ -321,7 +321,7 @@ img {
 	width: 0;
 	height: 0;
 	border-top: 40% solid transparent;
-	border-left: 80% solid DeepPink ;
+	border-left: 80% solid Red ;
 	border-bottom: 40% solid transparent;
 }
 
@@ -329,6 +329,6 @@ img {
 	width: 0;
 	height: 0;
 	border-top: 40% solid transparent;
-	border-right: 80% solid DeepPink ;
+	border-right: 80% solid Red ;
 	border-bottom: 40% solid transparent;
 }
