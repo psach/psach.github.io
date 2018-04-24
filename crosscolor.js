@@ -265,8 +265,8 @@ function popWords(words){
 				
 				gridClone.appendTo(gridParent);
 				
-				gridParent.animate({opacity: 0},800);
-				gridParent.animate({opacity: 1},800);
+				gridClone.animate({opacity: 0},800);
+				gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
 	
 			
