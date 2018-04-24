@@ -351,5 +351,5 @@ img {
     height: 10px;
     
     /* Translate the box up by width / 2 then rotate */
-    -webkit-transform: translateX(10px) rotate(135deg);
+    -webkit-transform: translateX(15px) rotate(135deg);
 }
