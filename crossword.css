@@ -332,3 +332,14 @@ img {
 	border-right: 21px solid DeepPink ;
 	border-bottom: 10px solid transparent;
 }
+
+/* Make an arrow */
+.arrow{
+    background-color: pink;
+    box-shadow: 3px 3px 4px black;
+    width: 10px;
+    height: 10px;
+    
+    /* Translate the box up by width / 2 then rotate */
+    -webkit-transform:  translateX(-5px) rotate(-45deg);
+}
