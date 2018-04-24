@@ -164,7 +164,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					activeId;
 					randomString='';
 					
-					document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
+					//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
+						$('html').html(nextLevelHTML[level]);
 						//window.location.replace('level1.html');
 					loadCW();
 					level++;
