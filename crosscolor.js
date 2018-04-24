@@ -363,7 +363,8 @@ function popWords(words){
 			});
 			 */
 			$("#crossword").find(".cwd-tile-active").dblclick(function() {
-				if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
+				alert(activeSet.text().trim());
+				//if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
 			});
 			
 		
