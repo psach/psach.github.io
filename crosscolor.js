@@ -257,10 +257,11 @@ function popWords(words){
 				end.addClass("red");
 				end.find('.cwd-tile-letter').html(redChar);
 				
-				var gridParent = $("#cwd-grid").parent();
+				var gridParent = $("#cwd-grid").pafadeOut();
+				gridParent.fadeOut();
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-				gridParent.hide();
+				
 				gridClone.appendTo(gridParent).fadeIn('slow');
 				
 	
