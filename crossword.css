@@ -350,9 +350,9 @@ img {
 }
 
 .show {
-    -webkit-transition: opacity 3s easy-in-out;
-    -moz-transition: opacity 3s easy-in-out;
-    -ms-transition: opacity 3s easy-in-out;
-    -o-transition: opacity 3s easy-in-out;
+    -webkit-transition: opacity 5s easy-in-out;
+    -moz-transition: opacity 5s easy-in-out;
+    -ms-transition: opacity 5s easy-in-out;
+    -o-transition: opacity 5s easy-in-out;
      opacity: 1;
 }
