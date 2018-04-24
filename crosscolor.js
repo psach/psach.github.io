@@ -368,7 +368,8 @@ function popWords(words){
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
 				
-				var prevActiveSet = activeSet.clone();
+				var prevActiveSetId = activeSet?activeSet[0].attr(clueid):-1;
+				
 				$(".cwd-tile").removeClass("cwd-tile-highlight");	
 				$(".cwd-tile").removeClass("cwd-tile-incorrect");	
 				
@@ -396,7 +397,7 @@ function popWords(words){
 				activeSet=activeSet.find('.cwd-tile-letter');
 				activeId=id;
 				
-				if(preActiveSet && activeSet && activeSet[0].attr('clueid')==preActiveSet[0].attr('clueid')) twice++;
+				if( prevActiveSetId == clueid ) twice++;
 				
 				
 				if(twice==2) clear();
