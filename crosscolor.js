@@ -140,7 +140,7 @@ function popWords(words){
 			}
 			
 			function clear(){
-				twice=0;
+				//twice=0;
 					var clearGrid =$("#crossword").find(".cwd-tile-active");
 					clearGrid.removeAttr('class');
 					clearGrid.addClass('cwd-tile cwd-tile-active');
@@ -363,8 +363,8 @@ function popWords(words){
 			});
 			 */
 			$("#crossword").find(".cwd-tile-active").dblclick(function() {
-				clear();
-			}
+				if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
+			});
 			
 		
 			$("#crossword").find(".cwd-tile-active").click(function() {
