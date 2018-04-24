@@ -364,7 +364,9 @@ function popWords(words){
 			
 		
 			$("#crossword").find(".cwd-tile-active").click(function() {
-			
+				
+				if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
+				
 				$(".cwd-tile").removeClass("cwd-tile-highlight");	
 				$(".cwd-tile").removeClass("cwd-tile-incorrect");	
 				
