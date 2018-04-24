@@ -368,7 +368,7 @@ function popWords(words){
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
 				
-				
+				var prevActiveSet = activeSet.clone();
 				$(".cwd-tile").removeClass("cwd-tile-highlight");	
 				$(".cwd-tile").removeClass("cwd-tile-incorrect");	
 				
@@ -395,11 +395,12 @@ function popWords(words){
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
 				activeId=id;
-				twice++;
-				if(activeSet && activeSet.text().trim().length==activeSet.length && twice==2){
-					
-					clear();
-				}
+				
+				if(preActiveSet && activeSet && activeSet[0].attr('clueid')==preActiveSet[0].attr('clueid')) twice++;
+				
+				
+				if(twice==2) clear();
+				
 				
 				
 			});	
