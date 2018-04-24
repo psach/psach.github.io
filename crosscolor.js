@@ -260,9 +260,9 @@ function popWords(words){
 				var gridParent = $("#cwd-grid").parent();
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-				gridClone.show();
+				gridParent.show();
 				gridClone.appendTo(gridParent).fadeOut('slow').fadeIn('slow');
-				gridClone.show();
+				gridParent.show();
 	
 			
 			}
