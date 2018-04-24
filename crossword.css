@@ -341,7 +341,7 @@ img {
     height: 10px;
     
     /* Translate the box up by width / 2 then rotate */
-    -webkit-transform: rotate(-45deg);
+    -webkit-transform: translateX(10px) rotate(-45deg);
 }
 
 .arrow-left{
@@ -351,5 +351,5 @@ img {
     height: 10px;
     
     /* Translate the box up by width / 2 then rotate */
-    -webkit-transform: rotate(135deg);
+    -webkit-transform: translateX(10px) (135deg);
 }
