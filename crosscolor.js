@@ -258,7 +258,7 @@ function popWords(words){
 				end.find('.cwd-tile-letter').html(redChar);
 				
 				var gridParent = $("#cwd-grid").parent();
-				gridParent.fadeOut();
+				//gridParent.fadeOut();
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				
