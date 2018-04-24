@@ -362,13 +362,15 @@ function popWords(words){
 				popWords(moreWords[moreCount]);
 			});
 			 */
-			
+			$("#crossword").find(".cwd-tile-active").dblclick(function() {
+				clear();
+			}
 			
 		
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
 				
-				var prevActiveSetId = id
+				//var prevActiveSetId = id
 				
 				$(".cwd-tile").removeClass("cwd-tile-highlight");	
 				$(".cwd-tile").removeClass("cwd-tile-incorrect");	
@@ -397,10 +399,10 @@ function popWords(words){
 				activeSet=activeSet.find('.cwd-tile-letter');
 				activeId=id;
 				
-				if( prevActiveSetId == id ) twice++;
+				//if( prevActiveSetId == id ) twice++;
 				
 				
-				if(twice==2) clear();
+				//if(twice==2) clear();
 				
 				
 				
