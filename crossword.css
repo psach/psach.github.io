@@ -334,12 +334,22 @@ img {
 }
 
 /* Make an arrow */
-.arrow{
+.arrow-right{
     background-color: pink;
     box-shadow: 3px 3px 4px black;
     width: 10px;
     height: 10px;
     
     /* Translate the box up by width / 2 then rotate */
-    -webkit-transform:  translateX(-5px) rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+.arrow-left{
+    background-color: pink;
+    box-shadow: 3px 3px 4px black;
+    width: 10px;
+    height: 10px;
+    
+    /* Translate the box up by width / 2 then rotate */
+    -webkit-transform: rotate(135deg);
 }
