@@ -320,15 +320,15 @@ img {
 .triangle-right {
 	width: 0;
 	height: 0;
-	border-top: 50% solid transparent;
-	border-left: 100% solid HotPink ;
-	border-bottom: 50% solid transparent;
+	border-top: 40% solid transparent;
+	border-left: 80% solid DeepPink ;
+	border-bottom: 40% solid transparent;
 }
 
 .triangle-left {
 	width: 0;
 	height: 0;
-	border-top: 50% solid transparent;
-	border-right: 100% solid HotPink ;
-	border-bottom: 50% solid transparent;
+	border-top: 40% solid transparent;
+	border-right: 80% solid DeepPink ;
+	border-bottom: 40% solid transparent;
 }
