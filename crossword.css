@@ -336,9 +336,9 @@ img {
    
 }
 
-.left{
-	-webkit-transform: translateX(10px) rotate(-45deg);
-}
 .right{
-	-webkit-transform: translateX(15px) rotate(135deg);
+	-webkit-transform: rotate(-45deg);
+}
+.left{
+	-webkit-transform: rotate(135deg);
 }
