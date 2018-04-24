@@ -1,5 +1,6 @@
 
-		
+var twice=0;
+
 function getRandomArbitrary(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
@@ -139,6 +140,7 @@ function popWords(words){
 			}
 			
 			function clear(){
+				twice=0;
 					var clearGrid =$("#crossword").find(".cwd-tile-active");
 					clearGrid.removeAttr('class');
 					clearGrid.addClass('cwd-tile cwd-tile-active');
@@ -365,7 +367,7 @@ function popWords(words){
 		
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
-				if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
+				
 				
 				$(".cwd-tile").removeClass("cwd-tile-highlight");	
 				$(".cwd-tile").removeClass("cwd-tile-incorrect");	
@@ -373,7 +375,7 @@ function popWords(words){
 				
 				
 				
-				$(this).addClass("cwd-tile-highlight");
+				//$(this).addClass("cwd-tile-highlight");
 				
 				
 				
@@ -393,9 +395,11 @@ function popWords(words){
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
 				activeId=id;
-				
-				
-				
+				twice++;
+				if(activeSet && activeSet.text().trim().length==activeSet.length && twice==2){
+					
+					clear();
+				}
 				
 				
 			});	
