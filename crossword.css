@@ -293,3 +293,27 @@ html{
 
 }
 }
+
+
+.frame {
+    height: 90%;      /* equals max image height */
+    width: 100%;
+
+    white-space: nowrap;
+    
+    text-align: center; margin: 1em 0;
+}
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+img {
+    
+    vertical-align: middle;
+  
+}
+
+
