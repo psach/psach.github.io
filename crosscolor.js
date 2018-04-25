@@ -249,12 +249,12 @@ function popWords(words){
 					
 				}
 				start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
-				start.addClass("green");
+				start.addClass("d3 green");
 				
 				start.find('.cwd-tile-letter').html(greenChar);
 				
 				end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
-				end.addClass("red");
+				end.addClass("d3 red");
 				end.find('.cwd-tile-letter').html(redChar);
 				
 				var gridParent = $("#cwd-grid").parent();
