@@ -443,12 +443,13 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				activeId=id;
 				
 				//if( prevActiveSetId == id ) twice++;
-				if(activeSet && activeSet.find('.strikeout').length==activeSet.length && activeSet.text().trim().length==activeSet.length){
+				if(activeSet && activeSet.filter('.strikeout').length==activeSet.length && activeSet.text().trim().length==activeSet.length){
 					clear();
 					return;
 				}
 				
 				prevActiveSet = prevActiveSet?prevActiveSet:activeSet;
+				
 				prevActiveSet.removeClass('strikeout');
 				prevActiveSet.parent().removeClass("cwd-tile-highlight");	
 				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
