@@ -439,8 +439,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
 				
-				activeSet=activeSet.find('.cwd-tile-letter');
-				activeId=id;
+				
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet.hasClass('strikeout')){
@@ -460,11 +459,12 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					$(".cwd-tile").removeClass("cwd-tile-highlight");	
 					$(".cwd-tile").removeClass("cwd-tile-incorrect");	
 					$(".cwd-tile").removeClass("strikeout");	
-					activeSet.parent().addClass("cwd-tile-highlight");
+					activeSet.addClass("cwd-tile-highlight");
 					
 				}
 				
-				
+				activeSet=activeSet.find('.cwd-tile-letter');
+				activeId=id;
 				
 			});	
 			
