@@ -26,7 +26,7 @@ function popWords(words){
 							tr.appendTo(tbody);
 						});
 						
-				$("#words").find(".cwd-tile-letter").click(function() {
+$("#words").find(".cwd-tile-letter").click(function() {
 				var word = $(this).attr('word');
 				var invalid = false;
 				
@@ -115,7 +115,10 @@ function popWords(words){
 						randomString='';
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
-						play();
+						$(this).delay(1000,function(){
+							
+							
+							play();
 						
 						 // this will load a full screen ad on startup
 						  AdMob.prepareInterstitial({
@@ -123,6 +126,7 @@ function popWords(words){
 							isTesting: true, // TODO: remove this line when release
 							autoShow: true
 						  });
+						})
 						  
 						  
 					}else{
