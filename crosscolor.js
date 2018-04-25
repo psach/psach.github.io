@@ -449,16 +449,18 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				}
 				
 				//if(twice==2) clear();
-				if(""+activeSet.text().trim().length==0){
+				if(activeSet && activeSet.text().trim().length==activeSet.length){
 				
+					$(".cwd-tile").removeClass("strikeout");	
+					activeSet.addClass('strikeout');
+					
+					
+					
+				}else{
 					$(".cwd-tile").removeClass("cwd-tile-highlight");	
 					$(".cwd-tile").removeClass("cwd-tile-incorrect");	
 					$(".cwd-tile").removeClass("strikeout");	
 					activeSet.parent().addClass("cwd-tile-highlight");
-					
-				}else{
-					$(".cwd-tile").removeClass("strikeout");	
-					activeSet.addClass('strikeout');
 					
 				}
 				
