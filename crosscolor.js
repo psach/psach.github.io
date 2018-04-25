@@ -266,7 +266,7 @@ function popWords(words){
 				if(level>0){
 					gridClone.fadeOut(2000,function(){
 						
-						$(this).fadeIn(2000);
+						gridClone.appendTo(gridParent).fadeIn(2000);
 					});
 					//gridClone.appendTo(gridParent).fadeIn(2000);
 				}
