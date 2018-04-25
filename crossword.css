@@ -349,6 +349,7 @@ img {
 .level-change {
    left:50%;
    top:50%;
+   height:22px;
    -webkit-transform: translate(-50%, -50%);
     -moz-transform: translate(-50%, -50%);
    transform: translate(-50%, -50%);
