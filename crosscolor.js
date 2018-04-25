@@ -153,7 +153,9 @@ $("#words").find(".cwd-tile-letter").click(function() {
 			
 			function clear(){
 				//twice=0;
-					var clearGrid =$("#crossword").find(".cwd-tile-active");
+					var clearGrid = $("#crossword").find(".cwd-tile-active")
+					.not("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]"+
+					     "[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
 					clearGrid.removeAttr('class');
 					clearGrid.addClass('cwd-tile cwd-tile-active');
 					var gridChild=clearGrid.find('.cwd-tile-letter');
@@ -161,14 +163,15 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					gridChild.removeAttr('class');
 					gridChild.addClass('cwd-tile-letter');
 					
-					start = $("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
+					/* start = $("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
 				
 				
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(greenChar);
 					end.addClass("d3 red");
-					end.find('.cwd-tile-letter').html(redChar);
+					end.find('.cwd-tile-letter').html(redChar); */
+					
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
 				
