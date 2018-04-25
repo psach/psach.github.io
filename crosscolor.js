@@ -443,7 +443,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				activeId=id;
 				
 				//if( prevActiveSetId == id ) twice++;
-				if(activeSet && activeSet.hasClass('strikeout') && activeSet.text().trim().length==activeSet.length){
+				if(activeSet && activeSet.find('.strikeout').length==activeSet.length && activeSet.text().trim().length==activeSet.length){
 					clear();
 					
 				}
