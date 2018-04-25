@@ -115,7 +115,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 						randomString='';
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
-						$(this).delay(1000,function(){
+						$(activeSet[0]).delay(1000,function(){
 							
 							
 							  play();
@@ -134,7 +134,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 						if(answered){
 							levelAnswered++;
 							
-							$(this).delay(1000,function(){
+							$(activeSet[0]).delay(1000,function(){
 													
 								setStartEnd(++currLevel);
 							
