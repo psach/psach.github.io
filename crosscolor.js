@@ -439,7 +439,8 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
 				
-				
+				activeSet=activeSet.find('.cwd-tile-letter');
+				activeId=id;
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet.hasClass('strikeout')){
@@ -450,7 +451,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				//if(twice==2) clear();
 				if(activeSet && activeSet.text().trim().length==activeSet.length){
 				
-					$(".cwd-tile").removeClass("strikeout");	
+					activeSet.parent().removeClass("strikeout");	
 					activeSet.addClass('strikeout');
 					
 					
@@ -459,12 +460,11 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					$(".cwd-tile").removeClass("cwd-tile-highlight");	
 					$(".cwd-tile").removeClass("cwd-tile-incorrect");	
 					$(".cwd-tile").removeClass("strikeout");	
-					activeSet.addClass("cwd-tile-highlight");
+					activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}
 				
-				activeSet=activeSet.find('.cwd-tile-letter');
-				activeId=id;
+				
 				
 			});	
 			
