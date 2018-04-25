@@ -373,10 +373,10 @@ img {
   position: relative;
 }
 .strikeout::after {
-  border-bottom: 0.125em solid rgba(0, 0, 0, 0.5);
+  border-bottom: 0.125em solid rgba(255,255,255, 0.5);
   content: "";
   left: 0;
-  line-height: 1em;
+  line-height: 2em;
   margin-top: calc(0.125em / 2 * -1);
   position: absolute;
   right: 0;
