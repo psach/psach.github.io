@@ -263,10 +263,10 @@ function popWords(words){
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				
-				gridClone.appendTo(gridParent);
+				gridClone.appendTo(gridParent).fadeIn('slow').fadeOut('slow').fadeIn('slow');
 				
-				gridClone.animate({opacity: 0},800);
-				gridClone.animate({opacity: 1},800);
+				//gridClone.animate({opacity: 0},800);
+				//gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
 	
 			
