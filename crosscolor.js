@@ -262,10 +262,10 @@ function popWords(words){
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-				
-				gridClone.appendTo(gridParent);
-				var levelChange=$("<div class='level-change' >GOOD</div>");
-				levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
+				gridClone.fadeOut('slow');
+				gridClone.appendTo(gridParent).fadeIn());
+				//var levelChange=$("<div class='level-change' >GOOD</div>");
+				//levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
 				//$(".level-change").fadeIn('slow').fadeOut('slow');
 				//gridClone.animate({opacity: 0},800);
 				//gridClone.animate({opacity: 1},800);
