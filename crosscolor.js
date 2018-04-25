@@ -415,8 +415,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 				//var prevActiveSetId = id
 				
-				$(".cwd-tile").removeClass("cwd-tile-highlight");	
-				$(".cwd-tile").removeClass("cwd-tile-incorrect");	
+				
 				
 				
 				
@@ -429,7 +428,8 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 				 clueid=id?'acrossclueid':'downclueid';
 				
-				id = id?id:$(this).attr('downclueid');
+				 id = id?id:$(this).attr('downclueid');
+				
 				
 				
 				
@@ -437,15 +437,29 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				activeSet= $('*['+clueid+'="'+id+'"]');
 				
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
-				activeSet.addClass("cwd-tile-highlight");
+				
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
 				activeId=id;
 				
 				//if( prevActiveSetId == id ) twice++;
-				
+				if(activeSet.hasClass('strikeout')){
+					clear();
+					
+				}
 				
 				//if(twice==2) clear();
+				if(""+activeSet.text().trim().length()==0){
+				
+					$(".cwd-tile").removeClass("cwd-tile-highlight");	
+					$(".cwd-tile").removeClass("cwd-tile-incorrect");	
+					$(".cwd-tile").removeClass("strikeout");	
+					activeSet.addClass("cwd-tile-highlight");
+					
+				}else{
+					activeSet.addClass('strikeout');
+					
+				}
 				
 				
 				
