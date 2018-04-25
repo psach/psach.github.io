@@ -263,7 +263,7 @@ function popWords(words){
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				gridClone.fadeOut('slow');
-				gridClone.appendTo(gridParent).fadeIn());
+				gridClone.appendTo(gridParent).fadeIn('slow');
 				//var levelChange=$("<div class='level-change' >GOOD</div>");
 				//levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
 				//$(".level-change").fadeIn('slow').fadeOut('slow');
