@@ -76,21 +76,14 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					//alert(stringSelected + " : " + correctAns);
 					stringCorrect = ""+correctAns[currLevel];
 					
-					var answered=true;
-					
+
 					$.each(arr, function(j,word){
-						if(stringCorrect.indexOf(word)!=-1){
-							stringCorrect = stringCorrect.replace(word,"|");
-						}else{
-							
-							answered=false;
-						}
+						stringCorrect = stringCorrect.replace(word,"|");
 					});
 					
 					//alert(stringCorrect);
 					//alert((stringCorrect.split('|').length + stringCorrect.split('|').length-3) + " : " + stringCorrect.length );
-					answered = answered?((stringCorrect.split('|').length + stringCorrect.split('|').length-3)==stringCorrect.length):answered;
-					
+					var answered = ((stringCorrect.split('|').length + stringCorrect.split('|').length-3)==stringCorrect.length);
 					
 					//levelAnswered = answered?levelAnswered++:levelAnswered;
 					//var levelAnswered = correctAns.match("^"+startWord);
@@ -172,9 +165,9 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
 				
 				
-					start.addClass("green");
+					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(greenChar);
-					end.addClass("red");
+					end.addClass("d3 red");
 					end.find('.cwd-tile-letter').html(redChar);
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
