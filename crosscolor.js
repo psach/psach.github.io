@@ -264,8 +264,11 @@ function popWords(words){
 				$("#cwd-grid").remove();
 				
 				if(level>0){
-					//gridClone.fadeOut(1000);
-					gridClone.appendTo(gridParent).fadeIn(2000);
+					gridClone.fadeOut(2000,function(){
+						
+						$(this).fadeIn(2000);
+					});
+					//gridClone.appendTo(gridParent).fadeIn(2000);
 				}
 				//var levelChange=$("<div class='level-change' >GOOD</div>");
 				//levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
