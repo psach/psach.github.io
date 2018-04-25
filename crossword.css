@@ -148,11 +148,11 @@ html{
 
 .A, .J, .R {
 	background: DodgerBlue ;
-	/* background-image: url("a.png");*/
+	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	/*color: transparent;*/	
+	color: transparent;*/	
 }
 
 
@@ -160,11 +160,11 @@ html{
 
 .B, .K, .S {
 	background: Yellow;
-	/*background-image: url("d.gif");*/
+	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	/*color: transparent;*/	
+	color: transparent;*/	
 }
 
 .C , .L, .T {
@@ -181,20 +181,20 @@ html{
 
 .E, .N , .W {
 	background: Orange ;
-	/* background-image: url("a.png");*/
+	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	/*color: transparent;*/	
+	color: transparent;*/	
 }
 
 .F,.O , .X {
 	background: MediumPurple ;
-	/*background-image: url("d.gif");*/
+	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	/*color: transparent;*/	
+	color: transparent;*/	
 }
 
 .I,.P , .Y {
