@@ -120,16 +120,16 @@ $("#words").find(".cwd-tile-letter").click(function() {
 						setTimeout(function(){ 
 							play();
 						
-							 // this will load a full screen ad on startup
+							
+
+						}, 1000);
+						
+						   // this will load a full screen ad on startup
 							  AdMob.prepareInterstitial({
 								adId: admobid.interstitial,
 								isTesting: true, // TODO: remove this line when release
 								autoShow: true
 							  });
-
-						}, 1000);
-						
-						  
 						  
 					}else{
 					
