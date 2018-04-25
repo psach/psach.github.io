@@ -373,7 +373,7 @@ img {
   position: relative;
 }
 .strikeout::after {
-  border-bottom: 0.250em solid rgba(255,255,255, 0.75);
+  border-right: 0.250em solid rgba(255,255,255, 0.75);
   content: "";
   left: 0;
   line-height: 2em;
