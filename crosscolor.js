@@ -76,13 +76,21 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					//alert(stringSelected + " : " + correctAns);
 					stringCorrect = ""+correctAns[currLevel];
 					
+					var answered=true;
+					
 					$.each(arr, function(j,word){
-						stringCorrect = stringCorrect.replace(word,"|");
+						if(stringCorrect.indexOf(word)!=-1){
+							stringCorrect = stringCorrect.replace(word,"|");
+						}else{
+							
+							answered=false;
+						}
 					});
 					
 					//alert(stringCorrect);
 					//alert((stringCorrect.split('|').length + stringCorrect.split('|').length-3) + " : " + stringCorrect.length );
-					var answered = ((stringCorrect.split('|').length + stringCorrect.split('|').length-3)==stringCorrect.length);
+					answered = answered?((stringCorrect.split('|').length + stringCorrect.split('|').length-3)==stringCorrect.length):answered;
+					
 					
 					//levelAnswered = answered?levelAnswered++:levelAnswered;
 					//var levelAnswered = correctAns.match("^"+startWord);
