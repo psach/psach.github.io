@@ -166,8 +166,8 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					
 					start = $("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
-					start.find('.cwd-tile-letter').removeClass('strikeout '+start.find('.cwd-tile-letter').html());
-					end.find('.cwd-tile-letter').removeClass('strikeout '+end.find('.cwd-tile-letter').html());
+					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
+					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
 					
 					
 					/*
