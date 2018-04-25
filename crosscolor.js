@@ -115,10 +115,9 @@ $("#words").find(".cwd-tile-letter").click(function() {
 						randomString='';
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
-						$(activeSet[0]).delay(1000,function(){
-							
-							
-							  play();
+						
+						setTimeout(function(){ 
+							play();
 						
 							 // this will load a full screen ad on startup
 							  AdMob.prepareInterstitial({
@@ -126,7 +125,9 @@ $("#words").find(".cwd-tile-letter").click(function() {
 								isTesting: true, // TODO: remove this line when release
 								autoShow: true
 							  });
-						})
+
+						}, 1000);
+						
 						  
 						  
 					}else{
@@ -134,11 +135,11 @@ $("#words").find(".cwd-tile-letter").click(function() {
 						if(answered){
 							levelAnswered++;
 							
-							$(activeSet[0]).delay(1000,function(){
+							setTimeout(function(){ setStartEnd(++currLevel); }, 1000);
 													
-								setStartEnd(++currLevel);
+								
 							
-							})
+							
 							
 							
 						}
