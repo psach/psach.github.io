@@ -391,6 +391,6 @@ img {
   top   : 0;
   height: 100%;
   width : 0;
-  border-right: 0.250em solid rgba(255,0,0, 0.75);
+  border-right: 0.250em solid rgba(255,255,255, 0.75);
   
 }
