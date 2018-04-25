@@ -454,14 +454,14 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					$(".cwd-tile").removeClass("cwd-tile-highlight");	
 					$(".cwd-tile").removeClass("cwd-tile-incorrect");	
 					$(".cwd-tile").removeClass("strikeout");	
-					activeSet.addClass("cwd-tile-highlight");
+					
 					
 				}else{
 					activeSet.addClass('strikeout');
 					
 				}
 				
-				
+				activeSet.addClass("cwd-tile-highlight");
 				
 			});	
 			
