@@ -163,11 +163,13 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					gridChild.html(' ');
 					gridChild.removeAttr('class');
 					gridChild.addClass('cwd-tile-letter');
-					/* 
+					
 					start = $("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
-				
-				
+					start.removeClass('strikeout '+greenChar);
+					end.removeClass('strikeout '+redChar);
+					
+					/*
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(greenChar);
 					end.addClass("d3 red");
