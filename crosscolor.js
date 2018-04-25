@@ -248,21 +248,26 @@ function popWords(words){
 					
 					
 				}
-				start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
-				start.addClass("d3 green");
 				
-				start.find('.cwd-tile-letter').html(greenChar);
-				
-				end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
-				end.addClass("d3 red");
-				end.find('.cwd-tile-letter').html(redChar);
 				
 				var gridParent = $("#cwd-grid").parent();
 				//gridParent.addClass('hide');
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-				gridClone.appendTo(gridParent).fadeIn(1000).fadeOut(1000).fadeIn(1000);
+				gridClone.appendTo(gridParent).fadeIn(1000).fadeOut(1000).fadeIn(1000,function(){
+					
+					
+					start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
+					start.addClass("d3 green");
+					
+					start.find('.cwd-tile-letter').html(greenChar);
+					
+					end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
+					end.addClass("d3 red");
+					end.find('.cwd-tile-letter').html(redChar);
+					
+				});
 				
 				
 				//if(level>0){
