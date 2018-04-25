@@ -117,20 +117,20 @@ $("#words").find(".cwd-tile-letter").click(function() {
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
 						
+						  // this will load a full screen ad on startup
+						  AdMob.prepareInterstitial({
+							adId: admobid.interstitial,
+							isTesting: true, // TODO: remove this line when release
+							autoShow: true
+						  });
+					  
+						  
 						setTimeout(function(){ 
 							play();
 						
-							
-
 						}, 1000);
 						
-						   // this will load a full screen ad on startup
-							  AdMob.prepareInterstitial({
-								adId: admobid.interstitial,
-								isTesting: true, // TODO: remove this line when release
-								autoShow: true
-							  });
-						  
+						 
 					}else{
 					
 						if(answered){
