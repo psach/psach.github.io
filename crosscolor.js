@@ -457,6 +457,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}else{
+					$(".cwd-tile").removeClass("strikeout");	
 					activeSet.addClass('strikeout');
 					
 				}
