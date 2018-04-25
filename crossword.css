@@ -372,7 +372,7 @@ img {
   
   position: relative;
 }
-.strikeout::after {
+.strikeout[clueid*="across"]::after {
   border-bottom: 0.250em solid rgba(255,255,255, 0.75);
   content: "";
   left: 0;
@@ -381,4 +381,16 @@ img {
   position: absolute;
   right: 0;
   top: 50%;
+  
+}
+
+.strikeout[clueid*="down"]::before { 
+  position: absolute;
+  content : "";
+  left  : 50%;
+  top   : 0;
+  height: 100%;
+  width : 0;
+  border-right: 0.250em solid rgba(255,0,0, 0.75);
+  
 }
