@@ -441,9 +441,10 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
 				activeId=id;
+				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
 				
 				//if( prevActiveSetId == id ) twice++;
-				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSet.text().trim().length==activeSet.parent().length){
+				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWord.length==activeSet.parent().length){
 					clear();
 					activeSet.parent().addClass("cwd-tile-highlight");
 					return;
@@ -457,7 +458,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 					
 				//if(twice==2) clear();
-				if(activeSet && activeSet.text().trim().length==activeSet.parent().length){
+				if(activeSet && activeSetWord.length==activeSet.parent().length){
 				
 					
 					activeSet.addClass('strikeout');
