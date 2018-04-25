@@ -448,7 +448,10 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
+				
+				activeSet.removeClass("strikedownclueid strikeacrossclueid");
 				activeSet.addClass("strike"+clueid);
+				
 				activeId=id;
 				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
 				
@@ -462,6 +465,9 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				prevActiveSet = prevActiveSet?prevActiveSet:activeSet;
 				
 				prevActiveSet.removeClass('strikeout');
+				prevActiveSet.removeClass('strikeacrossclueid');
+				prevActiveSet.removeClass('strikedownclueid');
+				
 				prevActiveSet.parent().removeClass("cwd-tile-highlight");	
 				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
 				
