@@ -262,14 +262,16 @@ function popWords(words){
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-				gridClone.appendTo(gridParent).fadeIn(2000);
-				if(level>0){
-					gridClone.fadeOut(2000,function(){
+				gridClone.appendTo(gridParent);
+				
+				
+				//if(level>0){
+					//gridClone.fadeOut(2000,function(){
 						
-						gridClone.appendTo(gridParent).fadeIn(2000);
-					});
+						//gridClone.appendTo(gridParent).fadeIn(2000);
+					//});
 					//gridClone.appendTo(gridParent).fadeIn(2000);
-				}
+				//}
 				//var levelChange=$("<div class='level-change' >GOOD</div>");
 				//levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
 				//$(".level-change").fadeIn('slow').fadeOut('slow');
