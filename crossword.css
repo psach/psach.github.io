@@ -104,7 +104,7 @@ html{
   border: 1px solid rgba(0,0,0,0.15);
   border-radius: 6px;
   -ms-transition: all 0.3s ease-out;
-  -webkit-animation: all 0.3s ease-out;
+  -webkit-animation: all 1s ease-out;
   -o-animation: all 0.3s ease-out;
   -moz-transition: all 0.3s ease-out;
   transition: all 0.3s ease-out;
