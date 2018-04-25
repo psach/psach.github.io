@@ -372,7 +372,7 @@ img {
   
   position: relative;
 }
-.strikeout[clueid*="across"]::after {
+.strikeout[clueid*="strikeacross"]::after {
   border-bottom: 0.250em solid rgba(255,255,255, 0.75);
   content: "";
   left: 0;
@@ -384,7 +384,7 @@ img {
   
 }
 
-.strikeout[clueid*="down"]::before { 
+.strikeout[clueid*="strikedown"]::before { 
   position: absolute;
   content : "";
   left  : 50%;

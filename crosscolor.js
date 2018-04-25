@@ -448,6 +448,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
+				activeSet.addClass("strike"+clueid);
 				activeId=id;
 				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
 				
