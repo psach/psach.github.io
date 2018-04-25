@@ -452,7 +452,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				prevActiveSet.removeClass('strikeout');
 				prevActiveSet.parent().removeClass("cwd-tile-highlight");	
 				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
-				prevActiveSet.parent().removeClass("strikeout");	
+				
 					
 				//if(twice==2) clear();
 				if(activeSet && activeSet.text().trim().length==activeSet.length){
