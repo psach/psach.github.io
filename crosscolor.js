@@ -260,8 +260,8 @@ function popWords(words){
 					
 					start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
 					end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
-					start.addClass('cwd-tile-highlight');
-					end.addClass('cwd-tile-highlight');
+					start.parent().addClass('cwd-tile-highlight');
+					end.parent().addClass('cwd-tile-highlight');
 					
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(greenChar);
