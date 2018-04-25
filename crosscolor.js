@@ -445,6 +445,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSet.text().trim().length==activeSet.parent().length){
 					clear();
+					activeSet.parent().addClass("cwd-tile-highlight");
 					return;
 				}
 				
