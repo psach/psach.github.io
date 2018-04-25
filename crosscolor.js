@@ -166,8 +166,8 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					
 					start = $("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
-					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
-					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
+					start.find('.cwd-tile-letter').removeClass('d3 strikeout hor ver '+start.find('.cwd-tile-letter').html());
+					end.find('.cwd-tile-letter').removeClass('d3 strikeout hor ver '+end.find('.cwd-tile-letter').html());
 					
 					
 					/*
@@ -424,7 +424,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				//var prevActiveSetId = id
 				
 				var prevActiveSet= activeSet;
-				
+				var strikeouttype;
 				
 				
 				
@@ -435,6 +435,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				 id = $(this).attr('acrossclueid');
 				
 				 clueid=id?'acrossclueid':'downclueid';
+				 strikeouttype=id?'hor ':'ver ';
 				
 				 id = id?id:$(this).attr('downclueid');
 				
@@ -460,7 +461,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 				prevActiveSet = prevActiveSet?prevActiveSet:activeSet;
 				
-				prevActiveSet.removeClass('strikeout');
+				prevActiveSet.removeClass('strikeout '+ strikeouttype + strikeouttype);
 				prevActiveSet.parent().removeClass("cwd-tile-highlight");	
 				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
 				
@@ -469,7 +470,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				if(activeSet && activeSetWord.length==activeSet.parent().length){
 				
 					
-					activeSet.addClass('strikeout');
+					activeSet.addClass('strikeout ' + strikeouttype);
 					
 					
 					
