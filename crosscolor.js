@@ -449,7 +449,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				}
 				
 				//if(twice==2) clear();
-				if(""+activeSet.text().trim().length()==0){
+				if(""+activeSet.text().trim().length==0){
 				
 					$(".cwd-tile").removeClass("cwd-tile-highlight");	
 					$(".cwd-tile").removeClass("cwd-tile-incorrect");	
