@@ -456,7 +456,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 					
 				//if(twice==2) clear();
-				if(activeSet && activeSet.text().trim().length==activeSet.length){
+				if(activeSet && activeSet.text().trim().length==activeSet.parent().length){
 				
 					
 					activeSet.addClass('strikeout');
