@@ -369,7 +369,7 @@ img {
 
 
 .strikeout {
-  font-size: 4em;
+  
   position: relative;
 }
 .strikeout::after {
