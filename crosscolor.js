@@ -415,7 +415,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				
 				//var prevActiveSetId = id
 				
-				
+				var prevActiveSet= activeSet;
 				
 				
 				
@@ -448,18 +448,20 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					
 				}
 				
+				prevActiveSet = prevActiveSet?prevActiveSet:activeSet;
+				
 				//if(twice==2) clear();
 				if(activeSet && activeSet.text().trim().length==activeSet.length){
 				
-					activeSet.parent().removeClass("strikeout");	
+					prevActiveSet.removeClass('strikeout');
 					activeSet.addClass('strikeout');
 					
 					
 					
 				}else{
-					$(".cwd-tile").removeClass("cwd-tile-highlight");	
-					$(".cwd-tile").removeClass("cwd-tile-incorrect");	
-					$(".cwd-tile").removeClass("strikeout");	
+					prevActiveSet.parent().removeClass("cwd-tile-highlight");	
+					prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
+					prevActiveSet.parent().removeClass("strikeout");	
 					activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}
