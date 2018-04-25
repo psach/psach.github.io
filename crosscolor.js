@@ -445,23 +445,25 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.find('.strikeout').length==activeSet.length && activeSet.text().trim().length==activeSet.length){
 					clear();
-					
+					return;
 				}
 				
 				prevActiveSet = prevActiveSet?prevActiveSet:activeSet;
-				
+				prevActiveSet.removeClass('strikeout');
+				prevActiveSet.parent().removeClass("cwd-tile-highlight");	
+				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
+				prevActiveSet.parent().removeClass("strikeout");	
+					
 				//if(twice==2) clear();
 				if(activeSet && activeSet.text().trim().length==activeSet.length){
 				
-					prevActiveSet.removeClass('strikeout');
+					
 					activeSet.addClass('strikeout');
 					
 					
 					
 				}else{
-					prevActiveSet.parent().removeClass("cwd-tile-highlight");	
-					prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
-					prevActiveSet.parent().removeClass("strikeout");	
+					
 					activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}
