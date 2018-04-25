@@ -118,14 +118,14 @@ $("#words").find(".cwd-tile-letter").click(function() {
 						$(this).delay(1000,function(){
 							
 							
-							play();
+							  play();
 						
-						 // this will load a full screen ad on startup
-						  AdMob.prepareInterstitial({
-							adId: admobid.interstitial,
-							isTesting: true, // TODO: remove this line when release
-							autoShow: true
-						  });
+							 // this will load a full screen ad on startup
+							  AdMob.prepareInterstitial({
+								adId: admobid.interstitial,
+								isTesting: true, // TODO: remove this line when release
+								autoShow: true
+							  });
 						})
 						  
 						  
@@ -133,7 +133,13 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					
 						if(answered){
 							levelAnswered++;
-							setStartEnd(++currLevel);
+							
+							$(this).delay(1000,function(){
+													
+								setStartEnd(++currLevel);
+							
+							})
+							
 							
 						}
 					}
