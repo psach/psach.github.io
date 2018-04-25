@@ -364,7 +364,9 @@ $("#words").find(".cwd-tile-letter").click(function() {
 				} */
 				//alert($("<div />").append(activeSet.text().clone()).html());
 				//alert(activeSet.text());
-				if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
+				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
+				
+				if(activeSet && activeSetWord.length==activeSet.length)clear();
 				
 			
 				
