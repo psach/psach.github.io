@@ -264,9 +264,9 @@ function popWords(words){
 				$("#cwd-grid").remove();
 				
 				gridClone.appendTo(gridParent);
-				//var levelChange=$("<div class='level-change' >green tick</div>");
-				//levelChange.appendTo(".crossword").fadeOut('slow',function(){$(this).remove();});
-				$(".level-change").fadeIn('slow').fadeOut('slow');
+				var levelChange=$("<div class='level-change d3' >GOOD</div>");
+				levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
+				//$(".level-change").fadeIn('slow').fadeOut('slow');
 				//gridClone.animate({opacity: 0},800);
 				//gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
