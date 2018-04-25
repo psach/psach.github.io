@@ -265,7 +265,7 @@ function popWords(words){
 				
 				gridClone.appendTo(gridParent);
 				var levelChange=$("<div class='level-change' >green tick</div>");
-				levelChange.appendTo(gridClone).fadeOut('slow',function(){$(this).remove();});
+				levelChange.appendTo(".inner-top").fadeOut('slow',function(){$(this).remove();});
 				
 				//gridClone.animate({opacity: 0},800);
 				//gridClone.animate({opacity: 1},800);
