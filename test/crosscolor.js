@@ -33,6 +33,7 @@ function popWords(words){
 			$("#words").find(".cwd-tile-letter").click(function() {
 				
 				if(!activeSet) return;
+				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
 	
 				var word = $(this).attr('word');
 				var invalid = false;
