@@ -30,7 +30,9 @@ function popWords(words){
 							tr.appendTo(tbody);
 						});
 						
-$("#words").find(".cwd-tile-letter").click(function() {
+			$("#words").find(".cwd-tile-letter").click(function() {
+				if(!$("#cwd-grid").hasClass('cwd-tile-highlight')) return;
+	
 				var word = $(this).attr('word');
 				var invalid = false;
 				
