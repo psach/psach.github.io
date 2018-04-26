@@ -1,7 +1,7 @@
 html{
   
   padding: 1px 1px;
-  border: 1px solid #ff3358;
+  border: 1px solid black;
   border-radius: 0px;
   -webkit-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
   -moz-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
