@@ -22,9 +22,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
 	
   		
-	<script src="jquery-2.1.4.min.js"></script>
+	
 	<script src="cordova.js"></script>
-  	<script src="crosscolor.js"></script>
+  	
 		
 	
   </head>
@@ -63,7 +63,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		if(strAgt.indexOf('Android')==-1){
 			window.location.replace('onefromapp.html');
 		}
-
+			
 			var admobid = {};
 			
 			var nextLevelHTML=[];
@@ -147,7 +147,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					}
 				};
 				
-				xmlhttp.open("GET", 'remote-level'+(i+1)+'.html?'+Math.random() , false);
+				xmlhttp.open("GET", window.location.pathname.substring(0,window.location.pathname.lastIndexOf("/")+1)'remote-level'+(i+1)+'.html?'+Math.random() , false);
 				xmlhttp.send();
 			}
 				
