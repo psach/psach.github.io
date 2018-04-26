@@ -42,7 +42,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
 
  <script>
-	
+			//alert(scriptlink);
+			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
+			var scriptlink= baseurl+'crosscolor.js';
+			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
+			$("html").append(csslink);
+
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink;
+			$("html").append(s);
+
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink1;
+			$("html").append(s);
 			
 							
 			var strAgt = ""+navigator.userAgent;
@@ -175,23 +191,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					//alert($('body').html(''));
 						$('.centerbody').html(nextLevelHTML[level]);
 						
-						//alert(scriptlink);
-						var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
-						var scriptlink= baseurl+'crosscolor.js';
-						var scriptlink1= baseurl+'jquery-2.1.4.min.js';
-						$("html").append(csslink);
-
-						var s = document.createElement("script");
-						s.type = "text/javascript";
-
-						s.src = scriptlink;
-						$("html").append(s);
-
-						var s = document.createElement("script");
-						s.type = "text/javascript";
-
-						s.src = scriptlink1;
-						$("html").append(s);
+						
 						
 							
 							
