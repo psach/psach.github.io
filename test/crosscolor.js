@@ -31,8 +31,8 @@ function popWords(words){
 						});
 						
 			$("#words").find(".cwd-tile-letter").click(function() {
-				alert(activeSet.hasClass('cwd-tile-highlight'));
-				if(!$("#cwd-grid").hasClass('cwd-tile-highlight')) return;
+				
+				if(!activeSet) return;
 	
 				var word = $(this).attr('word');
 				var invalid = false;
