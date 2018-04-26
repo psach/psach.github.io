@@ -231,7 +231,7 @@
 
 
  .N {
-	background: SaddleBrown   ;
+	background: LawnGreen  ;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -259,7 +259,7 @@
 
 
 .R {
-	background: Aquamarine ;
+	background: DeepSkyBlue ;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -280,7 +280,7 @@
 
 
 .T {
-	background: Coral;
+	background: DeepPink;
 	/*color: transparent;*/	
 }
 
@@ -331,7 +331,7 @@
 
 
 .Z {
-	background: LawnGreen ;
+	background: Lime ;
 	/*color: transparent;*/	
 }
 
