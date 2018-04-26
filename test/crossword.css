@@ -135,7 +135,7 @@
 }
 
 
-.A, .J, .R {
+.A {
 	background: DodgerBlue ;
 	/* background-image: url("a.png");
     background-size:     cover;                     
@@ -144,10 +144,26 @@
 	color: transparent;*/	
 }
 
+.J {
+	background: Aqua ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+.R {
+	background: Aquamarine ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
 
 
-
-.B, .K, .S {
+.B {
 	background: Yellow;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
@@ -156,19 +172,60 @@
 	color: transparent;*/	
 }
 
-.C , .L, .T {
+.K {
+	background: CadetBlue ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+.S {
+	background: BurlyWood ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+.C {
 	background: HotPink;
 	/*color: transparent;*/	
 }
 
+.T {
+	background: Coral;
+	/*color: transparent;*/	
+}
 
-.D ,.M, .U {
-	background: GreenYellow;
+.L {
+	background: DarkKhaki ;
 	/*color: transparent;*/	
 }
 
 
-.E, .N , .W {
+
+.D {
+	background: GreenYellow;
+	/*color: transparent;*/	
+}
+
+ .U {
+	background: SpringGreen;
+	/*color: transparent;*/	
+}
+
+
+.M {
+	background: Violet ;
+	/*color: transparent;*/	
+}
+
+
+.E {
 	background: Orange ;
 	/* background-image: url("a.png");
     background-size:     cover;                     
@@ -177,7 +234,27 @@
 	color: transparent;*/	
 }
 
-.F,.O , .X {
+ .N {
+	background: Thistle  ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+.W {
+	background: Salmon  ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+
+.F {
 	background: MediumPurple ;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
@@ -186,16 +263,57 @@
 	color: transparent;*/	
 }
 
-.I,.P , .Y {
+.X {
+	background: PeachPuff  ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+.O {
+	background: PaleGreen  ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+.I {
+	background: Gold;
+	/*color: transparent;*/	
+}
+
+.Y {
+	background: Gold;
+	/*color: transparent;*/	
+}
+
+.P {
 	background: Gold;
 	/*color: transparent;*/	
 }
 
 
-.J , .Q, .Z{
+
+.J {
 	background: Cyan;
 	/*color: transparent;*/	
 }
+
+.Z {
+	background: Cyan;
+	/*color: transparent;*/	
+}
+
+.Q {
+	background: Cyan;
+	/*color: transparent;*/	
+}
+
 
 
 .cwd-tile-active{
