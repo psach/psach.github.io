@@ -42,23 +42,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
 
  <script>
-	
+			//alert(scriptlink);
 			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
 			var scriptlink= baseurl+'crosscolor.js';
 			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
-			$("html").preappend(csslink);
-			
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			
-			s.src = scriptlink;
-			$("html").preappend(s);
+	 		var head = $("<head/>");
+	 
+			head.append(csslink);
 
 			var s = document.createElement("script");
 			s.type = "text/javascript";
-			
+
+			s.src = scriptlink;
+	 		
+	 
+			head.append(s);
+
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
 			s.src = scriptlink1;
-			$("html").preappend(s);
+			head.append(s);
+			$("html").append(head);
 							
 			var strAgt = ""+navigator.userAgent;
 			//alert(strAgt);
@@ -190,7 +195,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					//alert($('body').html(''));
 						$('.centerbody').html(nextLevelHTML[level]);
 						
-						//alert(scriptlink);
 						
 						
 							

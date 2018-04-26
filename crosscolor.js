@@ -125,7 +125,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 					  
 						  
 						setTimeout(function(){ 
-							alert('Good!');
+							//alert('Good!');
 							play();
 						
 						}, 1000);
