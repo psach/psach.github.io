@@ -1,16 +1,4 @@
-html{
-  
-  padding: 1px 1px;
-  border: 1px solid black;
-  border-radius: 0px;
-  -webkit-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
-  -moz-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
-  box-shadow: inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
-  background-color: pink;
-  background: linear-gradient(to bottom right, #ff99ac, #ff3358),
-  linear-gradient(to top right ,  #ff3358,#ff99ac); 
-  -webkit-backface-visibility: hidden;
-}
+
 
 #cwd-container {
     font-family: tahoma;
@@ -60,11 +48,12 @@ html{
   background: pink;
   border: 0px solid rgba(0,0,0,0.15);
   border-radius: 6px;
-  -ms-transition: all 0.3s ease-out;
+  -webkit-animation: all 0.3s ease-out;
+ /*  -ms-transition: all 0.3s ease-out;
   -webkit-animation: all 0.3s ease-out;
   -o-animation: all 0.3s ease-out;
   -moz-transition: all 0.3s ease-out;
-  transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out; */
 
    box-shadow:
     inset 0 5px 0 rgba(255,255,255,0.5),
@@ -146,7 +135,7 @@ html{
 }
 
 
-.A, .J, .R {
+.A {
 	background: DodgerBlue ;
 	/* background-image: url("a.png");
     background-size:     cover;                     
@@ -155,10 +144,7 @@ html{
 	color: transparent;*/	
 }
 
-
-
-
-.B, .K, .S {
+.B {
 	background: Yellow;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
@@ -167,19 +153,21 @@ html{
 	color: transparent;*/	
 }
 
-.C , .L, .T {
+
+.C {
 	background: HotPink;
 	/*color: transparent;*/	
 }
 
 
-.D ,.M, .U {
+.D {
 	background: GreenYellow;
 	/*color: transparent;*/	
 }
 
 
-.E, .N , .W {
+
+.E {
 	background: Orange ;
 	/* background-image: url("a.png");
     background-size:     cover;                     
@@ -188,7 +176,7 @@ html{
 	color: transparent;*/	
 }
 
-.F,.O , .X {
+.F {
 	background: MediumPurple ;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
@@ -197,16 +185,157 @@ html{
 	color: transparent;*/	
 }
 
-.I,.P , .Y {
-	background: Gold;
-	/*color: transparent;*/	
-}
-
-
-.J , .Q, .Z{
+.G {
 	background: Cyan;
 	/*color: transparent;*/	
 }
+
+
+.H {
+	background: Tomato ;
+	/*color: transparent;*/	
+}
+
+.I {
+	background: Gold;
+	/*color: transparent;*/	
+}
+.J {
+	background: Aqua ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+.K {
+	background: CadetBlue ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+.L {
+	background: DarkKhaki ;
+	/*color: transparent;*/	
+}
+
+.M {
+	background: Magenta  ;
+	/*color: transparent;*/	
+}
+
+
+
+ .N {
+	background: LawnGreen  ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+.O {
+	background: OliveDrab   ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+.P {
+	background: LightSeaGreen ;
+	/*color: transparent;*/	
+}
+
+.Q {
+	background: IndianRed ;
+	/*color: transparent;*/	
+}
+
+
+.R {
+	background: DeepSkyBlue ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+.S {
+	background: BurlyWood ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+
+.T {
+	background: DeepPink;
+	/*color: transparent;*/	
+}
+
+
+
+
+ .U {
+	background: SpringGreen;
+	/*color: transparent;*/	
+}
+
+ .V {
+	background: SlateBlue ;
+	/*color: transparent;*/	
+}
+
+
+.W {
+	background: Salmon  ;
+	/* background-image: url("a.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+
+.X {
+	background: PeachPuff  ;
+	/*background-image: url("d.gif");
+    background-size:     contain;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	color: transparent;*/	
+}
+
+
+
+
+.Y {
+	background: MediumVioletRed  ;
+	/*color: transparent;*/	
+}
+
+
+
+
+
+.Z {
+	background: Lime ;
+	/*color: transparent;*/	
+}
+
+
 
 
 .cwd-tile-active{

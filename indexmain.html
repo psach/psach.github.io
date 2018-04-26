@@ -9,6 +9,25 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 <!-- End Google Tag Manager -->
 	<script src="jquery-2.1.4.min.js"></script>
 	<script src="cordova.js"></script>
+	  
+	  
+	<style>
+	
+	html{
+  
+	  padding: 1px 1px;
+	  border: 1px solid #ff3358;
+	  border-radius: 0px;
+	  -webkit-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
+	  -moz-box-shadow:  inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
+	  box-shadow: inset 1px 6px 12px #ff99ac, inset -1px -10px 5px #ff99ac, 1px 2px 1px #ff3358;
+	  background-color: pink;
+	  background: linear-gradient(to bottom right, #ff99ac, #ff3358),
+	  linear-gradient(to top right ,  #ff3358,#ff99ac); 
+	  -webkit-backface-visibility: hidden;
+}
+
+	</style>
 </head>
 
   <body>
@@ -42,6 +61,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
 
  <script>
+	 
+	 if(navigator.userAgent.indexOf('Android')==-1){
+	 	window.location.replace('playstore.html');
+	 }
 			//alert(scriptlink);
 			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
 			var scriptlink= baseurl+'crosscolor.js';
