@@ -1,13 +1,16 @@
 <html !doctype>
  
   <head>  
-    <link href="crossword.css" rel="stylesheet" type="text/css">
-	
-   <!--  <script src="cordova.js"></script> -->
-    <script src="crosscolor.js"></script>
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-54J43ZF');</script>
+<!-- End Google Tag Manager -->
 	<script src="jquery-2.1.4.min.js"></script>
-	</head>
-	
+	<script src="cordova.js"></script>
+</head>
+
   <body>
    <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-54J43ZF"
@@ -15,6 +18,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <!-- div class='outer'  align='center' style='height:50%; padding-top:15%' >
 <img src='splashgif1.gif' / -->
+<div class='centerbody' >
 	<table align='center' >
 		<tr>
 			<td align='center' style='padding-top:20%'>
@@ -32,18 +36,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			</td>
 		</tr>
 	  </table>
-	
+	</div>
 	
   </body>
   
- <script>
- 
- var strAgt = ""+navigator.userAgent;
-  		//alert(strAgt);
-		if(strAgt.indexOf('Android')==-1){
-			window.location.replace('onefromapp.html');
-		}
 
+ <script>
+	
+			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
+			var scriptlink= baseurl+'crosscolor.js';
+			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
+			$("html").append(csslink);
+			
+			
+			$("html").append(csslink);
+					
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			
+			s.src = scriptlink;
+			$("html").append(s);
+
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			
+			s.src = scriptlink1;
+			$("html").append(s);
+							
+			var strAgt = ""+navigator.userAgent;
+			//alert(strAgt);
+			if(strAgt.indexOf('Android')==-1){
+				window.location.replace('onefromapp.html');
+			}
+							
 			var admobid = {};
 			
 			var nextLevelHTML=[];
@@ -127,7 +152,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					}
 				};
 				
-				xmlhttp.open("GET", 'remote-level'+(i+1)+'.html?'+Math.random() , false);
+				xmlhttp.open("GET", baseurl+'remote-level'+(i+1)+'.html?'+Math.random() , false);
 				xmlhttp.send();
 			}
 				
@@ -137,6 +162,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	
 				
 			function play(){
+			
+		
 					if(level==levels)level=0;
 					correctAns =levelCorrectAns[level];
 					
@@ -161,7 +188,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					randomString='';
 					
 					//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
-						$('html').html(nextLevelHTML[level]);
+					//var nextLevelDom = $(nextLevelHTML[level]);
+					
+					//alert($('body').html(''));
+						$('.centerbody').html(nextLevelHTML[level]);
+						
+						//alert(scriptlink);
+						
+						
+							
+							
 						//window.location.replace('level1.html');
 					loadCW();
 					level++;
@@ -176,6 +212,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					  } );
 
 			}
+			
+			
+				
 			
  </script>
 		
