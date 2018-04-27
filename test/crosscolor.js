@@ -492,11 +492,11 @@ function popWords(words){
         
 		   
 function storeLevel(){
-	alert("Storing : " +currLevel +" : "+ level );
+	alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage;
 	//currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
 	storage.setItem('currLevel', currLevel);
-	storage.setItem('mainLevel', level);
+	storage.setItem('mainLevel', level-1);
 	//storage.removeItem(key) 
 	
 }
