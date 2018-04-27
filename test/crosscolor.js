@@ -111,6 +111,9 @@ function popWords(words){
 					});
 					
 					if(levelAnswered==correctAns.length-1 && answered ){
+						//storeLevel();
+						getLevel();
+						
 						//answered=false;
 						moreCount=1;
 						insertCorrect=0;
@@ -126,20 +129,19 @@ function popWords(words){
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
 						
 					
-						storeLevel();
-						level++;
+						
+						  
 						setTimeout(function(){ 
 							//alert('Good!');
 							play();
 						
 						}, 1000);
 							  // this will load a full screen ad on startup
-						  AdMob.prepareInterstitial({
-							adId: admobid.interstitial,
-							isTesting: true, // TODO: remove this line when release
-							autoShow: true
-						  });
-						
+					  AdMob.prepareInterstitial({
+						adId: admobid.interstitial,
+						isTesting: true, // TODO: remove this line when release
+						autoShow: true
+					  });
 						 
 					}else{
 					
