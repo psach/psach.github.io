@@ -137,35 +137,76 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
-		
-					if(level==levelMoreWords.length)level=0;
-					correctAns =levelCorrectAns[level];
+					var storage = window.localStorage;
+					var prevData = storage.getItem('prevData');
 					
-					moreWords =levelMoreWords[level];
+					if(prevData){
+						
+						level = prevData[0];
+						if(level==levelMoreWords.length)level=0;
+						correctAns =prevData[1];
+						
+						moreWords =prevData[2];
+					
+						activeSet=prevData[3];
 				
-					activeSet;
-			
-					id, clueid;
+						id=prevData[4];
+						clueid=prevData[5];
+						
+						startCell = prevData[6];
+						endCell=prevData[7];
+						
+						moreCount=prevData[8];
+						//insertCorrect=0;
+						levelAnswered=prevData[9];
+						currLevel=prevData[10];
+						stringCorrect =prevData[11];
+						selectionTillLast=prevData[12];
+						greenChar=prevData[13];
+						redChar=prevData[14];
+						start=prevData[15];
+						end=prevData[16];
+						activeId=prevData[17];
+						//randomString='';
 					
-					startCell = levelStartCell[level];
-					endCell=levelEndCell[level];
+						$('.centerbody').html(prevData[18]);
+						storage.removeItem('prevData');
 					
-					moreCount=0;
-					insertCorrect=0;
-					levelAnswered=0;
-					currLevel=0;
-					stringCorrect ="";
-					selectionTillLast=[];
-					greenChar, redChar;
-					start,end;
-					activeId;
-					randomString='';
+					}else{
+					
+						if(level==levelMoreWords.length)level=0;
+						correctAns =levelCorrectAns[level];
+						
+						moreWords =levelMoreWords[level];
+					
+						activeSet;
+				
+						id, clueid;
+						
+						startCell = levelStartCell[level];
+						endCell=levelEndCell[level];
+						
+						moreCount=0;
+						insertCorrect=0;
+						levelAnswered=0;
+						currLevel=0;
+						stringCorrect ="";
+						selectionTillLast=[];
+						greenChar, redChar;
+						start,end;
+						activeId;
+						randomString='';
+					
+						$('.centerbody').html(nextLevelHTML[level]);
+					}
+					
+					
 					
 					//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
 					//var nextLevelDom = $(nextLevelHTML[level]);
 					
 					//alert($('body').html(''));
-					$('.centerbody').html(nextLevelHTML[level]);
+					
 						
 									
 					//window.location.replace('level1.html');
