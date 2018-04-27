@@ -135,7 +135,7 @@ function popWords(words){
 							//alert('Good!');
 							
 							play();
-							storeLevel();
+							//storeLevel();
 						}, 1000);
 							  // this will load a full screen ad on startup
 					  AdMob.prepareInterstitial({
@@ -153,7 +153,7 @@ function popWords(words){
 							setTimeout(function(){ 
 							setStartEnd(++currLevel); 
 							
-							storeLevel();
+							//storeLevel();
 							}, 1000);
 							
 								

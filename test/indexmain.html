@@ -194,8 +194,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
-					getLevel();
-						
+					//getLevel();
+
 					if(level==levels)level=0;
 					
 					correctAns =levelCorrectAns[level];
@@ -212,7 +212,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					//moreCount=1;
 					insertCorrect=0;
 					levelAnswered=0;
-					//currLevel=0;
+					currLevel=0;
 					stringCorrect ="";
 					selectionTillLast=[];
 					greenChar, redChar;
@@ -228,8 +228,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						
 					//window.location.replace('level1.html');
 					loadCW();
-					
-					
 					level++;
 					 // this will create a banner on startup
 					/*  AdMob.createBanner( {
