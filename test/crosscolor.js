@@ -340,7 +340,7 @@ function popWords(words){
 				
 			var storage = window.localStorage;
 			var savedLevel = storage.getItem('currHtml');
-			if(savedLevel){$('.centerbody').parent().html(savedLevel)};
+			if(savedLevel){$('.centerbody').html(savedLevel)};
 			storage.removeItem('currHtml');
 			
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
