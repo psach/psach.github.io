@@ -134,7 +134,7 @@ function popWords(words){
 						setTimeout(function(){ 
 							//alert('Good!');
 							play();
-							storeLevel();
+							//storeLevel();
 						}, 1000);
 							  // this will load a full screen ad on startup
 					  AdMob.prepareInterstitial({
@@ -148,7 +148,11 @@ function popWords(words){
 						if(answered){
 							levelAnswered++;
 							
-							setTimeout(function(){ setStartEnd(++currLevel); storeLevel();}, 1000);
+							setTimeout(function(){ 
+							setStartEnd(++currLevel); 
+							
+							//storeLevel();
+							}, 1000);
 							
 								
 							
@@ -330,7 +334,7 @@ function popWords(words){
 			function loadCW() {
 				
 				
-			getLevel();
+				//getLevel();
 
 
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
