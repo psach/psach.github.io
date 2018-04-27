@@ -30,12 +30,13 @@ function popWords(words){
 							tr.appendTo(tbody);
 						});
 						
-			$("#words").find(".cwd-tile-letter").click(function() {
+		$("#words").find(".cwd-tile-letter").click(function() {
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
 				
-	
+				//storeLevel();
+				
 				var word = $(this).attr('word');
 				var invalid = false;
 				
@@ -79,6 +80,7 @@ function popWords(words){
 					activeSet.parent().addClass('cwd-tile-incorrect');
 				
 				}else{
+					//storeLevel();
 					selectionTillLast.push([clueid,id,word]);
 					//var stringSelected = ""+arr+","+word;
 					arr.push(word);
@@ -151,9 +153,10 @@ function popWords(words){
 						if(answered){
 							
 							levelAnswered++;
-							
+							selectionTillLast=[];
 							setTimeout(function(){ 
-							setStartEnd(++currLevel); 
+							
+								setStartEnd(++currLevel); 
 							
 							//storeLevel();
 							}, 1000);
@@ -240,8 +243,8 @@ function popWords(words){
 				
 					
   
-					selectionTillLast=[];
-					randomString='';
+					//selectionTillLast=[];
+					//randomString='';
 				
 					$.each(correctAns[lvl], function(i, correctWord) {
 					
@@ -337,7 +340,11 @@ function popWords(words){
 			
 			function loadCW() {
 				
-				
+			/* var storage = window.localStorage;
+			var savedLevel = storage.getItem('currHtml');
+			if(savedLevel){$('.').html(savedLevel)};
+			storage.removeItem('currHtml'); */
+			
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
 			//$.mobile.loading().hide();
 			//$('head').append('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
@@ -494,12 +501,22 @@ function popWords(words){
         
 		   
 function storeLevel(){
-	alert("Storing : " +currLevel +" : "+ (level-1) );
+	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage;
-	//currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
-	storage.setItem('currLevel', currLevel);
-	storage.setItem('mainLevel', level-1);
-	//storage.removeItem(key) 
+	var prevData=[];
+	prevData.push(level-1);
+	prevData.push(id);
+	prevData.push(clueid);
+	prevData.push(moreCount);
+	prevData.push(levelAnswered);
+	prevData.push(currLevel);
+	prevData.push(stringCorrect);
+	prevData.push(greenChar);
+	prevData.push(redChar);
+	
+	storage.setItem('prevData',prevData);
+	storage.setItem('prevDataHtml',$('.centerbody').html());
+	
 	
 }
 

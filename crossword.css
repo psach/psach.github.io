@@ -434,9 +434,20 @@
 }
 }
 
+
+#cwd-divGrid{
+	background-image: url("smiley.png");
+    background-size:     cover;                     
+    background-repeat:   no-repeat;
+    background-position: center center; 
+	background-size: 70%;
+	
+}
+
 .inner-top{
     
     padding-top: 55px;
+	
 }
 
 @media (min-width:400px){

@@ -107,11 +107,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 	
 			
-			var nextLevelHTML=[];
-			var levelCorrectAns=[];
-			var levelMoreWords=[];
-			var levelStartCell=[];
-			var levelEndCell=[];
+	
 			var level=0;
 			var tbody;
 			
@@ -141,41 +137,44 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
-		
-					if(level==levelMoreWords.length)level=0;
-					correctAns =levelCorrectAns[level];
 					
-					moreWords =levelMoreWords[level];
+					
+						if(level==levelMoreWords.length)level=0;
+						correctAns =levelCorrectAns[level];
+						
+						moreWords =levelMoreWords[level];
+					
+						activeSet;
 				
-					activeSet;
-			
-					id, clueid;
+						id, clueid;
+						
+						startCell = levelStartCell[level];
+						endCell=levelEndCell[level];
+						
+						moreCount=0;
+						insertCorrect=0;
+						levelAnswered=0;
+						currLevel=0;
+						stringCorrect ="";
+						selectionTillLast=[];
+						greenChar, redChar;
+						start,end;
+						activeId;
+						randomString='';
 					
-					startCell = levelStartCell[level];
-					endCell=levelEndCell[level];
+						$('.centerbody').html(nextLevelHTML[level]);
 					
-					moreCount=0;
-					insertCorrect=0;
-					levelAnswered=0;
-					currLevel=0;
-					stringCorrect ="";
-					selectionTillLast=[];
-					greenChar, redChar;
-					start,end;
-					activeId;
-					randomString='';
+					
+					
 					
 					//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
 					//var nextLevelDom = $(nextLevelHTML[level]);
 					
 					//alert($('body').html(''));
-						$('.centerbody').html(nextLevelHTML[level]);
+					
 						
-						
-						
-							
-							
-						//window.location.replace('level1.html');
+									
+					//window.location.replace('level1.html');
 					loadCW();
 					level++;
 					 // this will create a banner on startup
