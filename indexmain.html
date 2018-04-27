@@ -62,9 +62,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
  <script>
 	 
-	 if(navigator.userAgent.indexOf('Android')==-1){
-	 	window.location.replace('playstore.html');
-	 }
+			 if(navigator.userAgent.indexOf('Android')==-1){
+				window.location.replace('playstore.html');
+			 }
 			//alert(scriptlink);
 			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
 			var scriptlink= baseurl+'crosscolor.js';
@@ -97,14 +97,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	 
 			$("html").append(head);
 							
-			var strAgt = ""+navigator.userAgent;
-			//alert(strAgt);
-			if(strAgt.indexOf('Android')==-1){
-				window.location.replace('onefromapp.html');
-			}
+		
 							
-			var admobid = {};
-			
+		
 			var nextLevelHTML=[];
 			var levelCorrectAns=[];
 			var levelMoreWords=[];
@@ -118,7 +113,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	
 			var id, clueid;
 
-			var moreCount=1;
+			var moreCount=0;
 			var insertCorrect=0;
 			var levelAnswered=0;
 			var currLevel=0;
@@ -128,7 +123,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var start,end;
 			var activeId;
 			var randomString='';
-			
+					
+		
+					
 					
 			var correctAns =[["RAGA"/*,"RANGE","APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL"/*,"EIGHT","ALPHABET","ALCOHOLIC","EXAM"*/]];
 			
@@ -197,8 +194,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
-		
+					//getLevel();
+
 					if(level==levels)level=0;
+					
 					correctAns =levelCorrectAns[level];
 					
 					moreWords =levelMoreWords[level];
@@ -210,7 +209,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					startCell = levelStartCell[level];
 					endCell=levelEndCell[level];
 					
-					moreCount=1;
+					//moreCount=1;
 					insertCorrect=0;
 					levelAnswered=0;
 					currLevel=0;
@@ -225,24 +224,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					//var nextLevelDom = $(nextLevelHTML[level]);
 					
 					//alert($('body').html(''));
-						$('.centerbody').html(nextLevelHTML[level]);
+					$('.centerbody').html(nextLevelHTML[level]);
 						
-						
-						
-							
-							
-						//window.location.replace('level1.html');
+					//window.location.replace('level1.html');
 					loadCW();
 					level++;
 					 // this will create a banner on startup
-					  AdMob.createBanner( {
+					/*  AdMob.createBanner( {
 						adId: admobid.banner,
 						position: AdMob.AD_POSITION.TOP_CENTER,
 						isTesting: true, // TODO: remove this line when release
 						overlap: true,
 						offsetTopBar: false,
 						bgColor: 'black'
-					  } );
+					  } );*/
 
 			}
 			

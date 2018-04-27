@@ -34,6 +34,7 @@ function popWords(words){
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
+				
 	
 				var word = $(this).attr('word');
 				var invalid = false;
@@ -74,7 +75,7 @@ function popWords(words){
 				if( invalid ) { 
 				
 					//alert('Incorrect selection');
-					activeSet.parent().removeClass('cwd-tile-highlight');
+					//activeSet.parent().removeClass('cwd-tile-highlight');
 					activeSet.parent().addClass('cwd-tile-incorrect');
 				
 				}else{
@@ -109,10 +110,14 @@ function popWords(words){
 						$(activeSet[j]).html(character);
 						
 					});
+					activeSet.parent().removeClass("cwd-tile-highlight");
 					
 					if(levelAnswered==correctAns.length-1 && answered ){
-						//answered=false;
-						moreCount=1;
+						//storeLevel();
+						
+						
+					/* 	//answered=false;
+						moreCount=0;
 						insertCorrect=0;
 						levelAnswered=0;
 						currLevel=0;
@@ -121,17 +126,18 @@ function popWords(words){
 						greenChar, redChar;
 						start,end;
 						activeId;
-						randomString='';
+						randomString=''; */
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
 						
 					
-					  
+						
 						  
 						setTimeout(function(){ 
 							//alert('Good!');
+							
 							play();
-						
+							//storeLevel();
 						}, 1000);
 							  // this will load a full screen ad on startup
 					  AdMob.prepareInterstitial({
@@ -143,10 +149,15 @@ function popWords(words){
 					}else{
 					
 						if(answered){
+							
 							levelAnswered++;
 							
-							setTimeout(function(){ setStartEnd(++currLevel); }, 1000);
-													
+							setTimeout(function(){ 
+							setStartEnd(++currLevel); 
+							
+							//storeLevel();
+							}, 1000);
+							
 								
 							
 							
@@ -225,14 +236,14 @@ function popWords(words){
 					}
 			}
 			
-			function setStartEnd(level){
+			function setStartEnd(lvl){
 				
-				
+					
   
 					selectionTillLast=[];
 					randomString='';
 				
-					$.each(correctAns[level], function(i, correctWord) {
+					$.each(correctAns[lvl], function(i, correctWord) {
 					
 						generateNumber(correctWord);
 						
@@ -259,13 +270,13 @@ function popWords(words){
 					gridChild.addClass('cwd-tile-letter');
 					
 				
-				//alert(level);
+				//alert(lvl);
 				
-				var correctAnsItem=correctAns[level];
-				currLevel=level;
+				var correctAnsItem=correctAns[lvl];
+				currlvl=lvl;
 				
 				
-				if (endCell[level][0]<startCell[level][0]){
+				if (endCell[lvl][0]<startCell[lvl][0]){
 					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
 					redChar = correctAnsItem[correctAnsItem.length-1][0];
 					
@@ -284,16 +295,16 @@ function popWords(words){
 				$("#cwd-grid").remove();
 				gridClone.appendTo(gridParent).fadeIn(1000,function(){
 					
-					start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
-					end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
+					start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+					end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 					start.addClass('cwd-tile-highlight');
 					end.addClass('cwd-tile-highlight');
 					
 					}).fadeOut(1000).fadeIn(1000,function(){
 					
 					
-					start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
-					end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
+					start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+					end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 					
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(greenChar);
@@ -307,16 +318,16 @@ function popWords(words){
 				});
 				
 				
-				//if(level>0){
+				//if(lvl>0){
 					//gridClone.fadeOut(2000,function(){
 						
 						//gridClone.appendTo(gridParent).fadeIn(2000);
 					//});
 					//gridClone.appendTo(gridParent).fadeIn(2000);
 				//}
-				//var levelChange=$("<div class='level-change' >GOOD</div>");
-				//levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
-				//$(".level-change").fadeIn('slow').fadeOut('slow');
+				//var lvlChange=$("<div class='lvl-change' >GOOD</div>");
+				//lvlChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
+				//$(".lvl-change").fadeIn('slow').fadeOut('slow');
 				//gridClone.animate({opacity: 0},800);
 				//gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
@@ -327,17 +338,14 @@ function popWords(words){
 			function loadCW() {
 				
 				
-
-
-
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
 			//$.mobile.loading().hide();
 			//$('head').append('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
-			popWords(moreWords[0]);
-			
+			popWords(moreWords[moreCount]);
+			moreCount++;
 			
 			$(".clear").click(function() {
 			
@@ -485,3 +493,26 @@ function popWords(words){
 			
         
 		   
+function storeLevel(){
+	alert("Storing : " +currLevel +" : "+ (level-1) );
+	var storage = window.localStorage;
+	//currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
+	storage.setItem('currLevel', currLevel);
+	storage.setItem('mainLevel', level-1);
+	//storage.removeItem(key) 
+	
+}
+
+
+function getLevel(){
+	
+	var storage = window.localStorage;
+	currLevel = storage.getItem('currLevel')?storage.getItem('currLevel'):0; 
+	level = storage.getItem('mainLevel')?storage.getItem('mainLevel'):0; 
+	alert("Retriving : " +currLevel +" : "+ level );
+	// Pass a key name to get its value.
+	//storage.setItem(key, value) // Pass a key name and its value to add or update that key.
+	//storage.removeItem(key) 
+	
+}
+
