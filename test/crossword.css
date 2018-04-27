@@ -131,7 +131,7 @@
 #cwd-grid td.cwd-tile-incorrect
 {
     border-color: Red !important; 
-	border: solid 2px Red;
+	border: solid 1px Red;
 }
 
 
