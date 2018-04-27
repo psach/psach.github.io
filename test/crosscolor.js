@@ -146,7 +146,7 @@ function popWords(words){
 							levelAnswered++;
 							
 							setTimeout(function(){ setStartEnd(++currLevel); }, 1000);
-													
+							storeLevel();
 								
 							
 							
@@ -225,14 +225,14 @@ function popWords(words){
 					}
 			}
 			
-			function setStartEnd(level){
+			function setStartEnd(lvl){
 				
 				
   
 					selectionTillLast=[];
 					randomString='';
 				
-					$.each(correctAns[level], function(i, correctWord) {
+					$.each(correctAns[lvl], function(i, correctWord) {
 					
 						generateNumber(correctWord);
 						
@@ -259,13 +259,13 @@ function popWords(words){
 					gridChild.addClass('cwd-tile-letter');
 					
 				
-				//alert(level);
+				//alert(lvl);
 				
-				var correctAnsItem=correctAns[level];
-				currLevel=level;
+				var correctAnsItem=correctAns[lvl];
+				currlvl=lvl;
 				
 				
-				if (endCell[level][0]<startCell[level][0]){
+				if (endCell[lvl][0]<startCell[lvl][0]){
 					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
 					redChar = correctAnsItem[correctAnsItem.length-1][0];
 					
@@ -284,16 +284,16 @@ function popWords(words){
 				$("#cwd-grid").remove();
 				gridClone.appendTo(gridParent).fadeIn(1000,function(){
 					
-					start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
-					end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
+					start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+					end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 					start.addClass('cwd-tile-highlight');
 					end.addClass('cwd-tile-highlight');
 					
 					}).fadeOut(1000).fadeIn(1000,function(){
 					
 					
-					start = $("[row="+startCell[level][0]+"][col="+startCell[level][1]+"]");
-					end = $("[row="+endCell[level][0]+"][col="+endCell[level][1]+"]");
+					start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+					end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 					
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(greenChar);
@@ -307,16 +307,16 @@ function popWords(words){
 				});
 				
 				
-				//if(level>0){
+				//if(lvl>0){
 					//gridClone.fadeOut(2000,function(){
 						
 						//gridClone.appendTo(gridParent).fadeIn(2000);
 					//});
 					//gridClone.appendTo(gridParent).fadeIn(2000);
 				//}
-				//var levelChange=$("<div class='level-change' >GOOD</div>");
-				//levelChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
-				//$(".level-change").fadeIn('slow').fadeOut('slow');
+				//var lvlChange=$("<div class='lvl-change' >GOOD</div>");
+				//lvlChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
+				//$(".lvl-change").fadeIn('slow').fadeOut('slow');
 				//gridClone.animate({opacity: 0},800);
 				//gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
@@ -485,3 +485,22 @@ function popWords(words){
 			
         
 		   
+function storeLevel(){
+	
+	var storage = window.localStorage;
+	//currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
+	storage.setItem('currLevel', currLevel) // Pass a key name and its value to add or update that key.
+	//storage.removeItem(key) 
+	
+}
+
+
+function getLevel(){
+	
+	var storage = window.localStorage;
+	currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
+	//storage.setItem(key, value) // Pass a key name and its value to add or update that key.
+	//storage.removeItem(key) 
+	
+}
+
