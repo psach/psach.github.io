@@ -74,7 +74,7 @@ function popWords(words){
 				if( invalid ) { 
 				
 					//alert('Incorrect selection');
-					activeSet.parent().removeClass('cwd-tile-highlight');
+					//activeSet.parent().removeClass('cwd-tile-highlight');
 					activeSet.parent().addClass('cwd-tile-incorrect');
 				
 				}else{
