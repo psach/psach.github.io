@@ -112,7 +112,7 @@ function popWords(words){
 					
 					if(levelAnswered==correctAns.length-1 && answered ){
 						//storeLevel();
-						getLevel();
+						
 						
 						//answered=false;
 						moreCount=1;
@@ -330,7 +330,7 @@ function popWords(words){
 			function loadCW() {
 				
 				
-
+			getLevel();
 
 
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
