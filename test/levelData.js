@@ -1,5 +1,5 @@
 
-			
+		
 			var levelCorrectAns=[];
 			var levelMoreWords=[];
 			var levelStartCell=[];
@@ -43,3 +43,5 @@
 			levelCorrectAns.push(correctAns);
 			levelStartCell.push(startCell);
 			levelEndCell.push(endCell);
+			
+			levels=levelMoreWords.length;
