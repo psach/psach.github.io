@@ -34,8 +34,7 @@ function popWords(words){
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
-				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
-				if(activeSetWord.length==activeSet.length)return;
+				
 	
 				var word = $(this).attr('word');
 				var invalid = false;
