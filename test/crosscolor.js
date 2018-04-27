@@ -34,6 +34,8 @@ function popWords(words){
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
+				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
+				if(activeSetWord.length==activeSet.length)return;
 	
 				var word = $(this).attr('word');
 				var invalid = false;
@@ -471,7 +473,7 @@ function popWords(words){
 					
 				}else{
 					
-					activeSet.parent().addClass("cwd-tile-highlight");
+					(activeSetWord.length==0)activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}
 				
