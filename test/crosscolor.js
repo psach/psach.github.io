@@ -340,7 +340,7 @@ function popWords(words){
 				
 			var storage = window.localStorage;
 			var savedLevel = storage.getItem('currHtml');
-			if(savedLevel){$('html').html(savedLevel)};
+			if(savedLevel){$('.centerbody').html(savedLevel)};
 			storage.removeItem('currHtml');
 			
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
@@ -505,7 +505,7 @@ function storeLevel(){
 	//storage.setItem('currLevel', currLevel);
 	//storage.setItem('mainLevel', level-1);
 	//storage.removeItem(key) 
-	storage.setItem('currHtml',$('html').html());
+	storage.setItem('currHtml',$('.centerbody').html());
 	
 }
 
