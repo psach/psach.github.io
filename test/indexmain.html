@@ -138,7 +138,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			function play(){
 			
 					var storage = window.localStorage;
-					var prevData = storage.getItem('prevData');
+					var prevData = $(storage.getItem('prevData'));
 					alert(prevData);
 					if(prevData){
 						
