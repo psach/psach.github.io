@@ -30,7 +30,11 @@ function popWords(words){
 							tr.appendTo(tbody);
 						});
 						
-$("#words").find(".cwd-tile-letter").click(function() {
+			$("#words").find(".cwd-tile-letter").click(function() {
+				
+				if(!activeSet) return;
+				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
+	
 				var word = $(this).attr('word');
 				var invalid = false;
 				
@@ -322,34 +326,7 @@ $("#words").find(".cwd-tile-letter").click(function() {
 			
 			function loadCW() {
 				
-				// TODO: replace the following ad units with your own
-				if( /(android)/i.test(navigator.userAgent) ) {
-				  admobid = { // for Android
-					banner: 'ca-app-pub-3940256099942544/6300978111',
-					interstitial: 'ca-app-pub-3940256099942544/1033173712',
-					rewardvideo: 'ca-app-pub-3940256099942544/5224354917',
-				  };
-				} else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
-				  admobid = { // for iOS
-					banner: 'ca-app-pub-3940256099942544/4480807092',
-					interstitial: 'ca-app-pub-3940256099942544/4411468910',
-					rewardvideo: 'ca-app-pub-3940256099942544/1712485313',
-				  };
-				} else {
-				  admobid = { // for Windows Phone
-					banner: 'ca-app-pub-6869992474017983/8878394753',
-					interstitial: 'ca-app-pub-6869992474017983/1355127956',
-					rewardvideo: '',
-				  };
-				}
-
 				
-				
-				if(( /(ipad|iphone|ipod|android|windows phone)/i.test(navigator.userAgent) )) {
-					document.addEventListener('deviceready', initApp, false);
-				} else {
-					initApp();
-				}
 
 
 
@@ -504,26 +481,6 @@ $("#words").find(".cwd-tile-letter").click(function() {
 			
 			
 		}
-		
-
-
-
-
-function initApp() {
-  if (! AdMob ) { alert( 'admob plugin not ready' ); return; }
-
-  // this will create a banner on startup
-  AdMob.createBanner( {
-    adId: admobid.banner,
-    position: AdMob.AD_POSITION.TOP_CENTER,
-    isTesting: true, // TODO: remove this line when release
-    overlap: false,
-    offsetTopBar: false,
-    bgColor: 'black'
-  } );
-
- 
-}
 
 			
         
