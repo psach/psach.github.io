@@ -308,26 +308,29 @@ function popWords(words){
 					start.addClass('cwd-tile-highlight');
 					end.addClass('cwd-tile-highlight');
 					
-					}).fadeOut(1000,function(){
+					$(this).fadeOut(1000,function(){
 						
-						$(this).fadeIn(1000,function(){
-					
-					
-							start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
-							end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
-							
-							start.addClass("d3 green");
-							start.find('.cwd-tile-letter').html(greenChar);
+								$(this).fadeIn(1000,function(){
 							
 							
-							end.addClass("d3 red");
-							end.find('.cwd-tile-letter').html(redChar);
-					
-					
-					
-						});
+									start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+									end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+									
+									start.addClass("d3 green");
+									start.find('.cwd-tile-letter').html(greenChar);
+									
+									
+									end.addClass("d3 red");
+									end.find('.cwd-tile-letter').html(redChar);
+							
+							
+							
+								});
 						
 					});
+					
+					
+				});
 				
 				
 				//if(lvl>0){
