@@ -147,12 +147,13 @@ function popWords(words){
 					}else{
 					
 						if(answered){
+							
 							levelAnswered++;
 							
 							setTimeout(function(){ 
 							setStartEnd(++currLevel); 
 							
-							//storeLevel();
+							storeLevel();
 							}, 1000);
 							
 								
@@ -235,7 +236,7 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 				
-					storeLevel();
+					
   
 					selectionTillLast=[];
 					randomString='';
