@@ -44,4 +44,4 @@
 			levelStartCell.push(startCell);
 			levelEndCell.push(endCell);
 			
-			levels=levelMoreWords.length;
+			var levels=levelMoreWords.length;
