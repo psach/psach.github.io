@@ -473,7 +473,7 @@ function popWords(words){
 					
 				}else{
 					
-					(activeSetWord.length==0)activeSet.parent().addClass("cwd-tile-highlight");
+					(activeSetWord.length<activeSet.parent().length)activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}
 				
