@@ -472,7 +472,7 @@ function popWords(words){
 					
 				}else{
 					
-					(activeSetWord.length<activeSet.parent().length)activeSet.parent().addClass("cwd-tile-highlight");
+					if(activeSetWord.length<activeSet.parent().length)activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}
 				
