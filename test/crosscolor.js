@@ -114,8 +114,8 @@ function popWords(words){
 						//storeLevel();
 						
 						
-						//answered=false;
-						moreCount=1;
+					/* 	//answered=false;
+						moreCount=0;
 						insertCorrect=0;
 						levelAnswered=0;
 						currLevel=0;
@@ -124,7 +124,7 @@ function popWords(words){
 						greenChar, redChar;
 						start,end;
 						activeId;
-						randomString='';
+						randomString=''; */
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
 						
@@ -133,8 +133,9 @@ function popWords(words){
 						  
 						setTimeout(function(){ 
 							//alert('Good!');
+							
 							play();
-							//storeLevel();
+							storeLevel();
 						}, 1000);
 							  // this will load a full screen ad on startup
 					  AdMob.prepareInterstitial({
@@ -234,7 +235,7 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 				
-				
+					storeLevel();
   
 					selectionTillLast=[];
 					randomString='';
@@ -334,17 +335,14 @@ function popWords(words){
 			function loadCW() {
 				
 				
-				//getLevel();
-
-
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
 			//$.mobile.loading().hide();
 			//$('head').append('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
-			popWords(moreWords[0]);
-			
+			popWords(moreWords[moreCount]);
+			moreCount++;
 			
 			$(".clear").click(function() {
 			
