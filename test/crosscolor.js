@@ -126,7 +126,7 @@ function popWords(words){
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
 						
 					
-					  
+						storeLevel();
 						  
 						setTimeout(function(){ 
 							//alert('Good!');
@@ -486,10 +486,11 @@ function popWords(words){
         
 		   
 function storeLevel(){
-	
+	alert("Storing : " +currLevel +" : "+ level );
 	var storage = window.localStorage;
 	//currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
-	storage.setItem('currLevel', currLevel) // Pass a key name and its value to add or update that key.
+	storage.setItem('currLevel', currLevel);
+	storage.setItem('mainLevel', level);
 	//storage.removeItem(key) 
 	
 }
@@ -498,7 +499,10 @@ function storeLevel(){
 function getLevel(){
 	
 	var storage = window.localStorage;
-	currLevel = storage.getItem('currLevel')?storage.getItem('currLevel'):0; // Pass a key name to get its value.
+	currLevel = storage.getItem('currLevel')?storage.getItem('currLevel'):0; 
+	level = storage.getItem('mainLevel')?storage.getItem('mainLevel'):0; 
+	alert("Retriving : " +currLevel +" : "+ level );
+	// Pass a key name to get its value.
 	//storage.setItem(key, value) // Pass a key name and its value to add or update that key.
 	//storage.removeItem(key) 
 	
