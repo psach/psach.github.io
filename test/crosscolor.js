@@ -498,7 +498,7 @@ function storeLevel(){
 function getLevel(){
 	
 	var storage = window.localStorage;
-	currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
+	currLevel = storage.getItem('currLevel')?storage.getItem('currLevel'):0; // Pass a key name to get its value.
 	//storage.setItem(key, value) // Pass a key name and its value to add or update that key.
 	//storage.removeItem(key) 
 	
