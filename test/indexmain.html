@@ -139,7 +139,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 					var storage = window.localStorage;
 					var prevData = storage.getItem('prevData');
-					
+					alert(prevData);
 					if(prevData){
 						
 						level = prevData[0];
@@ -164,7 +164,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						
 						//randomString='';
 					
-						$('.centerbody').html(prevData[9]);
+						//$('.centerbody').html(prevData[9]);
 						storage.removeItem('prevData');
 					
 					}else{
