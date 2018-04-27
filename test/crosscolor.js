@@ -30,7 +30,7 @@ function popWords(words){
 							tr.appendTo(tbody);
 						});
 						
-			$("#words").find(".cwd-tile-letter").click(function() {
+		$("#words").find(".cwd-tile-letter").click(function() {
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
@@ -79,6 +79,7 @@ function popWords(words){
 					activeSet.parent().addClass('cwd-tile-incorrect');
 				
 				}else{
+					storeLevel();
 					selectionTillLast.push([clueid,id,word]);
 					//var stringSelected = ""+arr+","+word;
 					arr.push(word);
@@ -337,7 +338,11 @@ function popWords(words){
 			
 			function loadCW() {
 				
-				
+			var storage = window.localStorage;
+			var savedLevel = storage.getItem('currHtml');
+			if(savedLevel){$('html').html(savedLevel)};
+			storage.removeItem('currHtml');
+			
 			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
 			//$.mobile.loading().hide();
 			//$('head').append('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
@@ -494,12 +499,13 @@ function popWords(words){
         
 		   
 function storeLevel(){
-	alert("Storing : " +currLevel +" : "+ (level-1) );
+	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage;
 	//currLevel = storage.getItem('currLevel'); // Pass a key name to get its value.
-	storage.setItem('currLevel', currLevel);
-	storage.setItem('mainLevel', level-1);
+	//storage.setItem('currLevel', currLevel);
+	//storage.setItem('mainLevel', level-1);
 	//storage.removeItem(key) 
+	storage.setItem('currHtml',$('html').html());
 	
 }
 
