@@ -124,7 +124,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var activeId;
 			var randomString='';
 					
-			getLevel();
+		
 					
 					
 			var correctAns =[["RAGA"/*,"RANGE","APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL"/*,"EIGHT","ALPHABET","ALCOHOLIC","EXAM"*/]];
@@ -194,7 +194,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
-					
+					getLevel();
+						
 					if(level==levels)level=0;
 					
 					correctAns =levelCorrectAns[level];
