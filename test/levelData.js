@@ -1,5 +1,5 @@
 
-		
+		$(function(){
 			var levelCorrectAns=[];
 			var levelMoreWords=[];
 			var levelStartCell=[];
@@ -63,4 +63,4 @@
 				xmlhttp.open("GET", baseurl+'remote-level'+(i+1)+'.html?'+Math.random() , false);
 				xmlhttp.send();
 			}
-				
+		});
