@@ -103,7 +103,7 @@ function popWords(words){
 					
 					//alert(stringSelected + " : " + stringCorrect );
 					
-					
+					// SET VALID WORD
 					$.each(word.split(''), function(j,character){
 					
 						
@@ -113,7 +113,9 @@ function popWords(words){
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
-					
+					activeSet.parent().removeClass("cwd-tile-incorrect");
+						
+					// MAIN LEVEL COMPLETED
 					if(levelAnswered==correctAns.length-1 && answered ){
 						//storeLevel();
 						
@@ -150,6 +152,7 @@ function popWords(words){
 						 
 					}else{
 					
+						// CHILD LEVEL COMPLETED
 						if(answered){
 							
 							levelAnswered++;
@@ -174,6 +177,7 @@ function popWords(words){
 			});	
 			}
 			
+			// CLEAR SELECTED WORD
 			function clear(){
 				//twice=0;
 					var clearGrid =$("#crossword").find(".cwd-tile-active");
