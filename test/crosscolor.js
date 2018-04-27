@@ -137,18 +137,18 @@ function popWords(words){
 					
 						
 						  
-						setTimeout(function(){ 
+						//setTimeout(function(){ 
 							//alert('Good!');
 							
-							play();
+							
 							//storeLevel();
-						}, 1000);
+						//}, 1000);
 							  // this will load a full screen ad on startup
-					  AdMob.prepareInterstitial({
-						adId: admobid.interstitial,
-						isTesting: true, // TODO: remove this line when release
-						autoShow: true
-					  });
+						  AdMob.prepareInterstitial({
+							adId: admobid.interstitial,
+							isTesting: true, // TODO: remove this line when release
+							autoShow: true
+						  },function(){play();});
 						 
 					}else{
 					
