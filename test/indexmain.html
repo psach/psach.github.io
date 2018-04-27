@@ -144,32 +144,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						
 						level = prevData[0];
 						if(level==levelMoreWords.length)level=0;
-						correctAns =levelCorrectAns[level];
+							
+						id=prevData[1];                                        
+						clueid=prevData[2];                                    
+						                                                       
+						startCell = levelStartCell[level];                     
+						endCell = levelEndCell[level];                         
+						                                                       
+						moreCount=prevData[3];                                 
+						//insertCorrect=0;                                     
+						levelAnswered=prevData[4];                             
+						currLevel=prevData[5];                                 
+						stringCorrect =prevData[6];
 						
-						moreWords =prevData[2];
-					
-						//activeSet=prevData[3];
-				
-						id=prevData[4];
-						clueid=prevData[5];
-						
-						startCell = levelStartCell[level];
-						endCell = levelEndCell[level];
-						
-						moreCount=prevData[8];
-						//insertCorrect=0;
-						levelAnswered=prevData[9];
-						currLevel=prevData[10];
-						stringCorrect =prevData[11];
-						selectionTillLast=prevData[12];
-						greenChar=prevData[13];
-						redChar=prevData[14];
+						greenChar=prevData[7];
+						redChar=prevData[8];
 						//start=prevData[15];
 						//end=prevData[16];
-						activeId=prevData[17];
+						
 						//randomString='';
 					
-						$('.centerbody').html(prevData[18]);
+						$('.centerbody').html(prevData[9]);
 						storage.removeItem('prevData');
 					
 					}else{

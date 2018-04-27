@@ -505,24 +505,14 @@ function storeLevel(){
 	var storage = window.localStorage;
 	var prevData=[];
 	prevData.push(level);
-	prevData.push($(correctAns));
-	prevData.push($(moreWords));
-	prevData.push($(activeSet));
 	prevData.push(id);
 	prevData.push(clueid);
-	prevData.push(startCell);
-	prevData.push(endCell);
 	prevData.push(moreCount);
 	prevData.push(levelAnswered);
 	prevData.push(currLevel);
 	prevData.push(stringCorrect);
-	prevData.push($(selectionTillLast));
 	prevData.push(greenChar);
 	prevData.push(redChar);
-	prevData.push(start);
-	prevData.push(end);
-	prevData.push(activeId);
-	
 	prevData.push($('.centerbody').html());
 	storage.setItem('prevData',prevData);
 	
