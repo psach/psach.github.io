@@ -11,49 +11,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	<script src="cordova.js"></script>
 	  
 	   <script>
-   if(navigator.userAgent.indexOf('Android')==-1){
-				window.location.replace('playstore.html');
-			 }
-			//alert(scriptlink);
-			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
-			var scriptlink= baseurl+'crosscolor.js';
-			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
-	 		var scriptlink2= baseurl+'admob.js';
-			var scriptlink3= baseurl+'levelData.js';
-			
-	 		var head = $("<head/>");
-	 
-			head.append(csslink);
-
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink;
-	 		
-	 
-			head.append(s);
-
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink1;
-			head.append(s);
-	 
-	 		var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink2;
-			head.append(s);
-	 
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink3;
-			head.append(s);
-	 
-	 
-	 
-			$("html").append(head);
+  
 </script>
 
 	<style>
@@ -106,8 +64,95 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
  
 
  <script>
+ 
+							
+		
+			var nextLevelHTML=[];
+			
+			var level=0;
+			var tbody;
+			
+			
+			var activeSet;
+	
+			var id, clueid;
+
+			var moreCount=0;
+			var insertCorrect=0;
+			var levelAnswered=0;
+			var currLevel=0;
+			var stringCorrect ="";
+			var selectionTillLast=[];
+			var greenChar, redChar;
+			var start,end;
+			var activeId;
+			var randomString='';
+					
+			
+				
+			 if(navigator.userAgent.indexOf('Android')==-1){
+				window.location.replace('playstore.html');
+			 }
+			//alert(scriptlink);
+			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
+			var scriptlink= baseurl+'levelData.js';
+			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
+	 		var scriptlink2= baseurl+'admob.js';
+			var scriptlink3= baseurl+'crosscolor.js';
+			
+	 		var head = $("<head/>");
 	 
-		var nextLevelHTML=[];
+			head.append(csslink);
+
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink;
+	 		
+	 
+			head.append(s);
+
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink1;
+			head.append(s);
+	 
+	 		var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink2;
+			head.append(s);
+	 
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink3;
+			head.append(s);
+	 
+	 
+	 
+			$("html").append(head);
+			
+			for(i=0; i<levels;i++){
+				var xmlhttp = new XMLHttpRequest();
+
+				// Callback function when XMLHttpRequest is ready
+				xmlhttp.onreadystatechange=function(){
+					if (xmlhttp.readyState === 4){
+						if (xmlhttp.status === 200) {
+							nextLevelHTML[i]=xmlhttp.responseText;
+							//alert(nextLevelHTML);
+							if(i==levels-1) document.querySelectorAll('.play')[0].style.visibility='visible';
+						}
+					}
+				};
+				
+				xmlhttp.open("GET", baseurl+'remote-level'+(i+1)+'.html?'+Math.random() , false);
+				xmlhttp.send();
+			}
+			
+		
 			
 			function play(){
 			
@@ -159,35 +204,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			}
 			
 							
-		$(function(){
-							
-		
-			
-			
-			var level=0;
-			var tbody;
-			
-			
-			var activeSet;
 	
-			var id, clueid;
+			
+			
 
-			var moreCount=0;
-			var insertCorrect=0;
-			var levelAnswered=0;
-			var currLevel=0;
-			var stringCorrect ="";
-			var selectionTillLast=[];
-			var greenChar, redChar;
-			var start,end;
-			var activeId;
-			var randomString='';
-					
-			
-				
-			
-			
-			});
 				
 			
  </script>
