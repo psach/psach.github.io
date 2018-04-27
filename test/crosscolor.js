@@ -505,9 +505,9 @@ function storeLevel(){
 	var storage = window.localStorage;
 	var prevData=[];
 	prevData.push(level);
-	prevData.push(correctAns);
-	prevData.push(moreWords);
-	prevData.push(activeSet);
+	prevData.push([correctAns]);
+	prevData.push([moreWords]);
+	prevData.push([activeSet]);
 	prevData.push(id);
 	prevData.push(clueid);
 	prevData.push(startCell);
@@ -516,7 +516,7 @@ function storeLevel(){
 	prevData.push(levelAnswered);
 	prevData.push(currLevel);
 	prevData.push(stringCorrect);
-	prevData.push(selectionTillLast);
+	prevData.push([selectionTillLast]);
 	prevData.push(greenChar);
 	prevData.push(redChar);
 	prevData.push(start);
