@@ -505,7 +505,7 @@ function storeLevel(){
 	//storage.setItem('currLevel', currLevel);
 	//storage.setItem('mainLevel', level-1);
 	//storage.removeItem(key) 
-	storage.setItem('currHtml',$('html').innerHTML);
+	storage.setItem('currHtml',$('html').html());
 	
 }
 
