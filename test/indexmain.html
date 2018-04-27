@@ -141,7 +141,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					var prevData = storage.getItem('prevData');
 					//alert(prevData);
 					if(prevData){
-						prevData=$('['+prevData+']');
+						prevData=prevData.split(',');
 						level = prevData[0];
 						if(level==levelMoreWords.length)level=0;
 							
