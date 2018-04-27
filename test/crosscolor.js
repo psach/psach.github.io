@@ -148,8 +148,8 @@ function popWords(words){
 						if(answered){
 							levelAnswered++;
 							
-							setTimeout(function(){ setStartEnd(++currLevel); }, 1000);
-							storeLevel();
+							setTimeout(function(){ setStartEnd(++currLevel); storeLevel();}, 1000);
+							
 								
 							
 							
