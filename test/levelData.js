@@ -56,8 +56,8 @@
 								nextLevelHTML[i]=xmlhttp.responseText;
 								//alert(nextLevelHTML);
 								if(i==levels-1) {
-									//	document.querySelectorAll('.play')[0].style.visibility='visible';
-									$('.play').show();
+									document.querySelectorAll('.play')[0].style.visibility='visible';
+									//$('.play').show();
 								}
 							}
 						}
