@@ -137,37 +137,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
-					var storage = window.localStorage;
-					var prevData = storage.getItem('prevData');
-					//alert(prevData);
-					if(prevData){
-						prevData=prevData.split(',');
-						level = prevData[0];
-						if(level==levelMoreWords.length)level=0;
-							
-						id=prevData[1];                                        
-						clueid=prevData[2];                                    
-						                                                       
-						startCell = levelStartCell[level];                     
-						endCell = levelEndCell[level];                         
-						                                                       
-						moreCount=prevData[3];                                 
-						//insertCorrect=0;                                     
-						levelAnswered=prevData[4];                             
-						currLevel=prevData[5];                                 
-						stringCorrect =prevData[6];
-						
-						greenChar=prevData[7];
-						redChar=prevData[8];
-						//start=prevData[15];
-						//end=prevData[16];
-						
-						//randomString='';
 					
-						$('.centerbody').html(storage.getItem('prevDataHtml'));
-						storage.removeItem('prevData');
-					
-					}else{
 					
 						if(level==levelMoreWords.length)level=0;
 						correctAns =levelCorrectAns[level];
@@ -193,7 +163,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						randomString='';
 					
 						$('.centerbody').html(nextLevelHTML[level]);
-					}
+					
 					
 					
 					

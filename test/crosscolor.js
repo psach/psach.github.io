@@ -35,7 +35,7 @@ function popWords(words){
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
 				
-				storeLevel();
+				//storeLevel();
 				
 				var word = $(this).attr('word');
 				var invalid = false;
@@ -80,7 +80,7 @@ function popWords(words){
 					activeSet.parent().addClass('cwd-tile-incorrect');
 				
 				}else{
-					storeLevel();
+					//storeLevel();
 					selectionTillLast.push([clueid,id,word]);
 					//var stringSelected = ""+arr+","+word;
 					arr.push(word);
@@ -504,7 +504,7 @@ function storeLevel(){
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage;
 	var prevData=[];
-	prevData.push(level);
+	prevData.push(level-1);
 	prevData.push(id);
 	prevData.push(clueid);
 	prevData.push(moreCount);
