@@ -310,7 +310,9 @@ function popWords(words){
 					
 					$(this).fadeOut(1000,function(){
 						
-								$(this).fadeIn(1000,function(){
+						
+						setTimeout(function(){ 
+							$(this).fadeIn(1000,function(){
 							
 							
 									start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
@@ -326,6 +328,11 @@ function popWords(words){
 							
 							
 								});
+								
+							}, 1000);
+							
+							
+								
 						
 					});
 					
