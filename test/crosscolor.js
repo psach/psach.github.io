@@ -513,8 +513,10 @@ function storeLevel(){
 	prevData.push(stringCorrect);
 	prevData.push(greenChar);
 	prevData.push(redChar);
-	//prevData.push($('.centerbody').html());
+	
 	storage.setItem('prevData',prevData);
+	storage.setItem('prevDataHtml',$('.centerbody').html());
+	
 	
 }
 
