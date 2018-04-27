@@ -502,6 +502,7 @@ function popWords(words){
 function storeLevel(){
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage;
+	var prevData=[];
 	prevData.push(level);
 	prevData.push(correctAns);
 	prevData.push(moreWords);
