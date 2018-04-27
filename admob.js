@@ -29,7 +29,7 @@ function initApp() {
     adId: admobid.banner,
     position: AdMob.AD_POSITION.TOP_CENTER,
     isTesting: true, // TODO: remove this line when release
-    overlap: false,
+    overlap: true,
     offsetTopBar: false,
     bgColor: 'black'
   } );
