@@ -300,30 +300,34 @@ function popWords(words){
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-				
-				gridClone.appendTo(gridParent).fadeOut(1000,function(){
+
+				gridClone.appendTo(gridParent).fadeIn(1000,function(){
 					
 					start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 					end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 					start.addClass('cwd-tile-highlight');
 					end.addClass('cwd-tile-highlight');
 					
-					}).fadeIn(1000,function(){
+					}).fadeOut(1000,function(){
+						
+						$(this).fadeIn(1000,function(){
 					
 					
-					start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
-					end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+							start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+							end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+							
+							start.addClass("d3 green");
+							start.find('.cwd-tile-letter').html(greenChar);
+							
+							
+							end.addClass("d3 red");
+							end.find('.cwd-tile-letter').html(redChar);
 					
-					start.addClass("d3 green");
-					start.find('.cwd-tile-letter').html(greenChar);
 					
 					
-					end.addClass("d3 red");
-					end.find('.cwd-tile-letter').html(redChar);
-					
-					
-					
-				});
+						});
+						
+					});
 				
 				
 				//if(lvl>0){
