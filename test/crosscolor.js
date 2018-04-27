@@ -459,7 +459,7 @@ function popWords(words){
 				prevActiveSet.parent().removeClass("cwd-tile-highlight");	
 				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
 				
-				activeSet.removeClass("strikedownclueid strikeacrossclueid");
+				activeSet.removeClass("cwd-tile-highlight strikedownclueid strikeacrossclueid");
 				activeSet.addClass("strike"+clueid);
 					
 				//if(twice==2) clear();
@@ -472,7 +472,7 @@ function popWords(words){
 					
 				}else{
 					
-					if(activeSetWord.length<activeSet.parent().length)activeSet.parent().addClass("cwd-tile-highlight");
+					activeSet.parent().addClass("cwd-tile-highlight");
 					
 				}
 				
