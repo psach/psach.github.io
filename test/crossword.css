@@ -434,13 +434,19 @@
 }
 }
 
-.inner-top{
-    
-    padding-top: 55px;
+
+#cwd-divGrid{
 	background-image: url("https://cdn.pixabay.com/photo/2013/07/18/10/56/smiley-163510_1280.jpg");
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
+	
+}
+
+.inner-top{
+    
+    padding-top: 55px;
+	
 }
 
 @media (min-width:400px){
