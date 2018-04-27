@@ -144,17 +144,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						
 						level = prevData[0];
 						if(level==levelMoreWords.length)level=0;
-						//correctAns =prevData[1];
+						correctAns =levelCorrectAns[level];
 						
 						moreWords =prevData[2];
 					
-						activeSet=prevData[3];
+						//activeSet=prevData[3];
 				
 						id=prevData[4];
 						clueid=prevData[5];
 						
-						startCell = prevData[6];
-						endCell=prevData[7];
+						startCell = levelStartCell[level];
+						endCell = levelEndCell[level];
 						
 						moreCount=prevData[8];
 						//insertCorrect=0;
