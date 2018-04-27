@@ -153,9 +153,10 @@ function popWords(words){
 						if(answered){
 							
 							levelAnswered++;
-							
+							selectionTillLast=[];
 							setTimeout(function(){ 
-							setStartEnd(++currLevel); 
+							
+								setStartEnd(++currLevel); 
 							
 							//storeLevel();
 							}, 1000);
@@ -242,8 +243,8 @@ function popWords(words){
 				
 					
   
-					selectionTillLast=[];
-					randomString='';
+					//selectionTillLast=[];
+					//randomString='';
 				
 					$.each(correctAns[lvl], function(i, correctWord) {
 					
@@ -521,6 +522,7 @@ function storeLevel(){
 	prevData.push(start);
 	prevData.push(end);
 	prevData.push(activeId);
+	
 	prevData.push($('.centerbody').html());
 	storage.setItem('prevData',prevData);
 	
