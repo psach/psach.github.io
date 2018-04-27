@@ -62,14 +62,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
  <script>
 	 
-			 if(navigator.userAgent.indexOf('Android')==-1){
-				window.location.replace('playstore.html');
-			 }
-			//alert(scriptlink);
+		 if(navigator.userAgent.indexOf('Android')==-1){
+			window.location.replace('playstore.html');
+		 }
+				//alert(scriptlink);
 			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
 			var scriptlink= baseurl+'crosscolor.js';
 			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
 	 		var scriptlink2= baseurl+'admob.js';
+			var scriptlink3= baseurl+'levelData.js';
+			
+			
 	 		var head = $("<head/>");
 	 
 			head.append(csslink);
@@ -94,12 +97,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			s.src = scriptlink2;
 			head.append(s);
 	 
-	 
+	 	 	var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink3;
+			head.append(s);
+	
 			$("html").append(head);
-							
-		
-							
-		
+			
+	
+			
 			var nextLevelHTML=[];
 			var levelCorrectAns=[];
 			var levelMoreWords=[];
@@ -123,69 +130,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var start,end;
 			var activeId;
 			var randomString='';
+			
 					
-		
-					
-					
-			var correctAns =[["RAGA"/*,"RANGE","APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL"/*,"EIGHT","ALPHABET","ALCOHOLIC","EXAM"*/]];
-			
-			
-			var moreWords =[
-			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
-			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
-			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JAVA","MOBILE"],["SINGER","JUMPER","RISK"],
-			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZEBRA","SMALL","OBJECT"]
-			
-			];
-			
-			var startCell = [[10,0],[0,6]];
-			var endCell=[[0,6],[10,0]];
-			
-			levelMoreWords.push(moreWords);
-			levelCorrectAns.push(correctAns);
-			levelStartCell.push(startCell);
-			levelEndCell.push(endCell);
-			
-			
-			correctAns =[["TIME"/*,"ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"*/],
-			["GOOGLE"/*,"LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"*/]];
-				
-			 moreWords =[
-			["SIN","TAX","SOFT"],["FOUR","HIKE","EIGHTY"],["CARD","MISTY","RIDER"],["YOUNG","EAT","HUGE"],
-			["RANGE","LIME","THRICE"],["BABY","PART","LIKE"],["GOAL","GHOST","LITTLE"],["GOLDEN","SUN","AUDIO"],
-			["RIGHT","KITE","LOCK"],["DONKEY","ROCK","GRASS"],["BOXES","CRAZY","VIEW"],["JEWEL","JUMPER","RISK"],
-			["KANNADA","HINDI","MARATHI"],["CREAM","ENGLISH","TOWN"],["GOWN","STOVE","CHAIN"],["MINT","TALL","MUST"]
-			];
-			
-			startCell = [[12,2],[12,10]];
-     		endCell=[[0,10],[0,0]];
-			
-			
-			levelMoreWords.push(moreWords);
-			levelCorrectAns.push(correctAns);
-			levelStartCell.push(startCell);
-			levelEndCell.push(endCell);
-			
-			var levels=levelMoreWords.length;
-			
-			
-			for(i=0; i<levels;i++){
-				var xmlhttp = new XMLHttpRequest();
 
-				// Callback function when XMLHttpRequest is ready
-				xmlhttp.onreadystatechange=function(){
-					if (xmlhttp.readyState === 4){
-						if (xmlhttp.status === 200) {
-							nextLevelHTML[i]=xmlhttp.responseText;
-							//alert(nextLevelHTML);
-							if(i==levels-1) document.querySelectorAll('.play')[0].style.visibility='visible';
-						}
-					}
-				};
-				
-				xmlhttp.open("GET", baseurl+'remote-level'+(i+1)+'.html?'+Math.random() , false);
-				xmlhttp.send();
-			}
 				
 
 			
@@ -194,10 +141,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
-					//getLevel();
-
-					if(level==levels)level=0;
-					
+		
+					if(level==levelMoreWords.length)level=0;
 					correctAns =levelCorrectAns[level];
 					
 					moreWords =levelMoreWords[level];
@@ -209,7 +154,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					startCell = levelStartCell[level];
 					endCell=levelEndCell[level];
 					
-					//moreCount=1;
+					moreCount=0;
 					insertCorrect=0;
 					levelAnswered=0;
 					currLevel=0;
@@ -224,20 +169,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					//var nextLevelDom = $(nextLevelHTML[level]);
 					
 					//alert($('body').html(''));
-					$('.centerbody').html(nextLevelHTML[level]);
+						$('.centerbody').html(nextLevelHTML[level]);
 						
-					//window.location.replace('level1.html');
+						
+						
+							
+							
+						//window.location.replace('level1.html');
 					loadCW();
 					level++;
 					 // this will create a banner on startup
-					/*  AdMob.createBanner( {
+					  AdMob.createBanner( {
 						adId: admobid.banner,
 						position: AdMob.AD_POSITION.TOP_CENTER,
 						isTesting: true, // TODO: remove this line when release
 						overlap: true,
 						offsetTopBar: false,
 						bgColor: 'black'
-					  } );*/
+					  } );
 
 			}
 			
