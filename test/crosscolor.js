@@ -300,13 +300,13 @@ function popWords(words){
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-					start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
-					end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
-					start.addClass('cwd-tile-highlight');
-					end.addClass('cwd-tile-highlight');
+					
 					
 				gridClone.appendTo(gridParent).fadeIn(2000,function(){
-					
+						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+						start.addClass('cwd-tile-highlight');
+						end.addClass('cwd-tile-highlight');
 					
 					
 					$(this).fadeOut(1000,function(){
