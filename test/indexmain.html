@@ -141,8 +141,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 			function play(){
 			
+						if( firstLoad ){
+							getLevel();
+						}
 						
-					
 						if(level==levelMoreWords.length)level=0;
 						correctAns =levelCorrectAns[level];
 						
@@ -166,8 +168,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					
 						$('.centerbody').html(nextLevelHTML[level]);
 					
-						if(firstLoad ){
-							getLevel();
+						
+						if( firstLoad ){
 							$('#cwd-grid').html($(prevData.html));
 							firstLoad=false;
 						}
