@@ -564,7 +564,7 @@ function popWords(words){
 		   
 function storeLevel(){
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
-	var storage = window.localStorage;
+	var storage = window.localStorage?window.localStorage;localStorage;
 	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
 
 	prevData.currLevel=currLevel;
@@ -592,7 +592,7 @@ function clearLevelGrid(){
 }
 
 function getLevel(){
-	var storage = window.localStorage;
+	var storage = window.localStorage?window.localStorage;localStorage;
 	
 	prevData=JSON.parse(storage.getItem('prevData'));
 	if(prevData){
