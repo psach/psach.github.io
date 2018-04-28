@@ -32,6 +32,12 @@
 }
 
 
+
+#cwd-grid td.cwd-tile-highlight-start
+{
+    background-color: Yellow !important;
+}
+
 #cwd-grid td.red
 {
     background-color: Red !important;

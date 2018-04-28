@@ -126,19 +126,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var start,end;
 			var activeId;
 			var randomString='';
-			
+			var firstLoad=true;
 					
 
 				
-
+			//$(function(){
+			
+				
+			
+			//});
 			
 			
 	
 				
 			function play(){
 			
-					
-					
+						if( firstLoad ){
+							getLevel();
+						}
+						
 						if(level==levelMoreWords.length)level=0;
 						correctAns =levelCorrectAns[level];
 						
@@ -151,12 +157,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						startCell = levelStartCell[level];
 						endCell=levelEndCell[level];
 						
-						moreCount=0;
+						//currLevel=0;
 						insertCorrect=0;
-						levelAnswered=0;
-						currLevel=0;
 						stringCorrect ="";
-						selectionTillLast=[];
+						//selectionTillLast=[];
 						greenChar, redChar;
 						start,end;
 						activeId;
@@ -164,28 +168,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					
 						$('.centerbody').html(nextLevelHTML[level]);
 					
-					
-					
-					
-					//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
-					//var nextLevelDom = $(nextLevelHTML[level]);
-					
-					//alert($('body').html(''));
-					
 						
-									
-					//window.location.replace('level1.html');
-					loadCW();
-					level++;
-					 // this will create a banner on startup
-					  AdMob.createBanner( {
-						adId: admobid.banner,
-						position: AdMob.AD_POSITION.TOP_CENTER,
-						isTesting: true, // TODO: remove this line when release
-						overlap: true,
-						offsetTopBar: false,
-						bgColor: 'black'
-					  } );
+						if( firstLoad ){
+							if(prevData) $('#cwd-grid').html($(prevData.html));
+							firstLoad=false;
+						}
+					
+					
+						//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
+						//var nextLevelDom = $(nextLevelHTML[level]);
+						
+						//alert($('body').html(''));
+						
+							
+										
+						//window.location.replace('level1.html');
+						
+						loadCW();
+					
+					
+							
+						 // this will create a banner on startup
+						  AdMob.createBanner( {
+							adId: admobid.banner,
+							position: AdMob.AD_POSITION.TOP_CENTER,
+							isTesting: true, // TODO: remove this line when release
+							overlap: true,
+							offsetTopBar: false,
+							bgColor: 'black'
+						  } );
 
 			}
 			
