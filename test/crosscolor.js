@@ -174,7 +174,7 @@ function popWords(words){
 							}, 1000);
 						
 						
-							admob.interstitial.show()
+							admob.interstitial.show();
 							  // this will load a full screen ad on startup
 						 /*  AdMob.prepareInterstitial({
 							adId: admobid.interstitial,
