@@ -1,22 +1,31 @@
 var admobid = {};
 
+//var banner = 'ca-app-pub-9777986405041883/5940226316';
+//var inter = 'ca-app-pub-9777986405041883/5940226316';
+//var testing = false;
+
+var banner = 'ca-app-pub-3940256099942544/6300978111';
+var inter = 'ca-app-pub-3940256099942544/1033173712';
+var testing = true;
+
+
 // TODO: replace the following ad units with your own
 if( /(android)/i.test(navigator.userAgent) ) {
   admobid = { // for Android
-    banner: 'ca-app-pub-9777986405041883/5940226316',
-    interstitial: 'ca-app-pub-9777986405041883/7173416934',
+    banner: banner,
+    interstitial: inter,
     rewardvideo: '',
   };
 } else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
   admobid = { // for iOS
-    banner: 'ca-app-pub-9777986405041883/5940226316',
-    interstitial: 'ca-app-pub-9777986405041883/7173416934',
+    banner: banner,
+    interstitial: inter,
     rewardvideo: '',
   };
 } else {
   admobid = { // for Windows Phone
-    banner: 'ca-app-pub-9777986405041883/5940226316',
-    interstitial: 'ca-app-pub-9777986405041883/7173416934',
+    banner: banner,
+    interstitial: inter,
     rewardvideo: '',
   };
 }
@@ -28,7 +37,7 @@ function initApp() {
   AdMob.createBanner( {
     adId: admobid.banner,
     position: AdMob.AD_POSITION.TOP_CENTER,
-    isTesting: false, // TODO: remove this line when release
+    isTesting: testing, // TODO: remove this line when release
     overlap: true,
     offsetTopBar: false,
     bgColor: 'black'
