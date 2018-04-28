@@ -4,7 +4,7 @@
 			var levelStartCell=[];
 			var levelEndCell=[];
 
-			var correctAns =[["RAGA"/*,"RANGE","APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL"/*,"EIGHT","ALPHABET","ALCOHOLIC","EXAM"*/]];
+			var correctAns =[["RAGA","RANGE"/*,"APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL","EIGHT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]];
 			
 			
 			var moreWords =[

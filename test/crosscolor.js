@@ -1,7 +1,7 @@
 
 var twice=0;
 
-
+var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
 			
 			
@@ -32,18 +32,22 @@ function popWords(words){
 						
 		$("#words").find(".cwd-tile-letter").click(function() {
 				
+				activeSet = $("#crossword").find(".cwd-tile-highlight").find('.cwd-tile-letter');
+				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
 				
-				//storeLevel();
+					
+					
+				 
+				
+				
 				
 				var word = $(this).attr('word');
 				var invalid = false;
 				
-				var arr=[];
-				for (i = 0; i < selectionTillLast.length; i++) {
-					arr.push(selectionTillLast[i][2]);
-				}
+				
+				
 				
 				
 				
@@ -73,6 +77,7 @@ function popWords(words){
 				}
 				
 				
+				
 				if( invalid ) { 
 				
 					//alert('Incorrect selection');
@@ -80,10 +85,29 @@ function popWords(words){
 					activeSet.parent().addClass('cwd-tile-incorrect');
 				
 				}else{
-					//storeLevel();
+					
+					 clueid=activeSet.parent('[acrossclueid]').length==activeSet.parent().length?'acrossclueid':'downclueid';
+					 
+					 id = activeSet.parent().attr(clueid);
+				
+					
+					
+					 //id = id?id:activeSet.parent().attr('downclueid');
+					
+					
+					 activeId=id;
 					selectionTillLast.push([clueid,id,word]);
+				
+					var arr=[];
+					for (i = 0; i < selectionTillLast.length; i++) {
+						arr.push(selectionTillLast[i][2]);
+					}
+				
+				
+					//storeLevel();
+					
 					//var stringSelected = ""+arr+","+word;
-					arr.push(word);
+					//arr.push(word);
 					//alert(stringSelected + " : " + correctAns);
 					stringCorrect = ""+correctAns[currLevel];
 					
@@ -133,22 +157,30 @@ function popWords(words){
 						randomString=''; */
 						//window.location.replace(nextLevel);
 						//$('head').load('https://drive.google.com/uc?export=download&id=1HTs_G_XQciOrSrUbMJKAtCmhdBTImiy-');
+						moreCount=0;
+						levelAnswered=0;
+						currLevel=0;
+						selectionTillLast=[];
 						
-					
 						
 						  
-						//setTimeout(function(){ 
-							//alert('Good!');
-							
-							
-							//storeLevel();
-						//}, 1000);
+							setTimeout(function(){ 
+								level++;
+								clearLevelGrid();
+								play();
+								//alert('Good!');
+								
+								//storeLevel();
+							}, 1000);
+						
+						
+						
 							  // this will load a full screen ad on startup
 						  AdMob.prepareInterstitial({
 							adId: admobid.interstitial,
 							isTesting: true, // TODO: remove this line when release
 							autoShow: true
-						  },function(){play();});
+						  });
 						 
 					}else{
 					
@@ -157,11 +189,14 @@ function popWords(words){
 							
 							levelAnswered++;
 							selectionTillLast=[];
-							setTimeout(function(){ 
+							moreCount=0;
 							
+							
+							setTimeout(function(){ 
+								clearLevelGrid();
 								setStartEnd(++currLevel); 
 							
-							//storeLevel();
+							
 							}, 1000);
 							
 								
@@ -171,6 +206,7 @@ function popWords(words){
 							
 						}
 					}
+					storeLevel();
 					
 				};
 				
@@ -223,6 +259,7 @@ function popWords(words){
 						});
 						selectionTillLast.splice(removeElement,1);
 						//selectionTillLast.pop();
+						storeLevel();
 				
 			}
 			
@@ -245,7 +282,7 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 				
-					
+					storeLevel();
   
 					//selectionTillLast=[];
 					//randomString='';
@@ -268,13 +305,13 @@ function popWords(words){
 					clearGrid.addClass('cwd-tile cwd-tile-active');
 					gridChild.addClass('cwd-tile-letter'); */
 					
-					var clearGrid =$("#crossword").find(".cwd-tile-active");
+					/* var clearGrid =$("#crossword").find(".cwd-tile-active");
 					clearGrid.removeAttr('class');
 					clearGrid.addClass('cwd-tile cwd-tile-active');
 					var gridChild=clearGrid.find('.cwd-tile-letter');
 					gridChild.html(' ');
 					gridChild.removeAttr('class');
-					gridChild.addClass('cwd-tile-letter');
+					gridChild.addClass('cwd-tile-letter'); */
 					
 				
 				//alert(lvl);
@@ -325,7 +362,8 @@ function popWords(words){
 									
 									end.addClass("d3 red");
 									end.find('.cwd-tile-letter').html(redChar);
-							
+									start.removeClass('cwd-tile-highlight');
+									end.removeClass('cwd-tile-highlight');
 							
 							
 								});
@@ -358,6 +396,7 @@ function popWords(words){
 			}
 			
 			function loadCW() {
+				
 				
 			/* var storage = window.localStorage;
 			var savedLevel = storage.getItem('currHtml');
@@ -428,10 +467,7 @@ function popWords(words){
 				popWords(moreWords[moreCount]);
 			});
 			 */
-			$("#crossword").find(".cwd-tile-active").dblclick(function() {
-				//alert(activeSet.text().trim());
-				//if(activeSet && activeSet.text().trim().length==activeSet.length)clear();
-			});
+
 			
 		
 			$("#crossword").find(".cwd-tile-active").click(function() {
@@ -439,7 +475,7 @@ function popWords(words){
 				
 				//var prevActiveSetId = id
 				
-				var prevActiveSet= activeSet;
+				//var prevActiveSet= activeSet;
 				
 				
 				
@@ -474,26 +510,33 @@ function popWords(words){
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWord.length==activeSet.parent().length){
 					clear();
 					activeSet.parent().addClass("cwd-tile-highlight");
+					storeLevel();
 					return;
 				}
 				
-				prevActiveSet = prevActiveSet?prevActiveSet:activeSet;
+				/* prevActiveSet = prevActiveSet?prevActiveSet:activeSet;
 				
 				prevActiveSet.removeClass('strikeout');
 				prevActiveSet.removeClass('strikeacrossclueid');
-				prevActiveSet.removeClass('strikedownclueid');
+				prevActiveSet.removeClass('strikedownclueid'); */
 				
-				prevActiveSet.parent().removeClass("cwd-tile-highlight");	
-				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	
+				$('.cwd-tile-letter')
+				.removeClass("strikeout strikeacrossclueid strikedownclueid");
 				
+				
+				/* prevActiveSet.parent().removeClass("cwd-tile-highlight");	
+				prevActiveSet.parent().removeClass("cwd-tile-incorrect");	 */
+				$('.cwd-tile-letter').parent()
+				.removeClass("cwd-tile-highlight cwd-tile-incorrect");
+			
 				activeSet.removeClass("strikedownclueid strikeacrossclueid");
-				activeSet.addClass("strike"+clueid);
+				
 					
 				//if(twice==2) clear();
 				if(activeSet && activeSetWord.length==activeSet.parent().length){
 				
-					
-					activeSet.addClass('strikeout');
+				
+					activeSet.addClass('strikeout ' + "strike"+clueid);
 					
 					
 					
@@ -503,7 +546,7 @@ function popWords(words){
 					
 				}
 				
-				
+				storeLevel();
 				
 			});	
 			
@@ -522,33 +565,52 @@ function popWords(words){
 function storeLevel(){
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage;
-	var prevData=[];
-	prevData.push(level-1);
-	prevData.push(id);
-	prevData.push(clueid);
-	prevData.push(moreCount);
-	prevData.push(levelAnswered);
-	prevData.push(currLevel);
-	prevData.push(stringCorrect);
-	prevData.push(greenChar);
-	prevData.push(redChar);
+	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
+
+	prevData.currLevel=currLevel;
+	prevData.level=level;
+	prevData.moreCount=moreCount;
+	prevData.levelAnswered=levelAnswered;
+	prevData.html=$('#cwd-grid').html();
+	prevData.selections=selectionTillLast;
 	
-	storage.setItem('prevData',prevData);
-	storage.setItem('prevDataHtml',$('.centerbody').html());
+	
+	storage.setItem('prevData',JSON.stringify(prevData));
 	
 	
 }
 
+function clearLevelGrid(){
+	
+							var clearGrid =$("#crossword").find(".cwd-tile-active");
+							clearGrid.removeAttr('class');
+							clearGrid.addClass('cwd-tile cwd-tile-active');
+							var gridChild=clearGrid.find('.cwd-tile-letter');
+							gridChild.html(' ');
+							gridChild.removeAttr('class');
+							gridChild.addClass('cwd-tile-letter');
+}
 
 function getLevel(){
-	
 	var storage = window.localStorage;
-	currLevel = storage.getItem('currLevel')?storage.getItem('currLevel'):0; 
-	level = storage.getItem('mainLevel')?storage.getItem('mainLevel'):0; 
-	alert("Retriving : " +currLevel +" : "+ level );
-	// Pass a key name to get its value.
-	//storage.setItem(key, value) // Pass a key name and its value to add or update that key.
-	//storage.removeItem(key) 
 	
+	prevData=JSON.parse(storage.getItem('prevData'));
+	if(prevData){
+		currLevel=prevData.currLevel;
+		level=prevData.level;
+		moreCount=prevData.moreCount;
+		levelAnswered=prevData.levelAnswered;
+		selectionTillLast=prevData.selections;
+		
+	}else{
+		currLevel=0;
+		level=0;
+		moreCount=0;
+		levelAnswered=0;
+		selectionTillLast=[];
+		
+	}
+	console.log(prevData);
+	//storage.removeItem('prevData');
 }
 
