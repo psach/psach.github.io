@@ -1,12 +1,12 @@
 var admobid = {};
 
-//var banner = 'ca-app-pub-9777986405041883/5940226316';
-//var inter = 'ca-app-pub-9777986405041883/7173416934';
-//var testing = false;
+var banner = 'ca-app-pub-9777986405041883/5940226316';
+var inter = 'ca-app-pub-9777986405041883/7173416934';
+var testing = false;
 
-var banner = 'ca-app-pub-3940256099942544/6300978111';
+/* var banner = 'ca-app-pub-3940256099942544/6300978111';
 var inter = 'ca-app-pub-3940256099942544/1033173712';
-var testing = true;
+var testing = true; */
 
 
 // TODO: replace the following ad units with your own
