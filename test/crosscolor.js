@@ -342,8 +342,8 @@ function popWords(words){
 				gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
-						start.addClass('cwd-tile-highlight');
-						end.addClass('cwd-tile-highlight');
+						start.addClass('cwd-tile-highlight-start');
+						end.addClass('cwd-tile-highlight-start');
 					
 					
 					$(this).fadeOut(1000,function(){
@@ -362,8 +362,7 @@ function popWords(words){
 									
 									end.addClass("d3 red");
 									end.find('.cwd-tile-letter').html(redChar);
-									start.removeClass('cwd-tile-highlight');
-									end.removeClass('cwd-tile-highlight');
+									
 							
 							
 								});
