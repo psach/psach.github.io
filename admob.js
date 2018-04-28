@@ -1,7 +1,7 @@
 var admobid = {};
 
 //var banner = 'ca-app-pub-9777986405041883/5940226316';
-//var inter = 'ca-app-pub-9777986405041883/5940226316';
+//var inter = 'ca-app-pub-9777986405041883/7173416934';
 //var testing = false;
 
 var banner = 'ca-app-pub-3940256099942544/6300978111';
