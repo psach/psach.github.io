@@ -28,7 +28,7 @@ function initApp() {
   AdMob.createBanner( {
     adId: admobid.banner,
     position: AdMob.AD_POSITION.TOP_CENTER,
-    //isTesting: true, // TODO: remove this line when release
+    isTesting: false, // TODO: remove this line when release
     overlap: true,
     offsetTopBar: false,
     bgColor: 'black'
