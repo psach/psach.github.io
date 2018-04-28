@@ -130,11 +130,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					
 
 				
-			$(function(){
+			//$(function(){
 			
-				getLevel();
+				
 			
-			});
+			//});
 			
 			
 	
@@ -166,7 +166,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					
 						$('.centerbody').html(nextLevelHTML[level]);
 					
-						if(prevData && firstLoad ){
+						if(firstLoad ){
+							getLevel();
 							$('#cwd-grid').html($(prevData.html));
 							firstLoad=false;
 						}
