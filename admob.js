@@ -1,6 +1,6 @@
 var admobid = {};
 
-var banner = 'ca-app-pub-9777986405041883/5940226316';
+var banner = 'ca-app-pub-9777986405041883/2774613717';
 var inter = 'ca-app-pub-9777986405041883/7173416934';
 var testing = false;
 
