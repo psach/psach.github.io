@@ -1,33 +1,39 @@
 var admobid = {};
 
-var banner = 'ca-app-pub-9777986405041883/2774613717';
+/* var banner = 'ca-app-pub-9777986405041883/2774613717';
 var inter = 'ca-app-pub-9777986405041883/7173416934';
+var testing = false; */
 
-var testing = false;
+var banner = 'ca-app-pub-3940256099942544/6300978111';
+var inter = 'ca-app-pub-3940256099942544/1033173712';
+var testing = true;
+
 
 if (/(android)/i.test(navigator.userAgent)) {  // for android & amazon-fireos
   admobid = {
-    banner: 'ca-app-pub-3940256099942544/6300978111',
-    interstitial: 'ca-app-pub-3940256099942544/1033173712',
+    banner: banner,
+    interstitial: inter,
   }
 } else if (/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {  // for ios
   admobid = {
-    banner: 'ca-app-pub-3940256099942544/2934735716',
-    interstitial: 'ca-app-pub-3940256099942544/4411468910',
+    banner: banner,
+    interstitial: inter,
   }
 }
 
 document.addEventListener('deviceready', function() {
   admob.banner.config({
     id: admobid.banner,
-    isTesting: true,
+	overlap:true,
+	bannerAtTop:true,
+    isTesting: testing,
     autoShow: true,
   })
   admob.banner.prepare()
 
   admob.interstitial.config({
     id: admobid.interstitial,
-    isTesting: true,
+    isTesting: testing,
     autoShow: false,
   })
   admob.interstitial.prepare()
