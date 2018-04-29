@@ -174,13 +174,13 @@ function popWords(words){
 							}, 1000);
 						
 						
-						
+							admob.interstitial.show();
 							  // this will load a full screen ad on startup
-						  AdMob.prepareInterstitial({
+						 /*  AdMob.prepareInterstitial({
 							adId: admobid.interstitial,
 							isTesting: true, // TODO: remove this line when release
 							autoShow: true
-						  });
+						  }); */
 						 
 					}else{
 					
