@@ -31,34 +31,30 @@ document.addEventListener('deviceready', function() {
     isTesting: testing,
     autoShow: true,
   })
-  admob.banner.prepare()
+  admob.banner.prepare();
 
   admob.interstitial.config({
     id: admobid.interstitial,
     isTesting: testing,
     autoShow: false,
   })
-  admob.interstitial.prepare()
+  admob.interstitial.prepare();
 
-  document.getElementById('showAd').disabled = true
-  document.getElementById('showAd').onclick = function() {
-    admob.interstitial.show()
-  }
-
-}, false)
+ 
+}, false);
 
 document.addEventListener('admob.banner.events.LOAD_FAIL', function(event) {
   console.log(event)
-})
+});
 
 document.addEventListener('admob.interstitial.events.LOAD_FAIL', function(event) {
   console.log(event)
-})
+});
 
 document.addEventListener('admob.interstitial.events.LOAD', function(event) {
   console.log(event)
   document.getElementById('showAd').disabled = false
-})
+});
 
 document.addEventListener('admob.interstitial.events.CLOSE', function(event) {
   console.log(event)
