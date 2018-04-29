@@ -11,12 +11,6 @@ var inter = 'ca-app-pub-3940256099942544/1033173712';
 var testing = true; */
 
 
-
-var banner = 'ca-app-pub-9777986405041883/2774613717';
-var inter = 'ca-app-pub-9777986405041883/6706846212';
-var testing = false;
-
-
 if (/(android)/i.test(navigator.userAgent)) {  // for android & amazon-fireos
   admobid = {
     banner: banner,
