@@ -1,53 +1,67 @@
 var admobid = {};
 
-var banner = 'ca-app-pub-9777986405041883/2774613717';
+
+var banner = 'ca-app-pub-9777986405041883/5940226316';
 var inter = 'ca-app-pub-9777986405041883/7173416934';
 var testing = false;
 
-/* var banner = 'ca-app-pub-3940256099942544/6300978111';
+/* 
+var banner = 'ca-app-pub-3940256099942544/6300978111';
 var inter = 'ca-app-pub-3940256099942544/1033173712';
 var testing = true; */
 
 
-// TODO: replace the following ad units with your own
-if( /(android)/i.test(navigator.userAgent) ) {
-  admobid = { // for Android
+if (/(android)/i.test(navigator.userAgent)) {  // for android & amazon-fireos
+  admobid = {
     banner: banner,
     interstitial: inter,
-    rewardvideo: '',
-  };
-} else if(/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
-  admobid = { // for iOS
+  }
+} else if (/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {  // for ios
+  admobid = {
     banner: banner,
     interstitial: inter,
-    rewardvideo: '',
-  };
-} else {
-  admobid = { // for Windows Phone
-    banner: banner,
-    interstitial: inter,
-    rewardvideo: '',
-  };
+  }
 }
 
-function initApp() {
-  if (! AdMob ) { alert( 'admob plugin not ready' ); return; }
+document.addEventListener('deviceready', function() {
+  admob.banner.config({
+    id: admobid.banner,
+	overlap:true,
+	bannerAtTop:true,
+    isTesting: testing,
+    autoShow: true,
+  })
+  admob.banner.prepare()
 
-  // this will create a banner on startup
-  AdMob.createBanner( {
-    adId: admobid.banner,
-    position: AdMob.AD_POSITION.TOP_CENTER,
-    isTesting: testing, // TODO: remove this line when release
-    overlap: true,
-    offsetTopBar: false,
-    bgColor: 'black'
-  } );
+  admob.interstitial.config({
+    id: admobid.interstitial,
+    isTesting: testing,
+    autoShow: false,
+  })
+  admob.interstitial.prepare()
 
- 
-}
+  document.getElementById('showAd').disabled = true
+  document.getElementById('showAd').onclick = function() {
+    admob.interstitial.show()
+  }
 
-if(( /(ipad|iphone|ipod|android|windows phone)/i.test(navigator.userAgent) )) {
-    document.addEventListener('deviceready', initApp, false);
-} else {
-    initApp();
-}
+}, false)
+
+document.addEventListener('admob.banner.events.LOAD_FAIL', function(event) {
+  console.log(event)
+})
+
+document.addEventListener('admob.interstitial.events.LOAD_FAIL', function(event) {
+  console.log(event)
+})
+
+document.addEventListener('admob.interstitial.events.LOAD', function(event) {
+  console.log(event)
+  document.getElementById('showAd').disabled = false
+})
+
+document.addEventListener('admob.interstitial.events.CLOSE', function(event) {
+  console.log(event)
+
+  admob.interstitial.prepare()
+})
