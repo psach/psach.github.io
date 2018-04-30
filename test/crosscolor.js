@@ -339,7 +339,7 @@ function popWords(words){
 				$("#cwd-grid").remove();
 				gridClone.appendTo(gridParent);
 				gridClone.css('opacity', '1');
-				gridClone.css('transition','opacity 2s ease-in-out');
+				//gridClone.css('transition','opacity 2s ease-in-out');
 				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
