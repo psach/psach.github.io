@@ -343,11 +343,12 @@ function popWords(words){
 				//gridParent.css('opacity', '1');
 				//gridClone.css('transition','opacity 2s ease-in-out');
 				gridClone.appendTo(gridParent).fadeIn(2000,function(){
+						$(".scorediv").css('opacity',0);
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass('cwd-tile-highlight-start');
 						end.addClass('cwd-tile-highlight-start');
-					
+						
 					
 					$(this).fadeOut(2000,function(){
 						
@@ -365,7 +366,7 @@ function popWords(words){
 									
 									end.addClass("d3 red");
 									end.find('.cwd-tile-letter').html(redChar);
-									$(".scorediv").css('opacity',0);
+									
 							
 							
 								});
