@@ -446,9 +446,7 @@
     background-repeat:   no-repeat;
     background-position: center center; 
     background-size: 70%;
-    transition: opacity 1s ease-in-out;
-    opacity: 0;
-    display: block;
+
 }
 
 inner-top::after {
