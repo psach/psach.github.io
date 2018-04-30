@@ -570,10 +570,10 @@ function showLevel(){
 	    }, 1000);
 
 	  });*/
-	$('#cwd-divGrid').find('.wrapper').remove();
+	//$('#cwd-divGrid').find('.wrapper').remove();
 	
-	var score =$('<div class="wrapper"><div class="scorediv " style="border: 1px solid black;" >'+(currLevel+level)+'</div></div>');
-	$('#cwd-grid').before(score);
+	//var score =$('<div class="wrapper"><div class="scorediv " style="border: 1px solid black;" >'+(currLevel+level)+'</div></div>');
+	//$('#cwd-grid').before(score);
 	
 	//$('#cwd-divGrid').append(score);
 	
