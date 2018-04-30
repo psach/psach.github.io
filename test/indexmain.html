@@ -49,7 +49,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- div class='outer'  align='center' style='height:50%; padding-top:15%' >
 <img src='splashgif1.gif' / -->
 <div class='centerbody' >
-	 <div class="scorediv">0</div>
+	
 	<table align='center' >
 		<tr>
 			<td align='center' style='padding-top:20%'>
@@ -185,7 +185,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 							if(prevData) $('#cwd-grid').html($(prevData.html));
 							firstLoad=false;
 						}
-					
+						 $('.centerbody').append('<div class="scorediv">'+(currLevel+level)+'</div>');
 						var bgColor = $('html').css('background-color');
 						$('.arrow').css('background-color',bgColor);
 						$('.d3word').css('background-color',bgColor);
