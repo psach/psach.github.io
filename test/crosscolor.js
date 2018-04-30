@@ -365,7 +365,7 @@ function popWords(words){
 									
 									end.addClass("d3 red");
 									end.find('.cwd-tile-letter').html(redChar);
-									
+									$(".scorediv").css('opacity',0);
 							
 							
 								});
@@ -564,7 +564,8 @@ function popWords(words){
 
 			
 function showLevel(){
- //$(".scorediv").html(currLevel+level);
+ $(".scorediv").css('opacity',1);
+ $(".scorediv").html(currLevel+level);
  /*$(".wrapper").animate({
         	left: "0"
 	    }, 1000,function(){
@@ -580,7 +581,7 @@ function showLevel(){
 	//$('#cwd-grid').before(score);
 	
 	//$('#cwd-divGrid').append(score);
-	$('.inner-top').attr('data-bg-text',(currLevel+level));
+	//$('.inner-top').attr('data-bg-text',(currLevel+level));
 }
 		   
 function storeLevel(){
