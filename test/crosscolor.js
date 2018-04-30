@@ -1,6 +1,6 @@
 
 var twice=0;
-var gridClone;
+
 
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
@@ -336,7 +336,7 @@ function popWords(words){
 				var gridParent = $("#cwd-grid").parent();
 				//gridParent.addClass('hide');
 				//gridParent.css('visibility','hidden');
-				//gridClone = $("#cwd-grid").clone(true);
+				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				
 				//gridClone.appendTo(gridParent);
@@ -399,11 +399,7 @@ function popWords(words){
 			
 			function loadCW() {
 				
-			var gridParent = $("#cwd-grid").parent();
-			//gridParent.addClass('hide');
-			//gridParent.css('visibility','hidden');
-			gridClone = $("#cwd-grid").clone(true);
-			$("#cwd-grid").remove();
+			
 				
 			/* var storage = window.localStorage;
 			var savedLevel = storage.getItem('currHtml');
