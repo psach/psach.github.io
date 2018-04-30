@@ -449,6 +449,18 @@
 	
 }
 
+#cwd-divGrid::after {
+    color: #000;
+    content: attr(data-bg-text);
+    display: block;
+    font-size: 80px;
+    line-height: 1;
+    position: absolute;
+    bottom: 15px;
+    right: 10px;
+}
+
+
 .inner-top{
     
     padding-top: 55px;
