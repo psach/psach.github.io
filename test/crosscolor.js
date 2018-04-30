@@ -573,7 +573,9 @@ function showLevel(){
 	$('#cwd-divGrid').find('.wrapper').remove();
 	
 	var score =$('<div class="wrapper"><div class="scorediv " style="border: 1px solid black;" >'+(currLevel+level)+'</div></div>');
-	$('#cwd-divGrid').append(score);
+	$('#cwd-grid').before(score);
+	
+	//$('#cwd-divGrid').append(score);
 	
 }(currLevel+level)
 		   
