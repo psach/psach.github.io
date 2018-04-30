@@ -576,7 +576,7 @@ function showLevel(){
 	//$('#cwd-grid').before(score);
 	
 	//$('#cwd-divGrid').append(score);
-	$('#cwd-divGrid').attr('data-bg-text',(currLevel+level));
+	$('#cwd-grid').attr('data-bg-text',(currLevel+level));
 }
 		   
 function storeLevel(){
