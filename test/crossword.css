@@ -1,3 +1,9 @@
+.inner-word{
+	position:absolute; 
+	bottom:0;
+	left:50%
+	width:85%;
+}
 
 #cwd-container {
     font-family: tahoma;
