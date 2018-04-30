@@ -456,6 +456,14 @@ function popWords(words){
 				popWords(moreWords[moreCount]);
 				
 			});
+				
+				setInterval(function(){
+					
+					moreCount++;
+					if(moreCount==moreWords.length)moreCount=0;
+					popWords(moreWords[moreCount]);
+				
+				},3000);
 			
 			/* $( ".action-container" ).on( "swiperight", function(){
 				
