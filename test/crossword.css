@@ -449,7 +449,7 @@
 
 }
 
-inner-top::after {
+.inner-top::after {
     color: #000;
     content: attr(data-bg-text);
     display: block;
