@@ -560,7 +560,7 @@ function popWords(words){
 
 			
 function showLevel(){
- $(".scorediv").html(currLevel+level);
+ //$(".scorediv").html(currLevel+level);
  /*$(".wrapper").animate({
         	left: "0"
 	    }, 1000,function(){
@@ -570,8 +570,12 @@ function showLevel(){
 	    }, 1000);
 
 	  });*/
+	$('#cwd-grid').find('.wrapper').remove();
 	
-}
+	var score =$('<div class="wrapper"><div class="scorediv " style="border: 1px solid black;" >'+(currLevel+level)+'</div></div>');
+	$('#cwd-grid').append(score);
+	
+}(currLevel+level)
 		   
 function storeLevel(){
 	
