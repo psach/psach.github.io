@@ -561,7 +561,7 @@ function popWords(words){
 			
 function showLevel(){
  $(".scorediv").html(currLevel+level);
- $(".wrapper").animate({
+ /*$(".wrapper").animate({
         	left: "0"
 	    }, 1000,function(){
 
@@ -569,7 +569,7 @@ function showLevel(){
 		left: "-15%"
 	    }, 1000);
 
-	  });
+	  });*/
 	
 }
 		   
