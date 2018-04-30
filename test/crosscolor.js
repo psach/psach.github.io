@@ -562,6 +562,16 @@ function popWords(words){
         
 		   
 function storeLevel(){
+	
+	 $(".wrapper").animate({
+        	left: "0"
+	    }, 1000,function(){
+
+	    $(".wrapper").animate({
+		left: "-15%"
+	    }, 1000);
+
+	  });
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage?window.localStorage:localStorage;
 	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
