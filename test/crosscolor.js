@@ -281,7 +281,7 @@ function popWords(words){
 			}
 			
 			function setStartEnd(lvl){
-				
+					showLevel();
 					storeLevel();
   
 					//selectionTillLast=[];
@@ -559,11 +559,9 @@ function popWords(words){
 		}
 
 			
-        
-		   
-function storeLevel(){
-	
-	 $(".wrapper").animate({
+function showLevel(){
+
+ $(".wrapper").animate({
         	left: "0"
 	    }, 1000,function(){
 
@@ -572,6 +570,12 @@ function storeLevel(){
 	    }, 1000);
 
 	  });
+	
+}
+		   
+function storeLevel(){
+	
+	
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage?window.localStorage:localStorage;
 	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
