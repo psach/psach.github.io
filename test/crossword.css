@@ -450,13 +450,13 @@
 	
 }
 
-#cwd-divGrid::after {
+inner-top::after {
     color: #000;
     content: attr(data-bg-text);
     display: block;
     font-size: 80px;
     line-height: 1;
-    position: relative;
+    position: absolute;
     bottom: 15px;
     right: 10px;
 }
