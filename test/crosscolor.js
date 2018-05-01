@@ -344,7 +344,8 @@ function popWords(words){
 				$("#cwd-grid").remove();
 				gridClone.css('opacity','0');
 				gridClone.css('transition','opacity 2s ease-in-out');
-				
+				$(".wrapper").removeClass('wrapperSlideIn');
+				$(".wrapper").addClass('wrapperSlideOut');
 				//gridClone.appendTo(gridParent);
 						/* start = gridClone.find("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = gridClone.find("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
@@ -368,19 +369,16 @@ function popWords(words){
 									end.addClass("d3 red");
 									end.find('.cwd-tile-letter').html(redChar);
 									
-									 $(".wrapper").removeClass('wrapperSlideIn');
-									  $(".wrapper").addClass('wrapperSlideOut');
+									
 									  
 									  //$(".wrapper").addClass('wrapperSlideIn');
 									 
-									 setTimeout(function(){	
 									 
-										 $(".wrapper").removeClass('wrapperSlideOut');
-										 $(".wrapper").addClass('wrapperSlideIn');
-										 
-										 }
 									 
-									 ,2000);
+								 $(".wrapper").removeClass('wrapperSlideOut');
+								 $(".wrapper").addClass('wrapperSlideIn');
+								 
+										
 								
 				
 				});
