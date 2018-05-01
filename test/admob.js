@@ -59,4 +59,4 @@ document.addEventListener('admob.interstitial.events.CLOSE', function(event) {
   console.log(event)
 
   admob.interstitial.prepare()
-})
+});
