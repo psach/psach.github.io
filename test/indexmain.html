@@ -46,28 +46,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	background-size: 50%;
 	background-color:yellow; 
     position: absolute;
-	top:30%;
 	left:-200px;
-	width:100px;
-	height:40px;
+	width:150px;
+	height:50px;
 	
-    padding:15px;
+    padding-top:15px;
+	padding-bottom:10px;
+	padding-left:15px;
 	padding-right:5px;
    	border-radius: 0 100em 100em 0;
-	font-weight: bold;
-	font-family: Verdana;
-	font-size: 20px;
-	color: black;
-    text-align: right;
+	
 	-webkit-transition:left 1s;
     transition:left 1s;
 	z-index:10;
 	box-shadow:
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
-    0 0 0px 1px rgba(0,0,0,1);
+    0 10px 40px 0px rgba(0,0,0,0.75);
 }
 
+.score{
+	font-weight: bold;
+	font-family: cursive;
+	font-size: 25px;
+	color: black;
+    text-align: right;
+}
 .wrapperSlideIn {
   
    left: 0px;
@@ -91,7 +95,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <img src='splashgif1.gif' / -->
 <div class="wrapperContainer">
 
-<div class="wrapper" ></div>
+<div class="wrapper" ><table width=100% ><tr><td></td><td class='score'align='left' >0</td><td width='85%'></td></tr></table></div>
 
 </div>
 

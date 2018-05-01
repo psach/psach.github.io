@@ -283,6 +283,7 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 					
+					showLevel();
 					storeLevel();
 					setTimeout(function(){
 						
@@ -346,19 +347,19 @@ function popWords(words){
 				gridClone.css('transition','opacity 2s ease-in-out');
 				
   
-				//gridClone.appendTo(gridParent);
+						//gridClone.appendTo(gridParent);
 						start = gridClone.find("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = gridClone.find("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass('cwd-tile-highlight-start');
 						end.addClass('cwd-tile-highlight-start');
 						
-				//gridClone.appendTo(gridParent);
-				//gridParent.css('opacity', '1');
-				//gridClone.css('transition','opacity 2s ease-in-out');
-				gridClone.appendTo(gridParent).fadeIn('slow',function(){
-						gridClone.css('opacity','1');
-			
-				});
+						//gridClone.appendTo(gridParent);
+						//gridParent.css('opacity', '1');
+						//gridClone.css('transition','opacity 2s ease-in-out');
+						gridClone.appendTo(gridParent).fadeIn('slow',function(){
+								gridClone.css('opacity','1');
+					
+						});
 			
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
@@ -420,7 +421,7 @@ function popWords(words){
 				//gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
 			
-				showLevel();
+				
 			
 			
 			}
@@ -603,19 +604,23 @@ function popWords(words){
 function showLevel(){
 	//$(".wrapper").css('transition','left 1s');
 	//$(".wrapper").css('left','0px');
-	//$(".wrapper").html(currLevel+level);
+	$(".score").html(currLevel+level+100);
 
   $(".wrapper").addClass('wrapperSlideIn');
   $(".wrapper").removeClass('wrapperSlideOut');
  
-  setTimeout(function(){	
+  setTimeout(
+  
+  
+	 function(){	
  
-	 $(".wrapper").removeClass('wrapperSlideIn');
-	 $(".wrapper").addClass('wrapperSlideOut');
+		 $(".wrapper").removeClass('wrapperSlideIn');
+		 $(".wrapper").addClass('wrapperSlideOut');
 	 
 	 }
  
  ,2000); 
+
  //$(".scorediv").css('opacity',1);
  //$(".scorediv").html(currLevel+level);
  /*$(".wrapper").animate({
