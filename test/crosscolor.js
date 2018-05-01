@@ -12,7 +12,6 @@ function getRandomArbitrary(min, max) {
 
 
 
-
 function popWords(words){
 
 						$(".wordset").remove();
@@ -20,10 +19,20 @@ function popWords(words){
 							
 							
 							var tr = $('<tr class="wordset">');
-						
+							
 							$.each(word.split(''), function(j,character){
-								$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3 '+character+'" word='+word+' style="margin-top: 0px;"> '+character+'</div></td>').appendTo(tr);
-						
+							/* 	var temp = emojiUnicode(character);
+								console.log(temp);
+								//var df = String.fromCodePoint(parseInt(temp).toString(16));
+								//df.length;
+								var first = String.fromCodePoint(eval('0x'+temp)).charCodeAt(0).toString(16); // d83d
+								var second = String.fromCodePoint(eval('0x'+temp)).charCodeAt(1).toString(16);
+								console.log(first+second);
+								var temp =first+second; */
+								
+								$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3 '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar?emojiChar[character]:character)+'</div></td>').appendTo(tr);
+								//tr.find('.cwd-tile-letter').text(emojiChar?emojiChar[character]:character);
+					
 						});
 						
 						
@@ -59,10 +68,12 @@ function popWords(words){
 				
 				
 					$.each(word.split(''), function(j,character){
-					//alert("["+$(activeSet[j]).html()+"] : " + character);
+						character = emojiChar?emojiChar[character]:character;
+						
+					//alert("["+$(activeSet[j]).text()+"] : " + character);
 					
 						if ( $(activeSet[j]).html()!= ' ' && !invalid ) {
-							invalid = $(activeSet[j]).html()!=character;
+							invalid = $(activeSet[j]).text()!=character;
 							
 						}
 						
@@ -134,7 +145,9 @@ function popWords(words){
 						
 						$(activeSet[j]).addClass(character);
 						$(activeSet[j]).addClass('d3');
-						$(activeSet[j]).html(character);
+						$(activeSet[j]).html(emojiChar?emojiChar[character]:character);
+						$(activeSet[j]).attr('word',character);
+						
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
@@ -248,7 +261,7 @@ function popWords(words){
 									
 									if(activeList[1]!=activeId){
 										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
-										tile.html(character);
+										tile.text(emojiChar?emojiChar[character]:character);
 										tile.addClass('d3 ' + character);
 										
 									}else{
@@ -364,9 +377,9 @@ function popWords(words){
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass("d3 green");
-						start.find('.cwd-tile-letter').html(greenChar);
+						start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 						end.addClass("d3 red");
-						end.find('.cwd-tile-letter').html(redChar);
+						end.find('.cwd-tile-letter').html(emojiChar[redChar]);
 									
 				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						
@@ -444,19 +457,10 @@ function popWords(words){
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
-			$(".clear").click(function() {
+			/* $(".clear").click(function() {
 			
 					
-				//$("#crossword").find(".cwd-tile-active").dblclick(function() {
-				//$("#crossword").find(".cwd-tile-letter").html(' ');
-				//alert();
-				/* if(activeSet){
-				
-				activeSet.html(' ');
-				activeSet.removeClass('d3');
-				} */
-				//alert($("<div />").append(activeSet.text().clone()).html());
-				//alert(activeSet.text());
+
 				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
 				
 				if(activeSet && activeSetWord.length==activeSet.length)clear();
@@ -465,7 +469,7 @@ function popWords(words){
 				
 							
 				
-			});
+			}); */
 			
 			
 			
@@ -538,17 +542,20 @@ function popWords(words){
 				
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
+				activeSetWord=activeSet.find('[word]');
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
 				
 				
 				
 				activeId=id;
-				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
-				
+				//alert(activeSetWord.length);
+				//var activeSetWord = activeSet.text().trim().replace(' ' ,'');
+			
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWord.length==activeSet.parent().length){
 					clear();
+					activeSetWord.removeAttr('word');
 					activeSet.parent().addClass("cwd-tile-highlight");
 					storeLevel();
 					return;

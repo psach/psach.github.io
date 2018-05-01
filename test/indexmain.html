@@ -67,7 +67,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
 .score{
 	font-weight: bold;
-	font-family: 'cursive';
+	font-family: Comic Sans MS;
 	font-size: 25px;
 	color: black;
     text-align: right;
@@ -113,9 +113,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		
 		<tr>
 			<td align='center' style='padding-top:10%'>
+			
 				<div class="play d3 " 
-     style="padding-left: 3px;padding-right: 3px; width:41px; height:21px ; align:center;visibility:hidden;" 
-     align="center" onclick='play()' > Play </div>
+     style="padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
+     align="center" onclick='play()' > PLAY </div>
 			</td>
 		</tr>
 	  </table>
@@ -125,7 +126,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
 
  <script>
-	 
+		//var gametype = '';
+		var gametype = 'Fruit';
+		
+		
 		 if(navigator.userAgent.indexOf('Android')==-1){
 			window.location.replace('playstore.html');
 		 }
@@ -134,13 +138,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var scriptlink= baseurl+'crosscolor.js';
 			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
 	 		var scriptlink2= baseurl+'admob.js';
-			var scriptlink3= baseurl+'levelData.js';
-			
+			var scriptlink3= baseurl+'levelData'+gametype+'.js';
+			//var gametypelink = '<link href="'+baseurl+'gametype-'+gametype+'.css" rel="stylesheet" type="text/css" />';
 			
 	 		var head = $("<head/>");
 	 
+	 
+			
+			//head.append(gametypelink);
 			head.append(csslink);
 
+			
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink3;
+			head.append(s);
+			
 			var s = document.createElement("script");
 			s.type = "text/javascript";
 
@@ -161,11 +175,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			s.src = scriptlink2;
 			head.append(s);
 	 
-	 	 	var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink3;
-			head.append(s);
+	 	 
 	
 			$("html").append(head);
 			
