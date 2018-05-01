@@ -282,7 +282,7 @@ function popWords(words){
 			}
 			
 			function setStartEnd(lvl){
-					showLevel();
+					
 					storeLevel();
 					setTimeout(function(){
 						
@@ -356,7 +356,7 @@ function popWords(words){
 				//gridClone.css('transition','opacity 2s ease-in-out');
 				gridClone.appendTo(gridParent).fadeIn('slow',function(){
 									gridClone.css('opacity','1');
-						
+									
 				
 									start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 									end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
@@ -367,7 +367,7 @@ function popWords(words){
 									
 									end.addClass("d3 red");
 									end.find('.cwd-tile-letter').html(redChar);
-									
+								
 				
 				});
 				
@@ -423,7 +423,7 @@ function popWords(words){
 				//gridClone.animate({opacity: 0},800);
 				//gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
-	
+			showLevel();
 			
 			}
 			
@@ -601,7 +601,24 @@ function popWords(words){
 		}
 
 			
+
 function showLevel(){
+	//$(".wrapper").css('transition','left 1s');
+	//$(".wrapper").css('left','0px');
+	$(".wrapper").html(currLevel+level);
+ $(".wrapper").removeClass('wrapperSlideIn');
+  $(".wrapper").addClass('wrapperSlideOut');
+  
+  //$(".wrapper").addClass('wrapperSlideIn');
+ 
+ setTimeout(function(){	
+ 
+	 $(".wrapper").removeClass('wrapperSlideOut');
+	 $(".wrapper").addClass('wrapperSlideIn');
+	 
+	 }
+ 
+ ,2000);
  //$(".scorediv").css('opacity',1);
  //$(".scorediv").html(currLevel+level);
  /*$(".wrapper").animate({
