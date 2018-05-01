@@ -1,6 +1,7 @@
 
 var twice=0;
 
+
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
 			
@@ -174,7 +175,7 @@ function popWords(words){
 							}, 1000);
 						
 						
-							admob.interstitial.show();
+							
 							  // this will load a full screen ad on startup
 						 /*  AdMob.prepareInterstitial({
 							adId: admobid.interstitial,
@@ -281,9 +282,14 @@ function popWords(words){
 			}
 			
 			function setStartEnd(lvl){
-				
+					
+					showLevel();
 					storeLevel();
-  
+					setTimeout(function(){
+						
+						if(currLevel==1) admob.interstitial.show();
+						
+					},3000);
 					//selectionTillLast=[];
 					//randomString='';
 				
@@ -337,16 +343,40 @@ function popWords(words){
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
+				gridClone.css('opacity','0');
+				gridClone.css('transition','opacity 2s ease-in-out');
+				
+  
+						//gridClone.appendTo(gridParent);
+						start = gridClone.find("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+						end = gridClone.find("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+						start.addClass('cwd-tile-highlight-start');
+						end.addClass('cwd-tile-highlight-start');
+						
+						//gridClone.appendTo(gridParent);
+						//gridParent.css('opacity', '1');
+						//gridClone.css('transition','opacity 2s ease-in-out');
+						gridClone.appendTo(gridParent).fadeIn('slow',function(){
+								gridClone.css('opacity','1');
 					
-					
-				gridClone.appendTo(gridParent).fadeIn(2000,function(){
+						});
+			
+						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+						start.addClass("d3 green");
+						start.find('.cwd-tile-letter').html(greenChar);
+						end.addClass("d3 red");
+						end.find('.cwd-tile-letter').html(redChar);
+									
+				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
+						
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass('cwd-tile-highlight-start');
 						end.addClass('cwd-tile-highlight-start');
+						
 					
-					
-					$(this).fadeOut(1000,function(){
+					$(this).fadeOut(2000,function(){
 						
 						
 						
@@ -374,7 +404,7 @@ function popWords(words){
 					});
 					
 					
-				});
+				});*/
 				
 				
 				//if(lvl>0){
@@ -390,12 +420,15 @@ function popWords(words){
 				//gridClone.animate({opacity: 0},800);
 				//gridClone.animate({opacity: 1},800);
 				//gridParent.css('display','inline-block');
-	
+			
+				
+			
 			
 			}
 			
 			function loadCW() {
 				
+			
 				
 			/* var storage = window.localStorage;
 			var savedLevel = storage.getItem('currHtml');
@@ -451,6 +484,14 @@ function popWords(words){
 				popWords(moreWords[moreCount]);
 				
 			});
+				
+				/* setInterval(function(){
+					
+					moreCount++;
+					if(moreCount==moreWords.length)moreCount=0;
+					popWords(moreWords[moreCount]);
+				
+				},3000); */
 			
 			/* $( ".action-container" ).on( "swiperight", function(){
 				
@@ -559,9 +600,50 @@ function popWords(words){
 		}
 
 			
-        
+
+function showLevel(){
+	//$(".wrapper").css('transition','left 1s');
+	//$(".wrapper").css('left','0px');
+	$(".score").html(currLevel+level);
+
+  $(".wrapper").addClass('wrapperSlideIn');
+  $(".wrapper").removeClass('wrapperSlideOut');
+ 
+  setTimeout(
+  
+  
+	 function(){	
+ 
+		 $(".wrapper").removeClass('wrapperSlideIn');
+		 $(".wrapper").addClass('wrapperSlideOut');
+	 
+	 }
+ 
+ ,2000); 
+
+ //$(".scorediv").css('opacity',1);
+ //$(".scorediv").html(currLevel+level);
+ /*$(".wrapper").animate({
+        	left: "0"
+	    }, 1000,function(){
+
+	    $(".wrapper").animate({
+		left: "-15%"
+	    }, 1000);
+
+	  });*/
+	//$('#cwd-divGrid').find('.wrapper').remove();
+	
+	//var score =$('<div class="wrapper"><div class="scorediv " style="border: 1px solid black;" >'+(currLevel+level)+'</div></div>');
+	//$('#cwd-grid').before(score);
+	
+	//$('#cwd-divGrid').append(score);
+	//$('.inner-top').attr('data-bg-text',(currLevel+level));
+}
 		   
 function storeLevel(){
+	
+	
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage?window.localStorage:localStorage;
 	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
@@ -581,13 +663,13 @@ function storeLevel(){
 
 function clearLevelGrid(){
 	
-							var clearGrid =$("#crossword").find(".cwd-tile-active");
-							clearGrid.removeAttr('class');
-							clearGrid.addClass('cwd-tile cwd-tile-active');
-							var gridChild=clearGrid.find('.cwd-tile-letter');
-							gridChild.html(' ');
-							gridChild.removeAttr('class');
-							gridChild.addClass('cwd-tile-letter');
+	var clearGrid =$("#crossword").find(".cwd-tile-active");
+	clearGrid.removeAttr('class');
+	clearGrid.addClass('cwd-tile cwd-tile-active');
+	var gridChild=clearGrid.find('.cwd-tile-letter');
+	gridChild.html(' ');
+	gridChild.removeAttr('class');
+	gridChild.addClass('cwd-tile-letter');
 }
 
 function getLevel(){
