@@ -603,7 +603,7 @@ function popWords(words){
 function showLevel(){
 	//$(".wrapper").css('transition','left 1s');
 	//$(".wrapper").css('left','0px');
-	$(".wrapper").html(currLevel+level);
+	//$(".wrapper").html(currLevel+level);
 
   $(".wrapper").addClass('wrapperSlideIn');
   $(".wrapper").removeClass('wrapperSlideOut');
