@@ -288,7 +288,7 @@ function popWords(words){
 						
 						if(currLevel==1) admob.interstitial.show();
 						
-					},1000);
+					},3000);
 					//selectionTillLast=[];
 					//randomString='';
 				
