@@ -338,11 +338,36 @@ function popWords(words){
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
+				gridClone.css('opacity','0');
+				gridClone.css('transition','opacity 2s ease-in-out');
 				
+				//gridClone.appendTo(gridParent);
+						/* start = gridClone.find("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+						end = gridClone.find("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+						start.addClass('cwd-tile-highlight-start');
+						end.addClass('cwd-tile-highlight-start'); */
+						
 				//gridClone.appendTo(gridParent);
 				//gridParent.css('opacity', '1');
 				//gridClone.css('transition','opacity 2s ease-in-out');
-				gridClone.appendTo(gridParent).fadeIn(2000,function(){
+				gridClone.appendTo(gridParent).fadeIn('slow',function(){
+									gridClone.css('opacity','1');
+						
+				
+									start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
+									end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
+									
+									start.addClass("d3 green");
+									start.find('.cwd-tile-letter').html(greenChar);
+									
+									
+									end.addClass("d3 red");
+									end.find('.cwd-tile-letter').html(redChar);
+									
+				
+				});
+				
+				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
@@ -378,7 +403,7 @@ function popWords(words){
 					});
 					
 					
-				});
+				});*/
 				
 				
 				//if(lvl>0){
@@ -457,13 +482,13 @@ function popWords(words){
 				
 			});
 				
-				setInterval(function(){
+				/* setInterval(function(){
 					
 					moreCount++;
 					if(moreCount==moreWords.length)moreCount=0;
 					popWords(moreWords[moreCount]);
 				
-				},3000);
+				},3000); */
 			
 			/* $( ".action-container" ).on( "swiperight", function(){
 				
