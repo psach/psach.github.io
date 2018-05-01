@@ -175,7 +175,7 @@ function popWords(words){
 							}, 1000);
 						
 						
-							admob.interstitial.show();
+							
 							  // this will load a full screen ad on startup
 						 /*  AdMob.prepareInterstitial({
 							adId: admobid.interstitial,
@@ -284,7 +284,11 @@ function popWords(words){
 			function setStartEnd(lvl){
 					showLevel();
 					storeLevel();
-  
+					setTimeout(function(){
+						
+						if(currLevel==1) admob.interstitial.show();
+						
+					},1000);
 					//selectionTillLast=[];
 					//randomString='';
 				
