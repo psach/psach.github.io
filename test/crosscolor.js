@@ -367,6 +367,20 @@ function popWords(words){
 									
 									end.addClass("d3 red");
 									end.find('.cwd-tile-letter').html(redChar);
+									
+									 $(".wrapper").removeClass('wrapperSlideIn');
+									  $(".wrapper").addClass('wrapperSlideOut');
+									  
+									  //$(".wrapper").addClass('wrapperSlideIn');
+									 
+									 setTimeout(function(){	
+									 
+										 $(".wrapper").removeClass('wrapperSlideOut');
+										 $(".wrapper").addClass('wrapperSlideIn');
+										 
+										 }
+									 
+									 ,2000);
 								
 				
 				});
@@ -606,19 +620,7 @@ function showLevel(){
 	//$(".wrapper").css('transition','left 1s');
 	//$(".wrapper").css('left','0px');
 	$(".wrapper").html(currLevel+level);
- $(".wrapper").removeClass('wrapperSlideIn');
-  $(".wrapper").addClass('wrapperSlideOut');
-  
-  //$(".wrapper").addClass('wrapperSlideIn');
  
- setTimeout(function(){	
- 
-	 $(".wrapper").removeClass('wrapperSlideOut');
-	 $(".wrapper").addClass('wrapperSlideIn');
-	 
-	 }
- 
- ,2000);
  //$(".scorediv").css('opacity',1);
  //$(".scorediv").html(currLevel+level);
  /*$(".wrapper").animate({
