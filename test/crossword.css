@@ -1,14 +1,13 @@
 
-
 #cwd-container {
     font-family: tahoma;
 }
 
 #cwd-grid {
     border: solid 1px black;
-	
-	
+  
 }
+
 
 
 @media (min-width:400px){
@@ -442,13 +441,16 @@
 
 
 #cwd-divGrid{
-	background-image: url("smiley.png");
+    background-image: url("smiley.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	background-size: 70%;
-	
+    background-size: 70%;
+
 }
+
+
+
 
 .inner-top{
     

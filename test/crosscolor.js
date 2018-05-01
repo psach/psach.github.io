@@ -1,6 +1,7 @@
 
 var twice=0;
 
+
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
 			
@@ -281,7 +282,7 @@ function popWords(words){
 			}
 			
 			function setStartEnd(lvl){
-				
+					showLevel();
 					storeLevel();
   
 					//selectionTillLast=[];
@@ -337,16 +338,19 @@ function popWords(words){
 				//gridParent.css('visibility','hidden');
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
-					
-					
+				
+				//gridClone.appendTo(gridParent);
+				//gridParent.css('opacity', '1');
+				//gridClone.css('transition','opacity 2s ease-in-out');
 				gridClone.appendTo(gridParent).fadeIn(2000,function(){
+						
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass('cwd-tile-highlight-start');
 						end.addClass('cwd-tile-highlight-start');
+						
 					
-					
-					$(this).fadeOut(1000,function(){
+					$(this).fadeOut(2000,function(){
 						
 						
 						
@@ -396,6 +400,7 @@ function popWords(words){
 			
 			function loadCW() {
 				
+			
 				
 			/* var storage = window.localStorage;
 			var savedLevel = storage.getItem('currHtml');
@@ -451,6 +456,14 @@ function popWords(words){
 				popWords(moreWords[moreCount]);
 				
 			});
+				
+				setInterval(function(){
+					
+					moreCount++;
+					if(moreCount==moreWords.length)moreCount=0;
+					popWords(moreWords[moreCount]);
+				
+				},3000);
 			
 			/* $( ".action-container" ).on( "swiperight", function(){
 				
@@ -559,9 +572,30 @@ function popWords(words){
 		}
 
 			
-        
+function showLevel(){
+ //$(".scorediv").css('opacity',1);
+ //$(".scorediv").html(currLevel+level);
+ /*$(".wrapper").animate({
+        	left: "0"
+	    }, 1000,function(){
+
+	    $(".wrapper").animate({
+		left: "-15%"
+	    }, 1000);
+
+	  });*/
+	//$('#cwd-divGrid').find('.wrapper').remove();
+	
+	//var score =$('<div class="wrapper"><div class="scorediv " style="border: 1px solid black;" >'+(currLevel+level)+'</div></div>');
+	//$('#cwd-grid').before(score);
+	
+	//$('#cwd-divGrid').append(score);
+	//$('.inner-top').attr('data-bg-text',(currLevel+level));
+}
 		   
 function storeLevel(){
+	
+	
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	var storage = window.localStorage?window.localStorage:localStorage;
 	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
@@ -581,13 +615,13 @@ function storeLevel(){
 
 function clearLevelGrid(){
 	
-							var clearGrid =$("#crossword").find(".cwd-tile-active");
-							clearGrid.removeAttr('class');
-							clearGrid.addClass('cwd-tile cwd-tile-active');
-							var gridChild=clearGrid.find('.cwd-tile-letter');
-							gridChild.html(' ');
-							gridChild.removeAttr('class');
-							gridChild.addClass('cwd-tile-letter');
+	var clearGrid =$("#crossword").find(".cwd-tile-active");
+	clearGrid.removeAttr('class');
+	clearGrid.addClass('cwd-tile cwd-tile-active');
+	var gridChild=clearGrid.find('.cwd-tile-letter');
+	gridChild.html(' ');
+	gridChild.removeAttr('class');
+	gridChild.addClass('cwd-tile-letter');
 }
 
 function getLevel(){
