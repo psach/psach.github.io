@@ -551,8 +551,14 @@ function popWords(words){
 				activeId=id;
 				//alert(activeSetWord.length);
 				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
-				var factor = emojiChar[activeSet[0].text()]==activeSet[0].text()?1:2;
-				var activeSetWordlength = activeSetWord.length/factor;
+				
+				var factor;
+				var activeSetWordlength;
+				
+				if(activeSetWord.length>0){
+					factor = gametype.length>0?2:1;
+					activeSetWordlength = activeSetWord.length/factor;
+				}
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
