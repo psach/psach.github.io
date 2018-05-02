@@ -193,7 +193,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			head.append(s);
 						
 								
-			
+			$("html").append(head);
 	
 			var level=0;
 			var tbody;
@@ -214,7 +214,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var activeId;
 			var randomString='';
 			var firstLoad=true;
-					
+			var emojiChar;
 
 				
 			//$(function(){
@@ -230,17 +230,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						gametype=gid;
 						if( firstLoad ){
 						
-							var csslink1 = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
-							head.append(csslink1);
+						 emojiChar = {"A":"A","B":"B","C":"C","D":"D",
+						 "E":"E","F":"F","G":"G","H":"H",
+						 "I":"I","J":"J","K":"K","L":"L",
+						 "M":"M","N":"N","O":"O","P":"P",
+						 "Q":"Q","R":"R","S":"S","T":"T",
+						 "U":"U","V":"V","W":"W","X":"X",
+						 "Y":"Y","Z":"Z"};  
 							
-						
-							var scriptlink3= baseurl+'levelData'+gametype+'.js';
-							var s = document.createElement("script");
-							s.type = "text/javascript";
-							s.src = scriptlink3;
-							head.append(s);
 							
-							$("html").append(head);
 				
 							getLevel();
 						}
