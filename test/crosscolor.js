@@ -671,7 +671,7 @@ function storeLevel(){
 	prevData.selections=selectionTillLast;
 	
 	
-	storage.setItem('prevData',JSON.stringify(prevData));
+	storage.setItem(gametype+'prevData',JSON.stringify(prevData));
 	
 	
 }
@@ -690,7 +690,7 @@ function clearLevelGrid(){
 function getLevel(){
 	var storage = window.localStorage?window.localStorage:localStorage;
 	
-	prevData=JSON.parse(storage.getItem('prevData'));
+	prevData=JSON.parse(storage.getItem(gametype+'prevData'));
 	if(prevData){
 		currLevel=prevData.currLevel;
 		level=prevData.level;

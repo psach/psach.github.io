@@ -115,8 +115,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			<td align='center' style='padding-top:10%'>
 			
 				<div class="play d3 " 
-     style="padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
-     align="center" onclick='play()' > PLAY </div>
+     style="padding-left: 5px;padding-right: 5px; width:81px; height:21px ; align:center;visibility:hidden;" 
+     align="center" onclick='play("")' > PLAY - A</div>
+	 
+	 <div class="play d3 " 
+     style="padding-left: 5px;padding-right: 5px; width:81px; height:21px ; align:center;visibility:hidden;" 
+     align="center" onclick='play("Fruit")' > PLAY F</div>
 			</td>
 		</tr>
 	  </table>
@@ -134,53 +138,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			window.location.replace('playstore.html');
 		 }
 				//alert(scriptlink);
-			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
-			var csslink1 = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
-			
-			
-			var scriptlink= baseurl+'crosscolor.js';
-			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
-	 		var scriptlink2= baseurl+'admob.js';
-			var scriptlink3= baseurl+'levelData'+gametype+'.js';
-			//var gametypelink = '<link href="'+baseurl+'gametype-'+gametype+'.css" rel="stylesheet" type="text/css" />';
-			
-	 		var head = $("<head/>");
-	 
-	 
-			
-			head.append(csslink1);
-			head.append(csslink);
-
-			
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink3;
-			head.append(s);
-			
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink;
-	 		
-	 
-			head.append(s);
-
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink1;
-			head.append(s);
-	 
-	 		var s = document.createElement("script");
-			s.type = "text/javascript";
-
-			s.src = scriptlink2;
-			head.append(s);
-	 
-	 	 
-	
-			$("html").append(head);
 			
 	
 			
@@ -216,9 +173,58 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 	
 				
-			function play(){
-			
+			function play(gid){
+						gametype=gid;
 						if( firstLoad ){
+						var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+						var csslink1 = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
+						
+						
+						var scriptlink= baseurl+'crosscolor.js';
+						var scriptlink1= baseurl+'jquery-2.1.4.min.js';
+						var scriptlink2= baseurl+'admob.js';
+						var scriptlink3= baseurl+'levelData'+gametype+'.js';
+						//var gametypelink = '<link href="'+baseurl+'gametype-'+gametype+'.css" rel="stylesheet" type="text/css" />';
+						
+						var head = $("<head/>");
+				 
+				 
+						
+						head.append(csslink1);
+						head.append(csslink);
+
+						
+						var s = document.createElement("script");
+						s.type = "text/javascript";
+
+						s.src = scriptlink3;
+						head.append(s);
+						
+						var s = document.createElement("script");
+						s.type = "text/javascript";
+
+						s.src = scriptlink;
+						
+				 
+						head.append(s);
+
+						var s = document.createElement("script");
+						s.type = "text/javascript";
+
+						s.src = scriptlink1;
+						head.append(s);
+				 
+						var s = document.createElement("script");
+						s.type = "text/javascript";
+
+						s.src = scriptlink2;
+						head.append(s);
+				 
+					 
+				
+						$("html").append(head);
+						
+			
 							getLevel();
 						}
 						
