@@ -29,7 +29,7 @@ function popWords(words){
 					var second = String.fromCodePoint(eval('0x'+temp)).charCodeAt(1).toString(16);
 					console.log(first+second);
 					var temp =first+second; */
-					alert(emojiChar[character]);
+					//alert(emojiChar[character]);
 					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3 '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
 					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
 		
@@ -380,9 +380,9 @@ function popWords(words){
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass("d3 green");
-						start.find('.cwd-tile-letter').text(greenChar);
+						start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 						end.addClass("d3 red");
-						end.find('.cwd-tile-letter').text(redChar);
+						end.find('.cwd-tile-letter').html(emojiChar[redChar]);
 									
 				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						
@@ -457,9 +457,6 @@ function popWords(words){
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
-			alert(moreWords);
-			alert(moreCount);
-			
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
