@@ -659,7 +659,7 @@ function showLevel(){
 function storeLevel(){
 	
 	
-	//alert("Storing : " +currLevel +" : "+ (level-1) );
+	
 	var storage = window.localStorage?window.localStorage:localStorage;
 	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
 
@@ -672,7 +672,7 @@ function storeLevel(){
 	
 	
 	storage.setItem(gametype+'prevData',JSON.stringify(prevData));
-	
+	alert("Storing : " +currLevel +" : "+ (level-1) );
 	
 }
 
