@@ -13,11 +13,11 @@ function getRandomArbitrary(min, max) {
 
 
 function popWords(words){
-
+			alert(popWords);	
 			$(".wordset").remove();
 			$.each(words, function(i, word) {
 				
-				
+				alert(word);
 				var tr = $('<tr class="wordset">');
 				
 				$.each(word.split(''), function(j,character){
