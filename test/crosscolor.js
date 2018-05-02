@@ -13,7 +13,7 @@ function getRandomArbitrary(min, max) {
 
 
 function popWords(words){
-			alert(popWords);	
+			alert('popWords');	
 			$(".wordset").remove();
 			$.each(words, function(i, word) {
 				
@@ -337,7 +337,7 @@ function popWords(words){
 				
 				var correctAnsItem=correctAns[lvl];
 				currlvl=lvl;
-				alert(correctAnsItem);
+				alert(endCell[lvl][0]<startCell[lvl][0]);
 				
 				if (endCell[lvl][0]<startCell[lvl][0]){
 					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
@@ -377,9 +377,9 @@ function popWords(words){
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass("d3 green");
-						start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
+						start.find('.cwd-tile-letter').text(emojiChar[greenChar]);
 						end.addClass("d3 red");
-						end.find('.cwd-tile-letter').html(emojiChar[redChar]);
+						end.find('.cwd-tile-letter').text(emojiChar[redChar]);
 									
 				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						
