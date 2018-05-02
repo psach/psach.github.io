@@ -24,6 +24,29 @@
  }
  
  
+ .d3word {
+  box-sizing: border-box;
+  width:100%;
+  font-family: 'cursive';
+  margin: 0px;
+  padding: 0px 0px;
+  background: pink;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  -ms-transition: all 0.3s ease-out;
+  -webkit-animation: all 0.3s ease-out;
+  -o-animation: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+   vertical-align: center;
+   box-shadow:
+    inset 0 5px 0 rgba(255,255,255,0.5),
+    0 2px 2px rgba(0,0,0,1),
+    0 0 0px 1px rgba(0,0,0,1);
+
+ }
+ 
+ 
 .cwd-tile {
     width: 21px;
     height: 21px;
