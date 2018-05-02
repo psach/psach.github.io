@@ -29,7 +29,7 @@ function popWords(words){
 					var second = String.fromCodePoint(eval('0x'+temp)).charCodeAt(1).toString(16);
 					console.log(first+second);
 					var temp =first+second; */
-					
+					alert(emojiChar[character]);
 					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3 '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
 					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
 		
