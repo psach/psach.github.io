@@ -178,7 +178,7 @@ function popWords(words){
 							setTimeout(function(){ 
 								level++;
 								clearLevelGrid();
-								play();
+								play(gametype);
 								//alert('Good!');
 								
 								//storeLevel();
