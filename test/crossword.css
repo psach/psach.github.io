@@ -23,7 +23,11 @@
 
  }
  
- 
+.cwd-tile-inactive{
+	background: Black;
+	border-radius: 2px;
+}
+
  .d3word {
   box-sizing: border-box;
   width:100%;
