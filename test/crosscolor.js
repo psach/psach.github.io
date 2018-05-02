@@ -350,8 +350,8 @@ function popWords(words){
 					
 				}
 				
-				alert(greenChar);
-				alert(redChar);
+				//alert(greenChar);
+				//alert(redChar);
 				
 				
 				var gridParent = $("#cwd-grid").parent();
@@ -457,6 +457,9 @@ function popWords(words){
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
+			alert(moreWords);
+			alert(moreCount);
+			
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
