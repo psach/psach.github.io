@@ -155,7 +155,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
 
  <script>
-		//var gametype = '';
+		var gametype = '';
 		//var gametype = 'Fruit';
 		
 			
@@ -238,19 +238,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						gametype=gid;
 						if( firstLoad ){
 						
-						var csslink1 = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
-						head.append(csslink1);
+							var csslink1 = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
+							head.append(csslink1);
+							
 						
-					
-						var scriptlink3= baseurl+'levelData'+gametype+'.js';
-						var s = document.createElement("script");
-						s.type = "text/javascript";
-						s.src = scriptlink3;
-						head.append(s);
-						
-						
-			
-						getLevel();
+							var scriptlink3= baseurl+'levelData'+gametype+'.js';
+							var s = document.createElement("script");
+							s.type = "text/javascript";
+							s.src = scriptlink3;
+							head.append(s);
+							
+							
+				
+							getLevel();
 						}
 						
 						if(level==levelMoreWords.length)level=0;
