@@ -282,7 +282,7 @@ function popWords(words){
 				
 					var randomChild = getRandomArbitrary(0,3);
 					var random = getRandomArbitrary(0,moreWords.length);
-					alert("["+randomChild+random+"] in " + randomString);
+					alert("["+randomChild+random+"] in " + randomString + correctWord);
 					
 					
 					if(randomString.indexOf("["+randomChild+random+"]")==-1 ){
