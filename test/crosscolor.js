@@ -282,7 +282,7 @@ function popWords(words){
 				
 					var randomChild = getRandomArbitrary(0,3);
 					var random = getRandomArbitrary(0,moreWords.length);
-					//alert("["+randomChild+random+"] in " + randomString);
+					alert("["+randomChild+random+"] in " + randomString);
 					
 					
 					if(randomString.indexOf("["+randomChild+random+"]")==-1 ){
@@ -672,7 +672,7 @@ function storeLevel(){
 	
 	
 	storage.setItem(gametype+'prevData',JSON.stringify(prevData));
-	alert("Storing : " +currLevel +" : "+ (level-1) );
+	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	
 }
 
