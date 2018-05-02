@@ -107,6 +107,69 @@ font-family: 'cursive';
    left: -200px;
  }
 
+ /* The container */
+.container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.container input {
+    position: absolute;
+    opacity: 0;
+}
+
+/* Create a custom radio button */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 21px;
+    width: 21px;
+    background-color: #eee;
+    border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.container input:checked ~ .checkmark {
+    background-color: yellowgreen;
+ 
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.container .checkmark:after {
+ 	top: 7px;
+	left: 7px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: white;
+}
+
 
 	</style>
 </head>
@@ -139,13 +202,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		<tr>
 			<td align='center' style='padding-top:10%'>
 			
+			<table><tr><td><label class="container">A
+			  <input type="radio"  name="radio" onclick='gametype="";' >
+			  <span class="checkmark"></span>
+			</label></td><td>
+			<label class="container">🍇
+			  <input type="radio" name="radio" onclick='gametype="Fruit"' >
+			  <span class="checkmark"></span>
+			</label></td></tr></table>
+
 				<div class="play d3main " 
-     style="padding-left: 5px;padding-right: 5px; width:91px; height:21px ; align:center;visibility:hidden;" 
-     align="center" onclick='play("")' > PLAY - A</div>
+     style="padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
+     align="center" onclick='play()' > PLAY</div>
 	 </br>
-	 <div class="play d3main " 
-     style="padding-left: 5px;padding-right: 5px; width:91px; height:21px ; align:center;visibility:hidden;" 
-     align="center" onclick='play("Fruit")' > PLAY - 🍓 </div>
+
 			</td>
 		</tr>
 	  </table>
@@ -226,8 +296,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 	
 				
-			function play(gid){
-						gametype=gid;
+			function play(){
+						//gametype=gid;
 						if( firstLoad ){
 							var csslink = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
 							head.append(csslink);
