@@ -337,7 +337,7 @@ function popWords(words){
 				
 				var correctAnsItem=correctAns[lvl];
 				currlvl=lvl;
-				
+				alert(correctAnsItem);
 				
 				if (endCell[lvl][0]<startCell[lvl][0]){
 					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
@@ -349,7 +349,7 @@ function popWords(words){
 					
 					
 				}
-				alert(emojiChar[greenChar]+emojiChar[redChar]);
+				
 				
 				var gridParent = $("#cwd-grid").parent();
 				//gridParent.addClass('hide');
