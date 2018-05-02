@@ -380,7 +380,7 @@ function popWords(words){
 						start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 						end.addClass("d3 red");
 						end.find('.cwd-tile-letter').html(emojiChar[redChar]);
-									
+									alert(emojiChar[greenChar]+emojiChar[redChar]);
 				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
