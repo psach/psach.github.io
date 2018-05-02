@@ -212,7 +212,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			</label></td></tr></table>
 
 				<div class="play d3main " 
-     style="padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
+     style="display:none; padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
      align="center" onclick='play()' > PLAY</div>
 	 </br>
 
@@ -264,7 +264,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 			function selectGame(){
 			//alert(scriptlink);
-			
+			document.querySelectorAll('.play')[0].style.display='block';
 			head.find('link').remove();
 			
 			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
@@ -329,7 +329,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			function play(){
 						//gametype=gid;
 						if( firstLoad ){
-							
+							selectGame();
 				
 		
 							 
