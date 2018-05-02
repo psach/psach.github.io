@@ -232,10 +232,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
 			 }
+			var head = $("<head/>");
 			
 			function selectGame(){
 			//alert(scriptlink);
-			var head = $("<head/>");
+			
+			head.remove();
 			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
 			head.append(csslink);
 			
