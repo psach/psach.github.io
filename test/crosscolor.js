@@ -14,31 +14,32 @@ function getRandomArbitrary(min, max) {
 
 function popWords(words){
 
-						$(".wordset").remove();
-						$.each(words, function(i, word) {
-							
-							
-							var tr = $('<tr class="wordset">');
-							
-							$.each(word.split(''), function(j,character){
-							/* 	var temp = emojiUnicode(character);
-								console.log(temp);
-								//var df = String.fromCodePoint(parseInt(temp).toString(16));
-								//df.length;
-								var first = String.fromCodePoint(eval('0x'+temp)).charCodeAt(0).toString(16); // d83d
-								var second = String.fromCodePoint(eval('0x'+temp)).charCodeAt(1).toString(16);
-								console.log(first+second);
-								var temp =first+second; */
-								
-								$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3 '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar?emojiChar[character]:character)+'</div></td>').appendTo(tr);
-								//tr.find('.cwd-tile-letter').text(emojiChar?emojiChar[character]:character);
+			$(".wordset").remove();
+			$.each(words, function(i, word) {
+				
+				
+				var tr = $('<tr class="wordset">');
+				
+				$.each(word.split(''), function(j,character){
+				/* 	var temp = emojiUnicode(character);
+					console.log(temp);
+					//var df = String.fromCodePoint(parseInt(temp).toString(16));
+					//df.length;
+					var first = String.fromCodePoint(eval('0x'+temp)).charCodeAt(0).toString(16); // d83d
+					var second = String.fromCodePoint(eval('0x'+temp)).charCodeAt(1).toString(16);
+					console.log(first+second);
+					var temp =first+second; */
 					
-						});
+					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3 '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
+					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
+		
+			});
 						
 						
 						
 							tr.appendTo(tbody);
-						});
+			});
+						
 						
 		$("#words").find(".cwd-tile-letter").click(function() {
 				
@@ -47,11 +48,7 @@ function popWords(words){
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
 				
-					
-					
-				 
-				
-				
+								
 				
 				var word = $(this).attr('word');
 				var invalid = false;
@@ -68,7 +65,7 @@ function popWords(words){
 				
 				
 					$.each(word.split(''), function(j,character){
-						character = emojiChar?emojiChar[character]:character;
+						character = emojiChar[character];
 						
 					//alert("["+$(activeSet[j]).text()+"] : " + character);
 					
@@ -145,8 +142,8 @@ function popWords(words){
 						
 						$(activeSet[j]).addClass(character);
 						$(activeSet[j]).addClass('d3');
-						$(activeSet[j]).html(emojiChar?emojiChar[character]:character);
-						$(activeSet[j]).attr('word',character);
+						$(activeSet[j]).html(emojiChar[character]);
+						//$(activeSet[j]).attr('word',character);
 						
 						
 					});
@@ -261,13 +258,16 @@ function popWords(words){
 									
 									if(activeList[1]!=activeId){
 										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
-										tile.text(emojiChar?emojiChar[character]:character);
+										tile.html(emojiChar[character]);
 										tile.addClass('d3 ' + character);
+										
+										
 										
 									}else{
 										removeElement=i;
 										
 									}
+									
 							});
 							
 						});
@@ -542,7 +542,7 @@ function popWords(words){
 				
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
-				activeSetWord=activeSet.find('[word]');
+				//activeSetWord=activeSet.find('[word]');
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
 				
@@ -550,12 +550,14 @@ function popWords(words){
 				
 				activeId=id;
 				//alert(activeSetWord.length);
-				//var activeSetWord = activeSet.text().trim().replace(' ' ,'');
-			
+				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
+				var factor = emojiChar[activeSet[0].text()]==activeSet[0].text()?1:2;
+				var activeSetWordlength = activeSetWord.length/factor;
+				
 				//if( prevActiveSetId == id ) twice++;
-				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWord.length==activeSet.parent().length){
+				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
 					clear();
-					activeSetWord.removeAttr('word');
+					//activeSetWord.removeAttr('word');
 					activeSet.parent().addClass("cwd-tile-highlight");
 					storeLevel();
 					return;
@@ -580,7 +582,7 @@ function popWords(words){
 				
 					
 				//if(twice==2) clear();
-				if(activeSet && activeSetWord.length==activeSet.parent().length){
+				if(activeSet && activeSetWordlength==activeSet.parent().length){
 				
 				
 					activeSet.addClass('strikeout ' + "strike"+clueid);
