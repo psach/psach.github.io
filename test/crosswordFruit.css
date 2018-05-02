@@ -27,3 +27,38 @@
 	background: Black;
 	border-radius: 2px;
 }
+
+.cwd-tile {
+    width: 25px;
+    height: 25px;
+
+    border: solid 0.07em black;
+    padding: 0;
+    vertical-align: center;
+}
+
+.cwd-tile-word {
+    width: 25px;
+    height: 25px;
+    border: solid 0px black;
+    padding: 0;
+
+}
+
+
+.cwd-tile-letter {
+    text-align: center;
+    font-size: 15px; 
+	line-height: 150%;
+}
+
+.red {
+    text-align: center;
+    font-size: 15px; 
+}
+
+
+.green {
+    text-align: center;
+    font-size: 15px; 
+}
