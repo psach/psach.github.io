@@ -6,7 +6,7 @@
 
 			
 							 
-			var correctAns =[["RAGA","RANGE"/*,"APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL","EIGHT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]];
+			var correctAns =[["RAGA","RANGE","APPLEPIE","LITTLEMAN","EXAM"],["DIAL","EIGHT","ALPHABET","ALCOHOLIC","EXAM"]];
 			
 			
 			var moreWords =[
@@ -27,8 +27,8 @@
 			levelEndCell.push(endCell);
 			
 			
-			correctAns =[["TIME"/*,"ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"*/],
-			["GOOGLE"/*,"LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"*/]];
+			correctAns =[["TIME","ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"],
+			["GOOGLE","LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"]];
 				
 			 moreWords =[
 			["SIN","TAX","SOFT"],["FOUR","HIKE","EIGHTY"],["CARD","MISTY","RIDER"],["YOUNG","EAT","HUGE"],
