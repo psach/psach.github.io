@@ -12,24 +12,34 @@ function getRandomArbitrary(min, max) {
 
 
 
-
 function popWords(words){
-
-						$(".wordset").remove();
-						$.each(words, function(i, word) {
-							
-							
-							var tr = $('<tr class="wordset">');
-						
-							$.each(word.split(''), function(j,character){
-								$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3 '+character+'" word='+word+' style="margin-top: 0px;"> '+character+'</div></td>').appendTo(tr);
-						
-						});
+			//alert('popWords');	
+			$(".wordset").remove();
+			$.each(words, function(i, word) {
+				
+				//alert(word);
+				var tr = $('<tr class="wordset">');
+				
+				$.each(word.split(''), function(j,character){
+				/* 	var temp = emojiUnicode(character);
+					console.log(temp);
+					//var df = String.fromCodePoint(parseInt(temp).toString(16));
+					//df.length;
+					var first = String.fromCodePoint(eval('0x'+temp)).charCodeAt(0).toString(16); // d83d
+					var second = String.fromCodePoint(eval('0x'+temp)).charCodeAt(1).toString(16);
+					console.log(first+second);
+					var temp =first+second; */
+					//alert(emojiChar[character]);
+					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
+					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
+		
+			});
 						
 						
 						
 							tr.appendTo(tbody);
-						});
+			});
+						
 						
 		$("#words").find(".cwd-tile-letter").click(function() {
 				
@@ -38,11 +48,7 @@ function popWords(words){
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
 				
-					
-					
-				 
-				
-				
+								
 				
 				var word = $(this).attr('word');
 				var invalid = false;
@@ -59,10 +65,12 @@ function popWords(words){
 				
 				
 					$.each(word.split(''), function(j,character){
-					//alert("["+$(activeSet[j]).html()+"] : " + character);
+						character = emojiChar[character];
+						
+					//alert("["+$(activeSet[j]).text()+"] : " + character);
 					
 						if ( $(activeSet[j]).html()!= ' ' && !invalid ) {
-							invalid = $(activeSet[j]).html()!=character;
+							invalid = $(activeSet[j]).text()!=character;
 							
 						}
 						
@@ -134,7 +142,9 @@ function popWords(words){
 						
 						$(activeSet[j]).addClass(character);
 						$(activeSet[j]).addClass('d3');
-						$(activeSet[j]).html(character);
+						$(activeSet[j]).html(emojiChar[character]);
+						//$(activeSet[j]).attr('word',character);
+						
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
@@ -248,13 +258,16 @@ function popWords(words){
 									
 									if(activeList[1]!=activeId){
 										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
-										tile.html(character);
+										tile.html(emojiChar[character]);
 										tile.addClass('d3 ' + character);
+										
+										
 										
 									}else{
 										removeElement=i;
 										
 									}
+									
 							});
 							
 						});
@@ -269,7 +282,7 @@ function popWords(words){
 				
 					var randomChild = getRandomArbitrary(0,3);
 					var random = getRandomArbitrary(0,moreWords.length);
-					//alert("["+randomChild+random+"] in " + randomString);
+					//alert("["+randomChild+random+"] in " + randomString + correctWord);
 					
 					
 					if(randomString.indexOf("["+randomChild+random+"]")==-1 ){
@@ -324,7 +337,7 @@ function popWords(words){
 				
 				var correctAnsItem=correctAns[lvl];
 				currlvl=lvl;
-				
+				//alert(endCell[lvl][0]<startCell[lvl][0]);
 				
 				if (endCell[lvl][0]<startCell[lvl][0]){
 					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
@@ -336,6 +349,9 @@ function popWords(words){
 					
 					
 				}
+				
+				//alert(greenChar);
+				//alert(redChar);
 				
 				
 				var gridParent = $("#cwd-grid").parent();
@@ -364,9 +380,9 @@ function popWords(words){
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass("d3 green");
-						start.find('.cwd-tile-letter').html(greenChar);
+						start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 						end.addClass("d3 red");
-						end.find('.cwd-tile-letter').html(redChar);
+						end.find('.cwd-tile-letter').html(emojiChar[redChar]);
 									
 				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						
@@ -444,19 +460,10 @@ function popWords(words){
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
-			$(".clear").click(function() {
+			/* $(".clear").click(function() {
 			
 					
-				//$("#crossword").find(".cwd-tile-active").dblclick(function() {
-				//$("#crossword").find(".cwd-tile-letter").html(' ');
-				//alert();
-				/* if(activeSet){
-				
-				activeSet.html(' ');
-				activeSet.removeClass('d3');
-				} */
-				//alert($("<div />").append(activeSet.text().clone()).html());
-				//alert(activeSet.text());
+
 				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
 				
 				if(activeSet && activeSetWord.length==activeSet.length)clear();
@@ -465,7 +472,7 @@ function popWords(words){
 				
 							
 				
-			});
+			}); */
 			
 			
 			
@@ -538,17 +545,28 @@ function popWords(words){
 				
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
+				//activeSetWord=activeSet.find('[word]');
 				
 				activeSet=activeSet.find('.cwd-tile-letter');
 				
 				
 				
 				activeId=id;
+				//alert(activeSetWord.length);
 				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
 				
+				var factor;
+				var activeSetWordlength;
+				
+				if(activeSetWord.length>0){
+					factor = gametype.length>0?2:1;
+					activeSetWordlength = activeSetWord.length/factor;
+				}
+				
 				//if( prevActiveSetId == id ) twice++;
-				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWord.length==activeSet.parent().length){
+				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
 					clear();
+					//activeSetWord.removeAttr('word');
 					activeSet.parent().addClass("cwd-tile-highlight");
 					storeLevel();
 					return;
@@ -573,7 +591,7 @@ function popWords(words){
 				
 					
 				//if(twice==2) clear();
-				if(activeSet && activeSetWord.length==activeSet.parent().length){
+				if(activeSet && activeSetWordlength==activeSet.parent().length){
 				
 				
 					activeSet.addClass('strikeout ' + "strike"+clueid);
@@ -644,7 +662,7 @@ function showLevel(){
 function storeLevel(){
 	
 	
-	//alert("Storing : " +currLevel +" : "+ (level-1) );
+	
 	var storage = window.localStorage?window.localStorage:localStorage;
 	prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0,"html":0}');
 
@@ -656,8 +674,8 @@ function storeLevel(){
 	prevData.selections=selectionTillLast;
 	
 	
-	storage.setItem('prevData',JSON.stringify(prevData));
-	
+	storage.setItem(gametype+'prevData',JSON.stringify(prevData));
+	//alert("Storing : " +currLevel +" : "+ (level-1) );
 	
 }
 
@@ -675,7 +693,7 @@ function clearLevelGrid(){
 function getLevel(){
 	var storage = window.localStorage?window.localStorage:localStorage;
 	
-	prevData=JSON.parse(storage.getItem('prevData'));
+	prevData=JSON.parse(storage.getItem(gametype+'prevData'));
 	if(prevData){
 		currLevel=prevData.currLevel;
 		level=prevData.level;
@@ -695,3 +713,4 @@ function getLevel(){
 	//storage.removeItem('prevData');
 }
 
+		

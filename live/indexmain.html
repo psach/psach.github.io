@@ -36,6 +36,31 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
 	}
 	
+	.d3main {
+  box-sizing: border-box;
+
+  height:100%;
+  margin: 0px;
+ 
+  padding-top: 0px;
+  background: pink;
+  border: 0px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  -webkit-animation: all 0.3s ease-out;
+ /*  -ms-transition: all 0.3s ease-out;
+  -webkit-animation: all 0.3s ease-out;
+  -o-animation: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out; */
+
+   box-shadow:
+    inset 0 5px 0 rgba(255,255,255,0.5),
+    0 2px 10px rgba(0,0,0,1),
+    0 0 0px 1px rgba(0,0,0,1);
+
+ }
+ 
+	
 .wrapper {
 	
 	background-image: url("smiley.png");
@@ -82,6 +107,69 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
    left: -200px;
  }
 
+ /* The container */
+.container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default radio button */
+.container input {
+    position: absolute;
+    opacity: 0;
+}
+
+/* Create a custom radio button */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 21px;
+    width: 21px;
+    background-color: #eee;
+    border-radius: 50%;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the radio button is checked, add a blue background */
+.container input:checked ~ .checkmark {
+    background-color: yellowgreen;
+ 
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the indicator (dot/circle) */
+.container .checkmark:after {
+ 	top: 7px;
+	left: 7px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: white;
+}
+
 
 	</style>
 </head>
@@ -113,9 +201,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		
 		<tr>
 			<td align='center' style='padding-top:10%'>
-				<div class="play d3 " 
-     style="padding-left: 3px;padding-right: 3px; width:41px; height:21px ; align:center;visibility:hidden;" 
-     align="center" onclick='play()' > Play </div>
+			
+			<table><tr><td><label class="container">A
+			  <input type="radio"  name="radio" onclick='gametype="";selectGame();' >
+			  <span class="checkmark"></span>
+			</label></td><td>
+			<label class="container">🍇
+			  <input type="radio" name="radio" onclick='gametype="Fruit";selectGame();' >
+			  <span class="checkmark"></span>
+			</label></td></tr></table>
+
+				<div class="play d3main " 
+     style="padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
+     align="center" onclick='play()' > PLAY</div>
+	 </br>
+
 			</td>
 		</tr>
 	  </table>
@@ -125,52 +225,75 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
 
  <script>
-	 
-		 if(navigator.userAgent.indexOf('Android')==-1){
-			window.location.replace('playstore.html');
-		 }
-				//alert(scriptlink);
-			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
-			var scriptlink= baseurl+'crosscolor.js';
+		var gametype = '';
+		//var gametype = 'Fruit';
+		
+			
+			 if(navigator.userAgent.indexOf('Android')==-1){
+				window.location.replace('playstore.html');
+			 }
+			 
+			var head = $("<head/>");
+			
+			
 			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
-	 		var scriptlink2= baseurl+'admob.js';
-			var scriptlink3= baseurl+'levelData.js';
-			
-			
-	 		var head = $("<head/>");
-	 
-			head.append(csslink);
-
 			var s = document.createElement("script");
 			s.type = "text/javascript";
-
-			s.src = scriptlink;
-	 		
-	 
-			head.append(s);
-
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-
 			s.src = scriptlink1;
 			head.append(s);
-	 
-	 		var s = document.createElement("script");
+			
+			
+			var scriptlink2= baseurl+'admob.js';
+			var s = document.createElement("script");
 			s.type = "text/javascript";
-
 			s.src = scriptlink2;
 			head.append(s);
-	 
-	 	 	var s = document.createElement("script");
-			s.type = "text/javascript";
 
+			var scriptlink3= baseurl+'levelDataMain.js';
+			var s = document.createElement("script");
+			s.type = "text/javascript";
 			s.src = scriptlink3;
+			head.append(s);		
+			
+			var scriptlink= baseurl+'crosscolor.js';
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			s.src = scriptlink;
 			head.append(s);
-	
 			$("html").append(head);
 			
-	
+			function selectGame(){
+			//alert(scriptlink);
 			
+			head.find('link').remove();
+			
+			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			head.append(csslink);
+						
+			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
+			head.append(csslink);
+							
+							
+			if(gametype=='') emojiChar = {"A":"A","B":"B","C":"C","D":"D",
+			 "E":"E","F":"F","G":"G","H":"H",
+			 "I":"I","J":"J","K":"K","L":"L",
+			 "M":"M","N":"N","O":"O","P":"P",
+			 "Q":"Q","R":"R","S":"S","T":"T",
+			 "U":"U","V":"V","W":"W","X":"X",
+			 "Y":"Y","Z":"Z"};  
+				
+			if(gametype=='Fruit') emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
+				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
+				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
+				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
+				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
+				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
+				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
+							 
+							 
+								
+			
+			}
 	
 			var level=0;
 			var tbody;
@@ -191,7 +314,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var activeId;
 			var randomString='';
 			var firstLoad=true;
-					
+			var emojiChar;
 
 				
 			//$(function(){
@@ -204,8 +327,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	
 				
 			function play(){
-			
+						//gametype=gid;
 						if( firstLoad ){
+							
+				
+		
+							 
 							getLevel();
 						}
 						
