@@ -232,15 +232,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
 			 }
-			
-			
-			function selectGame(){
-			//alert(scriptlink);
+			 
 			var head = $("<head/>");
-			head.remove();
 			
-			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
-			head.append(csslink);
 			
 			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
 			var s = document.createElement("script");
@@ -266,8 +260,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			s.type = "text/javascript";
 			s.src = scriptlink;
 			head.append(s);
+			
+			function selectGame(){
+			//alert(scriptlink);
+			
+			head.find('link').remove();
+			
+			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			head.append(csslink);
 						
-			var csslink = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
+			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
 			head.append(csslink);
 							
 							
