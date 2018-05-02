@@ -710,3 +710,25 @@ function getLevel(){
 	//storage.removeItem('prevData');
 }
 
+		$(function(){
+				for(i=0; i<levels;i++){
+					var xmlhttp = new XMLHttpRequest();
+
+					// Callback function when XMLHttpRequest is ready
+					xmlhttp.onreadystatechange=function(){
+						if (xmlhttp.readyState === 4){
+							if (xmlhttp.status === 200) {
+								nextLevelHTML[i]=xmlhttp.responseText;
+								//alert(nextLevelHTML);
+								if(i==levels-1) {
+									document.querySelectorAll('.play')[0].style.visibility='visible';
+									//$('.play').show();
+								}
+							}
+						}
+					};
+					
+					xmlhttp.open("GET", baseurl+'remote-level'+(i+1)+'.html?'+Math.random() , false);
+					xmlhttp.send();
+				}
+			});
