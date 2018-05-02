@@ -134,7 +134,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			window.location.replace('playstore.html');
 		 }
 				//alert(scriptlink);
-			var csslink = '<link href="'+baseurl+'crossword.css" rel="stylesheet" type="text/css" />';
+			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			var csslink1 = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
+			
+			
 			var scriptlink= baseurl+'crosscolor.js';
 			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
 	 		var scriptlink2= baseurl+'admob.js';
@@ -145,7 +148,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	 
 	 
 			
-			//head.append(gametypelink);
+			head.append(csslink1);
 			head.append(csslink);
 
 			
