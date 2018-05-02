@@ -380,9 +380,9 @@ function popWords(words){
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
 						start.addClass("d3 green");
-						start.find('.cwd-tile-letter').text(emojiChar[greenChar]);
+						start.find('.cwd-tile-letter').text(greenChar);
 						end.addClass("d3 red");
-						end.find('.cwd-tile-letter').text(emojiChar[redChar]);
+						end.find('.cwd-tile-letter').text(redChar);
 									
 				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
 						
