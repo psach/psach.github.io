@@ -13,11 +13,11 @@ function getRandomArbitrary(min, max) {
 
 
 function popWords(words){
-			alert('popWords');	
+			//alert('popWords');	
 			$(".wordset").remove();
 			$.each(words, function(i, word) {
 				
-				alert(word);
+				//alert(word);
 				var tr = $('<tr class="wordset">');
 				
 				$.each(word.split(''), function(j,character){
@@ -282,7 +282,7 @@ function popWords(words){
 				
 					var randomChild = getRandomArbitrary(0,3);
 					var random = getRandomArbitrary(0,moreWords.length);
-					alert("["+randomChild+random+"] in " + randomString + correctWord);
+					//alert("["+randomChild+random+"] in " + randomString + correctWord);
 					
 					
 					if(randomString.indexOf("["+randomChild+random+"]")==-1 ){
@@ -337,7 +337,7 @@ function popWords(words){
 				
 				var correctAnsItem=correctAns[lvl];
 				currlvl=lvl;
-				alert(endCell[lvl][0]<startCell[lvl][0]);
+				//alert(endCell[lvl][0]<startCell[lvl][0]);
 				
 				if (endCell[lvl][0]<startCell[lvl][0]){
 					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
@@ -349,6 +349,9 @@ function popWords(words){
 					
 					
 				}
+				
+				alert(greenChar);
+				alert(redChar);
 				
 				
 				var gridParent = $("#cwd-grid").parent();
