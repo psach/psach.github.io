@@ -36,6 +36,31 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
 	}
 	
+	.d3 {
+  box-sizing: border-box;
+
+  height:100%;
+  margin: 0px;
+ 
+  padding-top: 0px;
+  background: pink;
+  border: 0px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  -webkit-animation: all 0.3s ease-out;
+ /*  -ms-transition: all 0.3s ease-out;
+  -webkit-animation: all 0.3s ease-out;
+  -o-animation: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out; */
+font-family: 'cursive';
+   box-shadow:
+    inset 0 5px 0 rgba(255,255,255,0.5),
+    0 2px 10px rgba(0,0,0,1),
+    0 0 0px 1px rgba(0,0,0,1);
+
+ }
+ 
+	
 .wrapper {
 	
 	background-image: url("smiley.png");
@@ -120,7 +145,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	 
 	 <div class="play d3 " 
      style="padding-left: 5px;padding-right: 5px; width:81px; height:21px ; align:center;visibility:hidden;" 
-     align="center" onclick='play("Fruit")' > PLAY F</div>
+     align="center" onclick='play("Fruit")' > PLAY - F</div>
 			</td>
 		</tr>
 	  </table>
@@ -130,17 +155,43 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   
 
  <script>
-		var gametype = '';
+		//var gametype = '';
 		//var gametype = 'Fruit';
 		
-		
-		 if(navigator.userAgent.indexOf('Android')==-1){
-			window.location.replace('playstore.html');
-		 }
+			
+			 if(navigator.userAgent.indexOf('Android')==-1){
+				window.location.replace('playstore.html');
+			 }
 				//alert(scriptlink);
+			var head = $("<head/>");
+			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			head.append(csslink);
 			
-	
+			var scriptlink= baseurl+'crosscolor.js';
+			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
+			var scriptlink2= baseurl+'admob.js';
+						
+						
 			
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			s.src = scriptlink;
+			head.append(s);
+						
+						
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink1;
+			head.append(s);
+	 
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+
+			s.src = scriptlink2;
+			head.append(s);
+						
+			$("html").append(head);
 	
 			var level=0;
 			var tbody;
@@ -176,56 +227,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			function play(gid){
 						gametype=gid;
 						if( firstLoad ){
-						var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+						
 						var csslink1 = '<link href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
-						
-						
-						var scriptlink= baseurl+'crosscolor.js';
-						var scriptlink1= baseurl+'jquery-2.1.4.min.js';
-						var scriptlink2= baseurl+'admob.js';
-						var scriptlink3= baseurl+'levelData'+gametype+'.js';
-						//var gametypelink = '<link href="'+baseurl+'gametype-'+gametype+'.css" rel="stylesheet" type="text/css" />';
-						
-						var head = $("<head/>");
-				 
-				 
-						
 						head.append(csslink1);
-						head.append(csslink);
-
 						
+					
+						var scriptlink3= baseurl+'levelData'+gametype+'.js';
 						var s = document.createElement("script");
 						s.type = "text/javascript";
 
 						s.src = scriptlink3;
 						head.append(s);
 						
-						var s = document.createElement("script");
-						s.type = "text/javascript";
-
-						s.src = scriptlink;
-						
-				 
-						head.append(s);
-
-						var s = document.createElement("script");
-						s.type = "text/javascript";
-
-						s.src = scriptlink1;
-						head.append(s);
-				 
-						var s = document.createElement("script");
-						s.type = "text/javascript";
-
-						s.src = scriptlink2;
-						head.append(s);
-				 
-					 
-				
-						$("html").append(head);
-						
-			
-							getLevel();
+						getLevel();
 						}
 						
 						if(level==levelMoreWords.length)level=0;
