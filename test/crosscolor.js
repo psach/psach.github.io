@@ -30,7 +30,7 @@ function popWords(words){
 					console.log(first+second);
 					var temp =first+second; */
 					//alert(emojiChar[character]);
-					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char'+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
+					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
 					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
 		
 			});
