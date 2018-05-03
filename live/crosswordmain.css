@@ -92,29 +92,7 @@
 
 
 
-.cwd-clue-highlight
-{
-    font-weight: bold;
-}
 
-.cwd-clues-header {
-    font-size: 105%;
-    font-weight: bold;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-
-.cwd-clue div {
-    display: table-cell;
-}
-
-.cwd-clue-no {
-    width: 25px;
-}
-
-.cwd-clue-text {
-    cursor: pointer;
-}
 
 
 .inner{
