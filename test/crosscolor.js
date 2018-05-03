@@ -624,7 +624,7 @@ function showLevel(){
 	//$(".wrapper").css('left','0px');
 	$(".score").html(currLevel+level);
 
-  $(".wrapper").addClass('wrapperSlideIn');
+  /*$(".wrapper").addClass('wrapperSlideIn');
   $(".wrapper").removeClass('wrapperSlideOut');
  
   setTimeout(
@@ -637,7 +637,7 @@ function showLevel(){
 	 
 	 }
  
- ,2000); 
+ ,2000); */
 
  //$(".scorediv").css('opacity',1);
  //$(".scorediv").html(currLevel+level);
