@@ -1,14 +1,6 @@
 
 .bounce {
   position:relative;
-  left:50%;
-  bottom:10;
-  margin-top:25px;
-  margin-left:25px;
-  height:21px;
-  width:21px;
-  background:white;
-  border-radius:100%;
   -webkit-animation:bounce  2s infinite;
   animation:bounce  2s infinite;
   text-align:center;
