@@ -624,7 +624,7 @@ function showLevel(){
 	//$(".wrapper").css('left','0px');
 	
 	$(".wrapper").remove();
-	$(".wrapperContainer").append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level)+'</td><td width="85%"></td></tr></table></div>');
+	$(".wrapperContainer").append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	//$(".wrapper").css('animation-play-state', 'paused');
