@@ -10,6 +10,7 @@
   background:white;
   border-radius:100%;
   -webkit-animation:bounce  2s infinite;
+  animation:bounce  2s infinite;
   text-align:center;
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   }
