@@ -623,8 +623,11 @@ function showLevel(){
 	//$(".wrapper").css('transition','left 1s');
 	//$(".wrapper").css('left','0px');
 	$(".score").html(currLevel+level);
+	
 	var wrapper = $(".wrapper");
+	
 	var newwrapper = wrapper.clone(true);
+	newwrapper.css('animation-play-state','running');
 	
 	wrapper.before(newwrapper);
 	$(".wrapper:last").remove();
