@@ -622,10 +622,10 @@ function popWords(words){
 function showLevel(){
 	//$(".wrapper").css('transition','left 1s');
 	//$(".wrapper").css('left','0px');
-	$(".score").html(currLevel+level);
+	
 	$(".wrapper").remove();
 	$(".wrapperContainer").append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >0</td><td width="85%"></td></tr></table></div>');
-	
+	$(".score").html(currLevel+level);
 	
 	//$(".wrapper").css('animation-play-state', 'paused');
   /*$(".wrapper").addClass('wrapperSlideIn');
