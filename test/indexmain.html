@@ -121,7 +121,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 }
 
 /* Hide the browser's default radio button */
-.container input {
+.container ~ input {
     position: absolute;
     opacity: 0;
 }
@@ -161,7 +161,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 }
 
 /* Style the indicator (dot/circle) */
-.container .checkmark:after {
+.container ~ .checkmark:after {
  	top: 7px;
 	left: 7px;
 	width: 8px;
@@ -202,7 +202,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		<tr>
 			<td align='center' style='padding-top:10%'>
 			
-				<table width='50%'><tr><td><label class="container"><div class='d3main' style="width:21px; height:21px;' >A</div>
+				<table width='50%'><tr><td><label class="container">
+					<div class='d3main' style="width:21px; height:21px; color:black' >A</div>
 			  <input type="radio"  name="radio" onclick='gametype="";selectGame();' >
 			  <span class="checkmark"></span>
 			</label></td><td>
