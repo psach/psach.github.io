@@ -112,8 +112,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
     display: block;
     position: relative;
     padding-left: 30px;
-    margin-bottom: 12px;
-    font-size: 16px;
+   
+    
+    font-size: 21px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -121,9 +122,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 }
 
 /* Hide the browser's default radio button */
-.container div input {
+.container input {
     position: absolute;
     opacity: 0;
+  
 }
 
 /* Create a custom radio button */
@@ -143,9 +145,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 }
 
 /* When the radio button is checked, add a blue background */
-.container div input:checked ~ .checkmark {
+.container input:checked ~ .checkmark {
     background-color: yellowgreen;
- 
 }
 
 /* Create the indicator (the dot/circle - hidden when not checked) */
@@ -156,7 +157,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 }
 
 /* Show the indicator (dot/circle) when checked */
-.container div input:checked ~ .checkmark:after {
+.container input:checked ~ .checkmark:after {
     display: block;
 }
 
@@ -169,7 +170,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	border-radius: 50%;
 	background: white;
 }
-
 
 	</style>
 </head>
@@ -203,12 +203,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			<td align='center' style='padding-top:10%'>
 			
 				<table width='50%'><tr><td><label class="container">
-					<div class='d3main' style="width:21px; height:21px; color:black" >A</div>
-			  <input type="radio"  name="radio" onclick='gametype="";selectGame();' >
+	<div class='d3main' style="line-height:20px; width:21px; height:21px; color:black" >A</div>
+	<input type="radio"  name="radio"  onclick='gametype="";selectGame();' >
 			  <span class="checkmark"></span>
 			</label></td><td>
 						 <label class="container" >
-				<div style="text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;">🍉</div>
+				<div style='line-height:20px; text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;'>??</div>
 			  <input type="radio" name="radio" onclick='gametype="Fruit";selectGame();' >
 			  <span class="checkmark"></span>
 			</label></td></tr></table>
