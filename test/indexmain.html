@@ -108,14 +108,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
  }
 
 .switch-field {
-  
-  padding: 10px;
+ 
+  padding: 5px;
 	overflow: hidden;
+	border: 1px solid black;
 }
 
-.switch-title {
-  margin-bottom: 6px;
-}
+
 
 .switch-field input {
     position: absolute !important;
@@ -135,11 +134,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   height: 25px;
   width: 25px;
   background-color: #e4e4e4;
-  color: rgba(0, 0, 0, 0.6);
+  
   font-size: 21px;
   font-weight: normal;
   text-align: center;
-  padding: 3px 5px;
+  padding-right: 10px;
+	padding-bottom: 10px;
+  padding-left: 5px;
+	
   border: 1px solid rgba(0, 0, 0, 0.2);
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
@@ -201,14 +203,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		<tr>
 			<td align='center' style='padding-top:5%'>
 			
-				<div class="switch-field">
-         <input type="radio" id="switch_4_left" name="switch_4" value="yes" onclick='gametype="";selectGame();'/>
-      <label for="switch_4_left">🇦</label>
+				 <div class="switch-field" >
+		 <table align='center' ><tr><td>
+      <input type="radio" id="switch_4_left" name="switch_4" value="yes" checked/>
+      <label for="switch_4_left">🍉</label>
 		 
-     <input type="radio" id="switch_4_center" name="switch_4" value="maybe" onclick='gametype="Fruit";selectGame();' />
-      <label for="switch_4_center">🍉</🇦label>
-		 
-				</div>
+     <input type="radio" id="switch_4_center" name="switch_4" value="maybe" />
+      <label for="switch_4_center">🇦</label>
+			 </td></tr></table>
 		</br>
 				<div class="play d3main " 
      style="display:none; padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
