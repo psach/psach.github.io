@@ -9,9 +9,9 @@
 
 @-webkit-keyframes bounce {
   0%       { bottom:0px; }
-  25%, 75% { bottom:5px; }
-  50%      { bottom:10px; }
-  100%     {bottom:0px;}
+  25%, 75% { bottom:10px; }
+  50%       { bottom:5px; }
+  100% {bottom:0px;}
 }
 
  
