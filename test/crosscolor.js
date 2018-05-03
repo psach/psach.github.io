@@ -242,8 +242,7 @@ function popWords(words){
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
 					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
-					start.find('.cwd-tile-letter').addClass('bounce');
-					end.find('.cwd-tile-letter').addClass('bounce');
+					
 				
 					/*		
 					start.addClass("d3 green");
