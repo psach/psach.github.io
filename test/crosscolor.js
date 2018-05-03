@@ -141,7 +141,7 @@ function popWords(words){
 					
 						
 						$(activeSet[j]).addClass(character);
-						$(activeSet[j]).addClass('d3');
+						$(activeSet[j]).addClass('d3char ');
 						$(activeSet[j]).html(emojiChar[character]);
 						//$(activeSet[j]).attr('word',character);
 						
@@ -259,7 +259,7 @@ function popWords(words){
 									if(activeList[1]!=activeId){
 										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
 										tile.html(emojiChar[character]);
-										tile.addClass('d3 ' + character);
+										tile.addClass('d3char ' + character);
 										
 										
 										
