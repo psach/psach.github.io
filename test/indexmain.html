@@ -81,13 +81,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	padding-right:5px;
    	border-radius: 0 100em 100em 0;
 	
-	-webkit-transition:left 1s;
-        transition:left 1s;
+	-webkit-animation:slide 2s;
+        animation :slide 2s;
 	z-index:10;
 	box-shadow:
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 10px 40px 0px rgba(0,0,0,0.75);
+}
+
+@-webkit-keyframes slide {
+  0%       { transform: translateY(-9px); -webkit-transform: translateY(10px); }
+  25%, 75% { transform: translateY(1px); -webkit-transform: translateY(50px); }
+  50%      { transform: translateY(-4px); -webkit-transform: translateY(100px); }
+  100%    {transform: translateY(-9px); -webkit-transform: translateY(-200px); }
 }
 
 .score{
