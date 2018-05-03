@@ -14,10 +14,10 @@
   100% {bottom:0px;}
 }*/
 @-webkit-keyframes bounce {
-  0%       { transform: translateY(-7px); -webkit-transform: translateY(-7px); }
-  25%, 75% { transform: translateY(3px); -webkit-transform: translateY(3px); }
-  50%      { transform: translateY(-2px); -webkit-transform: translateY(-2px); }
-  100%    {transform: translateY(-7px); -webkit-transform: translateY(-7px); }
+  0%       { transform: translateY(-9px); -webkit-transform: translateY(-9px); }
+  25%, 75% { transform: translateY(1px); -webkit-transform: translateY(1px); }
+  50%      { transform: translateY(-4px); -webkit-transform: translateY(-4px); }
+  100%    {transform: translateY(-9px); -webkit-transform: translateY(-9px); }
 }
 
  
