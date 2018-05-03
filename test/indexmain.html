@@ -107,69 +107,68 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
    left: -200px;
  }
 
- /* The container */
-.container {
-    display: block;
-    position: relative;
-    padding-left: 30px;
-   
-    
-    font-size: 21px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+	.switch-field {
+  font-family: "Lucida Grande", Tahoma, Verdana, sans-serif;
+  padding: 40px;
+	overflow: hidden;
 }
 
-/* Hide the browser's default radio button */
-.container input {
-    position: absolute;
-    opacity: 0;
-  
+.switch-title {
+  margin-bottom: 6px;
 }
 
-/* Create a custom radio button */
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 21px;
-    width: 21px;
-    background-color: #eee;
-    border-radius: 50%;
+.switch-field input {
+    position: absolute !important;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    width: 1px;
+    border: 0;
+    overflow: hidden;
 }
 
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
-    background-color: #ccc;
+.switch-field label {
+  float: left;
 }
 
-/* When the radio button is checked, add a blue background */
-.container input:checked ~ .checkmark {
-    background-color: yellowgreen;
+.switch-field label {
+  display: inline-block;
+	height: 25px;
+  width: 25px;
+  background-color: #e4e4e4;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 21px;
+  font-weight: normal;
+  text-align: center;
+  text-shadow: none;
+  padding: 3px 5px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition:    all 0.1s ease-in-out;
+  -ms-transition:     all 0.1s ease-in-out;
+  -o-transition:      all 0.1s ease-in-out;
+  transition:         all 0.1s ease-in-out;
 }
 
-/* Create the indicator (the dot/circle - hidden when not checked) */
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
+.switch-field label:hover {
+	cursor: pointer;
 }
 
-/* Show the indicator (dot/circle) when checked */
-.container input:checked ~ .checkmark:after {
-    display: block;
+.switch-field input:checked + label {
+  background-color: #A5DC86;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 
-/* Style the indicator (dot/circle) */
-.container .checkmark:after {
- 	top: 7px;
-	left: 7px;
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background: white;
+.switch-field label:first-of-type {
+  border-radius: 4px 0 0 4px;
 }
+
+.switch-field label:last-of-type {
+  border-radius: 0 4px 4px 0;
+}	
+
 
 	</style>
 </head>
@@ -202,16 +201,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		<tr>
 			<td align='center' style='padding-top:10%'>
 			
-				<table width='50%'><tr><td><label class="container">
-	<div style="line-height:20px; width:21px; height:21px; color:black; align:center; text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;" >🇦</div>
-	<input type="radio"  name="radio"  onclick='gametype="";selectGame();' >
-			  <span class="checkmark"></span>
-			</label></td><td>
-						 <label class="container" >
-		<div style='line-height:20px; text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;'>🍉</div>
-			  <input type="radio" name="radio" onclick='gametype="Fruit";selectGame();' >
-			  <span class="checkmark"></span>
-			</label></td></tr></table>
+				<div class="switch-field">
+      <div class="switch-title">Three fields? Sure.</div>
+		 
+      <input type="radio" id="switch_4_left" name="switch_4" value="yes" checked/>
+      <label for="switch_4_left">🇦</label>
+		 
+     <input type="radio" id="switch_4_center" name="switch_4" value="maybe" />
+      <label for="switch_4_center">🍉</🇦label>
+		 
+				</div>
 		</br>
 				<div class="play d3main " 
      style="display:none; padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
