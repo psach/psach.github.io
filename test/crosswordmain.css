@@ -1,6 +1,6 @@
 
 .bounce {
-  position:fixed;
+  position:relative;
   left:50%;
   bottom:10;
   margin-top:25px;
