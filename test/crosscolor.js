@@ -366,8 +366,8 @@ function popWords(words){
 						//gridClone.appendTo(gridParent);
 						start = gridClone.find("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = gridClone.find("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
-						start.addClass('bounce');
-						end.addClass('bounce');
+						start.find('.cwd-tile-letter').addClass('bounce');
+						end.find('.cwd-tile-letter').addClass('bounce');
 						
 						//gridClone.appendTo(gridParent);
 						//gridParent.css('opacity', '1');
