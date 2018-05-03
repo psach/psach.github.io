@@ -1,4 +1,24 @@
 
+.bounce {
+  position:relative;
+  -webkit-animation:bounce  1s infinite;
+  animation:bounce  1s infinite;
+  text-align:center;
+  text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
+  }
+
+/*@-webkit-keyframes bounce {
+  0%       { bottom:0px; }
+  25%, 75% { bottom:10px; }
+  50%       { bottom:5px; }
+  100% {bottom:0px;}
+}*/
+@-webkit-keyframes bounce {
+  0%       { transform: translateY(-9px); -webkit-transform: translateY(-9px); }
+  25%, 75% { transform: translateY(1px); -webkit-transform: translateY(1px); }
+  50%      { transform: translateY(-4px); -webkit-transform: translateY(-4px); }
+  100%    {transform: translateY(-9px); -webkit-transform: translateY(-9px); }
+}
 
  
 #cwd-container {

@@ -141,7 +141,7 @@ function popWords(words){
 					
 						
 						$(activeSet[j]).addClass(character);
-						$(activeSet[j]).addClass('d3');
+						$(activeSet[j]).addClass('d3char ');
 						$(activeSet[j]).html(emojiChar[character]);
 						//$(activeSet[j]).attr('word',character);
 						
@@ -243,8 +243,8 @@ function popWords(words){
 					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
 					
-					
-					/*
+				
+					/*		
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(greenChar);
 					end.addClass("d3 red");
@@ -259,7 +259,7 @@ function popWords(words){
 									if(activeList[1]!=activeId){
 										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
 										tile.html(emojiChar[character]);
-										tile.addClass('d3 ' + character);
+										tile.addClass('d3char ' + character);
 										
 										
 										
@@ -366,15 +366,15 @@ function popWords(words){
 						//gridClone.appendTo(gridParent);
 						start = gridClone.find("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
 						end = gridClone.find("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
-						start.addClass('cwd-tile-highlight-start');
-						end.addClass('cwd-tile-highlight-start');
+						start.find('.cwd-tile-letter').addClass('bounce');
+						end.find('.cwd-tile-letter').addClass('bounce');
 						
 						//gridClone.appendTo(gridParent);
 						//gridParent.css('opacity', '1');
 						//gridClone.css('transition','opacity 2s ease-in-out');
 						gridClone.appendTo(gridParent).fadeIn('slow',function(){
 								gridClone.css('opacity','1');
-					
+								
 						});
 			
 						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
@@ -622,9 +622,13 @@ function popWords(words){
 function showLevel(){
 	//$(".wrapper").css('transition','left 1s');
 	//$(".wrapper").css('left','0px');
+	
+	$(".wrapper").remove();
+	$(".wrapperContainer").append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >0</td><td width="85%"></td></tr></table></div>');
 	$(".score").html(currLevel+level);
-
-  $(".wrapper").addClass('wrapperSlideIn');
+	
+	//$(".wrapper").css('animation-play-state', 'paused');
+  /*$(".wrapper").addClass('wrapperSlideIn');
   $(".wrapper").removeClass('wrapperSlideOut');
  
   setTimeout(
@@ -637,7 +641,7 @@ function showLevel(){
 	 
 	 }
  
- ,2000); 
+ ,2000); */
 
  //$(".scorediv").css('opacity',1);
  //$(".scorediv").html(currLevel+level);

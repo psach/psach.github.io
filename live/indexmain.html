@@ -29,12 +29,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	  background-color: lightseagreen;
 	}
 
-.wrapperContainer {
-		
-		position: relative;
-		top:30%;
 
-	}
 	
 	.d3main {
   box-sizing: border-box;
@@ -60,7 +55,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
  }
  
-	
+.wrapperContainer {
+
+	position: relative;
+	top:30%;
+
+}
 .wrapper {
 	
 	background-image: url("smiley.png");
@@ -81,13 +81,29 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	padding-right:5px;
    	border-radius: 0 100em 100em 0;
 	
-	-webkit-transition:left 1s;
-    transition:left 1s;
+	-webkit-animation:slide 2s;
+    animation :slide 2s ;
 	z-index:10;
 	box-shadow:
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 10px 40px 0px rgba(0,0,0,0.75);
+	
+}
+
+
+@keyframes slide {
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
+  25%, 75% { transform: translateY(1px); -webkit-transform: translateX(150px); }
+  50%      { transform: translateY(-4px); -webkit-transform: translateX(195px); }
+  100%    {transform: translateY(-9px); -webkit-transform: translateX(-200px); }
+}
+
+@-webkit-keyframes slide {
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
+  25%, 75% { transform: translateY(1px); -webkit-transform: translateX(150px); }
+  50%      { transform: translateY(-4px); -webkit-transform: translateX(195px); }
+  100%    {transform: translateY(-9px); -webkit-transform: translateX(-200px); }
 }
 
 .score{
@@ -97,78 +113,95 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	color: black;
     text-align: right;
 }
-.wrapperSlideIn {
-  
-   left: 0px;
- }
 
-.wrapperSlideOut {
-   
-   left: -200px;
- }
-
- /* The container */
-.container {
-    display: block;
-    position: relative;
-    padding-left: 30px;
-    margin-bottom: 12px;
-    font-size: 16px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* Hide the browser's default radio button */
-.container input {
-    position: absolute;
-    opacity: 0;
-}
-
-/* Create a custom radio button */
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 21px;
-    width: 21px;
-    background-color: #eee;
-    border-radius: 50%;
-}
-
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
-    background-color: #ccc;
-}
-
-/* When the radio button is checked, add a blue background */
-.container input:checked ~ .checkmark {
-    background-color: yellowgreen;
+.switch-field {
  
+ 
+  overflow: hidden;
+	
 }
 
-/* Create the indicator (the dot/circle - hidden when not checked) */
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
+
+
+.switch-field input {
+    position: absolute !important;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    width: 1px;
+    border: 0;
+    overflow: hidden;
 }
 
-/* Show the indicator (dot/circle) when checked */
-.container input:checked ~ .checkmark:after {
-    display: block;
+.switch-field label {
+  float: left;
 }
 
-/* Style the indicator (dot/circle) */
-.container .checkmark:after {
- 	top: 7px;
-	left: 7px;
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background: white;
+.switch-field input:checked + label {
+  display: inline-block;
+  height: 23px;
+  width: 23px;
+  background-color: lightgrey;
+  
+  font-size: 21px;
+  font-weight: normal;
+  text-align: center;
+  padding-top: 3px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  padding-left: 5px;
+  border-radius: 6px;
+  border: 1px solid black;
+  text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
+  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition:    all 0.1s ease-in-out;
+  -ms-transition:     all 0.1s ease-in-out;
+  -o-transition:      all 0.1s ease-in-out;
+  transition:         all 0.1s ease-in-out;
+  
+	
 }
+
+
+
+.switch-field label {
+	
+  display: inline-block;
+  height: 23px;
+  width: 23px;
+  background-color: #A5DC86;
+  
+  font-size: 21px;
+  font-weight: normal;
+  text-align: center;
+   padding-top: 5px;
+  padding-left: 7px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
+  border-radius: 6px;
+  border: 1px solid black;
+  -webkit-animation: all 0.3s ease-out;
+   box-shadow:
+   inset 0 5px 0 rgba(255,255,255,0.5),
+   0 2px 10px rgba(0,0,0,1),
+   0 0 0px 1px rgba(0,0,0,1);
+	
+  
+ 
+	
+  
+
+}
+
+/*.switch-field label:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.switch-field label:last-of-type {
+  border-radius: 0 6px 6px 0;
+}	*/
 
 
 	</style>
@@ -183,7 +216,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <img src='splashgif1.gif' / -->
 <div class="wrapperContainer">
 
-<div class="wrapper" ><table width=100% ><tr><td></td><td class='score'align='left' >0</td><td width='85%'></td></tr></table></div>
+
 
 </div>
 
@@ -200,17 +233,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		</tr>
 		
 		<tr>
-			<td align='center' style='padding-top:10%'>
+			<td align='center' style='padding-top:5%;'>
 			
-			<table><tr><td><label class="container">A
-			  <input type="radio"  name="radio" onclick='gametype="";selectGame();' >
-			  <span class="checkmark"></span>
-			</label></td><td>
-			<label class="container">🍇
-			  <input type="radio" name="radio" onclick='gametype="Fruit";selectGame();' >
-			  <span class="checkmark"></span>
-			</label></td></tr></table>
-
+				 <div class="switch-field" >
+		 <table align='center' style='padding-bottom:10px;'><tr><td style='padding-right:4px;'>
+      <input type="radio" id="switch_4_left" name="switch_4" value="Char" onclick='gametype="";selectGame();' />
+      <label for="switch_4_left">🇦</label>
+			 </td><td style='padding-right:4px;'>
+     <input type="radio" id="switch_4_center" name="switch_4" value="Fruit" onclick='gametype="Fruit";selectGame();'/>
+      <label for="switch_4_center">🍉</label>
+			  </td><td>
+			   <input type="radio" id="switch_4_foot" name="switch_4" value="Fruit" onclick='gametype="Fruit";selectGame();'/>
+      <label for="switch_4_foot">⚽</label>
+			 
+			 </td></tr></table>
+		
 				<div class="play d3main " 
      style="display:none; padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
      align="center" onclick='play()' > PLAY</div>
