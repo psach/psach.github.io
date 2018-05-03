@@ -623,10 +623,11 @@ function showLevel(){
 	//$(".wrapper").css('transition','left 1s');
 	//$(".wrapper").css('left','0px');
 	$(".score").html(currLevel+level);
-	var wrapper = $(".wrapper").clone(true);
+	var wrapper = $(".wrapper");
+	var newwrapper = wrapper.clone(true);
 	
-	wrapper.before(wrapper);
-	wrapper.remove();
+	wrapper.before(newwrapper);
+	$(".wrapper:last").remove();
 	//$(".wrapper").css('animation-play-state', 'paused');
   /*$(".wrapper").addClass('wrapperSlideIn');
   $(".wrapper").removeClass('wrapperSlideOut');
