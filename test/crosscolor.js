@@ -296,7 +296,7 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 					
-					showLevel();
+					//showLevel();
 					storeLevel();
 					setTimeout(function(){
 						
@@ -374,6 +374,7 @@ function popWords(words){
 						//gridClone.css('transition','opacity 2s ease-in-out');
 						gridClone.appendTo(gridParent).fadeIn('slow',function(){
 								gridClone.css('opacity','1');
+								showLevel();
 								
 						});
 			
