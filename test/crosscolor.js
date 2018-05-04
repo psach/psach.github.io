@@ -385,59 +385,7 @@ function popWords(words){
 						end.addClass("d3 red");
 						end.find('.cwd-tile-letter').html(emojiChar[redChar]);
 									
-				/*gridClone.appendTo(gridParent).fadeIn(2000,function(){
-						
-						start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
-						end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
-						start.addClass('cwd-tile-highlight-start');
-						end.addClass('cwd-tile-highlight-start');
-						
-					
-					$(this).fadeOut(2000,function(){
-						
-						
-						
-							$(this).fadeIn(2000,function(){
-							
-							
-									start = $("[row="+startCell[lvl][0]+"][col="+startCell[lvl][1]+"]");
-									end = $("[row="+endCell[lvl][0]+"][col="+endCell[lvl][1]+"]");
-									
-									start.addClass("d3 green");
-									start.find('.cwd-tile-letter').html(greenChar);
-									
-									
-									end.addClass("d3 red");
-									end.find('.cwd-tile-letter').html(redChar);
-									
-							
-							
-								});
-								
-						
-							
-								
-						
-					});
-					
-					
-				});*/
 				
-				
-				//if(lvl>0){
-					//gridClone.fadeOut(2000,function(){
-						
-						//gridClone.appendTo(gridParent).fadeIn(2000);
-					//});
-					//gridClone.appendTo(gridParent).fadeIn(2000);
-				//}
-				//var lvlChange=$("<div class='lvl-change' >GOOD</div>");
-				//lvlChange.appendTo(gridParent).fadeOut('slow',function(){$(this).remove();});
-				//$(".lvl-change").fadeIn('slow').fadeOut('slow');
-				//gridClone.animate({opacity: 0},800);
-				//gridClone.animate({opacity: 1},800);
-				//gridParent.css('display','inline-block');
-			
 				
 			
 			
@@ -446,15 +394,6 @@ function popWords(words){
 			function loadCW() {
 				
 			
-				
-			/* var storage = window.localStorage;
-			var savedLevel = storage.getItem('currHtml');
-			if(savedLevel){$('.').html(savedLevel)};
-			storage.removeItem('currHtml'); */
-			
-			//$('#ccwordjs').load('https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1');
-			//$.mobile.loading().hide();
-			//$('head').append('<script src="https://drive.google.com/uc?export=download&id=1rezomHcxVkhzqCIbAP7UjH2UgkNAlXK1" />');
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
@@ -603,7 +542,8 @@ function showLevel(){
 	
 	
 	$(".wrapper").remove();
-	$(".wrapperContainer").append('<div class="wrapper" style='animation-delay: 5s; -webkit-animation-delay: 5s;' ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
+	$(".wrapperContainer")
+	.append('<div class="wrapper" style="animation-delay: 5s; -webkit-animation-delay: 5s;" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
