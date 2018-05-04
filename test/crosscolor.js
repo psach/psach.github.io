@@ -545,6 +545,8 @@ function showLevel(){
 	$(".wrapperContainer")
 	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
 	
+	start
+	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 }
