@@ -543,7 +543,7 @@ function popWords(words){
 function showLevel(){
 	
 	
-	$(".wrapper").remove();
+	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
 	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
 	
