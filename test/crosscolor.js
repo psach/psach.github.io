@@ -384,8 +384,7 @@ function popWords(words){
 						start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 						end.addClass("d3 red");
 						end.find('.cwd-tile-letter').html(emojiChar[redChar]);
-						start
-	.append('<div class="wrapperSE" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
+						start.append('<div class="wrapperSE" >H</div>');
 				
 				
 				
