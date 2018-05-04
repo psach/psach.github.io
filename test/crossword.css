@@ -97,9 +97,10 @@
 
 
 .cwd-tile-letter {
+	position:relative;
     text-align: center;
     font-size: 13px; 
-	line-height: 150%;
+	
 }
 
 .red {
