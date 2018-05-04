@@ -543,7 +543,7 @@ function showLevel(){
 	
 	$(".wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" style="animation-delay: 1s; -webkit-animation-delay: 1s;" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
