@@ -14,7 +14,40 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
 
 	<script src="cordova.js"></script>
-	  
+	  <script>
+		var grid =[
+			['a','i','a','a','h','e'],
+			['a','a','a','i','h','a'],
+			['i','i','a','i','h','i'],
+			['h','h','h','h','h','i'],
+			['h','i','a','i','a','i'],
+			['s','i','a','a','a','a']
+			]
+		var crossbody = $('<tbody id="crossword" />');
+			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
+			ctable.append(crossbody);
+			var splashContent = $('<div id="splashDiv" style="width: 85% ;" />').
+			append(ctable);
+			$.each(grid, function(i, row) {
+					
+					//alert(word);
+					var tr = $('<tr />');
+					
+					$.each(row, function(j,col){
+						
+						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
+					   ' '+(col=='s'?' green d3sp':'')+
+					   ' '+(col=='e'?' red d3sp':'')+
+					   ' '+(col=='h'?' cwd-tile-highlight':'')+
+					   ' " row="0" col="0" downclueid="0" >'+
+					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;"></div>'+
+					   '</td>').appendTo(tr);
+					});
+					
+					tr.appendTo(crossbody);
+					
+			});
+			</script>
 	  
 	<style>
 	
@@ -267,43 +300,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		</tr>
 		</table>
 		<script>
-		var grid =[
-			['a','i','a','a','h','e'],
-			['a','a','a','i','h','a'],
-			['i','i','a','i','h','i'],
-			['h','h','h','h','h','i'],
-			['h','i','a','i','a','i'],
-			['s','i','a','a','a','a']
-			]
-		var crossbody = $('<tbody id="crossword" />');
-			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
-			ctable.append(crossbody);
-			var splashContent = $('<div id="splashDiv" style="width: 85% ;" />').
-			append(ctable);
-			
 			
 			
 			var splash = $('#splash');
 			splash.append(splashContent);
-			$.each(grid, function(i, row) {
-					
-					//alert(word);
-					var tr = $('<tr />');
-					
-					$.each(row, function(j,col){
-						
-						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
-					   ' '+(col=='s'?' green d3sp':'')+
-					   ' '+(col=='e'?' red d3sp':'')+
-					   ' '+(col=='h'?' cwd-tile-highlight':'')+
-					   ' " row="0" col="0" downclueid="0" >'+
-					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;"></div>'+
-					   '</td>').appendTo(tr);
-					});
-					
-					tr.appendTo(crossbody);
-					
-			});
+			
          
 		</script>
 		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
