@@ -1,4 +1,28 @@
+.d3sp {
+  box-sizing: border-box;
 
+  height:100%;
+  margin: 0px;
+ 
+  padding-top: 0px;
+  background: black;
+  border: 0px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  -webkit-animation: all 0.3s ease-out;
+ /*  -ms-transition: all 0.3s ease-out;
+  -webkit-animation: all 0.3s ease-out;
+  -o-animation: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out; */
+
+   box-shadow:
+    inset 0 5px 0 rgba(255,255,255,0.5),
+    0 2px 10px rgba(0,0,0,1),
+    0 0 0px 1px rgba(0,0,0,1);
+
+ }
+ 
+ 
 .bounce {
   position:relative;
   -webkit-animation:bounce  1s infinite;
@@ -25,7 +49,7 @@
     font-family: tahoma;
 }
 
-#cwd-grid {
+#cwd-grid-sp {
     border: solid 1px black;
   
 }
@@ -33,7 +57,7 @@
 
 
 @media (min-width:400px){
-    #cwd-grid{
+    #cwd-grid-sp{
         width: 100%;
 		height: 80%;
 }
@@ -47,19 +71,19 @@
 }
 
 
-#cwd-grid td.cwd-tile-highlight
+#cwd-grid-sp td.cwd-tile-highlight
 {
     background-color: Yellow !important;
 }
 
 
 
-#cwd-grid td.cwd-tile-highlight-start
+#cwd-grid-sp td.cwd-tile-highlight-start
 {
     background-color: Yellow !important;
 }
 
-#cwd-grid td.red
+#cwd-grid-sp td.red
 {
     background-color: Red !important;
 	color: White !important;
@@ -71,7 +95,7 @@
 
 
 
-#cwd-grid td.green
+#cwd-grid-sp td.green
 {
     background-color: Green !important;
 	color: White !important;
@@ -79,19 +103,19 @@
 
 
 
-#cwd-grid td.cwd-tile-cursor
+#cwd-grid-sp td.cwd-tile-cursor
 {
     border-color: White !important;
     background-color: darkgray !important;
     color: white;
 }
 
-#cwd-grid td.cwd-tile-correct
+#cwd-grid-sp td.cwd-tile-correct
 {
     background-color: Lime !important;
 }
 
-#cwd-grid td.cwd-tile-incorrect
+#cwd-grid-sp td.cwd-tile-incorrect
 {
     border-color: Red !important; 
 	border: solid 1px Red;
@@ -100,16 +124,42 @@
 
 
 
-.cwd-tile-active{
+.cwd-tile-active-sp{
 	background: LightYellow;
 	border-radius: 0px;
 
 }
 
 
+.cwd-tile-inactive-sp{
+	background: Black;
+	border-radius: 2px;
+}
+
+.cwd-tile-sp {
+    width: 21px;
+    height: 21px;
+
+    border: solid 0.07em black;
+    padding: 0;
+    vertical-align: center;
+}
+
+.cwd-tile-word-sp {
+    width: 21px;
+    height: 21px;
+    border: solid 0px black;
+    padding: 0;
+
+}
 
 
+.cwd-tile-letter-sp {
 
+    text-align: center;
+    font-size: 13px; 
+	
+}
 
 
 
@@ -131,14 +181,7 @@
 }
 
 
-#cwd-divGrid{
-    /* background-image: url("smiley.png");
-    background-size:     cover;                     
-    background-repeat:   no-repeat;
-    background-position: center center; 
-    background-size: 70%; */
 
-}
 
 
 

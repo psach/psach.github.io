@@ -69,10 +69,57 @@
 
  }
  
+ .cwd-tile-active{
+	background: LightYellow;
+	border-radius: 0px;
+
+}
+
  .cwd-tile-inactive{
 	background: Black;
 	border-radius: 2px;
 }
+
+
+
+#cwd-grid td.red
+{
+    background-color: Red !important;
+	color: White !important;
+}
+
+ 
+ 
+
+
+
+
+#cwd-grid td.green
+{
+    background-color: Green !important;
+	color: White !important;
+}
+
+#cwd-grid td.cwd-tile-highlight
+{
+    background-color: Yellow !important;
+}
+
+
+
+#cwd-grid td.cwd-tile-highlight-start
+{
+    background-color: Yellow !important;
+}
+
+
+
+#cwd-grid td.cwd-tile-incorrect
+{
+    border-color: Red !important; 
+	border: solid 1px Red;
+}
+
 
 .cwd-tile {
     width: 26px;
