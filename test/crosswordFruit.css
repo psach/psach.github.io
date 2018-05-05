@@ -77,7 +77,7 @@
 
  .cwd-tile-inactive{
 	background: Black;
-	border-radius: 2px;
+	border-radius: 1px;
 }
 
 
@@ -145,7 +145,7 @@
 	
 }
 
-.red {
+/* .red {
     text-align: center;
     font-size: 17px; 
 }
@@ -154,4 +154,4 @@
 .green {
     text-align: center;
     font-size: 17px; 
-}
+} */
