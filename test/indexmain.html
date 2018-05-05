@@ -61,6 +61,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	top:30%;
 
 }
+
+
+#splashDiv {
+	
+		
+	-webkit-animation:slideSP 2s;
+        animation :slideSP 2s ;
+	
+		
+}
+
+@-webkit-keyframes slideSP {
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(-100px); }
+  25%      { transform: translateY(1px); -webkit-transform: translateX(100px); }
+  50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); }
+  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); }
+}
+
+
+
 .wrapper {
 	
 	background-image: url("smiley.png");
@@ -240,7 +260,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	<table align='center' >
 		<tr>
 			<td align='center' style='padding-top:50%'>
-				<div id='splash' align='center' style='height:40%' >
+				<div id='splash' align='center' >
    				 
 				</div>
 			</td>
@@ -380,7 +400,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var crossbody = $('<tbody id="crossword" />');
 			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
 			ctable.append(crossbody);
-			var splashContent = $('<div id="" style="width: 85% ;" />').
+			var splashContent = $('<div id="splashDiv" style="width: 85% ;" />').
 			append(ctable);
 			
 			
