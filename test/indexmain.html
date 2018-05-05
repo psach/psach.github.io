@@ -148,12 +148,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 .wrapperSE {
 	
 	
-	background-color:yellow; 
-        position: absolute;
-	top:0px;
-	left:0px;
-	right:0px;
-	bottom:0px;
+	background-color:transparent; 
+    position: absolute;
+	
 	
     
 	
@@ -304,7 +301,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 			var splash = $('#splash');
 			splash.append(splashContent);
-			
+			$('.green > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside">👉</div>'));
+			$('.red > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside">👉</div>'));
          
 		</script>
 		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
