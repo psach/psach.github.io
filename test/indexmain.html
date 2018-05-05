@@ -257,18 +257,58 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div class='centerbody' >
 	
-	<table align='center'  height='50%' width=50% >
+	<table align='center'  height='80%' width=50% >
 		<tr>
-			<td align='center' style=' height:40%; width:50%'>
+			<td align='center' style='padding-top: 35%; height:40%; width:50%'>
 				<div id='splash' align='center' >
    				 
 				</div>
 			</td>
 		</tr>
 		</table>
-<table align='center' border=0 height='50%'>
+		<script>
+		var grid =[
+			['a','i','a','a','h','e'],
+			['a','a','a','i','h','a'],
+			['i','i','a','i','h','i'],
+			['h','h','h','h','h','i'],
+			['h','i','a','i','a','i'],
+			['s','i','a','a','a','a']
+			]
+		var crossbody = $('<tbody id="crossword" />');
+			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
+			ctable.append(crossbody);
+			var splashContent = $('<div id="splashDiv" style="width: 85% ;" />').
+			append(ctable);
+			
+			
+			
+			var splash = $('#splash');
+			splash.append(splashContent);
+			$.each(grid, function(i, row) {
+					
+					//alert(word);
+					var tr = $('<tr />');
+					
+					$.each(row, function(j,col){
+						
+						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
+					   ' '+(col=='s'?' green d3sp':'')+
+					   ' '+(col=='e'?' red d3sp':'')+
+					   ' '+(col=='h'?' cwd-tile-highlight':'')+
+					   ' " row="0" col="0" downclueid="0" >'+
+					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;"></div>'+
+					   '</td>').appendTo(tr);
+					});
+					
+					tr.appendTo(crossbody);
+					
+			});
+         
+		</script>
+		<table align='center' border=0 height='10%'>
 		<tr>
-			<td align='center' style=' height:10%'>
+			<td align='center' style=''>
 			
 				 <div class="switch-field" >
 		 <table align='center' style='padding-bottom:10px;'><tr><td style='padding-right:4px;'>
@@ -387,47 +427,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var randomString='';
 			var firstLoad=true;
 			var emojiChar;
-			var grid =[
-			['a','i','a','a','h','e'],
-			['a','a','a','i','h','a'],
-			['i','i','a','i','h','i'],
-			['h','h','h','h','h','i'],
-			['h','i','a','i','a','i'],
-			['s','i','a','a','a','a']
-			]
+			
 				
 			//$(function(){
 			
-			var crossbody = $('<tbody id="crossword" />');
-			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
-			ctable.append(crossbody);
-			var splashContent = $('<div id="splashDiv" style="width: 85% ;" />').
-			append(ctable);
 			
-			
-			
-			var splash = $('#splash');
-			splash.append(splashContent);
-			$.each(grid, function(i, row) {
-					
-					//alert(word);
-					var tr = $('<tr />');
-					
-					$.each(row, function(j,col){
-						
-						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
-					   ' '+(col=='s'?' green d3sp':'')+
-					   ' '+(col=='e'?' red d3sp':'')+
-					   ' '+(col=='h'?' cwd-tile-highlight':'')+
-					   ' " row="0" col="0" downclueid="0" >'+
-					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;"></div>'+
-					   '</td>').appendTo(tr);
-					});
-					
-					tr.appendTo(crossbody);
-					
-			});
-         
             
 			
 			//});
