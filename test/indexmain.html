@@ -20,17 +20,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	<script src="cordova.js"></script>
 	  <script>
 		var grid =[
-			['a','i','a','a','h','e'],
-			['a','a','a','i','h','a'],
-			['i','i','a','i','h','i'],
-			['h','h','h','h','h','i'],
-			['h','i','a','i','a','i'],
-			['s','i','a','a','a','a']
+			['a','i','a','a','a','a','e'],
+			['a','i','a','a','a','i','h'],
+			['a','a','a','i','h','h','h'],
+			['i','i','a','i','h','i','a'],
+			['h','h','h','h','h','i','a'],
+			['h','i','a','i','a','i','a'],
+			['s','i','a','a','a','a','a']
 			]
 		var crossbody = $('<tbody id="crossword" />');
 			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
 			ctable.append(crossbody);
-			var splashContent = $('<div id="splashDiv" style="width: 85% ;" />').
+			var splashContent = $('<div id="splashDiv" style="width: 90% ;" />').
 			append(ctable);
 			$.each(grid, function(i, row) {
 					
