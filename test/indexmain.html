@@ -2,7 +2,7 @@
  
   <head>  
   
-  
+  <link href="crosswordmain.css" rel="stylesheet" type="text/css" />
   
     <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -16,7 +16,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	<script src="levelDataMain.js"></script>
 	
 	
-	<link href="crosswordmain.css" rel="stylesheet" type="text/css" />
+	
 
 	<script src="cordova.js"></script>
 	  <script>
@@ -55,184 +55,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			</script>
 	  
 	  
-	  <script>
-		var gametype = 'Fruit';
-		//var gametype = 'Fruit';
-		
-			
-			 if(navigator.userAgent.indexOf('Android')==-1){
-				window.location.replace('playstore.html');
-			 }
-			 /*
-			var head = $("<head/>");
-			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
-			head.append(csslink);
-			
-			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			s.src = scriptlink1;
-			head.append(s);
-			
-			
-			var scriptlink2= baseurl+'admob.js';
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			s.src = scriptlink2;
-			head.append(s);
-
-			var scriptlink3= baseurl+'levelDataMain.js';
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			s.src = scriptlink3;
-			head.append(s);		
-			
-			var scriptlink= baseurl+'crosscolor.js';
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			s.src = scriptlink;
-			head.append(s);
-			$("html").append(head);
-			*/
-			
-			
-			function selectGame(){
-			//alert(scriptlink);
-			document.querySelectorAll('.play')[0].style.display='block';
-			head.find('link[id*="css"]').remove();
-			
-			
-			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
-			head.append(csslink);
-							
-							
-			if(gametype=='') emojiChar = {"A":"A","B":"B","C":"C","D":"D",
-			 "E":"E","F":"F","G":"G","H":"H",
-			 "I":"I","J":"J","K":"K","L":"L",
-			 "M":"M","N":"N","O":"O","P":"P",
-			 "Q":"Q","R":"R","S":"S","T":"T",
-			 "U":"U","V":"V","W":"W","X":"X",
-			 "Y":"Y","Z":"Z"};  
-				
-			if(gametype=='Fruit') emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
-				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
-				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
-				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
-				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
-				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
-				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
-							 
-							 
-								
-			
-			}
-	
-			var level=0;
-			var tbody;
-			
-			
-			var activeSet;
-	
-			var id, clueid;
-
-			var moreCount=0;
-			var insertCorrect=0;
-			var levelAnswered=0;
-			var currLevel=0;
-			var stringCorrect ="";
-			var selectionTillLast=[];
-			var greenChar, redChar;
-			var start,end;
-			var activeId;
-			var randomString='';
-			var firstLoad=true;
-			var emojiChar;
-			
-				
-			//$(function(){
-			
-			
-            
-			
-			//});
-			
-			
-	
-				
-			function play(){
-						//gametype=gid;
-						if( firstLoad ){
-							selectGame();
-				
-		
-							 
-							getLevel();
-						}
-						
-						if(level==levelMoreWords.length)level=0;
-						correctAns =levelCorrectAns[level];
-						
-						moreWords =levelMoreWords[level];
-					
-						activeSet;
-				
-						id, clueid;
-						
-						startCell = levelStartCell[level];
-						endCell=levelEndCell[level];
-						
-						//currLevel=0;
-						insertCorrect=0;
-						stringCorrect ="";
-						//selectionTillLast=[];
-						greenChar, redChar;
-						start,end;
-						activeId;
-						randomString='';
-					
-						$('.centerbody').html(nextLevelHTML[level]);
-					
-						
-						if( firstLoad ){
-							if(prevData) $('#cwd-grid').html($(prevData.html));
-							firstLoad=false;
-						}
-						
-						
-						
-						var bgColor = $('html').css('background-color');
-						$('.arrow').css('background-color',bgColor);
-						$('.d3word').css('background-color',bgColor);
-						
-						//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
-						//var nextLevelDom = $(nextLevelHTML[level]);
-						
-						//alert($('body').html(''));
-						
-							
-										
-						//window.location.replace('level1.html');
-						
-						loadCW();
-					
-					
-							
-						 // this will create a banner on startup
-						  /*AdMob.createBanner( {
-							adId: admobid.banner,
-							position: AdMob.AD_POSITION.TOP_CENTER,
-							isTesting: true, // TODO: remove this line when release
-							overlap: true,
-							offsetTopBar: false,
-							bgColor: 'black'
-						  } );*/
-
-			}
-			
-			
-				
-			
- </script>
+	 
  
 	<style>
 	
@@ -249,7 +72,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 
 
 	
-	.d3main {
+.d3main {
   box-sizing: border-box;
 
   height:100%;
@@ -456,12 +279,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   border: 0px solid rgba(0,0,0,0.15);
   border-radius: 6px;
   
- /*  -ms-transition: all 0.3s ease-out;
-  -webkit-animation: all 0.3s ease-out;
-  -o-animation: all 0.3s ease-out;
-  -moz-transition: all 0.3s ease-out;
-  transition: all 0.3s ease-out; */
-
    box-shadow:
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
@@ -484,6 +301,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
+
 @-webkit-keyframes bounce {
   0%       { transform: translateY(-9px); -webkit-transform: translateY(-9px); }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateY(1px); }
@@ -589,7 +407,186 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	</div>
 	
   </body>
-  
+   <script>
+		var gametype = 'Fruit';
+		//var gametype = 'Fruit';
+		
+			
+			 if(navigator.userAgent.indexOf('Android')==-1){
+				window.location.replace('playstore.html');
+			 }
+			 
+			 var head = $("<head/>");
+			 /*
+			
+			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			head.append(csslink);
+			
+			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			s.src = scriptlink1;
+			head.append(s);
+			
+			
+			var scriptlink2= baseurl+'admob.js';
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			s.src = scriptlink2;
+			head.append(s);
+
+			var scriptlink3= baseurl+'levelDataMain.js';
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			s.src = scriptlink3;
+			head.append(s);		
+			
+			var scriptlink= baseurl+'crosscolor.js';
+			var s = document.createElement("script");
+			s.type = "text/javascript";
+			s.src = scriptlink;
+			head.append(s);
+			$("html").append(head);
+			*/
+			
+			
+			function selectGame(){
+			//alert(scriptlink);
+			document.querySelectorAll('.play')[0].style.display='block';
+			head.find('link[id*="css"]').remove();
+			
+			
+			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
+			head.append(csslink);
+							
+							
+			if(gametype=='') emojiChar = {"A":"A","B":"B","C":"C","D":"D",
+			 "E":"E","F":"F","G":"G","H":"H",
+			 "I":"I","J":"J","K":"K","L":"L",
+			 "M":"M","N":"N","O":"O","P":"P",
+			 "Q":"Q","R":"R","S":"S","T":"T",
+			 "U":"U","V":"V","W":"W","X":"X",
+			 "Y":"Y","Z":"Z"};  
+				
+			if(gametype=='Fruit') emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
+				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
+				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
+				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
+				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
+				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
+				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
+							 
+							 
+								
+			
+			}
+	
+			var level=0;
+			var tbody;
+			
+			
+			var activeSet;
+	
+			var id, clueid;
+
+			var moreCount=0;
+			var insertCorrect=0;
+			var levelAnswered=0;
+			var currLevel=0;
+			var stringCorrect ="";
+			var selectionTillLast=[];
+			var greenChar, redChar;
+			var start,end;
+			var activeId;
+			var randomString='';
+			var firstLoad=true;
+			var emojiChar;
+			
+				
+			//$(function(){
+			
+			
+            
+			
+			//});
+			
+			
+	
+				
+			function play(){
+						//gametype=gid;
+						if( firstLoad ){
+							selectGame();
+				
+		
+							 
+							getLevel();
+						}
+						
+						if(level==levelMoreWords.length)level=0;
+						correctAns =levelCorrectAns[level];
+						
+						moreWords =levelMoreWords[level];
+					
+						activeSet;
+				
+						id, clueid;
+						
+						startCell = levelStartCell[level];
+						endCell=levelEndCell[level];
+						
+						//currLevel=0;
+						insertCorrect=0;
+						stringCorrect ="";
+						//selectionTillLast=[];
+						greenChar, redChar;
+						start,end;
+						activeId;
+						randomString='';
+					
+						$('.centerbody').html(nextLevelHTML[level]);
+					
+						
+						if( firstLoad ){
+							if(prevData) $('#cwd-grid').html($(prevData.html));
+							firstLoad=false;
+						}
+						
+						
+						
+						var bgColor = $('html').css('background-color');
+						$('.arrow').css('background-color',bgColor);
+						$('.d3word').css('background-color',bgColor);
+						
+						//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
+						//var nextLevelDom = $(nextLevelHTML[level]);
+						
+						//alert($('body').html(''));
+						
+							
+										
+						//window.location.replace('level1.html');
+						
+						loadCW();
+					
+					
+							
+						 // this will create a banner on startup
+						  /*AdMob.createBanner( {
+							adId: admobid.banner,
+							position: AdMob.AD_POSITION.TOP_CENTER,
+							isTesting: true, // TODO: remove this line when release
+							overlap: true,
+							offsetTopBar: false,
+							bgColor: 'black'
+						  } );*/
+
+			}
+			
+			
+				
+			
+ </script>
 
  
 		
