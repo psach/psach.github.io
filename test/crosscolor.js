@@ -604,4 +604,8 @@ function getLevel(){
 	//storage.removeItem('prevData');
 }
 
-		
+function home(){
+	
+	$('.centerbody').html(indexMain);
+			 
+}

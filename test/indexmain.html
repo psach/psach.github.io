@@ -60,7 +60,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			</script>
 	  
 	  
-	 
+	 <script>
+			
+			
+			var splash = $('#splash');
+			splash.append(splashContent);
+			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
+			$('.red > .cwd-tile-letter-sp').append($('<div class="bounceside" style="-webkit-animation-delay:8s" >👉</div>'));
+			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
+			//$('.highlight').removeClass('highlight');
+			helpText
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
+			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find letter/emoji path</div>'));
+			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:18s ;">Select below to play</div>'));
+			
+		</script>
  
 	<style>
 	
@@ -379,23 +395,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			</td>
 		</tr>
 		</table>
-		<script>
-			
-			
-			var splash = $('#splash');
-			splash.append(splashContent);
-			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
-			$('.red > .cwd-tile-letter-sp').append($('<div class="bounceside" style="-webkit-animation-delay:8s" >👉</div>'));
-			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
-			//$('.highlight').removeClass('highlight');
-			helpText
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
-			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find letter/emoji path</div>'));
-			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:18s ;">Select below to play</div>'));
-			
-		</script>
+		
 		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
 		<tr><td id='helpText' align='center' style='padding-top:5%' > </td></tr>
 		<tr>
@@ -430,6 +430,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </body>
    <script>
 		var gametype = 'Fruit';
+		var indexMain ;
 		//var gametype = 'Fruit';
 		
 			
@@ -530,7 +531,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						//gametype=gid;
 						if( firstLoad ){
 							selectGame();
-				
+							indexMain= $('.centerbody').html();
 		
 							 
 							getLevel();
