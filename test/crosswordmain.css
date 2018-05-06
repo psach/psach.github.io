@@ -41,14 +41,32 @@
 	
 }
 
-.wrapperHelp
+#cwd-grid-sp td.cwd-tile-highlight-holder{
+	
+	color:transparent;
+}
+
+.wrapperHelpR
 {
 	border: 1px solid black;
 	border-radius: 6px;
 	background-color:lightyellow;
 	visibility:hidden;
-	-webkit-animation: slideHelp 5s;
+	-webkit-animation: slideHelpR 5s forwards;
 	padding: 3px;
+	background-color:#A5DC86;
+}
+
+
+.wrapperHelpL
+{
+	border: 1px solid black;
+	border-radius: 6px;
+	background-color:lightyellow;
+	visibility:hidden;
+	-webkit-animation: slideHelpL 5s forwards;
+	padding: 3px;
+	background-color:#A5DC86;
 	
 }
 

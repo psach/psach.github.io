@@ -23,7 +23,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			['h','i','a','i','a','i','a'],
 			['s','i','a','a','a','a','a']
 			]
-		var crossbody = $('<tbody id="crossword" />');
+			emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
+				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
+				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
+				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
+				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
+				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
+				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
+			var alphabetArray = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+			var alpha=0;
+			var crossbody = $('<tbody id="crossword" />');
 			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
 			ctable.append(crossbody);
 			var splashContent = $('<div id="splashDiv" />').
@@ -40,7 +49,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 					   ' '+(col=='e'?' red d3sp':'')+
 					   ' '+(col=='h'?' cwd-tile-highlight-holder':'')+
 					   ' " row="0" col="0" downclueid="0" >'+
-					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;"></div>'+
+					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
+					   (col=='h'?emojiChar[alphabetArray[alpha++]]:'')+'</div>'+
 					   '</td>').appendTo(tr);
 					});
 					
@@ -74,7 +84,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   margin: 0px;
  
   padding-top: 0px;
-  background: pink;
+  background: #A5DC86;
   border: 0px solid rgba(0,0,0,0.15);
   border-radius: 6px;
   -webkit-animation: all 0.3s ease-out;
@@ -109,9 +119,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 }
 
 @-webkit-keyframes fadein {
-  0%       { background-color : Yellow;}
-  50%  { background-color: lightyellow;}
-  100%     { background-color: Yellow;}
+  0%       { background-color : Yellow;color:black;}
+  50%  { background-color: Yellow;color:black;}
+  100%     { background-color: lightyellow;color:black;}
 }
 
 @-webkit-keyframes slideSP {
@@ -121,12 +131,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1 ;visibility:visible;}
 }
 
-@-webkit-keyframes slideHelp {
+@-webkit-keyframes slideHelpR {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(1000px); opacity:1;visibility:visible;}
-  50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;}
-  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1;}
+  50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
+  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
 }
 
+@-webkit-keyframes slideHelpL {
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(-1000px); opacity:1;visibility:visible;}
+  50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
+  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
+}
 
 .wrapper {
 	
@@ -374,11 +389,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
 			//$('.highlight').removeClass('highlight');
 			helpText
-			$('#helpText').append($('<div class="wrapperHelp" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
-			$('#helpText').append($('<div class="wrapperHelp" style="visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
-			$('#helpText').append($('<div class="wrapperHelp" style="visibility:hidden; -webkit-animation-delay:12s ">Find word/icon path</div>'));
-			$('.cwd-tile-highlight').append($('<div class="wrapperHelp" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));
-			$('#helpText').append($('<div class="wrapperHelp" style="visibility:hidden; -webkit-animation-delay:20s ;">Choose below to play</div>'));
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
+			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find letter/emoji path</div>'));
+			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:18s ;">Select below to play</div>'));
+			
 		</script>
 		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
 		<tr><td id='helpText' align='center' style='padding-top:5%' > </td></tr>
