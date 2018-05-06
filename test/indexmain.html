@@ -11,7 +11,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 })(window,document,'script','dataLayer','GTM-54J43ZF');</script>
 <!-- End Google Tag Manager -->
 	<script src="jquery-2.1.4.min.js"></script>
-
+	<script src="admob.js"></script>
+	<script src="colorcross.js"></script>
+	<script src="levelDataMain.js"></script>
+	
+	
+	<link href="crosswordmain.css" rel="stylesheet" type="text/css" />
 
 	<script src="cordova.js"></script>
 	  <script>
@@ -58,8 +63,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
 			 }
-			 
+			 /*
 			var head = $("<head/>");
+			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			head.append(csslink);
 			
 			var scriptlink1= baseurl+'jquery-2.1.4.min.js';
 			var s = document.createElement("script");
@@ -86,9 +93,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			s.src = scriptlink;
 			head.append(s);
 			$("html").append(head);
+			*/
 			
-			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
-			head.append(csslink);
 			
 			function selectGame(){
 			//alert(scriptlink);
