@@ -318,7 +318,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   opacity: 0;
   text-align:center;
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
-  animation-iteration-count: 3
+  -webkit-animation-iteration-count: 3;
   }
 
 /*@-webkit-keyframes bounce {
@@ -327,6 +327,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
+
 @-webkit-keyframes bounceside {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(-30px); opacity:1; }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(-20px); opacity:1;}
@@ -372,7 +373,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var splash = $('#splash');
 			splash.append(splashContent);
 			$('.green > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside">👉</div>'));
-			$('.red > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside">👉</div>'));
+			$('.red > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside" style="-webkit-animation-delay:8s" >👉</div>'));
          
 		</script>
 		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
@@ -418,7 +419,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 var head = $("<head/>");
 			 $("html").append(head);
 			 var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
-			 head.append(csslink);
+			 head.append(csslink); // Default head not working! so had to append.
 	
 			 /*
 			
@@ -432,24 +433,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			head.append(s);
 			
 			
-			var scriptlink2= baseurl+'admob.js';
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			s.src = scriptlink2;
-			head.append(s);
-
-			var scriptlink3= baseurl+'levelDataMain.js';
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			s.src = scriptlink3;
-			head.append(s);		
-			
-			var scriptlink= baseurl+'crosscolor.js';
-			var s = document.createElement("script");
-			s.type = "text/javascript";
-			s.src = scriptlink;
-			head.append(s);
-			$("html").append(head);
 			*/
 			
 			
