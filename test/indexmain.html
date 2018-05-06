@@ -42,7 +42,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
 					   ' '+(col=='s'?' green d3sp':'')+
 					   ' '+(col=='e'?' red d3sp':'')+
-					   ' '+(col=='h'?' cwd-tile-highlight':'')+
+					   ' '+(col=='h'?' cwd-tile-highlight-holder':'')+
 					   ' " row="0" col="0" downclueid="0" >'+
 					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;"></div>'+
 					   '</td>').appendTo(tr);
@@ -112,11 +112,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 		
 }
 
+@-webkit-keyframes fadein {
+  0%       { background-color : Yellow;}
+  50%  { background-color: lightyellow;}
+  100%     { background-color: Yellow;}
+}
+
 @-webkit-keyframes slideSP {
-  0%       { transform: translateY(-9px); -webkit-transform: translateX(-100px); }
-  25%      { transform: translateY(1px); -webkit-transform: translateX(100px); }
-  50%  { transform: translateY(-4px); -webkit-transform: translateX(50px); }
-  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); }
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(-100px); opacity:1}
+  25%      { transform: translateY(1px); -webkit-transform: translateX(100px); opacity:1}
+  50%  { transform: translateY(-4px); -webkit-transform: translateX(50px); opacity:1}
+  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1 }
 }
 
 
@@ -374,7 +380,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			splash.append(splashContent);
 			$('.green > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside">👉</div>'));
 			$('.red > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside" style="-webkit-animation-delay:8s" >👉</div>'));
-         
+			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
+			//$('.highlight').removeClass('highlight');
+			
 		</script>
 		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
 		<tr>

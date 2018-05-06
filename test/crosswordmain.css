@@ -28,7 +28,10 @@
 
 #cwd-grid-sp td.cwd-tile-highlight
 {
-    background-color: Yellow !important;
+   
+	-webkit-animation: slideSP  1s , fadein 2s forwards;
+	-webkit-animation-delay:12s;
+	
 }
 
 
