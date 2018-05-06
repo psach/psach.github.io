@@ -1,4 +1,11 @@
 
+ .d3cross {
+  
+  border:1px;
+  border-radius:3px;
+
+ }
+ 
  
 #cwd-container {
     font-family: tahoma;
@@ -31,6 +38,17 @@
    
 	-webkit-animation: slideSP  1s , fadein 2s forwards;
 	-webkit-animation-delay:12s;
+	
+}
+
+.wrapperHelp
+{
+	border: 1px solid black;
+	border-radius: 6px;
+	background-color:lightyellow;
+	visibility:hidden;
+	-webkit-animation: slideHelp 5s;
+	padding: 3px;
 	
 }
 

@@ -115,12 +115,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 }
 
 @-webkit-keyframes slideSP {
-  0%       { transform: translateY(-9px); -webkit-transform: translateX(-100px); opacity:1}
-  25%      { transform: translateY(1px); -webkit-transform: translateX(100px); opacity:1}
-  50%  { transform: translateY(-4px); -webkit-transform: translateX(50px); opacity:1}
-  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1 }
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(-100px); opacity:1;visibility:visible;}
+  25%      { transform: translateY(1px); -webkit-transform: translateX(100px); opacity:1;visibility:visible;}
+  50%  { transform: translateY(-4px); -webkit-transform: translateX(50px); opacity:1;visibility:visible;}
+  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1 ;visibility:visible;}
 }
 
+@-webkit-keyframes slideHelp {
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(1000px); opacity:1;visibility:visible;}
+  50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
+  100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1 ;visibility:visible;}
+}
 
 
 .wrapper {
@@ -154,16 +159,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
 }
 
-.wrapperSE {
-	
-	
-	background-color:transparent; 
-    position: absolute;
-	
-	
-    
-	
-}
 
 @keyframes slide {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
@@ -374,15 +369,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 			var splash = $('#splash');
 			splash.append(splashContent);
-			$('.green > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside">👉</div>'));
-			$('.red > .cwd-tile-letter-sp').append($('<div class="wrapperSE bounceside" style="-webkit-animation-delay:8s" >👉</div>'));
+			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
+			$('.red > .cwd-tile-letter-sp').append($('<div class="bounceside" style="-webkit-animation-delay:8s" >👉</div>'));
 			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
 			//$('.highlight').removeClass('highlight');
+			helpText
+			$('#helpText').append($('<div class="wrapperHelp" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
+			$('#helpText').append($('<div class="wrapperHelp" style="visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
+			$('#helpText').append($('<div class="wrapperHelp" style="visibility:hidden; -webkit-animation-delay:12s ">Find word/icon path</div>'));
+			$('.cwd-tile-highlight').append($('<div class="wrapperHelp" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));
 			
 		</script>
 		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
+		<tr><td id='helpText' align='center' style='padding-top:5%' > </td></tr>
 		<tr>
-			<td align='center' style='padding-top:30%'>
+			<td align='center' style='padding-top:20%'>
 			
 				 <div class="switch-field" >
 		 <table align='center' style='padding-bottom:10px;'><tr><td style='padding-right:4px;'>
