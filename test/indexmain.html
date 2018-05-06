@@ -2,8 +2,7 @@
  
   <head>  
   
-  <link href="crosswordmain.css" rel="stylesheet" type="text/css" />
-  
+ 
     <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -417,6 +416,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 }
 			 
 			 var head = $("<head/>");
+			 $("html").append(head);
+			 var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			 head.append(csslink);
+	
 			 /*
 			
 			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
