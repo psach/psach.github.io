@@ -27,17 +27,19 @@
 			levelEndCell.push(endCell);
 			
 			
-			correctAns =[["TIME","ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"],
-			["GOOGLE","LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"]];
+			/*correctAns =[["TIME","ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"],
+			["GOOGLE","LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"]];*/
+			correctAns =[
+			["MIND","CREAM","ONE","GOOGLE","TUNNEL","NURSE","ELEPHANT","CHAT","JACKET"],["TIME","TEACH","HOME","MORE","DIARY","ICE","BALANCED","MEDAL","RHYMES","GRASSY","JOKING"]];
 				
 			 moreWords =[
 			["SIN","TAX","SOFT"],["FOUR","HIKE","EIGHTY"],["CARD","MISTY","RIDER"],["YOUNG","EAT","HUGE"],
 			["RANGE","LIME","THRICE"],["BABY","PART","LIKE"],["GOAL","GHOST","LITTLE"],["GOLDEN","SUN","AUDIO"],
 			["RIGHT","KITE","LOCK"],["DONKEY","ROCK","GRASS"],["BOXES","CRAZY","VIEW"],["JEWEL","JUMPER","RISK"],
-			["KANNADA","HINDI","MARATHI"],["CREAM","ENGLISH","TOWN"],["GOWN","STOVE","CHAIN"],["MINT","TALL","MUST"]
+			["KANNADA","HINDI","MARATHI"],["MAID","ENGLISH","TOWN"],["GOWN","STOVE","CHAIN"],["MINT","TALL","MUST"]
 			];
 			
-			startCell = [[12,2],[12,10]];
+			startCell = [[10,4],[10,0]];
      		endCell=[[0,10],[0,0]];
 			
 			
