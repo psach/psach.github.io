@@ -9,11 +9,6 @@ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-54J43ZF');</script>
 <!-- End Google Tag Manager -->
-	<script src="jquery-2.1.4.min.js"></script>
-	<script src="admob.js"></script>
-	<script src="crosscolor.js"></script>
-	<script src="levelDataMain.js"></script>
-	
 	
 	
 
@@ -429,7 +424,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 $("html").append(head);
 			 var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
 			 head.append(csslink); // Default head not working! so had to append.
-	
+			 var script = ['jquery-2.1.4.min.js','admob.js','crosscolor.js','levelDataMain.js'];
+			 
+				$.each(script, function(i, item) {
+					var scriptlink1= baseurl+item;
+					var s = document.createElement("script");
+					s.type = "text/javascript";
+					s.src = scriptlink1;
+					head.append(s);
+				
+				});
+			 
 			 /*
 			
 			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
