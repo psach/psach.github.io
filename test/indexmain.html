@@ -16,11 +16,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	  <script>
 		var grid =[
 			['a','i','a','a','a','a','e'],
-			['a','i','a','a','a','i','h'],
+			['a','i','a','a','i','i','h'],
 			['a','a','a','i','h','h','h'],
-			['i','i','a','i','h','i','a'],
+			['i','i','a','i','h','i','i'],
 			['h','h','h','h','h','i','a'],
-			['h','i','a','i','a','i','a'],
+			['h','i','a','i','i','i','a'],
 			['s','i','a','a','a','a','a']
 			]
 			emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
@@ -446,7 +446,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      <input type="radio" id="switch_4_center" name="switch_4" value="Fruit" onclick='gametype="Fruit";selectGame();'/>
       <label for="switch_4_center">🍉</label>
 			  </td><td>
-			   <input type="radio" id="switch_4_foot" name="switch_4" value="Fruit" onclick='gametype="Fruit";selectGame();'/>
+			   <input type="radio" id="switch_4_foot" name="switch_4" value="Sport" onclick='gametype="Sport";selectGame();'/>
       <label for="switch_4_foot">⚽</label>
 			 
 			 </td></tr></table></div>
@@ -530,6 +530,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
 				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
 				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
+				 
+				 
+					if(gametype=='Sport') emojiChar = {
+										"A":'\ud83c\udfc0',
+										"B":'\ud83c\udfbe',
+										"C":'\ud83c\udfaf',
+										"D":'\ud83c\udfb1',
+										"E":'\ud83c\udfb2',
+										"F":'\ud83c\udfae',
+										"G":'\ud83c\udfc3',
+										"H":'\ud83c\udfc1',
+										"I":'\ud83c\udfbf',
+										"J":'\ud83c\udfd3',
+										"K":'\ud83c\udfcf',
+										"L":'\ud83e\udd4a',
+										"M":'\ud83c\udfc0',
+										"N":'\ud83c\udff9',
+										"O":'\ud83c\udfd1',
+										"P":'\ud83e\udd4b',
+										"Q":'\ud83e\udd3c',
+										"R":'\ud83c\udfc8',
+										"S":'\ud83c\udfc9',
+										"T":'\ud83d\udeb4',
+										"U":'\ud83d\udef4',
+										"V":'\ud83c\udfc4',
+										"W":'\ud83c\udfd0',
+										"X":'\ud83e\udd38',
+										"Y":'\ud83c\udfcc',
+										"Z":'\ud83c\udfcb'
+					};
 			}
 	
 			var level=0;
