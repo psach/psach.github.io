@@ -605,7 +605,7 @@ function getLevel(){
 }
 
 function home(){
-	
+	firstLoad=true;
 	$('.centerbody').html(indexMain);
 			 
 }
