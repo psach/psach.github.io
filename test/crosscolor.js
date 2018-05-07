@@ -606,7 +606,7 @@ function getLevel(){
 
 function home(){
 	firstLoad=true;
-	$('.switch-field').removeClass('wrapperHelpR');
+	$('.switch-field').css('-webkit-animation-delay','0s');
 	$('.centerbody').html(indexMain);
 			 
 }
