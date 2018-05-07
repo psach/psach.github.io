@@ -606,6 +606,7 @@ function getLevel(){
 
 function home(){
 	firstLoad=true;
+	$('.switch-field').removeClass('wrapperHelpR');
 	$('.centerbody').html(indexMain);
 			 
 }
