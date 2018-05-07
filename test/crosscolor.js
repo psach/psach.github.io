@@ -606,7 +606,7 @@ function getLevel(){
 
 function home(){
 	firstLoad=true;
-	$(indexMain).find('.switch-field').css('-webkit-animation-delay','0s');
+	$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	$('.centerbody').html(indexMain);
 			 
 }
