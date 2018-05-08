@@ -544,7 +544,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(correctAns.length-currLevel+level+1)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
@@ -605,7 +605,8 @@ function getLevel(){
 }
 
 function home(){
-	
+	firstLoad=true;
+	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	$('.centerbody').html(indexMain);
-			 
+	$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 }
