@@ -39,7 +39,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			var alpha=0;
 			var crossbody = $('<tbody id="crossword" />');
 			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
-			ctable.append(crossbody);
+			
 			var splashContent = $('<div id="splashDiv" />').
 			append(ctable);
 			$.each(grid, function(i, row) {
@@ -62,6 +62,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 					tr.appendTo(crossbody);
 					
 			});
+		 	 ctable.append(crossbody);
 			</script>
 	  
 	  
