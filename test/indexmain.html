@@ -1,7 +1,7 @@
 <html !doctype>
  
   <head>  
-  <script src="cordova.js"></script>
+  
  
     <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -11,25 +11,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	  
 
 	
-	const push = PushNotification.init({
-	android: {
-	},
-    browser: {
-        pushServiceURL: 'http://push.api.phonegap.com/v1/push'
-    },
-	ios: {
-		alert: "true",
-		badge: "true",
-		sound: "true"
-	},
-	windows: {}
-});
+var notiPush = PushNotification.init();
 
-push.on('registration', (data) => {
+notiPush.on('registration', (data) => {
 	// data.registrationId
 });
 
-push.on('notification', (data) => {
+notiPush.on('notification', (data) => {
 	// data.message,
 	// data.title,
 	// data.count,
@@ -38,14 +26,14 @@ push.on('notification', (data) => {
 	// data.additionalData
 });
 
-push.on('error', (e) => {
+notiPush.on('error', (e) => {
 	// e.message
 });
 	  </script>
 <!-- End Google Tag Manager -->
 	
 	
-
+<script src="cordova.js"></script>
 	
 	  <script>
 		var grid =[
