@@ -1,7 +1,8 @@
 <html !doctype>
  
   <head>  
-  
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+  <script src="cordova.js"></script>
  
     <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -10,13 +11,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 })(window,document,'script','dataLayer','GTM-54J43ZF');
 	  
 
-	var notiPush = PushNotification.init();
+	PushNotification.init({
+		android: {}
+	});
 
 	  </script>
 <!-- End Google Tag Manager -->
 	
 	
-<script src="cordova.js"></script>
+
 	
 	  <script>
 		var grid =[
