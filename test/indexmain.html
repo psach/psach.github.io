@@ -10,7 +10,6 @@ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-54J43ZF');
 	  
-
 	
 	  </script>
 <!-- End Google Tag Manager -->
@@ -18,7 +17,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 		
 // Add to index.js or the first page that loads with your app.
 // For Intel XDK and please add this to your app.js.
-
 document.addEventListener('deviceready', function () {
   // Enable to debug issues.
   // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
@@ -26,7 +24,6 @@ document.addEventListener('deviceready', function () {
   var notificationOpenedCallback = function(jsonData) {
     console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
   };
-
   window.plugins.OneSignal
     .startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
     .handleNotificationOpened(notificationOpenedCallback)
@@ -90,16 +87,16 @@ document.addEventListener('deviceready', function () {
 			
 			var splash = $('#splash');
 			splash.append(splashContent);
-			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">??</div>'));
-			$('.red > .cwd-tile-letter-sp').append($('<div class="bouncesideright" style="-webkit-animation-delay:8s" >??</div>'));
+			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
+			$('.red > .cwd-tile-letter-sp').append($('<div class="bouncesideright" style="-webkit-animation-delay:8s" >👈</div>'));
 			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
 			//$('.highlight').removeClass('highlight');
 			helpText
 			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
 			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find path using ??/?? </div>'));
-			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >??</div>'));*/
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:15s ;">Select ?? to play</div>'));
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find path using 🇦/🍉 </div>'));
+			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:15s ;">Select 👇 to play</div>'));
 			
 		</script>
  
@@ -110,17 +107,13 @@ document.addEventListener('deviceready', function () {
 	  padding: 1px 1px;
 	  border: 1px solid darkseagreen;
 	  border-radius: 0px;
-
 	  background-image: url(back.png);
 	  background-size:15%;
 	  background-color: lightseagreen;
 	}
-
-
 	
 .d3main {
   box-sizing: border-box;
-
   height:100%;
   margin: 0px;
  
@@ -134,22 +127,16 @@ document.addEventListener('deviceready', function () {
   -o-animation: all 0.3s ease-out;
   -moz-transition: all 0.3s ease-out;
   transition: all 0.3s ease-out; */
-
    box-shadow:
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 0 0px 1px rgba(0,0,0,1);
-
  }
  
 .wrapperContainer {
-
 	position: relative;
 	top:30%;
-
 }
-
-
 #splashDiv {
 	
 		
@@ -158,39 +145,33 @@ document.addEventListener('deviceready', function () {
 	
 		
 }
-
 @-webkit-keyframes fadein {
   0%       { background-color : Yellow;color:black;}
   50%  { background-color: Yellow;color:black;}
   100%     { background-color: lightyellow;color:black;text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;}
 }
-
 @-webkit-keyframes slideSP {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(-100px); opacity:1;visibility:visible;}
   25%      { transform: translateY(1px); -webkit-transform: translateX(100px); opacity:1;visibility:visible;}
   50%  { transform: translateY(-4px); -webkit-transform: translateX(50px); opacity:1;visibility:visible;}
   100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1 ;visibility:visible;}
 }
-
 @-webkit-keyframes slideHelpR {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(1000px); opacity:1;visibility:visible;}
   50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
   100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
 }
-
 @-webkit-keyframes slideHelpL {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(-1000px); opacity:1;visibility:visible;}
   50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
   100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
 }
-
 .wrapper {
 	
 	background-image: url("smiley.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: 80% center;
-
 	background-size: 40%;
 	background-color:yellow; 
     position: absolute;
@@ -214,22 +195,18 @@ document.addEventListener('deviceready', function () {
     0 10px 40px 0px rgba(0,0,0,0.75);
 	
 }
-
-
 @keyframes slide {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(150px); }
   50%      { transform: translateY(-4px); -webkit-transform: translateX(195px); }
   100%    {transform: translateY(-9px); -webkit-transform: translateX(-200px); }
 }
-
 @-webkit-keyframes slide {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(150px); }
   50%      { transform: translateY(-4px); -webkit-transform: translateX(195px); }
   100%    {transform: translateY(-9px); -webkit-transform: translateX(-200px); }
 }
-
 /*.score{
 	font-weight: bold;
 	
@@ -248,16 +225,12 @@ document.addEventListener('deviceready', function () {
 			-moz-background-clip: text;
 			background-clip: text;
 		}	
-
 .switch-field {
  
  
   overflow: hidden;
 	
 }
-
-
-
 .switch-field input {
     position: absolute !important;
     clip: rect(0, 0, 0, 0);
@@ -266,11 +239,9 @@ document.addEventListener('deviceready', function () {
     border: 0;
     overflow: hidden;
 }
-
 .switch-field label {
   float: left;
 }
-
 .switch-field input:checked + label {
   display: inline-block;
   height: 23px;
@@ -297,9 +268,6 @@ document.addEventListener('deviceready', function () {
   
 	
 }
-
-
-
 .switch-field label {
 	
   display: inline-block;
@@ -327,13 +295,9 @@ document.addEventListener('deviceready', function () {
  
 	
   
-
 }
-
-
 .d3sp {
   box-sizing: border-box;
-
   height:100%;
   margin: 0px;
  
@@ -346,7 +310,6 @@ document.addEventListener('deviceready', function () {
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 0 0px 1px rgba(0,0,0,1);
-
  }
  
  
@@ -357,22 +320,18 @@ document.addEventListener('deviceready', function () {
   text-align:center;
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   }
-
 /*@-webkit-keyframes bounce {
   0%       { bottom:0px; }
   25%, 75% { bottom:10px; }
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
-
 @-webkit-keyframes bounce {
   0%       { transform: translateY(-9px); -webkit-transform: translateY(-9px); }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateY(1px); }
   50%      { transform: translateY(-4px); -webkit-transform: translateY(-4px); }
   100%    {transform: translateY(-9px); -webkit-transform: translateY(-9px); }
 }
-
-
  
 .bounceside {
   position:relative;
@@ -384,22 +343,18 @@ document.addEventListener('deviceready', function () {
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   -webkit-animation-iteration-count: 3;
   }
-
 /*@-webkit-keyframes bounce {
   0%       { bottom:0px; }
   25%, 75% { bottom:10px; }
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
-
 @-webkit-keyframes bounceside {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(-30px); opacity:1; }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(-20px); opacity:1;}
   50%      { transform: translateY(-4px); -webkit-transform: translateX(-25px); opacity:1;}
   100%    {transform: translateY(-9px); -webkit-transform: translateX(-30px); opacity:1;}
 }
-
-
 .bouncesideright {
   position:relative;
   -webkit-animation:bouncesideright  1s infinite;
@@ -410,22 +365,18 @@ document.addEventListener('deviceready', function () {
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   -webkit-animation-iteration-count: 3;
   }
-
 /*@-webkit-keyframes bounce {
   0%       { bottom:0px; }
   25%, 75% { bottom:10px; }
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
-
 @-webkit-keyframes bouncesideright {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(30px); opacity:1; }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(20px); opacity:1;}
   50%      { transform: translateY(-4px); -webkit-transform: translateX(25px); opacity:1;}
   100%    {transform: translateY(-9px); -webkit-transform: translateX(30px); opacity:1;}
 }
-
-
 	</style>
 	
 	
@@ -469,19 +420,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				      style="visibility:hidden; -webkit-animation-delay:20s ;background-color:transparent; border:0px">
 		 <table align='center' style='padding-bottom:5px;'><tr><td style='padding-right:4px;'>
       <input type="radio" id="switch_4_left" name="switch_4" value="Char" onclick='gametype="";selectGame();' />
-      <label for="switch_4_left">??</label>
+      <label for="switch_4_left">🇦</label>
 			 </td><td style='padding-right:4px;'>
      <input type="radio" id="switch_4_center" name="switch_4" value="Fruit" onclick='gametype="Fruit";selectGame();'/>
-      <label for="switch_4_center">??</label>
+      <label for="switch_4_center">🍉</label>
 			  </td><td>
 			   <input type="radio" id="switch_4_foot" name="switch_4" value="Sport" onclick='gametype="Sport";selectGame();'/>
-      <label for="switch_4_foot">?</label>
+      <label for="switch_4_foot">⚽</label>
 			 
 			 </td></tr></table></div>
 		
 				<div class="play d3main " 
      style="display:none; padding-left: 5px;padding-right: 5px; width:61px; height:21px ; align:center;visibility:hidden;" 
      align="center" onclick='play()' > PLAY</div>
+	 </br>
+
 	 </br>
 
 			</td>
