@@ -79,7 +79,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
 			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find path using 🇦/🍉 </div>'));
 			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:18s ;">Select 👇 to play</div>'));
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:15s ;">Select 👇 to play</div>'));
 			
 		</script>
  
@@ -474,7 +474,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		var gametype = 'Fruit';
 		var indexMain ;
 		//var gametype = 'Fruit';
-		$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px")
+	   
+		   var sto = window.localStorage?window.localStorage:localStorage;
+		   var delayTime = sto.getItem('saved')?0:18;
+		
+		$('.centerbody').find('.switch-field').attr('style',
+		"visibility:hidden; -webkit-animation-delay:"+delayTime+"s ;background-color:transparent; border:0px")
 			
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
@@ -512,7 +517,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 			function selectGame(){
 			//alert(scriptlink);
-			document.querySelectorAll('.play')[0].style.display='block';
+			$('.play').css('display','block');
+			var sto = window.localStorage?window.localStorage:localStorage;
+		  	sto.setItem('saved',true);
+				
 			head.find('link[id*="css"]').remove();
 			
 			
