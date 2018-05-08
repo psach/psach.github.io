@@ -9,22 +9,7 @@ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-54J43ZF');
 	  
-	  // Add to index.js or the first page that loads with your app.
-// For Intel XDK and please add this to your app.js.
-/*
-document.addEventListener('deviceready', function () {
-  // Enable to debug issues.
-  // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
-  
-  var notificationOpenedCallback = function(jsonData) {
-    console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-  };
 
-  window.plugins.OneSignal
-    .startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
-    .handleNotificationOpened(notificationOpenedCallback)
-    .endInit();
-}, false);*/
 	
 	const push = PushNotification.init({
 	android: {
