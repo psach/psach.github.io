@@ -26,26 +26,36 @@ document.addEventListener('deviceready', function () {
     .endInit();
 }, false);*/
 	
-	var push = PushNotification.init({ "android": {},
-         "ios": {"alert": "true", "badge": "true", "sound": "true"}, "windows": {} } );
+	const push = PushNotification.init({
+	android: {
+	},
+    browser: {
+        pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+    },
+	ios: {
+		alert: "true",
+		badge: "true",
+		sound: "true"
+	},
+	windows: {}
+});
 
-    push.on('registration', function(data) {
-        // data.registrationId
-    });
+push.on('registration', (data) => {
+	// data.registrationId
+});
 
-    push.on('notification', function(data) {
-        // data.message,
-        // data.title,
-        // data.count,
-        // data.sound,
-        // data.image,
-        // data.additionalData
-    });
+push.on('notification', (data) => {
+	// data.message,
+	// data.title,
+	// data.count,
+	// data.sound,
+	// data.image,
+	// data.additionalData
+});
 
-    push.on('error', function(e) {
-        // e.message
-    });
-	
+push.on('error', (e) => {
+	// e.message
+});
 	  </script>
 <!-- End Google Tag Manager -->
 	
