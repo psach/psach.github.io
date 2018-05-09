@@ -225,7 +225,7 @@ function popWords(words){
 			}
 			
 			// CLEAR SELECTED WORD
-			function clear(){
+			function clear(add){
 				//twice=0;
 					var clearGrid =$("#crossword").find(".cwd-tile-active");
 					clearGrid = clearGrid.not("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
@@ -244,11 +244,7 @@ function popWords(words){
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
 					
 				
-					/*		
-					start.addClass("d3 green");
-					start.find('.cwd-tile-letter').html(greenChar);
-					end.addClass("d3 red");
-					end.find('.cwd-tile-letter').html(redChar); */
+					if(add){
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
 				
@@ -274,6 +270,7 @@ function popWords(words){
 						selectionTillLast.splice(removeElement,1);
 						//selectionTillLast.pop();
 						storeLevel();
+					}
 				
 			}
 			
@@ -485,7 +482,7 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
-					clear();
+					clear(true);
 					//activeSetWord.removeAttr('word');
 					activeSet.parent().addClass("cwd-tile-highlight");
 					storeLevel();
@@ -610,3 +607,8 @@ function home(){
 	$('.centerbody').html(indexMain);
 	$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 }
+
+function clearAll(){
+	clear(false);
+}
+
