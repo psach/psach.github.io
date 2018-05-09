@@ -35,71 +35,6 @@ document.addEventListener('deviceready', function () {
 	
 
 	
-	  <script>
-		var grid =[
-			['a','i','a','a','a','a','e'],
-			['a','i','a','a','i','i','h'],
-			['a','a','a','i','h','h','h'],
-			['i','i','a','i','h','i','i'],
-			['h','h','h','h','h','i','a'],
-			['h','i','a','i','i','i','a'],
-			['s','i','a','a','a','a','a']
-			]
-			emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
-				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
-				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
-				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
-				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
-				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
-				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
-			var alphabetArray = ['A','B','C','D','E','F','G','H','I','J','K','L'];
-			var alpha=0;
-			var crossbody = $('<tbody id="crossword" />');
-			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
-			
-			var splashContent = $('<div id="splashDiv" />').
-			append(ctable);
-			$.each(grid, function(i, row) {
-					
-					//alert(word);
-					var tr = $('<tr />');
-					
-					$.each(row, function(j,col){
-						
-						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
-					   ' '+(col=='s'?' green d3sp':'')+
-					   ' '+(col=='e'?' red d3sp':'')+
-					   ' '+(col=='h'?' cwd-tile-highlight-holder':'')+
-					   ' " row="0" col="0" downclueid="0" >'+
-					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
-					   (col=='h'?emojiChar[alphabetArray[alpha++]]:'')+'</div>'+
-					   '</td>').appendTo(tr);
-					});
-					
-					tr.appendTo(crossbody);
-					
-			});
-		 	 ctable.append(crossbody);
-			</script>
-	  
-	  
-	 <script>
-			
-			
-			var splash = $('#splash');
-			splash.append(splashContent);
-			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
-			$('.red > .cwd-tile-letter-sp').append($('<div class="bouncesideright" style="-webkit-animation-delay:8s" >👈</div>'));
-			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
-			//$('.highlight').removeClass('highlight');
-			helpText
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
-			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find path using 🇦/🍉 </div>'));
-			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:15s ;">Select 👇 to play</div>'));
-			
-		</script>
  
 	<style>
 	
@@ -379,8 +314,73 @@ document.addEventListener('deviceready', function () {
   100%    {transform: translateY(-9px); -webkit-transform: translateX(30px); opacity:1;}
 }
 	</style>
+
 	
-	
+	  <script>
+		var grid =[
+			['a','i','a','a','a','a','e'],
+			['a','i','a','a','i','i','h'],
+			['a','a','a','i','h','h','h'],
+			['i','i','a','i','h','i','i'],
+			['h','h','h','h','h','i','a'],
+			['h','i','a','i','i','i','a'],
+			['s','i','a','a','a','a','a']
+			]
+			emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
+				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
+				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
+				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
+				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
+				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
+				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
+			var alphabetArray = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+			var alpha=0;
+			var crossbody = $('<tbody id="crossword" />');
+			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
+			
+			var splashContent = $('<div id="splashDiv" />').
+			append(ctable);
+			$.each(grid, function(i, row) {
+					
+					//alert(word);
+					var tr = $('<tr />');
+					
+					$.each(row, function(j,col){
+						
+						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
+					   ' '+(col=='s'?' green d3sp':'')+
+					   ' '+(col=='e'?' red d3sp':'')+
+					   ' '+(col=='h'?' cwd-tile-highlight-holder':'')+
+					   ' " row="0" col="0" downclueid="0" >'+
+					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
+					   (col=='h'?emojiChar[alphabetArray[alpha++]]:'')+'</div>'+
+					   '</td>').appendTo(tr);
+					});
+					
+					tr.appendTo(crossbody);
+					
+			});
+		 	 ctable.append(crossbody);
+			</script>
+	  
+	  
+	 <script>
+			
+			
+			var splash = $('#splash');
+			splash.append(splashContent);
+			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
+			$('.red > .cwd-tile-letter-sp').append($('<div class="bouncesideright" style="-webkit-animation-delay:8s" >👈</div>'));
+			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
+			//$('.highlight').removeClass('highlight');
+			helpText
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
+			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find path using 🇦/🍉 </div>'));
+			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
+			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:15s ;">Select 👇 to play</div>'));
+			
+		</script>
 </head>
 
   <body>
