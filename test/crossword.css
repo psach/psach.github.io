@@ -133,8 +133,8 @@
 }
 
 .cwd-tile-word {
-    width: 21px;
-    height: 21px;
+    /* width: 21px;
+    height: 21px; */
     border: solid 0px black;
     padding: 0;
 
@@ -145,6 +145,7 @@
 
     text-align: center;
     font-size: 13px; 
+	padding: 3px 6px;
 	
 }
 
