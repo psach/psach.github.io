@@ -613,10 +613,10 @@ function clearAll(){
 }
 
 function help(){
-	var gridClone = $('#cwd-divGrid').clone();
-	var offset=$('#cwd-divGrid').offset();
+	var gridClone = $('.inner-top').parent().clone();
+	var offset=$('.inner-top').parent().offset();
 	//alert(offset);
 	gridClone.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; opacity:0.5;');
-	$('#cwd-divGrid').append(gridClone);
+	$('.inner-top').parent().append(gridClone);
 	
 }
