@@ -1,0 +1,72 @@
+
+
+var emoji =[0x1F3C0,0x1F3C0,0x1F3BE,0x1F3AF,0x1F3B1,0x1F3B2,0x1F3AE,0x1F3C3,0x1F3C1,0x1F3BF,0x1F3D3,
+0x1F3CF,0x1F94A,0x1F3C0,0x1F3F9,0x1F3D1,0x1F94B,0x1F93C,0x1F3C8,0x1F3C9,0x1F6B4,0x1F6F4,0x1F3C4,0x1F3D0,0x1F938,0x1F3CC,0x1F3CB];
+
+
+$.each(emoji, function(i, item) {
+					
+		console.log("\\u"+String.fromCodePoint(item).charCodeAt(0).toString(16)+
+		"\\u"+String.fromCodePoint(item).charCodeAt(1).toString(16));			
+						
+					
+					
+});
+
+
+{
+"A":'\ud83c\udfc0',
+"B":'\ud83c\udfbe',
+"C":'\ud83c\udfaf',
+"D":'\ud83c\udfb1',
+"E":'\ud83c\udfb2',
+"F":'\ud83c\udfae',
+"G":'\ud83c\udfc3',
+"H":'\ud83c\udfc1',
+"I":'\ud83c\udfbf',
+"J":'\ud83c\udfd3',
+"K":'\ud83c\udfcf',
+"L":'\ud83e\udd4a',
+"M":'\ud83c\udfc0',
+"N":'\ud83c\udff9',
+"O":'\ud83c\udfd1',
+"P":'\ud83e\udd4b',
+"Q":'\ud83e\udd3c',
+"R":'\ud83c\udfc8',
+"S":'\ud83c\udfc9',
+"T":'\ud83d\udeb4',
+"U":'\ud83d\udef4',
+"V":'\ud83c\udfce',
+"W":'\ud83c\udfcd',
+"X":'\ud83e\udd38',
+"Y":'\ud83c\udfcc',
+"Z":'\ud83c\udfcb'
+}
+
+
+
+	   \ud83c\udfc0
+VM71:8 \ud83c\udfbe
+VM71:8 \ud83c\udfaf
+VM71:8 \ud83c\udfb1
+VM71:8 \ud83c\udfb2
+VM71:8 \ud83c\udfae
+VM71:8 \ud83c\udfc3
+VM71:8 \ud83c\udfc1
+VM71:8 \ud83c\udfbf
+VM71:8 \ud83c\udfd3
+VM71:8 \ud83c\udfcf
+VM71:8 \ud83e\udd4a
+VM71:8 \ud83c\udfc0
+VM71:8 \ud83c\udff9
+VM71:8 \ud83c\udfd1
+VM71:8 \ud83e\udd4b
+VM71:8 \ud83e\udd3c
+VM71:8 \ud83c\udfc8
+VM71:8 \ud83c\udfc9
+VM71:8 \ud83d\udeb4
+VM71:8 \ud83d\udef4
+VM71:8 \ud83c\udfce
+VM71:8 \ud83c\udfcd
+VM71:8 \ud83e\udd38
+VM71:8 \ud83c\udfcc

@@ -291,6 +291,26 @@ document.addEventListener('deviceready', function () {
   50%      { transform: translateY(-4px); -webkit-transform: translateX(-25px); opacity:1;}
   100%    {transform: translateY(-9px); -webkit-transform: translateX(-30px); opacity:1;}
 }
+
+
+.bouncedown{
+  position:relative;
+  -webkit-animation:bouncedown  1s infinite;
+  animation:bouncedown  1s infinite;
+  -webkit-animation-delay: 6s;
+  opacity: 0;
+  text-align:center;
+  
+  -webkit-animation-iteration-count: 3;
+  }
+
+@-webkit-keyframes bouncedown {
+  0%       { transform: translateY(-9px); -webkit-transform: translateY(-30px); opacity:1; }
+  25%, 75% { transform: translateY(1px); -webkit-transform: translateY(-20px); opacity:1;}
+  50%      { transform: translateY(-4px); -webkit-transform: translateY(-25px); opacity:1;}
+  100%    {transform: translateY(-9px); -webkit-transform: translateY(-30px); opacity:1;}
+}
+
 .bouncesideright {
   position:relative;
   -webkit-animation:bouncesideright  1s infinite;

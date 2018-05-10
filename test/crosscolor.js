@@ -617,19 +617,32 @@ function help(){
 	var offset=$('.green').offset();
 	var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:0s; text-shadow:none;');
+	startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s; text-shadow:none;padding:2px;');
 	$('.centerbody').append(startHelp);
 	
+
 	var offset=$('.red').offset();
-	var startHelp = $('<div class="bounceside" >End here</div>');
+	var startHelp = $('<div class="bounceside" >End here 👉 </div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute;text-shadow:none; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:5s; ');
+	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left-70)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:5s; padding:2px;');
 	$('.centerbody').append(startHelp);
 	
-	var offset=$('.word-container').offset();
-	var startHelp = $('<div class="bounce"> Select word from below <br/> to join start and end</div>');
+	
+	var offset=$('[downclueid="18"]').offset();
+	
+	setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},7000);
+	
+	var startHelp = $('<div class="bounceside" >👈 Tap to select </div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute;text-shadow:none;visibility :hidden;left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:10s;');
+	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left+50)+'px; top:'+(offset.top+40)+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:8s; padding:2px;');
+	$('.centerbody').append(startHelp);
+	
+	setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');},11000);
+		
+	var offset=$('.word-container').offset();
+	var startHelp = $('<div class="bouncedown"> Tap word from below 👇 <br/> to join start and end</div>');
+	//alert(offset);
+	startHelp.attr('style','position:absolute;opacity:0;text-shadow:none;left:'+(offset.left+50)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:11s;');
 	$('.centerbody').append(startHelp);
 	
 }
