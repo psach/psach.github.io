@@ -626,7 +626,7 @@ function help(){
 	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:5s;');
 	$('.centerbody').append(startHelp);
 	
-	var offset=$('.wordset').offset();
+	var offset=$('.word-container').offset();
 	var startHelp = $('<div class="bounce"> Select word from below to join start and end</div>');
 	//alert(offset);
 	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:0s;');
