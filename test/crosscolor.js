@@ -617,13 +617,13 @@ function help(){
 	var offset=$('.green').offset();
 	var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:0s;');
+	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:0s; text-shadow:none;');
 	$('.centerbody').append(startHelp);
 	
 	var offset=$('.red').offset();
 	var startHelp = $('<div class="bounceside" >End from here</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:5s;');
+	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:5s; ');
 	$('.centerbody').append(startHelp);
 	
 	var offset=$('.word-container').offset();
