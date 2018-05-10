@@ -615,9 +615,9 @@ function clearAll(){
 function help(){
 
 	var offset=$('.green').offset();
-	var startHelp = $('<div class="bouncesideright" >ðŸ‘‰ Start from here</div>');
+	var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:lightyellow');
+	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow: border-radius:3px');
 	$('.centerbody').append(startHelp);
 	
 	
