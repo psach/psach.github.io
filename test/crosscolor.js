@@ -613,8 +613,8 @@ function clearAll(){
 }
 
 function help(){
-	var gridClone = $('#cpw-grid').clone();
-	gridClone.attr('style','position:absolute; left:0px; top:0px; opacity:0.5: border: 1px solid dimgray');
-	$('#cpw-grid').append(gridClone);
+	var gridClone = $('#cwd-divGrid').clone();
+	gridClone.attr('style','position:absolute; left:0px; top:0px; opacity:0.5: border: 1px solid dimgray; transform: scale(0.5)');
+	$('.inner-top').append(gridClone);
 	
 }
