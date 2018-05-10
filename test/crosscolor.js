@@ -616,7 +616,7 @@ function help(){
 	var gridClone = $('.inner-top').parent().clone();
 	var offset=$('.inner-top').parent().offset();
 	//alert(offset);
-	gridClone.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; opacity:0.2;');
+	gridClone.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:rgba(0,0,0,0);');
 	gridClone.find('.green > .cwd-tile-letter').append($('<div class="bounceside" style="opacity:1" >ðŸ‘‰ Start from here</div>'));
 	$('.inner-top').parent().append(gridClone);
 	
