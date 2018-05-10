@@ -617,7 +617,8 @@ function help(){
 	var offset=$('.inner-top').parent().offset();
 	//alert(offset);
 	gridClone.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; opacity:0;');
-	$('.inner-top').parent().append(gridClone);
 	gridClone.find('.cwd-tile-letter').append($('<div class="bounceside" style="opacity:1" >ðŸ‘‰ Start from here</div>'));
+	$('.inner-top').parent().append(gridClone);
+	
 	
 }
