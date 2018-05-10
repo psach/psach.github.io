@@ -617,24 +617,24 @@ function help(){
 	var offset=$('.green').offset();
 	var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s; text-shadow:none;padding:2px;');
+	startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 0.05em dimgray; text-shadow:none;padding:2px;');
 	$('.centerbody').append(startHelp);
 	
 
 	var offset=$('.red').offset();
 	var startHelp = $('<div class="bounceside" >End here 👉 </div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left-70)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:5s; padding:2px;');
+	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left-70)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
 	$('.centerbody').append(startHelp);
 	
 	
 	var offset=$('[downclueid="18"]').offset();
 	
-	setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},7000);
+	setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 	
 	var startHelp = $('<div class="bounceside" >👈 Tap to select </div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left+50)+'px; top:'+(offset.top+40)+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:8s; padding:2px;');
+	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left+50)+'px; top:'+(offset.top+40)+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:8s; padding:2px;');
 	$('.centerbody').append(startHelp);
 	
 	setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');},11000);
@@ -642,7 +642,7 @@ function help(){
 	var offset=$('.word-container').offset();
 	var startHelp = $('<div class="bouncedown"> Tap word from below 👇 <br/> to join start and end</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute;opacity:0;text-shadow:none;left:'+(offset.left+50)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:11s;');
+	startHelp.attr('style','position:absolute;opacity:0;text-shadow:none;left:'+(offset.left+50)+'px; top:'+(offset.top-10)+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:11s;');
 	$('.centerbody').append(startHelp);
 	
 }
