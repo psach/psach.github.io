@@ -618,5 +618,6 @@ function help(){
 	//alert(offset);
 	gridClone.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; opacity:0.5;');
 	$('.inner-top').parent().append(gridClone);
+	gridClone.find('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">ðŸ‘‰</div>'));
 	
 }
