@@ -614,7 +614,7 @@ function clearAll(){
 
 function help(){
 	var gridClone = $('#cwd-divGrid').clone();
-	gridClone.attr('style','position:absolute; left:0px; top:0px; opacity:0.5; border: 1px solid dimgray;');
+	gridClone.attr('style','position:absolute; left:0px; top:0px; opacity:0.5;');
 	$('#cwd-divGrid').append(gridClone);
 	
 }
