@@ -618,6 +618,6 @@ function help(){
 	//alert(offset);
 	gridClone.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; opacity:0;');
 	$('.inner-top').parent().append(gridClone);
-	gridClone.find('.green > .cwd-tile-letter').append($('<div class="bounceside" style='opacity:1' >ðŸ‘‰ Start from here</div>'));
+	gridClone.find('.green > .cwd-tile-letter').append($('<div class="bounceside" style="opacity:1" >ðŸ‘‰ Start from here</div>'));
 	
 }
