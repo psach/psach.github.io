@@ -621,15 +621,15 @@ function help(){
 	$('.centerbody').append(startHelp);
 	
 	var offset=$('.red').offset();
-	var startHelp = $('<div class="bounceside" >End from here</div>');
+	var startHelp = $('<div class="bounceside" >End here</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:5s; ');
+	startHelp.attr('style','position:absolute;text-shadow:none; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:5s; ');
 	$('.centerbody').append(startHelp);
 	
 	var offset=$('.word-container').offset();
-	var startHelp = $('<div class="bounceside"> Select word from below <br/> to join start and end</div>');
+	var startHelp = $('<div class="bounce"> Select word from below <br/> to join start and end</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:10s;');
+	startHelp.attr('style','position:absolute;text-shadow:none;visibility :hidden;left:'+offset.left+'px; top:'+offset.top+'px; background-color:yellow;  border-radius:3px; -webkit-animation-delay:10s;');
 	$('.centerbody').append(startHelp);
 	
 }
