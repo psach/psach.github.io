@@ -613,12 +613,13 @@ function clearAll(){
 }
 
 function help(){
-	var gridClone = $('.inner-top').parent().clone();
-	var offset=$('.inner-top').parent().offset();
+
+	var offset=$('.green').offset();
+	var startHelp = $('<div class="bounceside" >ðŸ‘‰ Start from here</div>');
 	//alert(offset);
-	gridClone.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; background-color:rgba(0,0,0,0);');
-	gridClone.find('.green > .cwd-tile-letter').append($('<div class="bounceside" style="opacity:1" >ðŸ‘‰ Start from here</div>'));
-	$('.inner-top').parent().append(gridClone);
+	startHelp.attr('style','position:absolute; left:'+offset.left+'px; top:'+offset.top+'px; ');
+	$('.centerbody').append(startHelp);
+	
 	
 	
 }
