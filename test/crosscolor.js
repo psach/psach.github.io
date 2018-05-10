@@ -612,3 +612,9 @@ function clearAll(){
 	clear(false);
 }
 
+function help(){
+	var gridClone = $('#cpw-grid').clone();
+	gridClone.attr('style','position:absolute; left:0px; right:0px; opacity:0.5');
+	$('#cpw-grid').append(gridClone);
+	
+}
