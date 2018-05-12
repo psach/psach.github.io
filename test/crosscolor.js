@@ -624,7 +624,8 @@ function help(){
 		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 0.05em dimgray; text-shadow:none;padding:2px;');
 		$('.centerbody').append(startHelp);
 		
-
+		var word = gametype.length==0?'word':'emoji word';
+		
 		var offset=$('.red').offset();
 		var startHelp = $('<div class="bounceside" >End here 👉 </div>');
 		//alert(offset);
@@ -638,7 +639,7 @@ function help(){
 		
 		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').addClass('cwd-tile-highlight');},8000);
 		
-		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid. Find path from start to end filling words</div>');
+		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid. Find path from start to end filling a '+word+'</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+20)+'px; top:'+(offset.top+10)+
@@ -648,7 +649,7 @@ function help(){
 		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').removeClass('cwd-tile-highlight');},15000);
 			
 		var offset=$('.d3word').offset();
-		var startHelp = $('<div class="wrapperHelpR"> To fill the selected grid <br/> tap on word 👇 </div>');
+		var startHelp = $('<div class="wrapperHelpR"> To fill the selected grid <br/> tap on '+word+' 👇 </div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
@@ -656,7 +657,7 @@ function help(){
 		$('.centerbody').append(startHelp);
 		
 		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 </br/> to get next set of words  </div>');
+		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 </br/> to get next set of '+word+'s  </div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
 				   (offset.left-180)+'px; top:'+(offset.top-5)+
