@@ -631,27 +631,27 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
 				   (offset.left-70)+'px; top:'+offset.top+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:3s; padding:2px;');
 		$('.centerbody').append(startHelp);
 		
 		
-		var offset=$('[downclueid="2"]:eq(6)').offset();
+		var offset=$('[downclueid="18"]:eq(1)').offset();
 		
-		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},14000);
+		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},10000);
 		
-		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},15000);
+		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},11000);
 		
-		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},16000);
+		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},12000);
 		
-		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},17000);
+		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},13000);
 		
-		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},18000);
+		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},14000);
 		
 		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid.<br/> Find path from start to end filling a '+word+'</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+20)+'px; top:'+(offset.top+10)+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:7s; padding:2px;');
 		$('.centerbody').append(startHelp);
 		
 		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
