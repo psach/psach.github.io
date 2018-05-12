@@ -611,9 +611,10 @@ function home(){
 function clearAll(){
 	clear(false);
 }
-
+var help=true;
 function help(){
-
+if(help){
+	help=false;
 	var offset=$('.green').offset();
 	var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
 	//alert(offset);
@@ -634,7 +635,7 @@ function help(){
 	
 	setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 	
-	var startHelp = $('<div class="bounceside" >👈 Tap to select grid. Find path from Start to End filling words</div>');
+	var startHelp = $('<div class="bounceside" >👈 Tap to select across or down grid. <br/> Find path from Start to End filling words</div>');
 	//alert(offset);
 	startHelp.attr('style','-webkit-animation-iteration-count: 6;position:absolute;text-shadow:none; left:'+
 		       (offset.left+50)+'px; top:'+(offset.top+60)+
@@ -656,16 +657,16 @@ function help(){
 	//alert(offset);
 	startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+
 		       (offset.left)+'px; top:'+(offset.top-70)+
-		       'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:15s;');
+		       'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:18s;');
 	$('.centerbody').append(startHelp);
-	
+	$('.arrow').addClass('bounceside');
 	
 	setTimeout(function(){
 		
 		$('.bouncesideright').attr('style','visibility:hidden;display:none');
 		$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
 		$('.bounceside').attr('style','visibility:hidden;display:none');
-		
+		help=true;
 	},30000);
-	
+}
 }
