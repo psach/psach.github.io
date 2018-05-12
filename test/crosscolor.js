@@ -698,7 +698,8 @@ function help(){
 			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
 		removeClass('cwd-tile-highlight');
 			helpFlag=true;
-		},33000);
+		},31000);
+		showLevel();
 	}
 	
 }
