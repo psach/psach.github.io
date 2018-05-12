@@ -655,7 +655,7 @@ function help(){
 		$('.centerbody').append(startHelp);
 		
 		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
-		removeClass('cwd-tile-highlight');},17000);
+		removeClass('cwd-tile-highlight');},19000);
 			
 		var offset=$('.d3word').offset();
 		var startHelp = $('<div class="wrapperHelpR"> To fill the selected grid <br/> tap on '+word+' 👇 </div>');
