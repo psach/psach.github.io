@@ -632,7 +632,7 @@ function help(){
 	
 	setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 	
-	var startHelp = $('<div class="bounceside" >👈 Tap to select </div>');
+	var startHelp = $('<div class="bounceside" >👈 Tap to select gird. Find path from Start to End</div>');
 	//alert(offset);
 	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left+50)+'px; top:'+(offset.top+40)+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:8s; padding:2px;');
 	$('.centerbody').append(startHelp);
@@ -640,7 +640,7 @@ function help(){
 	setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');},11000);
 		
 	var offset=$('.word-container').offset();
-	var startHelp = $('<div class="wrapperHelpR"> Find crossword path from start to end using below 👇 words. Use right/left arrows for next set of words</div>');
+	var startHelp = $('<div class="wrapperHelpR"> Fill the selected grid using below 👇 words. Use right/left arrows for next set of words</div>');
 	//alert(offset);
 	startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+(offset.left)+'px; top:'+(offset.top-70)+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:11s;');
 	$('.centerbody').append(startHelp);
