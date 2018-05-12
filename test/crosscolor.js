@@ -638,7 +638,7 @@ function help(){
 		
 		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').addClass('cwd-tile-highlight');},8000);
 		
-		var startHelp = $('<div class="bounceside" >👈 Tap to select one across or down grid. <br/> Find path from start to end filling words</div>');
+		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid. Find path from start to end filling words</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 6;position:absolute;text-shadow:none; left:'+
 				   (offset.left+50)+'px; top:'+(offset.top+10)+
