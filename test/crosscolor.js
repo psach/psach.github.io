@@ -611,9 +611,9 @@ function home(){
 function clearAll(){
 	clear(false);
 }
-var help=true;
+var helpFlag=true;
 function help(){
-if(help){
+if(helpFlag){
 	help=false;
 	var offset=$('.green').offset();
 	var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
@@ -666,7 +666,7 @@ if(help){
 		$('.bouncesideright').attr('style','visibility:hidden;display:none');
 		$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
 		$('.bounceside').attr('style','visibility:hidden;display:none');
-		help=true;
+		helpFlag=true;
 	},30000);
 }
 }
