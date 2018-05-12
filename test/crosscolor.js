@@ -605,68 +605,77 @@ function home(){
 	firstLoad=true;
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	$('.centerbody').html(indexMain);
-	$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
+	//$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 }
 
 function clearAll(){
 	clear(false);
 }
-var helpFlag=true;
-function help(){
-if(helpFlag){
-	help=false;
-	var offset=$('.green').offset();
-	var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
-	//alert(offset);
-	startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 0.05em dimgray; text-shadow:none;padding:2px;');
-	$('.centerbody').append(startHelp);
-	
 
-	var offset=$('.red').offset();
-	var startHelp = $('<div class="bounceside" >End here 👉 </div>');
-	//alert(offset);
-	startHelp.attr('style','position:absolute;text-shadow:none; left:'+
-		       (offset.left-70)+'px; top:'+offset.top+
-	'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
-	$('.centerbody').append(startHelp);
+var helpFlag=true;
+
+function help(){
 	
-	
-	var offset=$('[downclueid="18"]').offset();
-	
-	setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
-	
-	var startHelp = $('<div class="bounceside" >👈 Tap to select across or down grid. <br/> Find path from Start to End filling words</div>');
-	//alert(offset);
-	startHelp.attr('style','-webkit-animation-iteration-count: 6;position:absolute;text-shadow:none; left:'+
-		       (offset.left+50)+'px; top:'+(offset.top+60)+
-	'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:8s; padding:2px;');
-	$('.centerbody').append(startHelp);
-	
-	setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');},11000);
+	if(helpFlag){
+		helpFlag=false;
+		var offset=$('.green').offset();
+		var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 0.05em dimgray; text-shadow:none;padding:2px;');
+		$('.centerbody').append(startHelp);
 		
-	var offset=$('.word-container').offset();
-	var startHelp = $('<div class="wrapperHelpR"> Tap on word 👇 to fill the selected grid.</div>');
-	//alert(offset);
-	startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+
-		       (offset.left)+'px; top:'+(offset.top-70)+
-		       'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:11s;');
-	$('.centerbody').append(startHelp);
-	
-	var offset=$('.word-container').offset();
-	var startHelp = $('<div class="wrapperHelpR"> Use right/left arrows to get next set of words</div>');
-	//alert(offset);
-	startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+
-		       (offset.left)+'px; top:'+(offset.top-70)+
-		       'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:18s;');
-	$('.centerbody').append(startHelp);
-	$('.arrow').addClass('bounceside');
-	
-	setTimeout(function(){
+
+		var offset=$('.red').offset();
+		var startHelp = $('<div class="bounceside" >End here 👉 </div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
+				   (offset.left-70)+'px; top:'+offset.top+
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
+		$('.centerbody').append(startHelp);
 		
-		$('.bouncesideright').attr('style','visibility:hidden;display:none');
-		$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
-		$('.bounceside').attr('style','visibility:hidden;display:none');
-		helpFlag=true;
-	},30000);
-}
+		
+		var offset=$('[downclueid="2"]:eq(6)').offset();
+		
+		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').addClass('cwd-tile-highlight');},8000);
+		
+		var startHelp = $('<div class="bounceside" >👈 Tap to select across or down grid. <br/> Find path from Start to End filling words</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 6;position:absolute;text-shadow:none; left:'+
+				   (offset.left+50)+'px; top:'+(offset.top+10)+
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:8s; padding:2px;');
+		$('.centerbody').append(startHelp);
+		
+		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').removeClass('cwd-tile-highlight');},15000);
+			
+		var offset=$('.d3word').offset();
+		var startHelp = $('<div class="wrapperHelpR"> Tap on word 👇 to fill the selected grid.</div>');
+		//alert(offset);
+		startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+
+				   (offset.left+20)+'px; top:'+(offset.top-30)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:13s;');
+		$('.centerbody').append(startHelp);
+		
+		var offset=$('.d3word').offset();
+		var startHelp = $('<div class="wrapperHelpR"> Use right/left arrows to get next set of words</div>');
+		//alert(offset);
+		startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+
+				   (offset.left+5)+'px; top:'+(offset.top-30)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:18s;');
+		$('.centerbody').append(startHelp);
+		//$('.arrow').addClass('bounceside');
+		//$('.arrow').attr('style','-webkit-animation:bounceside  1s infinite;-webkit-animation-delay:18s;');
+		
+			
+		setTimeout(function(){
+			
+			$('.bouncesideright').attr('style','visibility:hidden;display:none');
+			$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
+			$('.bounceside').attr('style','visibility:hidden;display:none');
+			//$('.bounceside').removeClass('bounceside');
+			//$('.arrow').attr('style','visibility:visible;display:');
+			
+			helpFlag=true;
+		},25000);
+	}
+	
 }

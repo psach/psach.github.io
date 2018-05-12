@@ -73,6 +73,7 @@ document.addEventListener('deviceready', function () {
 	position: relative;
 	top:30%;
 }
+
 #splashDiv {
 	
 		
@@ -81,6 +82,7 @@ document.addEventListener('deviceready', function () {
 	
 		
 }
+
 @-webkit-keyframes fadein {
   0%       { background-color : Yellow;color:black;}
   50%  { background-color: Yellow;color:black;}
@@ -129,7 +131,7 @@ document.addEventListener('deviceready', function () {
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 10px 40px 0px rgba(0,0,0,0.75);
-	
+	 
 }
 @keyframes slide {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
@@ -333,74 +335,260 @@ document.addEventListener('deviceready', function () {
   50%      { transform: translateY(-4px); -webkit-transform: translateX(25px); opacity:1;}
   100%    {transform: translateY(-9px); -webkit-transform: translateX(30px); opacity:1;}
 }
+
+
+
+ .d3cross {
+  
+  border:1px;
+  border-radius:3px;
+
+ }
+ 
+ 
+#cwd-container {
+    font-family: tahoma;
+}
+
+#cwd-grid-sp {
+    border: solid 1px black;
+  
+}
+
+
+
+@media (min-width:400px){
+    #cwd-grid-sp{
+        width: 100%;
+		height: 80%;
+}
+}
+
+
+@media (min-width:400px){
+    .word-container{
+     padding-top:50%;
+}
+}
+
+
+#cwd-grid-sp td.cwd-tile-highlight
+{
+     background-color: Yellow !important;
+	/*-webkit-animation: slideSP  1s , fadein 2s forwards;
+	-webkit-animation-delay:12s;*/
+			color:black;
+			text-shadow: 2px 1px 2px rgba(175,175,175,1);
+			
+}
+
+#cwd-grid-sp td.cwd-tile-highlight-holder{
+	
+	color:transparent;
+}
+
+.wrapperHelpR
+{
+	border: 1px solid black;
+	border-radius: 6px;
+	background-color:lightyellow;
+	visibility:hidden;
+	-webkit-animation: slideHelpR 5s;
+	padding: 3px;
+	background-color:#A5DC86;
+}
+
+
+.wrapperHelpL
+{
+	border: 1px solid black;
+	border-radius: 6px;
+	background-color:lightyellow;
+	visibility:hidden;
+	-webkit-animation: slideHelpL 5s;
+	padding: 3px;
+	background-color:#A5DC86;
+	
+}
+
+
+
+#cwd-grid-sp td.cwd-tile-highlight-start
+{
+    background-color: Yellow !important;
+}
+
+#cwd-grid-sp td.red
+{
+    background-color: Red !important;
+	color: White !important;
+}
+
+ 
+ 
+
+
+
+
+#cwd-grid-sp td.green
+{
+    background-color: Green !important;
+	color: White !important;
+}
+
+
+
+#cwd-grid-sp td.cwd-tile-cursor
+{
+    border-color: White !important;
+    background-color: darkgray !important;
+    color: white;
+}
+
+#cwd-grid-sp td.cwd-tile-correct
+{
+    background-color: Lime !important;
+}
+
+#cwd-grid-sp td.cwd-tile-incorrect
+{
+    border-color: Red !important; 
+	border: solid 1px Red;
+}
+
+
+
+
+.cwd-tile-active-sp{
+	background: LightYellow;
+	border-radius: 0px;
+
+}
+
+
+.cwd-tile-inactive-sp{
+	background: Black;
+	border-radius: 1px;
+}
+
+.cwd-tile-sp {
+    width: 30px;
+    height: 30px;
+	font-weight:bold;
+    border: solid 0.07em black;
+    padding: 0;
+    vertical-align: center;
+}
+
+.cwd-tile-word-sp {
+    width: 21px;
+    height: 21px;
+    border: solid 0px black;
+    padding: 0;
+
+}
+
+
+.cwd-tile-letter-sp {
+
+    text-align: center;
+    font-size: 13px; 
+	
+}
+
+
+
+
+
+.inner{
+    
+    outline: 0px solid #333;
+    float: left;
+    width: 100%;
+}
+
+@media (min-width:400px){
+    .inner{
+	
+        width: 50%;
+
+}
+}
+
+
+
+
+
+
+
+.inner-top{
+    
+    padding-top: 55px;
+	position: relative;
+}
+
+
+
+
+.frame {
+    height: 90%;      /* equals max image height */
+    width: 100%;
+    align: center;
+    white-space: nowrap;
+    
+    text-align: center; margin: 1em 0;
+}
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+img {
+    
+    vertical-align: middle;
+  
+}
+
+.cn {
+	
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+
+.arrow{
+    background-color: transparent;
+    box-shadow: 3px 3px 4px black;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    /* Translate the box up by width / 2 then rotate */
+   
+}
+
+.right{
+	-webkit-transform: rotate(-45deg);
+}
+.left{
+	-webkit-transform: rotate(135deg);
+}
+
+
+
+
+
 	</style>
 
 	
-	  <script>
-		var grid =[
-			['a','i','a','a','a','a','e'],
-			['a','i','a','a','i','i','h'],
-			['a','a','a','i','h','h','h'],
-			['i','i','a','i','h','i','i'],
-			['h','h','h','h','h','i','a'],
-			['h','i','a','i','i','i','a'],
-			['s','i','a','a','a','a','a']
-			]
-			emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
-				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
-				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
-				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
-				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
-				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
-				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
-			var alphabetArray = ['A','B','C','D','E','F','G','H','I','J','K','L'];
-			var alpha=0;
-			var crossbody = $('<tbody id="crossword" />');
-			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
-			
-			var splashContent = $('<div id="splashDiv" />').
-			append(ctable);
-			$.each(grid, function(i, row) {
-					
-					//alert(word);
-					var tr = $('<tr />');
-					
-					$.each(row, function(j,col){
-						
-						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
-					   ' '+(col=='s'?' green d3sp':'')+
-					   ' '+(col=='e'?' red d3sp':'')+
-					   ' '+(col=='h'?' cwd-tile-highlight-holder':'')+
-					   ' " row="0" col="0" downclueid="0" >'+
-					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
-					   (col=='h'?emojiChar[alphabetArray[alpha++]]:'')+'</div>'+
-					   '</td>').appendTo(tr);
-					});
-					
-					tr.appendTo(crossbody);
-					
-			});
-		 	 ctable.append(crossbody);
-			</script>
+	 
 	  
 	  
-	 <script>
-			
-			
-			var splash = $('#splash');
-			splash.append(splashContent);
-			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
-			$('.red > .cwd-tile-letter-sp').append($('<div class="bouncesideright" style="-webkit-animation-delay:8s" >👈</div>'));
-			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
-			//$('.highlight').removeClass('highlight');
-			helpText
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
-			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find path using 🇦/🍉 </div>'));
-			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:15s ;">Select 👇 to play</div>'));
-			
-		</script>
+	
 </head>
 
   <body>
@@ -425,20 +613,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			<td align='center' >
 				<div id='splash' align='center' >
    				
-		
 				
-				</div>
 			</td>
 		</tr>
 		</table>
 		
-		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
+		<table id='gametype' align='center' border=0 height='10%' style='opacity:1;'>
 		<tr><td id='helpText' align='center' style='padding-top:5%' > </td></tr>
 		<tr>
 			<td align='center' style='padding-top:15%'>
 			
-				 <div class="switch-field wrapperHelpR" 
-				      style="visibility:hidden; -webkit-animation-delay:20s ;background-color:transparent; border:0px">
+				 <div class="switch-field" >
 		 <table align='center' style='padding-bottom:5px;'><tr><td style='padding-right:4px;'>
       <input type="radio" id="switch_4_left" name="switch_4" value="Char" onclick='gametype="";selectGame();' />
       <label for="switch_4_left">🇦</label>
@@ -462,7 +647,57 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		</tr>
 	  </table>
 	  <script>
-	  $('#gametype').css('opacity',1);
+	  
+	  
+	  
+	   
+		var grid =[
+			['a','i','a','a','e','i'],
+			['a','i','a','a','h','i'],
+			['a','a','h','i','h','a'],
+			['h','h','h','h','h','i'],
+			['i','i','h','i','i','a'],
+			['a','i','s','a','a','i'],
+			
+			]
+			
+			var crossbody = $('<tbody id="crossword" />');
+			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
+			var alphabetArray = ['A','W','Y','C','R','O','S','S','R','D'];
+			var alpha=0
+			var splashContent =  $('<div id="splashDiv"/>').html(ctable);
+			
+			$.each(grid, function(i, row) {
+					
+					//alert(word);
+					var tr = $('<tr />');
+					
+					$.each(row, function(j,col){
+						
+						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
+					   ' '+(col=='s'?' green d3sp':'')+
+					   ' '+(col=='e'?' red d3sp':'')+
+					   ' '+(col=='h'?' cwd-tile-highlight ':'')+
+					   ' " row="0" col="0" downclueid="0" >'+
+					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
+					   (col=='h'?alphabetArray[alpha++]:'')+
+					   (col=='s'?'D':'')+
+					   (col=='e'?'W':'')+
+					   '</div>'+
+					   '</td>').appendTo(tr);
+					});
+					
+					tr.appendTo(crossbody);
+					
+			});
+		 	 ctable.html(crossbody);
+			
+	 		$('#helpText').html($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:2s ;">Select 👇 to play</div>'));
+		
+			  var splash = $('#splash');
+			  
+			  splash.html(splashContent);
+			
 	  </script>
 	</div>
 	
@@ -475,8 +710,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		   var sto = window.localStorage?window.localStorage:localStorage;
 		   var delayTime = sto.getItem('saved')?0:18;
 		
-		$('.centerbody').find('.switch-field').attr('style',
-		"visibility:hidden; -webkit-animation-delay:"+delayTime+"s ;background-color:transparent; border:0px")
+		
 			
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
@@ -484,8 +718,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 
 			 var head = $("<head/>");
 			 $("html").append(head);
-			 var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
-			 head.append(csslink); // Default head not working! so had to append.
+			 //var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			 //head.append(csslink); // Default head not working! so had to append.
 			 var script = ['jquery-2.1.4.min.js','admob.js','crosscolor.js','levelDataMain.js'];
 			 
 				$.each(script, function(i, item) {
