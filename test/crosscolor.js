@@ -641,7 +641,7 @@ function help(){
 		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid. Find path from start to end filling words</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
-				   (offset.left+50)+'px; top:'+(offset.top+10)+
+				   (offset.left+20)+'px; top:'+(offset.top+10)+
 		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:8s; padding:2px;');
 		$('.centerbody').append(startHelp);
 		
