@@ -637,15 +637,15 @@ function help(){
 		
 		var offset=$('[downclueid="2"]:eq(6)').offset();
 		
-		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},6000);
+		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},7000);
 		
-		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},7000);
+		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},8000);
 		
-		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},8000);
+		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},9000);
 		
-		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},9000);
+		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},10000);
 		
-		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},10000);
+		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},11000);
 		
 		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid.<br/> Find path from start to end filling a '+word+'</div>');
 		//alert(offset);
@@ -654,7 +654,8 @@ function help(){
 		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
 		$('.centerbody').append(startHelp);
 		
-		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').removeClass('cwd-tile-highlight');},15000);
+		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
+		removeClass('cwd-tile-highlight');},17000);
 			
 		var offset=$('.d3word').offset();
 		var startHelp = $('<div class="wrapperHelpR"> To fill the selected grid <br/> tap on '+word+' 👇 </div>');
