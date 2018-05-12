@@ -637,9 +637,17 @@ function help(){
 		
 		var offset=$('[downclueid="2"]:eq(6)').offset();
 		
-		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').addClass('cwd-tile-highlight');},8000);
+		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},10000);
 		
-		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid. Find path from start to end filling a '+word+'</div>');
+		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},11000);
+		
+		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},12000);
+		
+		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},13000);
+		
+		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},14000);
+		
+		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid.<br/> Find path from start to end filling a '+word+'</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+20)+'px; top:'+(offset.top+10)+
