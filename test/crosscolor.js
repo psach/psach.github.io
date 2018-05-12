@@ -661,8 +661,8 @@ function help(){
 		var offset=$('.arrow:eq(1)').offset();
 		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
 		//alert(offset);
-		startHelp.attr('style','position:absolute;width:170px;opacity:1;text-shadow:none;left:'+
-				   (offset.left-170)+'px; top:'+(offset.top-5)+
+		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
+				   (offset.left-180)+'px; top:'+(offset.top-5)+
 				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:15s;');
 		$('.centerbody').append(startHelp);
 		
@@ -698,7 +698,7 @@ function help(){
 			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
 		removeClass('cwd-tile-highlight');
 			helpFlag=true;
-		},35000);
+		},33000);
 	}
 	
 }
