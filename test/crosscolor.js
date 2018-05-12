@@ -647,7 +647,7 @@ function help(){
 		
 		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},14000);
 		
-		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid.<br/> Find path from start to end filling a '+word+'</div>');
+		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid.Find path from start to end filling a '+word+'</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+20)+'px; top:'+(offset.top+10)+
