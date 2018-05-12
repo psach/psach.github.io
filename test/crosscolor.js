@@ -658,8 +658,8 @@ function help(){
 		var offset=$('.arrow:eq(1)').offset();
 		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 </br/> to get next set of words  </div>');
 		//alert(offset);
-		startHelp.attr('style','position:absolute;width:170px;opacity:1;text-shadow:none;left:'+
-				   (offset.left-165)+'px; top:'+(offset.top-5)+
+		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
+				   (offset.left-180)+'px; top:'+(offset.top-5)+
 				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:18s;');
 		$('.centerbody').append(startHelp);
 		//$('.arrow').addClass('bounceside');
