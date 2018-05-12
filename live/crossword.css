@@ -28,7 +28,7 @@
  .d3char {
   /* box-sizing: border-box; */
 
-  height:100%;
+  /* height:100%; */
   margin: 0px;
  
   padding-top: 0px;
@@ -124,10 +124,10 @@
  
  
 .cwd-tile {
-    width: 21px;
-    height: 21px;
+    width: 23px;
+    height: 23px;
 
-    border: solid 0.07em black;
+    border: solid 1px dimgray;
     padding: 0;
     vertical-align: center;
 }
@@ -145,6 +145,7 @@
 
     text-align: center;
     font-size: 13px; 
+	padding: 2px 2px;
 	
 }
 

@@ -10,7 +10,6 @@ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-54J43ZF');
 	  
-
 	
 	  </script>
 <!-- End Google Tag Manager -->
@@ -18,7 +17,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 		
 // Add to index.js or the first page that loads with your app.
 // For Intel XDK and please add this to your app.js.
-
 document.addEventListener('deviceready', function () {
   // Enable to debug issues.
   // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
@@ -26,7 +24,6 @@ document.addEventListener('deviceready', function () {
   var notificationOpenedCallback = function(jsonData) {
     console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
   };
-
   window.plugins.OneSignal
     .startInit("2c824581-04af-45d5-97ec-975cb3444587")
     .handleNotificationOpened(notificationOpenedCallback)
@@ -38,71 +35,6 @@ document.addEventListener('deviceready', function () {
 	
 
 	
-	  <script>
-		var grid =[
-			['a','i','a','a','a','a','e'],
-			['a','i','a','a','i','i','h'],
-			['a','a','a','i','h','h','h'],
-			['i','i','a','i','h','i','i'],
-			['h','h','h','h','h','i','a'],
-			['h','i','a','i','i','i','a'],
-			['s','i','a','a','a','a','a']
-			]
-			emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
-				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
-				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
-				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
-				 "Q":'\ud83c\udf6f',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
-				 "U":'\ud83c\udf44',"V":'\ud83c\udf6b',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
-				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};
-			var alphabetArray = ['A','B','C','D','E','F','G','H','I','J','K','L'];
-			var alpha=0;
-			var crossbody = $('<tbody id="crossword" />');
-			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
-			
-			var splashContent = $('<div id="splashDiv" />').
-			append(ctable);
-			$.each(grid, function(i, row) {
-					
-					//alert(word);
-					var tr = $('<tr />');
-					
-					$.each(row, function(j,col){
-						
-						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
-					   ' '+(col=='s'?' green d3sp':'')+
-					   ' '+(col=='e'?' red d3sp':'')+
-					   ' '+(col=='h'?' cwd-tile-highlight-holder':'')+
-					   ' " row="0" col="0" downclueid="0" >'+
-					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
-					   (col=='h'?emojiChar[alphabetArray[alpha++]]:'')+'</div>'+
-					   '</td>').appendTo(tr);
-					});
-					
-					tr.appendTo(crossbody);
-					
-			});
-		 	 ctable.append(crossbody);
-			</script>
-	  
-	  
-	 <script>
-			
-			
-			var splash = $('#splash');
-			splash.append(splashContent);
-			$('.green > .cwd-tile-letter-sp').append($('<div class="bounceside">👉</div>'));
-			$('.red > .cwd-tile-letter-sp').append($('<div class="bouncesideright" style="-webkit-animation-delay:8s" >👈</div>'));
-			$('.cwd-tile-highlight-holder').addClass('cwd-tile-highlight' );
-			//$('.highlight').removeClass('highlight');
-			helpText
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:3s">Start from Green</div>'));
-			$('#helpText').append($('<div class="wrapperHelpL" style="left:-300px; visibility:hidden; -webkit-animation-delay:7s ">Red is End</div>'));
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:12s ">Find path using 🇦/🍉 </div>'));
-			/*$('.cwd-tile-highlight').append($('<div class="wrapperHelpL" style="-webkit-animation-delay:15s; padding:0px; border-radius:0px;" >🍉</div>'));*/
-			$('#helpText').append($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:15s ;">Select 👇 to play</div>'));
-			
-		</script>
  
 	<style>
 	
@@ -111,17 +43,13 @@ document.addEventListener('deviceready', function () {
 	  padding: 1px 1px;
 	  border: 1px solid darkseagreen;
 	  border-radius: 0px;
-
 	  background-image: url(back.png);
 	  background-size:15%;
 	  background-color: lightseagreen;
 	}
-
-
 	
 .d3main {
   box-sizing: border-box;
-
   height:100%;
   margin: 0px;
  
@@ -135,21 +63,16 @@ document.addEventListener('deviceready', function () {
   -o-animation: all 0.3s ease-out;
   -moz-transition: all 0.3s ease-out;
   transition: all 0.3s ease-out; */
-
    box-shadow:
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 0 0px 1px rgba(0,0,0,1);
-
  }
  
 .wrapperContainer {
-
 	position: relative;
 	top:30%;
-
 }
-
 
 #splashDiv {
 	
@@ -165,33 +88,28 @@ document.addEventListener('deviceready', function () {
   50%  { background-color: Yellow;color:black;}
   100%     { background-color: lightyellow;color:black;text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;}
 }
-
 @-webkit-keyframes slideSP {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(-100px); opacity:1;visibility:visible;}
   25%      { transform: translateY(1px); -webkit-transform: translateX(100px); opacity:1;visibility:visible;}
   50%  { transform: translateY(-4px); -webkit-transform: translateX(50px); opacity:1;visibility:visible;}
   100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1 ;visibility:visible;}
 }
-
 @-webkit-keyframes slideHelpR {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(1000px); opacity:1;visibility:visible;}
   50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
   100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
 }
-
 @-webkit-keyframes slideHelpL {
-  0%       { transform: translateY(-9px); -webkit-transform: translateX(-1000px); opacity:1;visibility:visible;}
+  0%       { transform: translateY(-9px); -webkit-transform: translateX(-500px); opacity:1;visibility:visible;}
   50%  { transform: translateY(-4px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
   100%     { transform: translateY(-9px); -webkit-transform: translateX(0px); opacity:1;visibility:visible;}
 }
-
 .wrapper {
 	
 	background-image: url("smiley.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: 80% center;
-
 	background-size: 40%;
 	background-color:yellow; 
     position: absolute;
@@ -213,24 +131,20 @@ document.addEventListener('deviceready', function () {
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 10px 40px 0px rgba(0,0,0,0.75);
-	
+	 
 }
-
-
 @keyframes slide {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(150px); }
   50%      { transform: translateY(-4px); -webkit-transform: translateX(195px); }
   100%    {transform: translateY(-9px); -webkit-transform: translateX(-200px); }
 }
-
 @-webkit-keyframes slide {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(100px); }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(150px); }
   50%      { transform: translateY(-4px); -webkit-transform: translateX(195px); }
   100%    {transform: translateY(-9px); -webkit-transform: translateX(-200px); }
 }
-
 /*.score{
 	font-weight: bold;
 	
@@ -249,16 +163,12 @@ document.addEventListener('deviceready', function () {
 			-moz-background-clip: text;
 			background-clip: text;
 		}	
-
 .switch-field {
  
  
   overflow: hidden;
 	
 }
-
-
-
 .switch-field input {
     position: absolute !important;
     clip: rect(0, 0, 0, 0);
@@ -267,11 +177,9 @@ document.addEventListener('deviceready', function () {
     border: 0;
     overflow: hidden;
 }
-
 .switch-field label {
   float: left;
 }
-
 .switch-field input:checked + label {
   display: inline-block;
   height: 23px;
@@ -298,9 +206,6 @@ document.addEventListener('deviceready', function () {
   
 	
 }
-
-
-
 .switch-field label {
 	
   display: inline-block;
@@ -328,13 +233,9 @@ document.addEventListener('deviceready', function () {
  
 	
   
-
 }
-
-
 .d3sp {
   box-sizing: border-box;
-
   height:100%;
   margin: 0px;
  
@@ -347,7 +248,6 @@ document.addEventListener('deviceready', function () {
     inset 0 5px 0 rgba(255,255,255,0.5),
     0 2px 10px rgba(0,0,0,1),
     0 0 0px 1px rgba(0,0,0,1);
-
  }
  
  
@@ -358,22 +258,18 @@ document.addEventListener('deviceready', function () {
   text-align:center;
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   }
-
 /*@-webkit-keyframes bounce {
   0%       { bottom:0px; }
   25%, 75% { bottom:10px; }
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
-
 @-webkit-keyframes bounce {
   0%       { transform: translateY(-9px); -webkit-transform: translateY(-9px); }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateY(1px); }
   50%      { transform: translateY(-4px); -webkit-transform: translateY(-4px); }
   100%    {transform: translateY(-9px); -webkit-transform: translateY(-9px); }
 }
-
-
  
 .bounceside {
   position:relative;
@@ -385,14 +281,12 @@ document.addEventListener('deviceready', function () {
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   -webkit-animation-iteration-count: 3;
   }
-
 /*@-webkit-keyframes bounce {
   0%       { bottom:0px; }
   25%, 75% { bottom:10px; }
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
-
 @-webkit-keyframes bounceside {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(-30px); opacity:1; }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(-20px); opacity:1;}
@@ -400,6 +294,24 @@ document.addEventListener('deviceready', function () {
   100%    {transform: translateY(-9px); -webkit-transform: translateX(-30px); opacity:1;}
 }
 
+
+.bouncedown{
+  position:relative;
+  -webkit-animation:bouncedown  1s infinite;
+  animation:bouncedown  1s infinite;
+  -webkit-animation-delay: 6s;
+  opacity: 0;
+  text-align:center;
+  
+  -webkit-animation-iteration-count: 6;
+  }
+
+@-webkit-keyframes bouncedown {
+  0%       { transform: translateY(-9px); -webkit-transform: translateY(-30px); opacity:1; }
+  25%, 75% { transform: translateY(1px); -webkit-transform: translateY(-20px); opacity:1;}
+  50%      { transform: translateY(-4px); -webkit-transform: translateY(-25px); opacity:1;}
+  100%    {transform: translateY(-9px); -webkit-transform: translateY(-30px); opacity:1;}
+}
 
 .bouncesideright {
   position:relative;
@@ -411,14 +323,12 @@ document.addEventListener('deviceready', function () {
   text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
   -webkit-animation-iteration-count: 3;
   }
-
 /*@-webkit-keyframes bounce {
   0%       { bottom:0px; }
   25%, 75% { bottom:10px; }
   50%       { bottom:5px; }
   100% {bottom:0px;}
 }*/
-
 @-webkit-keyframes bouncesideright {
   0%       { transform: translateY(-9px); -webkit-transform: translateX(30px); opacity:1; }
   25%, 75% { transform: translateY(1px); -webkit-transform: translateX(20px); opacity:1;}
@@ -427,8 +337,257 @@ document.addEventListener('deviceready', function () {
 }
 
 
-	</style>
+
+ .d3cross {
+  
+  border:1px;
+  border-radius:3px;
+
+ }
+ 
+ 
+#cwd-container {
+    font-family: tahoma;
+}
+
+#cwd-grid-sp {
+    border: solid 1px black;
+  
+}
+
+
+
+@media (min-width:400px){
+    #cwd-grid-sp{
+        width: 100%;
+		height: 80%;
+}
+}
+
+
+@media (min-width:400px){
+    .word-container{
+     padding-top:50%;
+}
+}
+
+
+#cwd-grid-sp td.cwd-tile-highlight
+{
+     background-color: Yellow !important;
+	/*-webkit-animation: slideSP  1s , fadein 2s forwards;
+	-webkit-animation-delay:12s;*/
+			color:black;
+			text-shadow: 2px 1px 2px rgba(175,175,175,1);
+			
+}
+
+#cwd-grid-sp td.cwd-tile-highlight-holder{
 	
+	color:transparent;
+}
+
+.wrapperHelpR
+{
+	border: 1px solid black;
+	border-radius: 6px;
+	background-color:lightyellow;
+	visibility:hidden;
+	-webkit-animation: slideHelpR 5s;
+	padding: 3px;
+	background-color:#A5DC86;
+}
+
+
+.wrapperHelpL
+{
+	border: 1px solid black;
+	border-radius: 6px;
+	background-color:lightyellow;
+	visibility:hidden;
+	-webkit-animation: slideHelpL 5s;
+	padding: 3px;
+	background-color:#A5DC86;
+	
+}
+
+
+
+#cwd-grid-sp td.cwd-tile-highlight-start
+{
+    background-color: Yellow !important;
+}
+
+#cwd-grid-sp td.red
+{
+    background-color: Red !important;
+	color: White !important;
+}
+
+ 
+ 
+
+
+
+
+#cwd-grid-sp td.green
+{
+    background-color: Green !important;
+	color: White !important;
+}
+
+
+
+#cwd-grid-sp td.cwd-tile-cursor
+{
+    border-color: White !important;
+    background-color: darkgray !important;
+    color: white;
+}
+
+#cwd-grid-sp td.cwd-tile-correct
+{
+    background-color: Lime !important;
+}
+
+#cwd-grid-sp td.cwd-tile-incorrect
+{
+    border-color: Red !important; 
+	border: solid 1px Red;
+}
+
+
+
+
+.cwd-tile-active-sp{
+	background: LightYellow;
+	border-radius: 0px;
+
+}
+
+
+.cwd-tile-inactive-sp{
+	background: Black;
+	border-radius: 1px;
+}
+
+.cwd-tile-sp {
+    width: 30px;
+    height: 30px;
+	font-weight:bold;
+    border: solid 0.07em black;
+    padding: 0;
+    vertical-align: center;
+}
+
+.cwd-tile-word-sp {
+    width: 21px;
+    height: 21px;
+    border: solid 0px black;
+    padding: 0;
+
+}
+
+
+.cwd-tile-letter-sp {
+
+    text-align: center;
+    font-size: 13px; 
+	
+}
+
+
+
+
+
+.inner{
+    
+    outline: 0px solid #333;
+    float: left;
+    width: 100%;
+}
+
+@media (min-width:400px){
+    .inner{
+	
+        width: 50%;
+
+}
+}
+
+
+
+
+
+
+
+.inner-top{
+    
+    padding-top: 55px;
+	position: relative;
+}
+
+
+
+
+.frame {
+    height: 90%;      /* equals max image height */
+    width: 100%;
+    align: center;
+    white-space: nowrap;
+    
+    text-align: center; margin: 1em 0;
+}
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+img {
+    
+    vertical-align: middle;
+  
+}
+
+.cn {
+	
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+
+.arrow{
+    background-color: transparent;
+    box-shadow: 3px 3px 4px black;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    /* Translate the box up by width / 2 then rotate */
+   
+}
+
+.right{
+	-webkit-transform: rotate(-45deg);
+}
+.left{
+	-webkit-transform: rotate(135deg);
+}
+
+
+
+
+
+	</style>
+
+	
+	 
+	  
+	  
 	
 </head>
 
@@ -454,20 +613,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			<td align='center' >
 				<div id='splash' align='center' >
    				
-		
 				
-				</div>
 			</td>
 		</tr>
 		</table>
 		
-		<table id='gametype' align='center' border=0 height='10%' style='opacity:0;'>
+		<table id='gametype' align='center' border=0 height='10%' style='opacity:1;'>
 		<tr><td id='helpText' align='center' style='padding-top:5%' > </td></tr>
 		<tr>
 			<td align='center' style='padding-top:15%'>
 			
-				 <div class="switch-field wrapperHelpR" 
-				      style="visibility:hidden; -webkit-animation-delay:20s ;background-color:transparent; border:0px">
+				 <div class="switch-field" >
 		 <table align='center' style='padding-bottom:5px;'><tr><td style='padding-right:4px;'>
       <input type="radio" id="switch_4_left" name="switch_4" value="Char" onclick='gametype="";selectGame();' />
       <label for="switch_4_left">🇦</label>
@@ -485,11 +641,64 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      align="center" onclick='play()' > PLAY</div>
 	 </br>
 
+	
+
 			</td>
 		</tr>
 	  </table>
 	  <script>
-	  $('#gametype').css('opacity',1);
+	  
+	  
+	  
+	   
+		var grid =[
+			
+			['a','a','i','a','e','i'],
+			['i','a','a','i','h','i'],
+			['i','h','h','h','h','h'],
+			['a','i','a','i','h','i'],
+			['s','h','h','h','h','a'],
+			['a','a','i','a','a','i'],
+			
+			]
+			
+			var crossbody = $('<tbody id="crossword" />');
+			var ctable = $('<table id="cwd-grid-sp" cellspacing="0" rowspacing="0" />');
+			var alphabetArray = ['R','C','O','L','O','R','S','A','T','H','S'];
+			var alpha=0
+			var splashContent =  $('<div id="splashDiv"/>').html(ctable);
+			
+			$.each(grid, function(i, row) {
+					
+					//alert(word);
+					var tr = $('<tr />');
+					
+					$.each(row, function(j,col){
+						
+						$('<td class="cwd-tile-sp cwd-tile-'+(col=='i'?'ina':'a')+'ctive-sp '+
+					   ' '+(col=='s'?' green d3sp':'')+
+					   ' '+(col=='e'?' red d3sp':'')+
+					   ' '+(col=='h'?' cwd-tile-highlight ':'')+
+					   ' " row="0" col="0" downclueid="0" >'+
+					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
+					   (col=='h'?alphabetArray[alpha++]:'')+
+					   (col=='s'?'P':'')+
+					   (col=='e'?'C':'')+
+					   '</div>'+
+					   '</td>').appendTo(tr);
+					});
+					
+					tr.appendTo(crossbody);
+					
+			});
+		 	 ctable.html(crossbody);
+			
+	 		$('#helpText').html($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:2s ;">Select 👇 to play</div>'));
+		
+			  var splash = $('#splash');
+			  
+			  splash.html(splashContent);
+			
 	  </script>
 	</div>
 	
@@ -502,8 +711,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		   var sto = window.localStorage?window.localStorage:localStorage;
 		   var delayTime = sto.getItem('saved')?0:18;
 		
-		$('.centerbody').find('.switch-field').attr('style',
-		"visibility:hidden; -webkit-animation-delay:"+delayTime+"s ;background-color:transparent; border:0px")
+		
 			
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
@@ -511,8 +719,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 
 			 var head = $("<head/>");
 			 $("html").append(head);
-			 var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
-			 head.append(csslink); // Default head not working! so had to append.
+			 //var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
+			 //head.append(csslink); // Default head not working! so had to append.
 			 var script = ['jquery-2.1.4.min.js','admob.js','crosscolor.js','levelDataMain.js'];
 			 
 				$.each(script, function(i, item) {

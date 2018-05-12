@@ -225,7 +225,7 @@ function popWords(words){
 			}
 			
 			// CLEAR SELECTED WORD
-			function clear(){
+			function clear(add){
 				//twice=0;
 					var clearGrid =$("#crossword").find(".cwd-tile-active");
 					clearGrid = clearGrid.not("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
@@ -244,11 +244,7 @@ function popWords(words){
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
 					
 				
-					/*		
-					start.addClass("d3 green");
-					start.find('.cwd-tile-letter').html(greenChar);
-					end.addClass("d3 red");
-					end.find('.cwd-tile-letter').html(redChar); */
+					if(add){
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
 				
@@ -274,6 +270,7 @@ function popWords(words){
 						selectionTillLast.splice(removeElement,1);
 						//selectionTillLast.pop();
 						storeLevel();
+					}
 				
 			}
 			
@@ -485,7 +482,7 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
-					clear();
+					clear(true);
 					//activeSetWord.removeAttr('word');
 					activeSet.parent().addClass("cwd-tile-highlight");
 					storeLevel();
@@ -608,5 +605,102 @@ function home(){
 	firstLoad=true;
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	$('.centerbody').html(indexMain);
-	$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
+	//$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
+}
+
+function clearAll(){
+	clear(false);
+}
+
+var helpFlag=true;
+
+function help(){
+	
+	if(helpFlag){
+		helpFlag=false;
+		var offset=$('.green').offset();
+		var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 1px dimgray; text-shadow:none;padding:2px;');
+		$('.centerbody').append(startHelp);
+		
+		var word = gametype.length==0?'word':'emoji word';
+		
+		var offset=$('.red').offset();
+		var startHelp = $('<div class="bounceside" >End here 👉 </div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
+				   (offset.left-70)+'px; top:'+offset.top+
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:3s; padding:2px;');
+		$('.centerbody').append(startHelp);
+		
+		
+		var offset=$('[downclueid="18"]:eq(1)').offset();
+		
+		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
+		
+		
+		
+		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one <br/> across or down grid.</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left+20)+'px; top:'+(offset.top+10)+
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:5s; padding:2px;');
+		$('.centerbody').append(startHelp);
+		
+		
+			
+		var offset=$('.d3word').offset();
+		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
+				   (offset.left+20)+'px; top:'+(offset.top-40)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:10s;');
+		$('.centerbody').append(startHelp);
+		
+		var offset=$('.arrow:eq(1)').offset();
+		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
+				   (offset.left-180)+'px; top:'+(offset.top-5)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:15s;');
+		$('.centerbody').append(startHelp);
+		
+
+		
+		var offset=$('[downclueid="2"]:eq(5)').offset();
+		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
+				   (offset.left+20)+'px; top:'+(offset.top-40)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:19s;');
+		$('.centerbody').append(startHelp);
+		
+				
+		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},25000);
+		
+		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},26000);
+		
+		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},27000);
+		
+		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},28000);
+		
+		
+			
+		setTimeout(function(){
+			
+			$('.bouncesideright').attr('style','visibility:hidden;display:none');
+			$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
+			$('.wrapperHelpL').attr('style','visibility:hidden;display:none');
+			$('.bounceside').attr('style','visibility:hidden;display:none');
+			//$('.bounceside').removeClass('bounceside');
+			//$('.arrow').attr('style','visibility:visible;display:');
+			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
+		removeClass('cwd-tile-highlight');
+			helpFlag=true;
+			showLevel();
+		},31000);
+		
+	}
+	
 }

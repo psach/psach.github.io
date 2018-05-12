@@ -35,9 +35,9 @@
 
 #cwd-grid-sp td.cwd-tile-highlight
 {
-   
-	-webkit-animation: slideSP  1s , fadein 2s forwards;
-	-webkit-animation-delay:12s;
+     background-color: Yellow !important;
+	/*-webkit-animation: slideSP  1s , fadein 2s forwards;
+	-webkit-animation-delay:12s;*/
 	
 }
 
@@ -52,7 +52,7 @@
 	border-radius: 6px;
 	background-color:lightyellow;
 	visibility:hidden;
-	-webkit-animation: slideHelpR 5s forwards;
+	-webkit-animation: slideHelpR 5s;
 	padding: 3px;
 	background-color:#A5DC86;
 }
@@ -64,7 +64,7 @@
 	border-radius: 6px;
 	background-color:lightyellow;
 	visibility:hidden;
-	-webkit-animation: slideHelpL 5s forwards;
+	-webkit-animation: slideHelpL 5s;
 	padding: 3px;
 	background-color:#A5DC86;
 	
@@ -131,9 +131,9 @@
 }
 
 .cwd-tile-sp {
-    width: 21px;
-    height: 21px;
-
+    width: 30px;
+    height: 30px;
+	font-weight:bold;
     border: solid 0.07em black;
     padding: 0;
     vertical-align: center;
@@ -183,7 +183,7 @@
 .inner-top{
     
     padding-top: 55px;
-	
+	position: relative;
 }
 
 
@@ -221,7 +221,7 @@ img {
 
 
 .arrow{
-    background-color: pink;
+    background-color: transparent;
     box-shadow: 3px 3px 4px black;
     width: 10px;
     height: 10px;
