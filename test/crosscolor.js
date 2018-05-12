@@ -637,43 +637,54 @@ function help(){
 		
 		var offset=$('[downclueid="18"]:eq(1)').offset();
 		
-		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},10000);
+		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 		
-		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},11000);
 		
-		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},12000);
 		
-		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},13000);
-		
-		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},14000);
-		
-		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one across or down grid.Find path from start to end filling a '+word+'</div>');
+		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one <br/> across or down grid.</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+20)+'px; top:'+(offset.top+10)+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:7s; padding:2px;');
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
 		$('.centerbody').append(startHelp);
 		
-		setTimeout(function(){$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
-		removeClass('cwd-tile-highlight');},19000);
+		
 			
 		var offset=$('.d3word').offset();
-		var startHelp = $('<div class="wrapperHelpR"> To fill the selected grid <br/> tap on '+word+' 👇 </div>');
+		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:13s;');
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:10s;');
 		$('.centerbody').append(startHelp);
 		
 		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 </br/> to get next set of '+word+'s  </div>');
+		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
 		//alert(offset);
-		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
-				   (offset.left-180)+'px; top:'+(offset.top-5)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:18s;');
+		startHelp.attr('style','position:absolute;width:170px;opacity:1;text-shadow:none;left:'+
+				   (offset.left-170)+'px; top:'+(offset.top-5)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:15s;');
 		$('.centerbody').append(startHelp);
-		//$('.arrow').addClass('bounceside');
-		//$('.arrow').attr('style','-webkit-animation:bounceside  1s infinite;-webkit-animation-delay:18s;');
+		
+
+		
+		var offset=$('[downclueid="2"]:eq(5)').offset();
+		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
+				   (offset.left+20)+'px; top:'+(offset.top-40)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:19s;');
+		$('.centerbody').append(startHelp);
+		
+				
+		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},25000);
+		
+		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},26000);
+		
+		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},27000);
+		
+		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},28000);
+		
 		
 			
 		setTimeout(function(){
@@ -684,9 +695,10 @@ function help(){
 			$('.bounceside').attr('style','visibility:hidden;display:none');
 			//$('.bounceside').removeClass('bounceside');
 			//$('.arrow').attr('style','visibility:visible;display:');
-			
+			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
+		removeClass('cwd-tile-highlight');
 			helpFlag=true;
-		},25000);
+		},35000);
 	}
 	
 }
