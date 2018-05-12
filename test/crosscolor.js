@@ -624,7 +624,9 @@ function help(){
 	var offset=$('.red').offset();
 	var startHelp = $('<div class="bounceside" >End here 👉 </div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left-70)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
+	startHelp.attr('style','position:absolute;text-shadow:none; left:'+
+		       (offset.left-70)+'px; top:'+offset.top+
+	'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
 	$('.centerbody').append(startHelp);
 	
 	
@@ -632,24 +634,38 @@ function help(){
 	
 	setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 	
-	var startHelp = $('<div class="bounceside" >👈 Tap to select gird. Find path from Start to End</div>');
+	var startHelp = $('<div class="bounceside" >👈 Tap to select grid. Find path from Start to End filling words</div>');
 	//alert(offset);
-	startHelp.attr('style','position:absolute;text-shadow:none; left:'+(offset.left+50)+'px; top:'+(offset.top+40)+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:8s; padding:2px;');
+	startHelp.attr('style','-webkit-animation-iteration-count: 6;position:absolute;text-shadow:none; left:'+
+		       (offset.left+50)+'px; top:'+(offset.top+60)+
+	'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:8s; padding:2px;');
 	$('.centerbody').append(startHelp);
 	
 	setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');},11000);
 		
 	var offset=$('.word-container').offset();
-	var startHelp = $('<div class="wrapperHelpR"> Fill the selected grid using below 👇 words. Use right/left arrows for next set of words</div>');
+	var startHelp = $('<div class="wrapperHelpR"> Tap on word 👇 to fill the selected grid.</div>');
 	//alert(offset);
-	startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+(offset.left)+'px; top:'+(offset.top-70)+'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:11s;');
+	startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+
+		       (offset.left)+'px; top:'+(offset.top-70)+
+		       'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:11s;');
 	$('.centerbody').append(startHelp);
+	
+	var offset=$('.word-container').offset();
+	var startHelp = $('<div class="wrapperHelpR"> Use right/left arrows to get next set of words</div>');
+	//alert(offset);
+	startHelp.attr('style','text-align: justify;position:absolute;opacity:1;text-shadow:none;left:'+
+		       (offset.left)+'px; top:'+(offset.top-70)+
+		       'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:15s;');
+	$('.centerbody').append(startHelp);
+	
+	
 	setTimeout(function(){
 		
 		$('.bouncesideright').attr('style','visibility:hidden;display:none');
 		$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
 		$('.bounceside').attr('style','visibility:hidden;display:none');
 		
-	},20000);
+	},30000);
 	
 }
