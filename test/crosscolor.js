@@ -621,7 +621,7 @@ function help(){
 		var offset=$('.green').offset();
 		var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
 		//alert(offset);
-		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 0.05em dimgray; text-shadow:none;padding:2px;');
+		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 1px dimgray; text-shadow:none;padding:2px;');
 		$('.centerbody').append(startHelp);
 		
 		var word = gametype.length==0?'word':'emoji word';
@@ -631,7 +631,7 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
 				   (offset.left-70)+'px; top:'+offset.top+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:3s; padding:2px;');
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:3s; padding:2px;');
 		$('.centerbody').append(startHelp);
 		
 		
@@ -645,7 +645,7 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+20)+'px; top:'+(offset.top+10)+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:5s; padding:2px;');
+		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:5s; padding:2px;');
 		$('.centerbody').append(startHelp);
 		
 		
@@ -655,7 +655,7 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:10s;');
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:10s;');
 		$('.centerbody').append(startHelp);
 		
 		var offset=$('.arrow:eq(1)').offset();
@@ -663,7 +663,7 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
 				   (offset.left-180)+'px; top:'+(offset.top-5)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:15s;');
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:15s;');
 		$('.centerbody').append(startHelp);
 		
 
@@ -673,7 +673,7 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 0.05em dimgray; -webkit-animation-delay:19s;');
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:19s;');
 		$('.centerbody').append(startHelp);
 		
 				
