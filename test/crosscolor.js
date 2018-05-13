@@ -228,8 +228,8 @@ function popWords(words){
 			function clear(add){
 				//twice=0;
 					var clearGrid =$("#crossword").find(".cwd-tile-active");
-					clearGrid = clearGrid.not("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
-					clearGrid = clearGrid.not("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
+					//clearGrid = clearGrid.not("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
+					//clearGrid = clearGrid.not("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
 					
 					clearGrid.removeAttr('class');
 					clearGrid.addClass('cwd-tile cwd-tile-active');
@@ -240,9 +240,14 @@ function popWords(words){
 					
 					start = $("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
+					
 					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
 					
+					start.addClass("d3 green");
+					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
+					end.addClass("d3 red");
+					end.find('.cwd-tile-letter').html(emojiChar[redChar]);
 				
 					if(add){
 					var removeElement;
