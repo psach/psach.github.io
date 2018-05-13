@@ -655,6 +655,7 @@ function help(){
 		
 		
 		
+		
 		var offset=$('.wordset').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -665,6 +666,65 @@ function help(){
 		$('.wordset:eq(0)').addClass('clickWord').attr('style','-webkit-animation-delay:11s;');
 		
 		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},12000);
+		
+		
+		
+		var offset=$('[acrossclueid="17"]:eq(3)').offset();
+		
+		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},14000);
+		
+		
+		
+		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:14s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		
+		
+		var offset=$('[downclueid="2"]:eq(3)').offset();
+		
+		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},19000);
+		
+		
+		
+		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:19s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		
+		
+		var offset=$('[acrossclueid="10"]:eq(3)').offset();
+		
+		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},24000);
+		
+		
+		
+		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:24s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		
+		
+		
+		
+		var offset=$('[downclueid="3"]:eq(1)').offset();
+		
+		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},29000);
+		
+		
+		
+		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:29s;font-size:30px');
+		$('.centerbody').append(startHelp);
 		
 		
 		var offset=$('.arrow:eq(1)').offset();
