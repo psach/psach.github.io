@@ -720,7 +720,7 @@ function help(){
 		
 		var offset=$('[downclueid="3"]:eq(1)').offset();
 		
-		setTimeout(function(){$('[downclueid="2"]').removeClass('cwd-tile-highlight');$('[downclueid="3"]').addClass('cwd-tile-highlight');
+		setTimeout(function(){$('[acrossclueid="10"]').removeClass('cwd-tile-highlight');$('[downclueid="3"]').addClass('cwd-tile-highlight');
 		
 		},29000);
 		
