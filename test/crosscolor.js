@@ -401,6 +401,8 @@ function popWords(words){
 			
 			setStartEnd(currLevel);
 			moreWords[0][0]='JAVA';
+			moreWords[0][1]='JOKER';
+			
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
@@ -655,14 +657,11 @@ function help(){
 				   (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		
-		
-		
 		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 		
 		
 		
-		var offset=$('.wordset').offset();
+		var offset=$('.wordset:eq(0)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
@@ -675,69 +674,81 @@ function help(){
 		
 		
 		
-		var offset=$('[acrossclueid="17"]:eq(3)').offset();
-		
-		setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');$('[acrossclueid="17"]').addClass('cwd-tile-highlight');
-		},16000);
 		
 		
+		var offset=$('[acrossclueid="17"]:eq(2)').offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:14s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
 		$('.centerbody').append(startHelp);
+				
+		setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');
+			$('[acrossclueid="17"]').addClass('cwd-tile-highlight');
+		},15000);
+		
+			
+		var offset=$('.wordset:eq(1)').offset();
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left+50)+'px; top:'+(offset.top+5)+
+		'px; background-color:transparent;  -webkit-animation-delay:16s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		$('.wordset:eq(1)').addClass('clickWord').attr('style','-webkit-animation-delay:18s;');
+		
+		setTimeout(function(){$('.wordset:eq(1)').find('.cwd-tile-letter').click();},19000);
+		
+		
+		
 		
 		
 		var offset=$('[downclueid="2"]:eq(3)').offset();
 		
-		setTimeout(function(){$('[acrossclueid="17"]').removeClass('cwd-tile-highlight');$('[downclueid="2"]').addClass('cwd-tile-highlight');
-		
-		},21000);
-		
-		
-		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:19s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
 		$('.centerbody').append(startHelp);
+	
+		setTimeout(function(){$('[acrossclueid="17"]').removeClass('cwd-tile-highlight');$('[downclueid="2"]').addClass('cwd-tile-highlight');
+		
+		},22000);
 		
 		
 		var offset=$('[acrossclueid="10"]:eq(3)').offset();
-		
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+5)+
+		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
+		$('.centerbody').append(startHelp);
 		setTimeout(function(){$('[downclueid="2"]').removeClass('cwd-tile-highlight');$('[acrossclueid="10"]').addClass('cwd-tile-highlight');
 		
-		},26000);
+		},25000);
 		
 		
-		
+			
+		var offset=$('[downclueid="3"]:eq(1)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:24s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:26s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		
-		
-		
-		
-		var offset=$('[downclueid="3"]:eq(1)').offset();
 		
 		setTimeout(function(){$('[acrossclueid="10"]').removeClass('cwd-tile-highlight');$('[downclueid="3"]').addClass('cwd-tile-highlight');
 		
-		},31000);
+		},28000);
 		
-		setTimeout(function(){showLevel();},32000);
 		
-		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
-		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
-				   (offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:29s;font-size:30px');
-		$('.centerbody').append(startHelp);
+		
+		setTimeout(function(){showLevel();},29000);
+		
+		
 		
 		
 		var offset=$('.arrow:eq(1)').offset();
@@ -747,7 +758,7 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:33s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:31s;width:200px;');
 		$('.centerbody').append(startHelp);
 		//$('.arrow:eq(1)').addClass('clickWord').attr('style','-webkit-animation-delay:15s;');
 		
@@ -804,10 +815,12 @@ function help(){
 			//$('.bounceside').removeClass('bounceside');
 			//$('.arrow').attr('style','visibility:visible;display:');
 			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
-			removeClass('cwd-tile-highlight');
+			removeClass('cwd-tile-highlight').find('.cwd-tile-letter').removeClass('d3char '+emojiChar[greenChar]);
+			$('[downclueid="18"],[acrossclueid="17"]').not('.green').html('');
+			
 			helpFlag=true;
 			
-		},35000);
+		},33000);
 		
 	}
 	
