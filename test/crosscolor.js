@@ -621,7 +621,7 @@ function help(){
 	if(helpFlag){
 		helpFlag=false;
 		var offset=$('.green').offset();
-		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border:1px solid dimgray;padding:2px;background-color:#DDFF96;" >Start</font></div>');
+		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >??</font><font style="border:1px solid dimgray;padding:2px;background-color:#DDFF96;" >Start</font></div>');
 				//alert(offset);
 		startHelp.attr('style','position:absolute; left:'+(offset.left+20)+
 		'px; top:'+(offset.top-10)+
@@ -631,7 +631,7 @@ function help(){
 		var word = gametype.length==0?'word':'emoji word';
 		
 		var offset=$('.red').offset();
-		var startHelp = $('<div class="bounceside" ><font style="background-color:#DDFF96;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
+		var startHelp = $('<div class="bounceside" ><font style="background-color:#DDFF96;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >?? </font></div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
 				   (offset.left-50)+'px; top:'+(offset.top-10)+
@@ -645,7 +645,7 @@ function help(){
 		
 		
 		
-		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		var startHelp = $('<div class="wrapperHelpLClick" ><div>??</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
@@ -655,7 +655,7 @@ function help(){
 		
 		
 		var offset=$('.wordset').offset();
-		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		var startHelp = $('<div class="wrapperHelpLClick" >??</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+50)+'px; top:'+(offset.top+5)+
@@ -667,7 +667,7 @@ function help(){
 		
 		
 		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpLClick">👉</div>');
+		var startHelp = $('<div class="wrapperHelpLClick">??</div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left-30)+'px; top:'+(offset.top-15)+
@@ -683,7 +683,7 @@ function help(){
 		
 			/*
 		var offset=$('.d3word').offset();
-		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
+		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' ?? to fill the selected grid.</div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
@@ -691,7 +691,7 @@ function help(){
 		$('.centerbody').append(startHelp);
 		
 		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
+		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows ?? <br/> to get next set of '+word+'s.  </div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
 				   (offset.left-180)+'px; top:'+(offset.top-5)+
@@ -701,7 +701,7 @@ function help(){
 
 		
 		var offset=$('[downclueid="2"]:eq(5)').offset();
-		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
+		var startHelp = $('<div class="wrapperHelpL">?? Find path from start to end filling '+word+'s to complete level.</div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
@@ -743,7 +743,7 @@ function help1(){
 	if(helpFlag){
 		helpFlag=false;
 		var offset=$('.green').offset();
-		var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
+		var startHelp = $('<div class="bouncesideright" >?? Start from here</div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 1px dimgray; text-shadow:none;padding:2px;');
 		$('.centerbody').append(startHelp);
@@ -751,7 +751,7 @@ function help1(){
 		var word = gametype.length==0?'word':'emoji word';
 		
 		var offset=$('.red').offset();
-		var startHelp = $('<div class="bounceside" >End here 👉 </div>');
+		var startHelp = $('<div class="bounceside" >End here ?? </div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
 				   (offset.left-70)+'px; top:'+offset.top+
@@ -765,7 +765,7 @@ function help1(){
 		
 		
 		
-		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one <br/> across or down grid.</div>');
+		var startHelp = $('<div class="wrapperHelpL" >?? Tap to select one <br/> across or down grid.</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left+20)+'px; top:'+(offset.top+10)+
@@ -775,7 +775,7 @@ function help1(){
 		
 			
 		var offset=$('.d3word').offset();
-		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
+		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' ?? to fill the selected grid.</div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
@@ -783,7 +783,7 @@ function help1(){
 		$('.centerbody').append(startHelp);
 		
 		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
+		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows ?? <br/> to get next set of '+word+'s.  </div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
 				   (offset.left-180)+'px; top:'+(offset.top-5)+
@@ -793,7 +793,7 @@ function help1(){
 
 		
 		var offset=$('[downclueid="2"]:eq(5)').offset();
-		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
+		var startHelp = $('<div class="wrapperHelpL">?? Find path from start to end filling '+word+'s to complete level.</div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
 				   (offset.left+20)+'px; top:'+(offset.top-40)+
