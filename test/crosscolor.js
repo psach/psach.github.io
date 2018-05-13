@@ -640,9 +640,6 @@ function help(){
 		$('.centerbody').append(startHelp);
 		
 		
-		var offset=$('[downclueid="18"]:eq(1)').offset();
-		
-		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 		
 		
 		
@@ -653,6 +650,9 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		
+		var offset=$('[downclueid="18"]:eq(1)').offset();
+		
+		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 		
 		
 		
