@@ -631,7 +631,9 @@ var helpFlag=true;
 function help(){
 	
 	if(helpFlag){
-		
+		moreCount=0;
+		popWords(moreWords[moreCount]);
+		moreCount++;
 		helpFlag=false;
 		var offset=$('.green').offset();
 		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border-radius:6px;border:1px solid dimgray;padding:2px;background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);" >Start</font></div>');
