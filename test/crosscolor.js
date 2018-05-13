@@ -274,8 +274,12 @@ function popWords(words){
 						});
 						selectionTillLast.splice(removeElement,1);
 						//selectionTillLast.pop();
-						storeLevel();
+						
+					}else{
+						selectionTillLast=[];
+						
 					}
+					storeLevel();
 				
 			}
 			
@@ -808,15 +812,8 @@ function help(){
 			
 		setTimeout(function(){
 			
-			$('.bouncesideright').attr('style','visibility:hidden;display:none');
-			
-			$('.wrapperHelpLClick').attr('style','visibility:hidden;display:none');
-			$('.bounceside').attr('style','visibility:hidden;display:none');
-			//$('.bounceside').removeClass('bounceside');
-			//$('.arrow').attr('style','visibility:visible;display:');
-			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
-			removeClass('cwd-tile-highlight').find('.cwd-tile-letter').removeClass('d3char '+emojiChar[greenChar]);
-			$('[downclueid="18"],[acrossclueid="17"]').not('.green').html('');
+						
+			clearAll();
 			
 			helpFlag=true;
 			
@@ -826,7 +823,7 @@ function help(){
 	
 }
 
-
+/*
 function help1(){
 	
 	if(helpFlag){
@@ -903,8 +900,8 @@ function help1(){
 		setTimeout(function(){
 			
 			$('.bouncesideright').attr('style','visibility:hidden;display:none');
-			$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
-			$('.wrapperHelpL').attr('style','visibility:hidden;display:none');
+			
+			$('.wrapperHelpLClick').attr('style','visibility:hidden;display:none');
 			$('.bounceside').attr('style','visibility:hidden;display:none');
 			//$('.bounceside').removeClass('bounceside');
 			//$('.arrow').attr('style','visibility:visible;display:');
@@ -916,4 +913,4 @@ function help1(){
 		
 	}
 	
-}
+}*/
