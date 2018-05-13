@@ -814,7 +814,8 @@ function help(){
 			
 		setTimeout(function(){
 			
-						
+			$('.wrapperHelpLClick').remove();
+			$('.bounceside').remove();		
 			clearAll();
 			
 			helpFlag=true;
