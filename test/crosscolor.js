@@ -622,7 +622,7 @@ function help(){
 		
 		helpFlag=false;
 		var offset=$('.green').offset();
-		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border:1px solid dimgray;padding:2px;background-color:#DDFF96;" >Start</font></div>');
+		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border-radius:6px;border:1px solid dimgray;padding:2px;background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);" >Start</font></div>');
 				//alert(offset);
 		startHelp.attr('style','position:absolute; left:'+(offset.left+20)+
 		'px; top:'+(offset.top-10)+
@@ -632,7 +632,7 @@ function help(){
 		var word = gametype.length==0?'word':'emoji word';
 		
 		var offset=$('.red').offset();
-		var startHelp = $('<div class="bounceside" ><font style="background-color:#DDFF96;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
+		var startHelp = $('<div class="bounceside" ><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
 		//alert(offset);
 		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
 				   (offset.left-50)+'px; top:'+(offset.top-10)+
@@ -641,7 +641,7 @@ function help(){
 		
 		
 		
-		
+		var offset=$('[downclueid="18"]:eq(1)').offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
 		//alert(offset);
@@ -650,7 +650,7 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		
-		var offset=$('[downclueid="18"]:eq(1)').offset();
+		
 		
 		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
 		
@@ -665,14 +665,14 @@ function help(){
 		$('.centerbody').append(startHelp);
 		$('.wordset:eq(0)').addClass('clickWord').attr('style','-webkit-animation-delay:11s;');
 		
-		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},12000);
+		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},14000);
 		
 		
 		
 		var offset=$('[acrossclueid="17"]:eq(3)').offset();
 		
 		setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');$('[acrossclueid="17"]').addClass('cwd-tile-highlight');
-		},14000);
+		},16000);
 		
 		
 		
@@ -688,7 +688,7 @@ function help(){
 		
 		setTimeout(function(){$('[acrossclueid="17"]').removeClass('cwd-tile-highlight');$('[downclueid="2"]').addClass('cwd-tile-highlight');
 		
-		},19000);
+		},21000);
 		
 		
 		
@@ -704,7 +704,7 @@ function help(){
 		
 		setTimeout(function(){$('[downclueid="2"]').removeClass('cwd-tile-highlight');$('[acrossclueid="10"]').addClass('cwd-tile-highlight');
 		
-		},24000);
+		},26000);
 		
 		
 		
@@ -722,9 +722,9 @@ function help(){
 		
 		setTimeout(function(){$('[acrossclueid="10"]').removeClass('cwd-tile-highlight');$('[downclueid="3"]').addClass('cwd-tile-highlight');
 		
-		},29000);
+		},31000);
 		
-		
+		setTimeout(function(){showLevel();},32000);
 		
 		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
 		//alert(offset);
@@ -735,11 +735,13 @@ function help(){
 		
 		
 		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpLClick">👉</div>');
+		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
+		
+		
 		//alert(offset);
-		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
-				   (offset.left-30)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent;font-size:30px; -webkit-animation-delay:32s;');
+		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
+				   (offset.left-130)+'px; top:'+(offset.top-15)+
+				   'px; background-color:transparent; -webkit-animation-delay:33s;width:200px;');
 		$('.centerbody').append(startHelp);
 		//$('.arrow:eq(1)').addClass('clickWord').attr('style','-webkit-animation-delay:15s;');
 		
@@ -790,16 +792,16 @@ function help(){
 		setTimeout(function(){
 			
 			$('.bouncesideright').attr('style','visibility:hidden;display:none');
-			$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
-			$('.wrapperHelpL').attr('style','visibility:hidden;display:none');
+			
+			$('.wrapperHelpLClick').attr('style','visibility:hidden;display:none');
 			$('.bounceside').attr('style','visibility:hidden;display:none');
 			//$('.bounceside').removeClass('bounceside');
 			//$('.arrow').attr('style','visibility:visible;display:');
 			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
-		removeClass('cwd-tile-highlight');
+			removeClass('cwd-tile-highlight');
 			helpFlag=true;
-			showLevel();
-		},31000);
+			
+		},35000);
 		
 	}
 	
