@@ -228,8 +228,8 @@ function popWords(words){
 			function clear(add){
 				//twice=0;
 					var clearGrid =$("#crossword").find(".cwd-tile-active");
-					clearGrid = clearGrid.not("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
-					clearGrid = clearGrid.not("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
+					//clearGrid = clearGrid.not("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
+					//clearGrid = clearGrid.not("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
 					
 					clearGrid.removeAttr('class');
 					clearGrid.addClass('cwd-tile cwd-tile-active');
@@ -240,9 +240,14 @@ function popWords(words){
 					
 					start = $("[row="+startCell[currLevel][0]+"][col="+startCell[currLevel][1]+"]");
 					end = $("[row="+endCell[currLevel][0]+"][col="+endCell[currLevel][1]+"]");
+					
 					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
 					
+					start.addClass("d3 green");
+					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
+					end.addClass("d3 red");
+					end.find('.cwd-tile-letter').html(emojiChar[redChar]);
 				
 					if(add){
 					var removeElement;
@@ -269,8 +274,12 @@ function popWords(words){
 						});
 						selectionTillLast.splice(removeElement,1);
 						//selectionTillLast.pop();
-						storeLevel();
+						
+					}else{
+						selectionTillLast=[];
+						
 					}
+					storeLevel();
 				
 			}
 			
@@ -395,6 +404,9 @@ function popWords(words){
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
+			moreWords[0][0]='JAVA';
+			moreWords[0][1]='JOKER';
+			
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
@@ -614,7 +626,207 @@ function clearAll(){
 
 var helpFlag=true;
 
+
+
 function help(){
+	
+	if(helpFlag){
+		moreCount=0;
+		popWords(moreWords[moreCount]);
+		moreCount++;
+		helpFlag=false;
+		var offset=$('.green').offset();
+		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border-radius:6px;border:1px solid dimgray;padding:2px;background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);" >Start</font></div>');
+				//alert(offset);
+		startHelp.attr('style','position:absolute; left:'+(offset.left+20)+
+		'px; top:'+(offset.top-10)+
+		'px; background-color:transparent; -webkit-animation-delay:0s;text-shadow:none;width:100px;');
+		$('.centerbody').append(startHelp);
+		
+		var word = gametype.length==0?'word':'emoji word';
+		
+		var offset=$('.red').offset();
+		var startHelp = $('<div class="bounceside" ><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
+				   (offset.left-50)+'px; top:'+(offset.top-10)+
+		'px; background-color:transparent; -webkit-animation-delay:3s;width:100px ');
+		$('.centerbody').append(startHelp);
+		
+		
+		
+		var offset=$('[downclueid="18"]:eq(1)').offset();
+		
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
+		
+		
+		
+		var offset=$('.wordset:eq(0)').offset();
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left+50)+'px; top:'+(offset.top+5)+
+		'px; background-color:transparent;  -webkit-animation-delay:9s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		$('.wordset:eq(0)').addClass('clickWord').attr('style','-webkit-animation-delay:11s;');
+		
+		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},12000);
+		
+		
+		
+		
+		
+		var offset=$('[acrossclueid="17"]:eq(2)').offset();
+		
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
+		$('.centerbody').append(startHelp);
+				
+		setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');
+			$('[acrossclueid="17"]').addClass('cwd-tile-highlight');
+		},15000);
+		
+			
+		var offset=$('.wordset:eq(1)').offset();
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left+50)+'px; top:'+(offset.top+5)+
+		'px; background-color:transparent;  -webkit-animation-delay:16s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		$('.wordset:eq(1)').addClass('clickWord').attr('style','-webkit-animation-delay:18s;');
+		
+		setTimeout(function(){$('.wordset:eq(1)').find('.cwd-tile-letter').click();},19000);
+		
+		
+		
+		
+		
+		var offset=$('[downclueid="2"]:eq(3)').offset();
+		
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
+		$('.centerbody').append(startHelp);
+	
+		setTimeout(function(){$('[acrossclueid="17"]').removeClass('cwd-tile-highlight');$('[downclueid="2"]').addClass('cwd-tile-highlight');
+		
+		},22000);
+		
+		
+		var offset=$('[acrossclueid="10"]:eq(3)').offset();
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+5)+
+		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		setTimeout(function(){$('[downclueid="2"]').removeClass('cwd-tile-highlight');$('[acrossclueid="10"]').addClass('cwd-tile-highlight');
+		
+		},25000);
+		
+		
+			
+		var offset=$('[downclueid="3"]:eq(1)').offset();
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
+		//alert(offset);
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+				   (offset.left)+'px; top:'+(offset.top+10)+
+		'px; background-color:transparent;  -webkit-animation-delay:26s;font-size:30px');
+		$('.centerbody').append(startHelp);
+		
+		setTimeout(function(){$('[acrossclueid="10"]').removeClass('cwd-tile-highlight');$('[downclueid="3"]').addClass('cwd-tile-highlight');
+		
+		},28000);
+		
+		
+		
+		setTimeout(function(){showLevel();},29000);
+		
+		
+		
+		
+		var offset=$('.arrow:eq(1)').offset();
+		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
+		
+		
+		//alert(offset);
+		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
+				   (offset.left-130)+'px; top:'+(offset.top-15)+
+				   'px; background-color:transparent; -webkit-animation-delay:31s;width:200px;');
+		$('.centerbody').append(startHelp);
+		//$('.arrow:eq(1)').addClass('clickWord').attr('style','-webkit-animation-delay:15s;');
+		
+		//setTimeout(function(){
+			
+		
+		
+		//},10000);   
+		
+			/*
+		var offset=$('.d3word').offset();
+		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
+				   (offset.left+20)+'px; top:'+(offset.top-40)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:10s;');
+		$('.centerbody').append(startHelp);
+		
+		var offset=$('.arrow:eq(1)').offset();
+		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
+				   (offset.left-180)+'px; top:'+(offset.top-5)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:15s;');
+		$('.centerbody').append(startHelp);
+		
+
+		
+		var offset=$('[downclueid="2"]:eq(5)').offset();
+		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
+		//alert(offset);
+		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
+				   (offset.left+20)+'px; top:'+(offset.top-40)+
+				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:19s;');
+		$('.centerbody').append(startHelp);
+		
+				
+		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},25000);
+		
+		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},26000);
+		
+		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},27000);
+		
+		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},28000);
+		
+		*/
+			
+		setTimeout(function(){
+			
+						
+			clearAll();
+			
+			helpFlag=true;
+			
+		},33000);
+		
+	}
+	
+}
+
+/*
+function help1(){
 	
 	if(helpFlag){
 		helpFlag=false;
@@ -690,8 +902,8 @@ function help(){
 		setTimeout(function(){
 			
 			$('.bouncesideright').attr('style','visibility:hidden;display:none');
-			$('.wrapperHelpR').attr('style','visibility:hidden;display:none');
-			$('.wrapperHelpL').attr('style','visibility:hidden;display:none');
+			
+			$('.wrapperHelpLClick').attr('style','visibility:hidden;display:none');
 			$('.bounceside').attr('style','visibility:hidden;display:none');
 			//$('.bounceside').removeClass('bounceside');
 			//$('.arrow').attr('style','visibility:visible;display:');
@@ -703,4 +915,4 @@ function help(){
 		
 	}
 	
-}
+}*/
