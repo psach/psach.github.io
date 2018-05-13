@@ -644,7 +644,7 @@ function help(){
 		
 		var offset=$('[downclueid="18"]:eq(1)').offset();
 		
-		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
@@ -666,7 +666,7 @@ function help(){
 		$('.centerbody').append(startHelp);
 		$('.wordset:eq(0)').addClass('clickWord').attr('style','-webkit-animation-delay:11s;');
 		
-		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},14000);
+		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},12000);
 		
 		
 		
@@ -677,7 +677,7 @@ function help(){
 		
 		
 		
-		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
@@ -693,7 +693,7 @@ function help(){
 		
 		
 		
-		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
@@ -709,7 +709,7 @@ function help(){
 		
 		
 		
-		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
@@ -727,7 +727,7 @@ function help(){
 		
 		setTimeout(function(){showLevel();},32000);
 		
-		var startHelp = $('<div class="wrapperHelpLClick" ><div>👆</div>');
+		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
