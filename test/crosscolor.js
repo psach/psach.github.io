@@ -395,6 +395,7 @@ function popWords(words){
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
+			moreWords[0][0]='JAVA';
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
