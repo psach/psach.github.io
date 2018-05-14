@@ -637,7 +637,8 @@ function help(){
 		popWords(moreWords[moreCount]);
 		moreCount++;
 		helpFlag=false;
-		
+		$('#crossword').attr('style','-webkit-filter:sepia(50%)');
+		$('#words').attr('style','-webkit-filter:sepia(50%)');
 		var offset=$('.green').offset();
 		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border-radius:6px;border:1px solid dimgray;padding:2px;background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);" >Start</font></div>');
 				//alert(offset);
@@ -820,7 +821,8 @@ function help(){
 			$('.wrapperHelpLClick').remove();
 			$('.bounceside').remove();		
 			clearAll();
-			
+			$('#crossword').attr('style','-webkit-filter:none;');
+			$('#words').attr('style','-webkit-filter:none;');
 			helpFlag=true;
 		},33000);
 		
