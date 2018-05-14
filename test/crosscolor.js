@@ -248,7 +248,9 @@ function popWords(words){
 					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 					end.addClass("d3 red");
 					end.find('.cwd-tile-letter').html(emojiChar[redChar]);
-				
+					start.find('.cwd-tile-letter').addClass('bounce');
+					end.find('.cwd-tile-letter').addClass('bounce');
+					
 					if(add){
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
@@ -404,8 +406,8 @@ function popWords(words){
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
-			moreWords[0][0]='JAVA';
-			moreWords[0][1]='JOKER';
+			moreWords[0][0]='MAID';
+			moreWords[0][1]='MONEY';
 			
 			popWords(moreWords[moreCount]);
 			moreCount++;
@@ -639,6 +641,8 @@ function help(){
 		helpFlag=false;
 		$('#crossword').attr('style','-webkit-filter:sepia(50%)');
 		$('#words').attr('style','-webkit-filter:sepia(50%)');
+		
+		// Start
 		var offset=$('.green').offset();
 		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border-radius:6px;border:1px solid dimgray;padding:2px;background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);" >Start</font></div>');
 				//alert(offset);
@@ -647,7 +651,7 @@ function help(){
 		'px; background-color:transparent; -webkit-animation-delay:0s;text-shadow:none;width:100px;');
 		$('.centerbody').append(startHelp);
 		
-		var word = gametype.length==0?'word':'emoji word';
+		// End
 		
 		var offset=$('.red').offset();
 		var startHelp = $('<div class="bounceside" ><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
@@ -659,7 +663,7 @@ function help(){
 		
 		
 		
-		var offset=$('[downclueid="18"]:eq(1)').offset();
+		var offset=$('[downclueid="13"]:eq(1)').offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -667,7 +671,7 @@ function help(){
 				   (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
+		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},8000);
 		
 		
 		
@@ -686,7 +690,7 @@ function help(){
 		
 		
 		
-		var offset=$('[acrossclueid="17"]:eq(2)').offset();
+		var offset=$('[acrossclueid="12"]:eq(2)').offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -695,8 +699,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
-		setTimeout(function(){$('[downclueid="18"]').removeClass('cwd-tile-highlight');
-			$('[acrossclueid="17"]').addClass('cwd-tile-highlight');
+		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight');
+			$('[acrossclueid="12"]').addClass('cwd-tile-highlight');
 		},15000);
 		
 			
@@ -715,7 +719,7 @@ function help(){
 		
 		
 		
-		var offset=$('[downclueid="2"]:eq(3)').offset();
+		var offset=$('[downclueid="3"]:eq(2)').offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -724,11 +728,11 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
 		$('.centerbody').append(startHelp);
 	
-		setTimeout(function(){$('[acrossclueid="17"]').removeClass('cwd-tile-highlight');$('[downclueid="2"]').addClass('cwd-tile-highlight');
+		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight');$('[downclueid="3"]').addClass('cwd-tile-highlight');
 		
 		},22000);
 		
-		
+		/*
 		var offset=$('[acrossclueid="10"]:eq(3)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -754,77 +758,33 @@ function help(){
 		
 		},28000);
 		
+		*/
 		
-		
-		setTimeout(function(){showLevel();},29000);
+		setTimeout(function(){showLevel();
+		$('[downclueid="3"]').removeClass('cwd-tile-highlight');
+		},23000);
 		
 		
 		
 		
 		var offset=$('.arrow:eq(1)').offset();
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
-		
-		
-		//alert(offset);
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:31s;width:200px;');
-		$('.centerbody').append(startHelp);
-		//$('.arrow:eq(1)').addClass('clickWord').attr('style','-webkit-animation-delay:15s;');
-		
-		//setTimeout(function(){
-			
-		
-		
-		//},10000);   
-		
-			/*
-		var offset=$('.d3word').offset();
-		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
-				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:10s;');
+				   'px; background-color:transparent; -webkit-animation-delay:25s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
-		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
-				   (offset.left-180)+'px; top:'+(offset.top-5)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:15s;');
-		$('.centerbody').append(startHelp);
-		
-
-		
-		var offset=$('[downclueid="2"]:eq(5)').offset();
-		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
-				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:19s;');
-		$('.centerbody').append(startHelp);
-		
-				
-		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},25000);
-		
-		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},26000);
-		
-		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},27000);
-		
-		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},28000);
-		
-		*/
 			
 		setTimeout(function(){
 			
 			$('.wrapperHelpLClick').remove();
-			$('.bounceside').remove();		
+			$('.bounceside').remove();	
+			helpFlag=true;			
 			clearAll();
 			$('#crossword').attr('style','-webkit-filter:none;');
 			$('#words').attr('style','-webkit-filter:none;');
-			helpFlag=true;
-		},33000);
+			
+		},27000);
 		
 	}
 	

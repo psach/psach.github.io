@@ -4,6 +4,25 @@
 			var levelStartCell=[];
 			var levelEndCell=[];
 
+			var correctAns =[["ROAD","RELAX","FLEX"/*,"LITTLEMAN","EXAM"*/],["CARAMEL","TEA","STAR","WATER","MINT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]];
+			
+			
+			var moreWords =[
+			/*["ABCDEFGH","IJKLMNOPQ","RSTUVWXYZ"],*/
+			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
+			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
+			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JACK","MOBILE"],["SINGER","JUMPER","RISK"],
+			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZEBRA","SMALL","OBJECT"]
+			
+			];
+			
+			var startCell = [[8,2],[8,8]];
+			var endCell=[[2,6],[2,4]];
+			
+			levelMoreWords.push(moreWords);
+			levelCorrectAns.push(correctAns);
+			levelStartCell.push(startCell);
+			levelEndCell.push(endCell);
 			
 							 
 			var correctAns =[["RAGA","RANGE"/*,"APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL","EIGHT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]];
