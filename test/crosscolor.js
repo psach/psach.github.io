@@ -744,7 +744,7 @@ function help(){
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:28s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:29s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			
@@ -757,7 +757,7 @@ function help(){
 			//$('#crossword').attr('style','-webkit-filter:none;');
 			//$('#words').attr('style','-webkit-filter:none;');
 			$('#crossword .cwd-tile-active').attr('style','background-color:lightyellow;');
-		},29000);
+		},31000);
 		
 	}
 	
