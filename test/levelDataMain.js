@@ -68,6 +68,9 @@
 			levelEndCell.push(endCell);
 			
 			var levels=levelMoreWords.length;
+			var totalLevels = 0;
+			
+			
 			
 			$(function(){
 				for(i=0; i<levels;i++){
@@ -78,6 +81,7 @@
 						if (xmlhttp.readyState === 4){
 							if (xmlhttp.status === 200) {
 								nextLevelHTML[i]=xmlhttp.responseText;
+								totalLevels+=levelCorrectAns[i].length;
 								//alert(nextLevelHTML);
 								if(i==levels-1) {
 									document.querySelectorAll('.play')[0].style.visibility='visible';

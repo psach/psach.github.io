@@ -408,25 +408,11 @@ function popWords(words){
 			setStartEnd(currLevel);
 			moreWords[0][0]='MAID';
 			moreWords[0][1]='MONEY';
-			
+			moreWords[0][2]='FOGY';
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
-			/* $(".clear").click(function() {
-			
-					
-
-				var activeSetWord = activeSet.text().trim().replace(' ' ,'');
-				
-				if(activeSet && activeSetWord.length==activeSet.length)clear();
-				
-			
-				
-							
-				
-			}); */
-			
-			
+						
 			
 				
 			$(".next").click(function() {
@@ -555,7 +541,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(correctAns.length-currLevel-1)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels-currLevel+level)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
@@ -639,8 +625,8 @@ function help(){
 		popWords(moreWords[moreCount]);
 		moreCount++;
 		helpFlag=false;
-		$('#crossword').attr('style','-webkit-filter:sepia(50%)');
-		$('#words').attr('style','-webkit-filter:sepia(50%)');
+		$('#crossword .cwd-tile-active').attr('style','background-color:lightgray');
+		//$('#words').attr('style','-webkit-filter:sepia(50%)');
 		
 		// Start
 		var offset=$('.green').offset();
@@ -732,37 +718,24 @@ function help(){
 		
 		},22000);
 		
-		/*
-		var offset=$('[acrossclueid="10"]:eq(3)').offset();
+		var offset=$('.wordset:eq(2)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
-				   (offset.left)+'px; top:'+(offset.top+5)+
+				   (offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="2"]').removeClass('cwd-tile-highlight');$('[acrossclueid="10"]').addClass('cwd-tile-highlight');
+		$('.wordset:eq(2)').addClass('clickWord').attr('style','-webkit-animation-delay:25s;');
 		
-		},25000);
+		setTimeout(function(){$('.wordset:eq(2)').find('.cwd-tile-letter').click();},26000);
 		
 		
-			
-		var offset=$('[downclueid="3"]:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
-		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
-				   (offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:26s;font-size:30px');
-		$('.centerbody').append(startHelp);
 		
-		setTimeout(function(){$('[acrossclueid="10"]').removeClass('cwd-tile-highlight');$('[downclueid="3"]').addClass('cwd-tile-highlight');
 		
-		},28000);
-		
-		*/
 		
 		setTimeout(function(){showLevel();
 		$('[downclueid="3"]').removeClass('cwd-tile-highlight');
-		},23000);
+		},27000);
 		
 		
 		
@@ -771,7 +744,7 @@ function help(){
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:25s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:28s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			
@@ -781,10 +754,10 @@ function help(){
 			$('.bounceside').remove();	
 			helpFlag=true;			
 			clearAll();
-			$('#crossword').attr('style','-webkit-filter:none;');
-			$('#words').attr('style','-webkit-filter:none;');
-			
-		},27000);
+			//$('#crossword').attr('style','-webkit-filter:none;');
+			//$('#words').attr('style','-webkit-filter:none;');
+			$('#crossword .cwd-tile-active').attr('style','background-color:lightyellow;');
+		},29000);
 		
 	}
 	
