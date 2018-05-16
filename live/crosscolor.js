@@ -480,9 +480,10 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
+					activeSet.parent().addClass("cwd-tile-highlight");
 					clear(true);
 					//activeSetWord.removeAttr('word');
-					activeSet.parent().addClass("cwd-tile-highlight");
+										
 					storeLevel();
 					return;
 				}
