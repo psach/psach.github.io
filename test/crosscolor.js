@@ -406,9 +406,7 @@ function popWords(words){
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
-			moreWords[0][0]='MAID';
-			moreWords[0][1]='MONEY';
-			moreWords[0][2]='FOGY';
+			
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
@@ -621,9 +619,11 @@ var helpFlag=true;
 function help(){
 	
 	if(helpFlag){
-		moreCount=0;
-		popWords(moreWords[moreCount]);
-		moreCount++;
+		
+		var helpMoreWords=[['MAID','MONEY','FOGY']];
+	
+		popWords(helpMoreWords[0]);
+		
 		helpFlag=false;
 		$('#crossword .cwd-tile-active').attr('style','background-color:lightgray');
 		//$('#words').attr('style','-webkit-filter:sepia(50%)');
@@ -757,6 +757,9 @@ function help(){
 			//$('#crossword').attr('style','-webkit-filter:none;');
 			//$('#words').attr('style','-webkit-filter:none;');
 			$('#crossword .cwd-tile-active').attr('style','background-color:lightyellow;');
+			moreCount=0;
+			popWords(moreWords[moreCount]);
+			moreCount++;
 		},31000);
 		
 	}
