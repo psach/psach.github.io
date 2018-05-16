@@ -32,6 +32,7 @@ document.addEventListener('deviceready', function () {
     .endInit();
 }, false);
 		
+var sto = window.localStorage?window.localStorage:localStorage;
 	  </script>
 	
 
@@ -828,12 +829,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		var indexMain ;
 		//var gametype = 'Fruit';
 	   
-		   var sto = window.localStorage?window.localStorage:localStorage;
-		   var delayTime = sto.getItem('saved')?0:18;
+		  
+		   //var delayTime = sto.getItem('saved')?0:18;
 		
 			if(sto.getItem('saved')){
 				$('.play').text('CONTINUE');
-		
+	
 			}
 			
 			 if(navigator.userAgent.indexOf('Android')==-1){
