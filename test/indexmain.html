@@ -26,6 +26,7 @@ document.addEventListener('deviceready', function () {
   };
   window.plugins.OneSignal
     .startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
+    //.startInit("2c824581-04af-45d5-97ec-975cb3444587")
     .handleNotificationOpened(notificationOpenedCallback)
     .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
     .endInit();
