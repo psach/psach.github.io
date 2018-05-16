@@ -586,7 +586,7 @@ function getLevel(){
 		moreCount=prevData.moreCount;
 		levelAnswered=prevData.levelAnswered;
 		selectionTillLast=prevData.selections;
-		totalLevels=prevData.totalLevels;
+		totalLevels=prevData.totalLevels?prevData.totalLevels:mainTotalLevel;
 	}else{
 		currLevel=0;
 		level=0;
