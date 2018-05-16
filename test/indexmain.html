@@ -822,7 +822,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		   var sto = window.localStorage?window.localStorage:localStorage;
 		   var delayTime = sto.getItem('saved')?0:18;
 		
-		
+			if(sto.getItem('saved')){
+				$('.play').text('CONTINUE');
+		$('.play').parent().append(
+		'<div class="restart d3main " style="display:none; padding-left: 5px;padding-right: 5px;'+
+		' width:61px; height:21px ; align:center;visibility:hidden;" '+
+		'align="center" onclick="sto.clear()"> RESTART</div>');
+			}
 			
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
