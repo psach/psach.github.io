@@ -153,7 +153,7 @@ function popWords(words){
 					// MAIN LEVEL COMPLETED
 					if(levelAnswered==correctAns.length-1 && answered ){
 						//storeLevel();
-						
+						totalLevels--;
 						
 					/* 	//answered=false;
 						moreCount=0;
@@ -197,7 +197,7 @@ function popWords(words){
 					
 						// CHILD LEVEL COMPLETED
 						if(answered){
-							
+							totalLevels--;
 							levelAnswered++;
 							selectionTillLast=[];
 							moreCount=0;
@@ -541,7 +541,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels--)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
