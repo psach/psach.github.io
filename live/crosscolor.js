@@ -243,6 +243,7 @@ function popWords(words){
 					
 					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
+					activeSet.parent().addClass("cwd-tile-highlight");
 					
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
@@ -480,7 +481,6 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
-					activeSet.parent().addClass("cwd-tile-highlight");
 					clear(true);
 					//activeSetWord.removeAttr('word');
 										

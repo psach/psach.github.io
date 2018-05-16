@@ -31,7 +31,7 @@
  #cwd-grid td.red
 {
     background-color: Red !important;
-	color: White 
+	color: White !important;
 }
 
  
@@ -43,13 +43,13 @@
 #cwd-grid td.green
 {
     background-color: Green !important;
-	color: White 
+	color: White !important;
 }
 
 #cwd-grid td.cwd-tile-highlight
 {
-    background-color: Yellow !important;
-	color:black !important;
+    background-color: Yellow;
+	color:black;
 }
 
 
@@ -136,7 +136,7 @@
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 .B {
@@ -145,19 +145,19 @@
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 
 .C {
 	background: HotPink;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
 .D {
 	background: GreenYellow;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
@@ -168,7 +168,7 @@
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 .F {
@@ -177,23 +177,23 @@
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 .G {
 	background: Cyan;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
 .H {
 	background: Tomato ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 .I {
 	background: Gold;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 .J {
 	background: Aqua ;
@@ -201,7 +201,7 @@
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 
@@ -211,16 +211,16 @@
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 .L {
 	background: DarkKhaki ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 .M {
 	background: Magenta  ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
@@ -231,7 +231,7 @@
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 .O {
@@ -240,16 +240,16 @@
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 .P {
 	background: LightSeaGreen ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 .Q {
 	background: IndianRed ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
@@ -259,7 +259,7 @@
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 
@@ -269,14 +269,14 @@
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 
 
 .T {
 	background: DeepPink;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
@@ -284,12 +284,12 @@
 
  .U {
 	background: SpringGreen;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
  .V {
 	background: SlateBlue ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
@@ -299,7 +299,7 @@
     background-size:     cover;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 
@@ -310,7 +310,7 @@
     background-size:     contain;                     
     background-repeat:   no-repeat;
     background-position: center center; 
-	color: transparent;*/	
+	*/ color: black;
 }
 
 
@@ -318,7 +318,7 @@
 
 .Y {
 	background: MediumVioletRed  ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
 
@@ -327,6 +327,6 @@
 
 .Z {
 	background: Lime ;
-	/*color: transparent;*/	
+	/**/ color: black;
 }
 
