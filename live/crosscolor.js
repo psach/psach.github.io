@@ -153,7 +153,7 @@ function popWords(words){
 					// MAIN LEVEL COMPLETED
 					if(levelAnswered==correctAns.length-1 && answered ){
 						//storeLevel();
-						
+						totalLevels--;
 						
 					/* 	//answered=false;
 						moreCount=0;
@@ -197,7 +197,7 @@ function popWords(words){
 					
 						// CHILD LEVEL COMPLETED
 						if(answered){
-							
+							totalLevels--;
 							levelAnswered++;
 							selectionTillLast=[];
 							moreCount=0;
@@ -406,9 +406,7 @@ function popWords(words){
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
-			moreWords[0][0]='MAID';
-			moreWords[0][1]='MONEY';
-			moreWords[0][2]='FOGY';
+			
 			popWords(moreWords[moreCount]);
 			moreCount++;
 			
@@ -541,7 +539,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels--)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
@@ -560,7 +558,7 @@ function storeLevel(){
 	prevData.levelAnswered=levelAnswered;
 	prevData.html=$('#cwd-grid').html();
 	prevData.selections=selectionTillLast;
-	
+	prevData.totalLevels=totalLevels;
 	
 	storage.setItem(gametype+'prevData',JSON.stringify(prevData));
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
@@ -588,14 +586,14 @@ function getLevel(){
 		moreCount=prevData.moreCount;
 		levelAnswered=prevData.levelAnswered;
 		selectionTillLast=prevData.selections;
-		
+		totalLevels=prevData.totalLevels;
 	}else{
 		currLevel=0;
 		level=0;
 		moreCount=0;
 		levelAnswered=0;
 		selectionTillLast=[];
-		
+		totalLevels=mainTotalLevel;
 	}
 	console.log(prevData);
 	//storage.removeItem('prevData');
@@ -621,9 +619,11 @@ var helpFlag=true;
 function help(){
 	
 	if(helpFlag){
-		moreCount=0;
-		popWords(moreWords[moreCount]);
-		moreCount++;
+		
+		var helpMoreWords=[['MAID','MONEY','FOGY']];
+	
+		popWords(helpMoreWords[0]);
+		
 		helpFlag=false;
 		$('#crossword .cwd-tile-active').attr('style','background-color:lightgray');
 		//$('#words').attr('style','-webkit-filter:sepia(50%)');
@@ -757,6 +757,9 @@ function help(){
 			//$('#crossword').attr('style','-webkit-filter:none;');
 			//$('#words').attr('style','-webkit-filter:none;');
 			$('#crossword .cwd-tile-active').attr('style','background-color:lightyellow;');
+			moreCount=0;
+			popWords(moreWords[moreCount]);
+			moreCount++;
 		},31000);
 		
 	}
