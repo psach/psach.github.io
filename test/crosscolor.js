@@ -595,7 +595,7 @@ function getLevel(){
 		moreCount=0;
 		levelAnswered=0;
 		selectionTillLast=[];
-		//totalLevels=0;
+		totalLevels=mainTotalLevel;
 	}
 	console.log(prevData);
 	//storage.removeItem('prevData');
