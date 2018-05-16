@@ -737,13 +737,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				 <div class="switch-field" >
 		 <table align='center' style='padding-bottom:5px;'><tr><td style='padding-right:4px;'>
       <input type="radio" id="switch_4_left" name="switch_4" value="Char" onclick='gametype="";selectGame();' />
-      <label for="switch_4_left">ðŸ‡¦</label>
+      <label for="switch_4_left">🇦</label>
 			 </td><td style='padding-right:4px;'>
      <input type="radio" id="switch_4_center" name="switch_4" value="Fruit" onclick='gametype="Fruit";selectGame();'/>
-      <label for="switch_4_center">ðŸ‰</label>
+      <label for="switch_4_center">🍉</label>
 			  </td><td>
 			   <input type="radio" id="switch_4_foot" name="switch_4" value="Sport" onclick='gametype="Sport";selectGame();'/>
-      <label for="switch_4_foot">âš½</label>
+      <label for="switch_4_foot">⚽</label>
 			 
 			 </td></tr></table></div>
 		
@@ -804,7 +804,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			});
 		 	 ctable.html(crossbody);
 			
-	 		$('#helpText').html($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:2s ;">Select ðŸ‘‡ to play</div>'));
+	 		$('#helpText').html($('<div class="wrapperHelpR" style="visibility:hidden; -webkit-animation-delay:2s ;">Select 👇 to play</div>'));
 		
 			  var splash = $('#splash');
 			  
@@ -986,11 +986,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					
 						
 						if( firstLoad ){
-							if( prevData && 
-							$(nextLevelHTML[level]).find('td').length==$(prevData.html).find('td').length) 
-							{
-								$('#cwd-grid').html($(prevData.html));
-							}
+							if(prevData) $('#cwd-grid').html($(prevData.html));
 							firstLoad=false;
 						}
 						
