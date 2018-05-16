@@ -560,7 +560,7 @@ function storeLevel(){
 	prevData.levelAnswered=levelAnswered;
 	prevData.html=$('#cwd-grid').html();
 	prevData.selections=selectionTillLast;
-	
+	prevData.totalLevels=totalLevels;
 	
 	storage.setItem(gametype+'prevData',JSON.stringify(prevData));
 	//alert("Storing : " +currLevel +" : "+ (level-1) );
@@ -588,14 +588,14 @@ function getLevel(){
 		moreCount=prevData.moreCount;
 		levelAnswered=prevData.levelAnswered;
 		selectionTillLast=prevData.selections;
-		
+		totalLevels=prevData.totalLevels;
 	}else{
 		currLevel=0;
 		level=0;
 		moreCount=0;
 		levelAnswered=0;
 		selectionTillLast=[];
-		
+		totalLevels=0;
 	}
 	console.log(prevData);
 	//storage.removeItem('prevData');
