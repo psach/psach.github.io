@@ -857,7 +857,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
 			 }
-			 
+			 $('.centerbody').parent().append($('<hr/>'));
 			 var head = $("<head/>");
 			 $("html").append(head);
 			 //var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
@@ -904,7 +904,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
 			head.append(csslink);
-			$('.innertop').append($('<hr/>'));
+			
 							
 			if(gametype=='') emojiChar = {"A":"A","B":"B","C":"C","D":"D",
 			 "E":"E","F":"F","G":"G","H":"H",
