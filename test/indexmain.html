@@ -857,7 +857,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 if(navigator.userAgent.indexOf('Android')==-1){
 				window.location.replace('playstore.html');
 			 }
-			 $('.centerbody').parent().append($('<hr/>'));
+			
 			 var head = $("<head/>");
 			 $("html").append(head);
 			 //var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
@@ -1029,7 +1029,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 						var bgColor = $('html').css('background-color');
 						$('.arrow').css('background-color',bgColor);
 						$('.d3word').css('background-color',bgColor);
-						
+				
+						$('.centerbody hr').length==0?$('.centerbody').append($('<hr/>')):0;
+				
 						//document.getElementsByTagName('html')[0].innerHTML=nextLevelHTML[level];	
 						//var nextLevelDom = $(nextLevelHTML[level]);
 						
