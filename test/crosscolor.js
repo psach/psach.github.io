@@ -43,7 +43,7 @@ function popWords(words){
 						
 		$("#words").find(".cwd-tile-letter").click(function() {
 				
-				activeSet = $("#crossword").find(".cwd-tile-highlight").find('.cwd-tile-letter');
+				activeSet = $("#crossword").find(".cwd-tile-highlight, .cwd-tile-highlight-help").find('.cwd-tile-letter');
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight') ) return;
