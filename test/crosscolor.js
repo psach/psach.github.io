@@ -43,10 +43,10 @@ function popWords(words){
 						
 		$("#words").find(".cwd-tile-letter").click(function() {
 				
-				activeSet = $("#crossword").find(".cwd-tile-highlight, .cwd-tile-highlight-help").find('.cwd-tile-letter');
+				activeSet = $("#crossword").find(".cwd-tile-highlight").find('.cwd-tile-letter');
 				
 				if(!activeSet) return;
-				if(!activeSet.parent().hasClass('cwd-tile-highlight') && !activeSet.parent().hasClass('cwd-tile-highlight-help')) return;
+				if(!activeSet.parent().hasClass('cwd-tile-highlight')) return;
 				
 								
 				
@@ -658,7 +658,7 @@ function help(){
 				   (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight-help');},8000);
+		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},8000);
 		
 		
 		
@@ -686,8 +686,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
-		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight-help');
-			$('[acrossclueid="12"]').addClass('cwd-tile-highlight-help');
+		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight');
+			$('[acrossclueid="12"]').addClass('cwd-tile-highlight');
 		},15000);
 		
 			
@@ -715,8 +715,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
 		$('.centerbody').append(startHelp);
 	
-		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight-help');
-				      $('[downclueid="3"]').addClass('cwd-tile-highlight-help');
+		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight');
+				      $('[downclueid="3"]').addClass('cwd-tile-highlight');
 		
 		},22000);
 		
@@ -736,7 +736,7 @@ function help(){
 		
 		
 		setTimeout(function(){showLevel();
-		$('[downclueid="3"]').removeClass('cwd-tile-highlight-help');
+		$('[downclueid="3"]').removeClass('cwd-tile-highlight');
 		},27000);
 		
 		
