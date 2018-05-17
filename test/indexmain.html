@@ -1,7 +1,11 @@
 <html !doctype>
  
   <head>  
- 
+ <link id="css" href="crossword.css" rel="stylesheet" type="text/css" />
+ <link id="cssFruit" href="crosswordFruit.css" rel="stylesheet" type="text/css" />
+ <link id="cssSport" href="crosswordSport.css" rel="stylesheet" type="text/css" />
+
+	  
   <script src="cordova.js"></script>
  
     <!-- Google Tag Manager -->
@@ -900,7 +904,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			
 			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
 			head.append(csslink);
-							
+			$('.innertop').append($('<hr/>'));
 							
 			if(gametype=='') emojiChar = {"A":"A","B":"B","C":"C","D":"D",
 			 "E":"E","F":"F","G":"G","H":"H",
