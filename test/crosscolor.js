@@ -46,7 +46,7 @@ function popWords(words){
 				activeSet = $("#crossword").find(".cwd-tile-highlight, .cwd-tile-highlight-help").find('.cwd-tile-letter');
 				
 				if(!activeSet) return;
-				if(!activeSet.parent().hasClass('cwd-tile-highlight') || !activeSet.parent().hasClass('cwd-tile-highlight-help')) return;
+				if(!activeSet.parent().hasClass('cwd-tile-highlight') && !activeSet.parent().hasClass('cwd-tile-highlight-help')) return;
 				
 								
 				
