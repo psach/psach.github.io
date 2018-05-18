@@ -23,7 +23,7 @@ function popWords(words){
 					
 			$.each(words, function(i, word) {
 				
-				var flag=arr.includes(word);
+				var selFlag=arr.includes(word);
 					
 				//alert(word);
 				var tr = $('<tr class="wordset">');
@@ -42,7 +42,7 @@ function popWords(words){
 					
 					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+
 					character+
-					(flag?' strikeout strikeacross':'')+
+					(selFlag?' strikeout strikeacross':'')+
 					'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
 					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
 		
