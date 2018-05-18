@@ -329,7 +329,7 @@ function popWords(words){
 					storeLevel();
 					setTimeout(function(){
 						
-						if(currLevel==1) admob.interstitial.show();
+						//if(currLevel==1) admob.interstitial.show();
 						
 					},3000);
 					//selectionTillLast=[];
@@ -557,7 +557,7 @@ function popWords(words){
 
 function showLevel(){
 	
-	//$("#cwd-grid").css('opacity','0');
+	$(".d3main").css('opacity','0');
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
@@ -566,7 +566,7 @@ function showLevel(){
 	setTimeout(function(){
 		clearLevelGrid();
 		setStartEnd(currLevel);
-		
+		$(".d3main").css('opacity','1');
 	},5000);
 	
 }
@@ -773,7 +773,7 @@ function help(){
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:30s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:32s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			
@@ -789,7 +789,7 @@ function help(){
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
-		},31000);
+		},33000);
 		
 	}
 	
