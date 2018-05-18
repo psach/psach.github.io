@@ -569,10 +569,11 @@ function showLevel(){
 	.append('<div class="wrapper" style="-webkit-animation-delay:2s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
 	setTimeout(function(){
+		helpFlag=true;
 		clearLevelGrid();
 		setStartEnd(currLevel);
 		//$(".help").css('opacity','1');
-		helpFlag=true;
+		
 	},5000);
 	
 }
