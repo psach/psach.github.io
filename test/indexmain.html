@@ -136,6 +136,44 @@ hr {
 		
 }
 
+.wordSlide {
+	
+		
+	-webkit-animation:slideSP 2s;
+        animation :slideSP 2s ;
+	
+		
+}
+
+.wordSlide > div[class*='A'] {
+	
+		
+	-webkit-animation:slideHelpR 2s;
+        animation :slideHelpR 2s ;
+	
+		
+}
+
+
+
+.wordSlide > div[class*='C'] {
+	
+		
+	-webkit-animation:slideHelpR 2s;
+        animation :slideHelpR 2s ;
+	
+		
+}
+
+.wordSlide > div[class*='E'] {
+	
+		
+	-webkit-animation:slideHelpR 2s;
+        animation :slideHelpR 2s ;
+	
+		
+}
+
 @-webkit-keyframes fadein {
   0%       { background-color : Yellow;color:black;}
   50%  { background-color: Yellow;color:black;}
@@ -909,7 +947,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var sto = window.localStorage?window.localStorage:localStorage;
 		  	sto.setItem('saved',true);
 				
-			head.find('link[id*="css"]').remove();
+			$('link[id*="css"]').remove();
 			
 			
 			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';

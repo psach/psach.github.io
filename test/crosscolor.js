@@ -53,7 +53,7 @@ function popWords(words){
 				var word = $(this).attr('word');
 				var invalid = false;
 				
-				
+				$(this).parent().parent().addClass('clickWord');
 				
 				
 				
@@ -140,9 +140,10 @@ function popWords(words){
 					$.each(word.split(''), function(j,character){
 					
 						
-						$(activeSet[j]).addClass(character);
-						$(activeSet[j]).addClass('d3char ');
+						$(activeSet[j]).addClass(character+' d3char ' );
 						$(activeSet[j]).html(emojiChar[character]);
+						$(activeSet[j]).parent().addClass('wordSlide');
+						//$(activeSet[j]).toggleClass('SR');
 						//$(activeSet[j]).attr('word',character);
 						
 						
@@ -208,7 +209,7 @@ function popWords(words){
 								setStartEnd(++currLevel); 
 							
 							
-							}, 1000);
+							}, 3000);
 							
 								
 							
@@ -540,7 +541,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" style="-webkit-animation-delay:2s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
