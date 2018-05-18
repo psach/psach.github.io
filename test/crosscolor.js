@@ -1,6 +1,6 @@
 
 var twice=0;
-
+var arr=[];
 
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
@@ -30,7 +30,16 @@ function popWords(words){
 					console.log(first+second);
 					var temp =first+second; */
 					//alert(emojiChar[character]);
-					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
+					//character = 
+					arr=[];
+					for (i = 0; i < selectionTillLast.length; i++) {
+						
+						arr.push(selectionTillLast[i][2]);
+					}
+					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+
+					character+
+					(arr.includes(word)?' strikeout strikeacross':'')+
+					'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
 					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
 		
 			});
@@ -47,12 +56,12 @@ function popWords(words){
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight')) return;
-				
+				if($(this).hasClass('strikeout')) return;
 								
 				
 				var word = $(this).attr('word');
 				var invalid = false;
-				
+				$("#words tr").removeClass('clickWord');
 				$(this).parent().parent().addClass('clickWord');
 				
 				
@@ -107,12 +116,14 @@ function popWords(words){
 					 activeId=id;
 					selectionTillLast.push([clueid,id,word]);
 				
-					var arr=[];
+					arr=[];
 					for (i = 0; i < selectionTillLast.length; i++) {
+						
 						arr.push(selectionTillLast[i][2]);
 					}
 				
-				
+					$('[word="'+word+'"]').addClass((arr.includes(word)?' strikeout strikeacross':''));
+					
 					//storeLevel();
 					
 					//var stringSelected = ""+arr+","+word;
@@ -121,8 +132,9 @@ function popWords(words){
 					stringCorrect = ""+correctAns[currLevel];
 					
 
-					$.each(arr, function(j,word){
-						stringCorrect = stringCorrect.replace(word,"|");
+					$.each(arr, function(j,selword){
+						
+						stringCorrect = stringCorrect.replace(selword,"|");
 					});
 					
 					//alert(stringCorrect);
@@ -150,7 +162,7 @@ function popWords(words){
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
 					activeSet.parent().removeClass("cwd-tile-incorrect");
-						
+					
 					// MAIN LEVEL COMPLETED
 					if(levelAnswered==correctAns.length-1 && answered ){
 						//storeLevel();
@@ -484,7 +496,7 @@ function popWords(words){
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
 					clear(true);
 					//activeSetWord.removeAttr('word');
-										
+					$('#words').find('[word="'+activeSetWord+'"]').removeClass('strikeout strikeacrossclueid');				
 					storeLevel();
 					return;
 				}
@@ -495,7 +507,7 @@ function popWords(words){
 				prevActiveSet.removeClass('strikeacrossclueid');
 				prevActiveSet.removeClass('strikedownclueid'); */
 				
-				$('.cwd-tile-letter')
+				$('#crossword .cwd-tile-letter')
 				.removeClass("strikeout strikeacrossclueid strikedownclueid");
 				
 				
