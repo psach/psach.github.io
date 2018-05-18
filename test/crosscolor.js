@@ -193,15 +193,15 @@ function popWords(words){
 						selectionTillLast=[];
 						
 						
-						  showLevel();
-							setTimeout(function(){ 
+						  
+							//setTimeout(function(){ 
 								level++;
-								clearLevelGrid();
+								
 								play();
 								//alert('Good!');
 								
 								//storeLevel();
-							}, 4000);
+							//}, 1000);
 						
 						
 							
@@ -221,13 +221,14 @@ function popWords(words){
 							selectionTillLast=[];
 							moreCount=0;
 							
-							showLevel();
-							setTimeout(function(){ 
-								clearLevelGrid();
-								setStartEnd(++currLevel); 
 							
+							//setTimeout(function(){ 
+								
+								++currLevel;
+								//setStartEnd(++currLevel); 
+								showLevel();
 							
-							}, 4000);
+							//}, 1000);
 							
 								
 							
@@ -324,7 +325,7 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 					
-					
+					//showLevel();
 					storeLevel();
 					setTimeout(function(){
 						
@@ -388,7 +389,7 @@ function popWords(words){
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				gridClone.css('opacity','0');
-				gridClone.css('transition','opacity 2s ease-in-out');
+				gridClone.css('transition','opacity 4s ease-in-out');
 				
   
 						//gridClone.appendTo(gridParent);
@@ -400,7 +401,7 @@ function popWords(words){
 						//gridClone.appendTo(gridParent);
 						//gridParent.css('opacity', '1');
 						//gridClone.css('transition','opacity 2s ease-in-out');
-						gridClone.appendTo(gridParent).fadeIn('slow',function(){
+						gridClone.appendTo(gridParent).fadeIn(4000,function(){
 								gridClone.css('opacity','1');
 								
 								
@@ -425,7 +426,7 @@ function popWords(words){
 			showLevel();
 			tbody = $('#words');
 			
-			setStartEnd(currLevel);
+			
 			
 			popWords(moreWords[moreCount]);
 			moreCount++;
@@ -556,12 +557,17 @@ function popWords(words){
 
 function showLevel(){
 	
+	$("#cwd-grid").css('opacity','0');
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" style="-webkit-animation-delay:2s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" style="-webkit-animation-delay:2s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
-	
+	setTimeout(function(){
+		clearLevelGrid();
+		setStartEnd(currLevel);
+		
+	},5000);
 	
 }
 		    
