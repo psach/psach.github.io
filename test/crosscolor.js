@@ -15,15 +15,15 @@ function getRandomArbitrary(min, max) {
 function popWords(words){
 			//alert('popWords');	
 			$(".wordset").remove();
-			var arr1=[];
+			/*var arr1=[];
 			for (i = 0; i < selectionTillLast.length; i++) {
 				
 				arr1.push(selectionTillLast[i][2]);
-			}
+			}*/
 					
 			$.each(words, function(i, word) {
 				
-				var selFlag=arr1.includes(word);
+				//var selFlag=arr1.includes(word);
 					
 				//alert(word);
 				var tr = $('<tr class="wordset">');
@@ -42,7 +42,7 @@ function popWords(words){
 					
 					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+
 					character+
-					(selFlag?' strikeout strikeacross':'')+
+					//(selFlag?' strikeout strikeacross':'')+
 					'" word='+word+' style="margin-top: 0px;">'+
 					(emojiChar[character])+
 					'</div></td>').appendTo(tr);
