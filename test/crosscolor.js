@@ -557,7 +557,7 @@ function popWords(words){
 
 function showLevel(){
 	
-	$("#cwd-grid").css('opacity','0');
+	//$("#cwd-grid").css('opacity','0');
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
