@@ -29,7 +29,7 @@ document.addEventListener('deviceready', function () {
     console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
   };
   window.plugins.OneSignal
-   //startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
+    //.startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
     .startInit("2c824581-04af-45d5-97ec-975cb3444587")
     .handleNotificationOpened(notificationOpenedCallback)
     .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
@@ -281,8 +281,8 @@ hr {
 	padding-right:5px;
    	border-radius: 0 100em 100em 0;
 	
-	-webkit-animation:slide 2s;
-        animation :slide 2s ;
+	-webkit-animation:slide 3s;
+        animation :slide 3s ;
 	
 	z-index:10;
 	box-shadow:

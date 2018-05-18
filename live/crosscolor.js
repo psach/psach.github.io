@@ -194,14 +194,14 @@ function popWords(words){
 						
 						
 						  
-							setTimeout(function(){ 
+							//setTimeout(function(){ 
 								level++;
-								clearLevelGrid();
+								
 								play();
 								//alert('Good!');
 								
 								//storeLevel();
-							}, 1000);
+							//}, 1000);
 						
 						
 							
@@ -222,12 +222,13 @@ function popWords(words){
 							moreCount=0;
 							
 							
-							setTimeout(function(){ 
-								clearLevelGrid();
-								setStartEnd(++currLevel); 
+							//setTimeout(function(){ 
+								
+								++currLevel;
+								//setStartEnd(++currLevel); 
+								showLevel();
 							
-							
-							}, 2000);
+							//}, 1000);
 							
 								
 							
@@ -324,11 +325,12 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 					
-					showLevel();
+					//showLevel();
 					storeLevel();
 					setTimeout(function(){
 						
-						if(currLevel==1) admob.interstitial.show();
+						//if(currLevel==1) admob.interstitial.show();
+						admob.interstitial.show();
 						
 					},3000);
 					//selectionTillLast=[];
@@ -388,7 +390,7 @@ function popWords(words){
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				gridClone.css('opacity','0');
-				gridClone.css('transition','opacity 2s ease-in-out');
+				gridClone.css('transition','opacity 1s ease-in-out');
 				
   
 						//gridClone.appendTo(gridParent);
@@ -400,7 +402,7 @@ function popWords(words){
 						//gridClone.appendTo(gridParent);
 						//gridParent.css('opacity', '1');
 						//gridClone.css('transition','opacity 2s ease-in-out');
-						gridClone.appendTo(gridParent).fadeIn('slow',function(){
+						gridClone.appendTo(gridParent).fadeIn(3000,function(){
 								gridClone.css('opacity','1');
 								
 								
@@ -422,10 +424,10 @@ function popWords(words){
 			
 			function loadCW() {
 				
-			
+			showLevel();
 			tbody = $('#words');
 			
-			setStartEnd(currLevel);
+			
 			
 			popWords(moreWords[moreCount]);
 			moreCount++;
@@ -556,15 +558,21 @@ function popWords(words){
 
 function showLevel(){
 	
-	
+	//$(".help").css('opacity','0');
+	helpFlag=false;
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" style="-webkit-animation-delay:2s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" style="-webkit-animation-delay:2s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
-	
+	setTimeout(function(){
+		clearLevelGrid();
+		setStartEnd(currLevel);
+		//$(".help").css('opacity','1');
+		helpFlag=true;
+	},5000);
 	
 }
-		   
+		    
 function storeLevel(){
 	
 	
@@ -630,6 +638,7 @@ function home(){
 
 function clearAll(){
 	if(helpFlag){
+		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
 		clear(false);
 	}
 }
@@ -679,7 +688,7 @@ function help(){
 				   (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight help');},8000);
+		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},8000);
 		
 		
 		
@@ -690,7 +699,7 @@ function help(){
 				   (offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:9s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		$('.wordset:eq(0)').addClass('clickWord').attr('style','-webkit-animation-delay:11s;');
+		//$('.wordset:eq(0)').attr('style','-webkit-animation-delay:11s;');
 		
 		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},12000);
 		
@@ -707,8 +716,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
-		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight help');
-			$('[acrossclueid="12"]').addClass('cwd-tile-highlight help');
+		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight ');
+			$('[acrossclueid="12"]').addClass('cwd-tile-highlight ');
 		},15000);
 		
 			
@@ -719,7 +728,7 @@ function help(){
 				   (offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:16s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		$('.wordset:eq(1)').addClass('clickWord').attr('style','-webkit-animation-delay:18s;');
+		//$('.wordset:eq(1)').attr('style','-webkit-animation-delay:18s;');
 		
 		setTimeout(function(){$('.wordset:eq(1)').find('.cwd-tile-letter').click();},19000);
 		
@@ -736,8 +745,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
 		$('.centerbody').append(startHelp);
 	
-		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight help');
-				      $('[downclueid="3"]').addClass('cwd-tile-highlight help');
+		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight ');
+				      $('[downclueid="3"]').addClass('cwd-tile-highlight ');
 		
 		},22000);
 		
@@ -748,7 +757,7 @@ function help(){
 				   (offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		$('.wordset:eq(2)').addClass('clickWord').attr('style','-webkit-animation-delay:25s;');
+		//$('.wordset:eq(2)').attr('style','-webkit-animation-delay:25s;');
 		
 		setTimeout(function(){$('.wordset:eq(2)').find('.cwd-tile-letter').click();},26000);
 		
@@ -757,7 +766,7 @@ function help(){
 		
 		
 		setTimeout(function(){showLevel();
-		$('[downclueid="3"]').removeClass('cwd-tile-highlight help');
+		$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
 		},27000);
 		
 		
@@ -767,7 +776,7 @@ function help(){
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:30s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:32s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			
@@ -783,7 +792,7 @@ function help(){
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
-		},31000);
+		},33000);
 		
 	}
 	
