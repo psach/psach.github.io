@@ -42,7 +42,7 @@ function popWords(words){
 					
 					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+
 					character+
-					//(selFlag?' strikeout strikeacross':'')+
+					(selFlag?' strikeout strikeacross':'')+
 					'" word='+word+' style="margin-top: 0px;">'+
 					(emojiChar[character])+
 					'</div></td>').appendTo(tr);
@@ -126,10 +126,10 @@ function popWords(words){
 					for (i = 0; i < selectionTillLast.length; i++) {
 						
 						arr.push(selectionTillLast[i][2]);
-					}
-				
-					$('[word="'+word+'"]').addClass((arr.indexOf(word)>-1?' strikeout strikeacross':''));
-					
+					} 
+					setTimeout(function(){
+						$('[word="'+word+'"]').addClass((arr.indexOf(word)>-1?' strikeout strikeacross':''));
+					},1500);
 					//storeLevel();
 					
 					//var stringSelected = ""+arr+","+word;
