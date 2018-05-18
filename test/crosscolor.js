@@ -201,7 +201,7 @@ function popWords(words){
 								//alert('Good!');
 								
 								//storeLevel();
-							}, 2000);
+							}, 4000);
 						
 						
 							
@@ -227,7 +227,7 @@ function popWords(words){
 								setStartEnd(++currLevel); 
 							
 							
-							}, 2000);
+							}, 4000);
 							
 								
 							
@@ -559,7 +559,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" style="-webkit-animation-delay:1s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" style="-webkit-animation-delay:2s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
