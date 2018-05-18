@@ -389,7 +389,7 @@ function popWords(words){
 				var gridClone = $("#cwd-grid").clone(true);
 				$("#cwd-grid").remove();
 				gridClone.css('opacity','0');
-				gridClone.css('transition','opacity 4s ease-in-out');
+				gridClone.css('transition','opacity 1s ease-in-out');
 				
   
 						//gridClone.appendTo(gridParent);
@@ -401,7 +401,7 @@ function popWords(words){
 						//gridClone.appendTo(gridParent);
 						//gridParent.css('opacity', '1');
 						//gridClone.css('transition','opacity 2s ease-in-out');
-						gridClone.appendTo(gridParent).fadeIn(4000,function(){
+						gridClone.appendTo(gridParent).fadeIn(3000,function(){
 								gridClone.css('opacity','1');
 								
 								
