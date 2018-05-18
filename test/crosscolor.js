@@ -1,6 +1,6 @@
 
 var twice=0;
-var arr=[];
+
 
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
@@ -15,8 +15,16 @@ function getRandomArbitrary(min, max) {
 function popWords(words){
 			//alert('popWords');	
 			$(".wordset").remove();
+			var arr=[];
+			for (i = 0; i < selectionTillLast.length; i++) {
+				
+				arr.push(selectionTillLast[i][2]);
+			}
+					
 			$.each(words, function(i, word) {
 				
+				var flag=arr.includes(word);
+					
 				//alert(word);
 				var tr = $('<tr class="wordset">');
 				
@@ -31,14 +39,10 @@ function popWords(words){
 					var temp =first+second; */
 					//alert(emojiChar[character]);
 					//character = 
-					arr=[];
-					for (i = 0; i < selectionTillLast.length; i++) {
-						
-						arr.push(selectionTillLast[i][2]);
-					}
+					
 					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+
 					character+
-					(arr.includes(word)?' strikeout strikeacross':'')+
+					(flag?' strikeout strikeacross':'')+
 					'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
 					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
 		
