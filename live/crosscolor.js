@@ -327,12 +327,12 @@ function popWords(words){
 					
 					//showLevel();
 					storeLevel();
-					setTimeout(function(){
+					//setTimeout(function(){
 						
 						//if(currLevel==1) admob.interstitial.show();
-						admob.interstitial.show();
 						
-					},3000);
+						
+					//},3000);
 					//selectionTillLast=[];
 					//randomString='';
 				
@@ -404,7 +404,7 @@ function popWords(words){
 						//gridClone.css('transition','opacity 2s ease-in-out');
 						gridClone.appendTo(gridParent).fadeIn(3000,function(){
 								gridClone.css('opacity','1');
-								
+								admob.interstitial.show();
 								
 						});
 			
