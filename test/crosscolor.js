@@ -15,15 +15,15 @@ function getRandomArbitrary(min, max) {
 function popWords(words){
 			//alert('popWords');	
 			$(".wordset").remove();
-			var arr=[];
+			var arr1=[];
 			for (i = 0; i < selectionTillLast.length; i++) {
 				
-				arr.push(selectionTillLast[i][2]);
+				arr1.push(selectionTillLast[i][2]);
 			}
 					
 			$.each(words, function(i, word) {
 				
-				var selFlag=arr.includes(word);
+				var selFlag=arr1.includes(word);
 					
 				//alert(word);
 				var tr = $('<tr class="wordset">');
