@@ -15,8 +15,16 @@ function getRandomArbitrary(min, max) {
 function popWords(words){
 			//alert('popWords');	
 			$(".wordset").remove();
+			var arr=[];
+			for (i = 0; i < selectionTillLast.length; i++) {
+				
+				arr.push(selectionTillLast[i][2]);
+			}
+					
 			$.each(words, function(i, word) {
 				
+				var selFlag=arr.indexOf(word)>-1;
+					
 				//alert(word);
 				var tr = $('<tr class="wordset">');
 				
@@ -30,7 +38,14 @@ function popWords(words){
 					console.log(first+second);
 					var temp =first+second; */
 					//alert(emojiChar[character]);
-					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+character+'" word='+word+' style="margin-top: 0px;">'+(emojiChar[character])+'</div></td>').appendTo(tr);
+					//character = 
+					
+					$('<td class="cwd-tile-word" ><div class="cwd-tile-letter d3char '+
+					character+
+					//(selFlag?' strikeout strikeacross':'')+
+					'" word='+word+' style="margin-top: 0px;">'+
+					(emojiChar[character])+
+					'</div></td>').appendTo(tr);
 					//tr.find('.cwd-tile-letter').text(emojiChar[character]);
 		
 			});
@@ -47,13 +62,13 @@ function popWords(words){
 				
 				if(!activeSet) return;
 				if(!activeSet.parent().hasClass('cwd-tile-highlight')) return;
-				
+				if($(this).hasClass('strikeout')) return;
 								
 				
 				var word = $(this).attr('word');
 				var invalid = false;
-				
-				
+				$("#words tr").removeClass('clickWord');
+				$(this).parent().parent().addClass('clickWord');
 				
 				
 				
@@ -109,10 +124,12 @@ function popWords(words){
 				
 					var arr=[];
 					for (i = 0; i < selectionTillLast.length; i++) {
+						
 						arr.push(selectionTillLast[i][2]);
 					}
 				
-				
+					$('[word="'+word+'"]').addClass((arr.indexOf(word)>-1?' strikeout strikeacross':''));
+					
 					//storeLevel();
 					
 					//var stringSelected = ""+arr+","+word;
@@ -121,8 +138,9 @@ function popWords(words){
 					stringCorrect = ""+correctAns[currLevel];
 					
 
-					$.each(arr, function(j,word){
-						stringCorrect = stringCorrect.replace(word,"|");
+					$.each(arr, function(j,selword){
+						
+						stringCorrect = stringCorrect.replace(selword,"|");
 					});
 					
 					//alert(stringCorrect);
@@ -132,7 +150,7 @@ function popWords(words){
 					//levelAnswered = answered?levelAnswered++:levelAnswered;
 					//var levelAnswered = correctAns.match("^"+startWord);
 					//var levelAnswered = correctAns.match(endWord+"$");
-					
+				 	
 					
 					//alert(stringSelected + " : " + stringCorrect );
 					
@@ -140,16 +158,17 @@ function popWords(words){
 					$.each(word.split(''), function(j,character){
 					
 						
-						$(activeSet[j]).addClass(character);
-						$(activeSet[j]).addClass('d3char ');
+						$(activeSet[j]).addClass(character+' d3char ' );
 						$(activeSet[j]).html(emojiChar[character]);
+						$(activeSet[j]).addClass('wordSlide');
+						//$(activeSet[j]).toggleClass('SR');
 						//$(activeSet[j]).attr('word',character);
 						
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
 					activeSet.parent().removeClass("cwd-tile-incorrect");
-						
+					
 					// MAIN LEVEL COMPLETED
 					if(levelAnswered==correctAns.length-1 && answered ){
 						//storeLevel();
@@ -208,7 +227,7 @@ function popWords(words){
 								setStartEnd(++currLevel); 
 							
 							
-							}, 1000);
+							}, 2000);
 							
 								
 							
@@ -483,7 +502,7 @@ function popWords(words){
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
 					clear(true);
 					//activeSetWord.removeAttr('word');
-										
+					$('#words').find('[word="'+activeSetWord+'"]').removeClass('strikeout strikeacrossclueid');				
 					storeLevel();
 					return;
 				}
@@ -494,7 +513,7 @@ function popWords(words){
 				prevActiveSet.removeClass('strikeacrossclueid');
 				prevActiveSet.removeClass('strikedownclueid'); */
 				
-				$('.cwd-tile-letter')
+				$('#crossword .cwd-tile-letter')
 				.removeClass("strikeout strikeacrossclueid strikedownclueid");
 				
 				
@@ -540,7 +559,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" style="-webkit-animation-delay:2s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
@@ -748,7 +767,7 @@ function help(){
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:29s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:30s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			

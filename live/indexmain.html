@@ -29,7 +29,7 @@ document.addEventListener('deviceready', function () {
     console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
   };
   window.plugins.OneSignal
-    //.startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
+   //startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
     .startInit("2c824581-04af-45d5-97ec-975cb3444587")
     .handleNotificationOpened(notificationOpenedCallback)
     .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
@@ -135,6 +135,52 @@ hr {
 	
 		
 }
+
+.wordSlide.B,
+.wordSlide.D,
+.wordSlide.F,
+.wordSlide.H,
+.wordSlide.J,
+.wordSlide.L,
+.wordSlide.N,
+.wordSlide.P,
+.wordSlide.R,
+.wordSlide.T,
+.wordSlide.V,
+.wordSlide.X,
+.wordSlide.Y 
+ {
+	
+		
+	-webkit-animation:slideSP 1s;
+        animation :slideSP 1s ;
+	
+		
+}
+
+.wordSlide.A,
+.wordSlide.C,
+.wordSlide.E,
+.wordSlide.G,
+.wordSlide.I,
+.wordSlide.K,
+.wordSlide.M,
+.wordSlide.O,
+.wordSlide.Q,
+.wordSlide.S,
+.wordSlide.U,
+.wordSlide.W,
+.wordSlide.Z
+{
+	
+		
+	-webkit-animation:slideHelpR 1s;
+        animation :slideHelpR 1s ;
+	
+		
+}
+
+
 
 @-webkit-keyframes fadein {
   0%       { background-color : Yellow;color:black;}
@@ -909,7 +955,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			var sto = window.localStorage?window.localStorage:localStorage;
 		  	sto.setItem('saved',true);
 				
-			head.find('link[id*="css"]').remove();
+			$('link[id*="css"]').remove();
 			
 			
 			var csslink = '<link id="css'+gametype+'" href="'+baseurl+'crossword'+gametype+'.css" rel="stylesheet" type="text/css" />';
