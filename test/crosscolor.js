@@ -193,7 +193,7 @@ function popWords(words){
 						selectionTillLast=[];
 						
 						
-						  
+						  showLevel();
 							setTimeout(function(){ 
 								level++;
 								clearLevelGrid();
@@ -201,7 +201,7 @@ function popWords(words){
 								//alert('Good!');
 								
 								//storeLevel();
-							}, 1000);
+							}, 2000);
 						
 						
 							
@@ -221,7 +221,7 @@ function popWords(words){
 							selectionTillLast=[];
 							moreCount=0;
 							
-							
+							showLevel();
 							setTimeout(function(){ 
 								clearLevelGrid();
 								setStartEnd(++currLevel); 
@@ -324,7 +324,7 @@ function popWords(words){
 			
 			function setStartEnd(lvl){
 					
-					showLevel();
+					
 					storeLevel();
 					setTimeout(function(){
 						
@@ -422,7 +422,7 @@ function popWords(words){
 			
 			function loadCW() {
 				
-			
+			showLevel();
 			tbody = $('#words');
 			
 			setStartEnd(currLevel);
@@ -559,12 +559,12 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" style="-webkit-animation-delay:2s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	.append('<div class="wrapper" style="-webkit-animation-delay:1s " ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
 	
 	
 }
-		   
+		    
 function storeLevel(){
 	
 	
