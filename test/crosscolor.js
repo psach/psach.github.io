@@ -150,7 +150,7 @@ function popWords(words){
 					//levelAnswered = answered?levelAnswered++:levelAnswered;
 					//var levelAnswered = correctAns.match("^"+startWord);
 					//var levelAnswered = correctAns.match(endWord+"$");
-					
+				 	
 					
 					//alert(stringSelected + " : " + stringCorrect );
 					
@@ -160,7 +160,7 @@ function popWords(words){
 						
 						$(activeSet[j]).addClass(character+' d3char ' );
 						$(activeSet[j]).html(emojiChar[character]);
-						$(activeSet[j]).parent().addClass('wordSlide');
+						$(activeSet[j]).addClass('wordSlide');
 						//$(activeSet[j]).toggleClass('SR');
 						//$(activeSet[j]).attr('word',character);
 						
