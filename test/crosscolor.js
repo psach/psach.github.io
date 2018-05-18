@@ -275,7 +275,8 @@ function popWords(words){
 					if(add){
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
-				
+							
+							
 							$.each(activeList[2].split(''), function(j,character){
 						
 									//alert('['+activeList[0]+'='+activeList[1]+']');
@@ -284,7 +285,7 @@ function popWords(words){
 										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
 										tile.html(emojiChar[character]);
 										tile.addClass('d3char ' + character);
-										
+										tile.attr('word',activeList[2]);
 										
 										
 									}else{
@@ -461,24 +462,26 @@ function popWords(words){
 				
 				//var prevActiveSet= activeSet;
 				
+				//var tempWord = $(this).find('.cwd-tile-letter').attr('word');
 				
 				
-				
-				//$(this).addClass("cwd-tile-highlight");
-				
-				
-				
+				//if(!tempWord){
 				 id = $(this).attr('acrossclueid');
 				
 				 clueid=id?'acrossclueid':'downclueid';
 				
 				 id = id?id:$(this).attr('downclueid');
+				//}else{
+					//$('[word="'+tempWord+'"]').
+					
+					
+				//}
 				 
+				 
+				 
+				 activeSet= $('*['+clueid+'="'+id+'"]');
 				
 				
-				
-				
-				activeSet= $('*['+clueid+'="'+id+'"]');
 				
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
@@ -505,7 +508,7 @@ function popWords(words){
 					clear(true);
 					//activeSetWord.removeAttr('word');
 					$('#words [word="'+word+'"]').removeClass('strikeout strikeacross');
-					activeSet.removeAttr('word');					
+					activeSet.removeAttr('word');
 					storeLevel();
 					return;
 				}
