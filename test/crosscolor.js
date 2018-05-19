@@ -328,12 +328,12 @@ function popWords(words){
 					
 					//showLevel();
 					storeLevel();
-					//setTimeout(function(){
+					setTimeout(function(){
 						
 						//if(currLevel==1) admob.interstitial.show();
+						admob.interstitial.show();
 						
-						
-					//},3000);
+					},3000);
 					//selectionTillLast=[];
 					//randomString='';
 				
@@ -405,7 +405,7 @@ function popWords(words){
 						//gridClone.css('transition','opacity 2s ease-in-out');
 						gridClone.appendTo(gridParent).fadeIn(3000,function(){
 								gridClone.css('opacity','1');
-								admob.interstitial.show();
+								
 								
 						});
 			
@@ -566,7 +566,7 @@ function popWords(words){
 			
 
 function showLevel(){
-	if(gametype.indexOf('Fruit')>-1) $('.cwd-tile-inactive').html($('<div class="cwd-tile-letter-inactive" >🌿</div>'));
+	if(gametype.indexOf('Fruit')>-1) $('.cwd-tile-inactive').html($('<div class="cwd-tile-letter-inactive" >🍁</div>'));
 	//$(".help").css('opacity','0');
 	helpFlag=false;
 	$(".wrapperContainer > .wrapper").remove();
