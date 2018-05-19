@@ -163,7 +163,7 @@ function popWords(words){
 						$(activeSet[j]).addClass('wordSlide');
 						//$(activeSet[j]).toggleClass('SR');
 						$(activeSet[j]).attr('word',word);
-						
+						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j)+'s');
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
@@ -561,7 +561,7 @@ function popWords(words){
 			
 
 function showLevel(){
-	
+	if(gametype.indexOf('Fruit')>-1) $('.cwd-tile-inactive').html($('<div class="cwd-tile-letter-inactive" style="-webkit-transform:scale(1.5)" >🌿</div>'));
 	//$(".help").css('opacity','0');
 	helpFlag=false;
 	$(".wrapperContainer > .wrapper").remove();
