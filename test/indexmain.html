@@ -131,8 +131,8 @@ hr {
  {
 	
 		
-	-webkit-animation:clickeffectfill 1s;
-        animation :clickeffectfill 1s ;
+	-webkit-animation:clickeffectfill 0.5s;
+        animation :clickeffectfill 0.5s ;
 	
 		
 }
@@ -153,13 +153,21 @@ hr {
 {
 	
 		
-	-webkit-animation:clickeffectfill 1s;
-        animation :clickeffectfill 1s ;
+	-webkit-animation:clickeffectfill 0.5s;
+        animation :clickeffectfill 0.5s ;
 	
 		
 }
 
-
+.wordSlide.remove
+{
+	
+		
+	-webkit-animation:remove 0.5s forwards;
+    animation :remove 0.5s forwards;
+	
+		
+}
 
 @-webkit-keyframes fadein {
   0%       { background-color : Yellow;color:black;}
@@ -237,6 +245,26 @@ hr {
   100% {
     -webkit-transform: scale(1, 1);
    opacity:1;visibility:visible;
+  }
+
+}
+
+@-webkit-keyframes remove {
+
+	
+  0% {
+    -webkit-transform: scale(1);
+	
+	opacity:1;visibility:visible;
+   
+  }
+  50% {
+    -webkit-transform: scale(0.5, 0.5);
+    opacity:0.5;visibility:visible;
+  }
+  100% {
+    -webkit-transform: scale(0, 0);
+   opacity:0;visibility:hidden;
   }
 
 }

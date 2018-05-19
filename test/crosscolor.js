@@ -163,7 +163,7 @@ function popWords(words){
 						$(activeSet[j]).addClass('wordSlide');
 						//$(activeSet[j]).toggleClass('SR');
 						$(activeSet[j]).attr('word',word);
-						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j)+'s');
+						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j/2)+'s');
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
@@ -505,11 +505,16 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
+					activeSet.addClass('remove');
+					setTimeout(function(){
 					clear(true);
 					//activeSetWord.removeAttr('word');
 					$('#words [word="'+word+'"]').removeClass('strikeout strikeacross');
 					activeSet.removeAttr('word');
+					
 					storeLevel();
+					},3000);
+					
 					return;
 				}
 				
