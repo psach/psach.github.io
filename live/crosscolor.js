@@ -163,7 +163,7 @@ function popWords(words){
 						$(activeSet[j]).addClass('wordSlide');
 						//$(activeSet[j]).toggleClass('SR');
 						$(activeSet[j]).attr('word',word);
-						
+						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j/2)+'s');
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
@@ -275,7 +275,8 @@ function popWords(words){
 					if(add){
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
-				
+							
+							
 							$.each(activeList[2].split(''), function(j,character){
 						
 									//alert('['+activeList[0]+'='+activeList[1]+']');
@@ -284,7 +285,7 @@ function popWords(words){
 										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
 										tile.html(emojiChar[character]);
 										tile.addClass('d3char ' + character);
-										
+										tile.attr('word',activeList[2]);
 										
 										
 									}else{
@@ -327,12 +328,12 @@ function popWords(words){
 					
 					//showLevel();
 					storeLevel();
-					//setTimeout(function(){
+					setTimeout(function(){
 						
 						//if(currLevel==1) admob.interstitial.show();
+						admob.interstitial.show();
 						
-						
-					//},3000);
+					},3000);
 					//selectionTillLast=[];
 					//randomString='';
 				
@@ -404,7 +405,7 @@ function popWords(words){
 						//gridClone.css('transition','opacity 2s ease-in-out');
 						gridClone.appendTo(gridParent).fadeIn(3000,function(){
 								gridClone.css('opacity','1');
-								admob.interstitial.show();
+								
 								
 						});
 			
@@ -461,24 +462,26 @@ function popWords(words){
 				
 				//var prevActiveSet= activeSet;
 				
+				//var tempWord = $(this).find('.cwd-tile-letter').attr('word');
 				
 				
-				
-				//$(this).addClass("cwd-tile-highlight");
-				
-				
-				
+				//if(!tempWord){
 				 id = $(this).attr('acrossclueid');
 				
 				 clueid=id?'acrossclueid':'downclueid';
 				
 				 id = id?id:$(this).attr('downclueid');
+				//}else{
+					//$('[word="'+tempWord+'"]').
+					
+					
+				//}
 				 
+				 
+				 
+				 activeSet= $('*['+clueid+'="'+id+'"]');
 				
 				
-				
-				
-				activeSet= $('*['+clueid+'="'+id+'"]');
 				
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
@@ -502,11 +505,16 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
+					activeSet.addClass('remove');
+					setTimeout(function(){
 					clear(true);
 					//activeSetWord.removeAttr('word');
 					$('#words [word="'+word+'"]').removeClass('strikeout strikeacross');
-					activeSet.removeAttr('word');					
+					activeSet.removeAttr('word');
+					
 					storeLevel();
+					},3000);
+					
 					return;
 				}
 				
@@ -559,17 +567,32 @@ function popWords(words){
 
 function showLevel(){
 	
-	//$(".help").css('opacity','0');
-	helpFlag=false;
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append('<div class="wrapper" style="-webkit-animation-delay:2s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	
+	
+	helpFlag=false;
+	if(gametype.indexOf('Fruit')>-1) {
+		
+		var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
+		temp.attr('style','position:absolute; top:-5px; left:-3px;');
+		
+		$('.cwd-tile-inactive').attr('style','position:relative');
+		$('.cwd-tile-inactive').html(temp);
+		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
+		
+	}
+	//<tr><td><div class="cwd-tile-letter-inactive" >🌿</div></td><td><div class="cwd-tile-letter-inactive" >🍁</div></td></tr>
+	//$(".help").css('opacity','0');
+	
 	
 	setTimeout(function(){
+		helpFlag=true;
 		clearLevelGrid();
 		setStartEnd(currLevel);
 		//$(".help").css('opacity','1');
-		helpFlag=true;
+		
 	},5000);
 	
 }
