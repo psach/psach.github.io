@@ -566,10 +566,18 @@ function popWords(words){
 			
 
 function showLevel(){
-	if(gametype.indexOf('Fruit')>-1) $('.cwd-tile-inactive').html(
-	$('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr></table>')
-	//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
-	);
+	
+	
+	if(gametype.indexOf('Fruit')>-1) {
+		
+		var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
+		temp.attr('style','position:absolute; top:0px; left:0px;');
+		
+		$('.cwd-tile-inactive').attr('style','position:relative');
+		$('.cwd-tile-inactive').html(temp);
+		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
+		
+	}
 	//<tr><td><div class="cwd-tile-letter-inactive" >🌿</div></td><td><div class="cwd-tile-letter-inactive" >🍁</div></td></tr>
 	//$(".help").css('opacity','0');
 	helpFlag=false;
