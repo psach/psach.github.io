@@ -567,7 +567,7 @@ function popWords(words){
 
 function showLevel(){
 	if(gametype.indexOf('Fruit')>-1) $('.cwd-tile-inactive').html(
-	$('<table><tr><td><div class="cwd-tile-letter-inactive" >🍂</div></td><td><div class="cwd-tile-letter-inactive" >🌱</div></td></tr></table>')
+	$('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr></table>')
 	//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
 	);
 	//<tr><td><div class="cwd-tile-letter-inactive" >🌿</div></td><td><div class="cwd-tile-letter-inactive" >🍁</div></td></tr>
