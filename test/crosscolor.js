@@ -571,7 +571,7 @@ function showLevel(){
 	if(gametype.indexOf('Fruit')>-1) {
 		
 		var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
-		temp.attr('style','position:absolute; top:-5px; left:0px;');
+		temp.attr('style','position:absolute; top:-5px; left:-3px;');
 		
 		$('.cwd-tile-inactive').attr('style','position:relative');
 		$('.cwd-tile-inactive').html(temp);
