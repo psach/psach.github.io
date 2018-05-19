@@ -567,7 +567,12 @@ function popWords(words){
 
 function showLevel(){
 	
+	$(".wrapperContainer > .wrapper").remove();
+	$(".wrapperContainer")
+	.append('<div class="wrapper" style="-webkit-animation-delay:2s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
 	
+	
+	helpFlag=false;
 	if(gametype.indexOf('Fruit')>-1) {
 		
 		var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
@@ -580,10 +585,7 @@ function showLevel(){
 	}
 	//<tr><td><div class="cwd-tile-letter-inactive" >🌿</div></td><td><div class="cwd-tile-letter-inactive" >🍁</div></td></tr>
 	//$(".help").css('opacity','0');
-	helpFlag=false;
-	$(".wrapperContainer > .wrapper").remove();
-	$(".wrapperContainer")
-	.append('<div class="wrapper" style="-webkit-animation-delay:2s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>');
+	
 	
 	setTimeout(function(){
 		helpFlag=true;
