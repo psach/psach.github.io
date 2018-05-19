@@ -1,8 +1,5 @@
 <html !doctype>
  <head>  
-  <meta name="HandheldFriendly" content="true" />
-<meta name="MobileOptimized" content="320" />
-<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no" />
  
  <link id="css" href="crossword.css" rel="stylesheet" type="text/css" />
  <link id="cssFruit" href="crosswordFruit.css" rel="stylesheet" type="text/css" />
@@ -985,6 +982,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				
 				});
 			 
+			 var metalink = '<meta name="HandheldFriendly" content="true" />';
+			head.append(metalink);
+			 var metalink = '<meta name="MobileOptimized" content="320" />';
+			head.append(metalink);
+			     var metalink = '<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no" />';
+			head.append(metalink);
+				
+				
+
+
 			 /*
 			
 			var csslink = '<link href="'+baseurl+'crosswordmain.css" rel="stylesheet" type="text/css" />';
