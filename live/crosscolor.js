@@ -1,6 +1,7 @@
 
 var twice=0;
 
+var removeOver=false;
 
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
@@ -460,7 +461,7 @@ function popWords(words){
 		
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
-				
+				if(removeOver)return;
 				//var prevActiveSetId = id
 				
 				//var prevActiveSet= activeSet;
@@ -508,15 +509,16 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
-					activeSet.addClass('remove');
+					activeSet.addClass('wordSlide remove');
+					removeOver=true;
 					setTimeout(function(){
 					clear(true);
 					//activeSetWord.removeAttr('word');
 					$('#words [word="'+word+'"]').removeClass('strikeout strikeacross');
 					activeSet.removeAttr('word');
-					
+					removeOver=false;
 					storeLevel();
-					},3000);
+					},activeSet.length*500);
 					
 					return;
 				}
