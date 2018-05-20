@@ -712,7 +712,7 @@ function help(){
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
-		'-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px 1px 1px black; left:'+  (offset.left)+'px; top:'+(offset.top+10)+
+		'-webkit-animation-iteration-count: 1;position:absolute; left:'+  (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},8000);
@@ -723,7 +723,7 @@ function help(){
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
-		'-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px 1px 1px black; left:'+(offset.left+50)+'px; top:'+(offset.top+5)+
+		'-webkit-animation-iteration-count: 1;position:absolute; left:'+(offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:9s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		//$('.wordset:eq(0)').attr('style','-webkit-animation-delay:11s;');
@@ -739,7 +739,7 @@ function help(){
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
-		'-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px 1px 1px black; left:'+(offset.left)+'px; top:'+(offset.top+10)+
+		'-webkit-animation-iteration-count: 1;position:absolute; left:'+(offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
@@ -752,7 +752,7 @@ function help(){
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
-		'-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px 1px 1px black; left:'+
+		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:16s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -769,7 +769,7 @@ function help(){
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
-		'-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px 1px 1px black; left:'+
+		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -783,7 +783,7 @@ function help(){
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
-		'-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px 1px 1px black; left:'+
+		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
 		$('.centerbody').append(startHelp);
