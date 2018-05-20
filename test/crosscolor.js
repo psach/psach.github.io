@@ -615,8 +615,8 @@ function showLevel(){
 		
 		div1.attr('style','position:absolute; top:-3px; left:-2px;');
 		div2.attr('style','position:absolute; top:3px; left:10px;');
-		div3.attr('style','position:absolute; top:0px; left:3px; font-size:7px');
-		div4.attr('style','position:absolute; top:7x; left:10px; font-size:10px');
+		div3.attr('style','position:absolute; top:10px; left:3px; font-size:7px');
+		div4.attr('style','position:absolute; top:10x; left:10px; font-size:10px');
 		
 		$('.cwd-tile-inactive').removeClass('d3');
 		$('.cwd-tile-inactive').attr('style','position:relative');
@@ -624,7 +624,9 @@ function showLevel(){
 		//$('.cwd-tile-inactive').filter(':odd').html(temp1);
 		$('.cwd-tile-inactive').filter(':even').append(div1).append(div2).append(div3);
 		
-		$('.cwd-tile-inactive').filter(':odd').append(div3).append(div4);;
+		$('.cwd-tile-inactive').filter(':odd').append(div3.clone().
+		attr('style','position:absolute; top:0px; left:3px; font-size:7px');
+		).append(div4);;
 		
 		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
 		
