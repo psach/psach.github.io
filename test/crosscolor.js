@@ -697,7 +697,7 @@ function help(){
 		var offset=$('.red').offset();
 		var startHelp = $('<div class="bounceside" ><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
 		//alert(offset);
-		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','position:absolute;text-shadow:1px 1px black; left:'+
 				   (offset.left-50)+'px; top:'+(offset.top-10)+
 		'px; background-color:transparent; -webkit-animation-delay:3s;width:100px ');
 		$('.centerbody').append(startHelp);
@@ -708,7 +708,7 @@ function help(){
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px black; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -719,7 +719,7 @@ function help(){
 		var offset=$('.wordset:eq(0)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px black; left:'+
 				   (offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:9s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -735,7 +735,7 @@ function help(){
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px black; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -748,7 +748,7 @@ function help(){
 		var offset=$('.wordset:eq(1)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px black; left:'+
 				   (offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:16s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -764,7 +764,7 @@ function help(){
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px black; left:'+
 				   (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -777,7 +777,7 @@ function help(){
 		var offset=$('.wordset:eq(2)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:1px 1px black; left:'+
 				   (offset.left+50)+'px; top:'+(offset.top+5)+
 		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
 		$('.centerbody').append(startHelp);
@@ -798,7 +798,7 @@ function help(){
 		
 		var offset=$('.arrow:eq(1)').offset();
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
-		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
+		startHelp.attr('style','position:absolute;text-shadow:1px 1px black;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
 				   'px; background-color:transparent; -webkit-animation-delay:32s;width:200px;');
 		$('.centerbody').append(startHelp);
