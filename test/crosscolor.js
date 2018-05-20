@@ -593,7 +593,7 @@ function showLevel(){
 		setStartEnd(currLevel);
 		//$(".help").css('opacity','1');
 		
-	},2000);
+	},3000);
 	
 }
 		    
