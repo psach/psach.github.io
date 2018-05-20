@@ -264,7 +264,13 @@ function popWords(words){
 					
 					start.find('.cwd-tile-letter').removeClass('d3 strikeout '+start.find('.cwd-tile-letter').html());
 					end.find('.cwd-tile-letter').removeClass('d3 strikeout '+end.find('.cwd-tile-letter').html());
-					activeSet.parent().addClass("cwd-tile-highlight");
+					
+					
+					if(activeSet) {
+						activeSet.parent().addClass("cwd-tile-highlight");
+					}else{
+						activeId =-1;
+					}
 					
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
@@ -297,7 +303,8 @@ function popWords(words){
 							});
 							
 						});
-						selectionTillLast.splice(removeElement,1);
+						
+						if(activeId!=-1)selectionTillLast.splice(removeElement,1);
 						//selectionTillLast.pop();
 						
 					}else{
@@ -594,8 +601,11 @@ function showLevel(){
 	
 	setTimeout(function(){
 		helpFlag=true;
+		getLevel();
 		clearLevelGrid();
 		setStartEnd(currLevel);
+		
+		clear(true);
 		//$(".help").css('opacity','1');
 		
 	},1500);
@@ -613,7 +623,7 @@ function storeLevel(){
 	prevData.level=level;
 	prevData.moreCount=moreCount;
 	prevData.levelAnswered=levelAnswered;
-	prevData.html=$('#cwd-grid').html();
+	//prevData.html=$('#cwd-grid').html();
 	prevData.selections=selectionTillLast;
 	prevData.totalLevels=totalLevels;
 	
