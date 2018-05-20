@@ -323,12 +323,15 @@ function popWords(words){
 					//alert("["+randomChild+random+"] in " + randomString + correctWord);
 					
 					
-					if(randomString.indexOf("["+randomChild+random+"]")==-1 ){
+					if(randomString.indexOf("["+randomChild+''+random+"]")==-1 )
+						{
 						moreWords[random][randomChild]=correctWord;
-						randomString+='['+randomChild+random+']';
-					}else{
+						randomString+='['+randomChild+''+random+']'+'['+correctWord+']';
 						
-						generateNumber(correctWord);
+					}else{
+						if(randomString.indexOf("["+correctWord+"]")==-1){
+							generateNumber(correctWord);
+						}
 					}
 			}
 			
