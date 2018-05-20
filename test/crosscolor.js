@@ -326,19 +326,20 @@ function popWords(words){
 					if(randomString.indexOf("["+randomChild+''+random+"]")==-1 )
 						{
 						moreWords[random][randomChild]=correctWord;
-						randomString+='['+randomChild+''+random+']'+'['+correctWord+']';
+						randomString+='['+randomChild+''+random+']';
 						
 					}else{
-						if(randomString.indexOf("["+correctWord+"]")==-1){
+					
 							generateNumber(correctWord);
-						}
+						
 					}
 			}
 			
 			function setStartEnd(lvl){
 					
+					//moreWords=levelMoreWords[level].slice();
 					//showLevel();
-					storeLevel();
+					
 					if(currLevel*(level+1) >=1){
 						setTimeout(function(){
 							
@@ -350,13 +351,19 @@ function popWords(words){
 					
 					//selectionTillLast=[];
 					//randomString='';
-				
-					$.each(correctAns[lvl], function(i, correctWord) {
+					randomString='';
+					var tMoreWords = moreWords+"";
 					
-						generateNumber(correctWord);
+					$.each(correctAns[lvl], function(i, correctWord) {
+						
+						if(tMoreWords.indexOf(','+correctWord+',')==-1){
+							generateNumber(correctWord);
+						}
 						
 					
 					});
+					
+					
 					//$($('['+activeList[0]+'='+activeList[1]+'] div')[j]).html(character);
 					//$($('['+activeList[0]+'='+activeList[1]+'] div')).removeClass(character);
 					/* var clearGrid =$("#crossword").find(".cwd-tile-active");
@@ -432,7 +439,7 @@ function popWords(words){
 						
 				
 				
-				
+				storeLevel();
 			
 			
 			}
@@ -665,7 +672,7 @@ function getLevel(){
 		selectionTillLast=[];
 		totalLevels=mainTotalLevel;
 	}
-	console.log(prevData);
+	//console.log(prevData);
 	//storage.removeItem('prevData');
 }
 
