@@ -328,12 +328,15 @@ function popWords(words){
 					
 					//showLevel();
 					storeLevel();
-					setTimeout(function(){
-						
-						//if(currLevel==1) admob.interstitial.show();
-						admob.interstitial.show();
-						
-					},3000);
+					if(currLevel*(level+1) >=1){
+						setTimeout(function(){
+							
+							//if(currLevel==1) admob.interstitial.show();
+							admob.interstitial.show();
+							
+						},4000);
+					}
+					
 					//selectionTillLast=[];
 					//randomString='';
 				
@@ -569,7 +572,7 @@ function showLevel(){
 	
 	$(".wrapperContainer > .wrapper").remove();
 	$(".wrapperContainer")
-	.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	
 	
 	helpFlag=false;
@@ -593,7 +596,7 @@ function showLevel(){
 		setStartEnd(currLevel);
 		//$(".help").css('opacity','1');
 		
-	},3000);
+	},1500);
 	
 }
 		    
@@ -697,7 +700,7 @@ function help(){
 		var offset=$('.red').offset();
 		var startHelp = $('<div class="bounceside" ><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
 		//alert(offset);
-		startHelp.attr('style','position:absolute;text-shadow:1px 1px black; left:'+
+		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
 				   (offset.left-50)+'px; top:'+(offset.top-10)+
 		'px; background-color:transparent; -webkit-animation-delay:3s;width:100px ');
 		$('.centerbody').append(startHelp);
