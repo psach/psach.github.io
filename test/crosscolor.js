@@ -624,7 +624,7 @@ function showLevel(){
 		//$('.cwd-tile-inactive').filter(':odd').html(temp1);
 		$('.cwd-tile-inactive').filter(':even').append(div1).append(div2).append(div3);
 		div3 = div3.clone();
-		div3.attr('style','position:absolute; top:0px; left:3px; font-size:7px')
+		div3.attr('style','position:absolute; top:0px; left:3px; font-size:10px')
 		$('.cwd-tile-inactive').filter(':odd').append(div3).append(div4);
 		
 		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
