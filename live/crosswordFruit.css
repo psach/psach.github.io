@@ -24,7 +24,7 @@
 	
 	
 	border: solid 1px transparent !important;
-	background: sandybrown;
+	background: transparent;
 }
 
 
@@ -76,7 +76,11 @@
  
 
 
-
+.d3cross{
+	border: 1px solid black;
+	border-radius:6px;	
+	background:saddlebrown;
+}
 
 
 
@@ -121,7 +125,7 @@
  .cwd-tile-active{
 	background: LightYellow;
 	border-radius: 5px;
-
+  border: solid 1px dimgray;
 }
 
 
@@ -129,8 +133,9 @@
 .cwd-tile{
     width: 26px;
     height: 26px;
-    border: solid 1px dimgray;
+  
     padding: 0;
+	
 	
  }
 
@@ -154,8 +159,8 @@
 
 .cwd-tile-letter-inactive{ 
     text-align: left;
-    font-size: 4px; 
-	text-shadow: 1px 1px black ;
+    font-size: 3px; 
+	text-shadow: -1px 0px 6px black;
 	-webkit-animation: wave 5s infinite;
 	transform-origin:30% 68%;
 }
