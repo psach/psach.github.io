@@ -24,7 +24,7 @@
 	
 	
 	border: solid 1px transparent !important;
-	background: lightyellow;
+	background: transparent;
 }
 
 
@@ -76,7 +76,11 @@
  
 
 
-
+.d3cross{
+	border: 1px solid black;
+	border-radius:6px;	
+	background:darkseagreen;
+}
 
 
 
@@ -121,7 +125,7 @@
  .cwd-tile-active{
 	background: LightYellow;
 	border-radius: 5px;
-
+  border: solid 1px dimgray;
 }
 
 
@@ -129,8 +133,9 @@
 .cwd-tile{
     width: 26px;
     height: 26px;
-    border: solid 1px dimgray;
+  
     padding: 0;
+	
 	
  }
 
