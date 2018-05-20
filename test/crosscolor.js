@@ -529,6 +529,7 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
+					activeSet.attr('style','-webkit-animation-delay:0s');
 					activeSet.addClass('wordSlide remove');
 					removeOver=true;
 					setTimeout(function(){
@@ -538,7 +539,7 @@ function popWords(words){
 					activeSet.removeAttr('word');
 					removeOver=false;
 					storeLevel();
-					},activeSet.length*500);
+					},500);
 					
 					return;
 				}
@@ -600,11 +601,16 @@ function showLevel(){
 	helpFlag=false;
 	if(gametype.indexOf('Fruit')>-1) {
 		
-		var temp = $('<table><tr ><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
+		var temp = $('<table><tr ><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
+		
+		var temp1 = $('<table ><tr><td class="cwd-tile-letter-inactive" style="font-size:4px" >🍂</td><td ></td></tr><tr><td></td><td class="cwd-tile-letter-inactive" style="font-size:2px">🌿</td></tr></table>');
+				
 		temp.attr('style','position:absolute; top:-3px; left:-2px;');
+		temp1.attr('style','position:absolute; top:-3px; left:-2px;');
 		$('.cwd-tile-inactive').removeClass('d3');
 		$('.cwd-tile-inactive').attr('style','position:relative');
-		$('.cwd-tile-inactive').html(temp);
+		$('.cwd-tile-inactive').filter(':even').html(temp);
+		$('.cwd-tile-inactive').filter(':odd').html(temp1);
 		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
 		
 	}
