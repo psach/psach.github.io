@@ -603,7 +603,7 @@ function showLevel(){
 		
 		var temp = $('<table><tr ><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
 		
-		var temp1 = $('<table ><tr><td class="cwd-tile-letter-inactive" style="font-size:5px" >🍂</td><td ></td></tr><tr><td></td><td class="cwd-tile-letter-inactive" style="font-size:2px">🌿</td></tr></table>');
+		var temp1 = $('<table ><tr><td class="cwd-tile-letter-inactive" style="font-size:10px" >🍂</td><td ></td></tr><tr><td></td><td class="cwd-tile-letter-inactive" style="font-size:7px">🌿</td></tr></table>');
 				
 		temp.attr('style','position:absolute; top:-3px; left:-2px;');
 		temp1.attr('style','position:absolute; top:-3px; left:-2px;');
