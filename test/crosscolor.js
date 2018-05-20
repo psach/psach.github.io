@@ -268,9 +268,9 @@ function popWords(words){
 					
 					if(activeSet) {
 						activeSet.parent().addClass("cwd-tile-highlight");
-					}else{
-						activeId =-1;
 					}
+						
+					
 					
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
@@ -604,7 +604,7 @@ function showLevel(){
 		getLevel();
 		clearLevelGrid();
 		setStartEnd(currLevel);
-		
+		activeId =-1;
 		clear(true);
 		//$(".help").css('opacity','1');
 		
