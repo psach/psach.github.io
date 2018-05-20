@@ -271,7 +271,8 @@ function popWords(words){
 					}
 						
 					
-					
+					var wordPanel = $('#words').find('[word]');
+					wordPanel.removeClass('strikeout strikeacross');
 					start.addClass("d3 green");
 					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 					end.addClass("d3 red");
@@ -293,7 +294,9 @@ function popWords(words){
 										tile.html(emojiChar[character]);
 										tile.addClass('d3char ' + character);
 										tile.attr('word',activeList[2]);
-										
+										wordPanel.filter('[word="'+activeList[2]+'"]').
+										//$(,wordPanel.parent()).
+										addClass('strikeout strikeacross');
 										
 									}else{
 										removeElement=i;
@@ -616,6 +619,7 @@ function showLevel(){
 		setStartEnd(currLevel);
 		activeId =-1;
 		clear(true);
+		
 		//$(".help").css('opacity','1');
 		
 	},1500);
