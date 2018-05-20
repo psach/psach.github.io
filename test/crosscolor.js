@@ -508,7 +508,7 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
-					activeSet.addClass('remove');
+					activeSet.addClass('wordSlide remove');
 					setTimeout(function(){
 					clear(true);
 					//activeSetWord.removeAttr('word');
