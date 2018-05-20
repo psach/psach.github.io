@@ -4,7 +4,10 @@
 			var levelStartCell=[];
 			var levelEndCell=[];
 
-			var correctAns =[["ROAD","RELAX","FLEX"/*,"LITTLEMAN","EXAM"*/],["CARAMEL","TEA","STAR","WATER","MINT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]];
+			var correctAns =[
+			["ROAD","RELAX","FLEX"],
+			["CARAMEL","TEA","STAR","WATER","MINT"]
+			];
 			
 			
 			var moreWords =[
@@ -25,7 +28,10 @@
 			levelEndCell.push(endCell);
 			
 							 
-			var correctAns =[["RAGA","RANGE"/*,"APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL","EIGHT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]];
+			var correctAns =[
+			["RAGA","RANGE","APPLEPIE","LITTLEMAN","EXAM"],
+			["DIAL","EIGHT","ALPHABET","ALCOHOLIC","EXAM"]
+			];
 			
 			
 			var moreWords =[
@@ -49,7 +55,7 @@
 			/*correctAns =[["TIME","ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"],
 			["GOOGLE","LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"]];*/
 			correctAns =[
-			["MIND","CREAM",/*"ONE","GOOGLE","TUNNEL","NURSE","ELEPHANT","CHAT","JACKET"*/],["TIME","TEACH"/*,"HOME","MORE","DIARY","ICE","BALANCED","MEDAL","RHYMES","GRASSY","JOKING"*/]];
+			["MIND","CREAM","ONE","GOOGLE","TUNNEL","NURSE","ELEPHANT","CHAT","JACKET"],["TIME","TEACH","HOME","MORE","DIARY","ICE","BALANCED","MEDAL","RHYMES","GRASSY","JOKING"]];
 				
 			 moreWords =[
 			["SIN","TAX","SOFT"],["FOUR","HIKE","EIGHTY"],["CARD","MISTY","RIDER"],["YOUNG","EAT","HUGE"],
