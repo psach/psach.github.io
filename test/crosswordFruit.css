@@ -155,7 +155,7 @@
 .cwd-tile-letter-inactive{ 
     text-align: left;
     font-size: 3px; 
-	text-shadow: -1px 0 black;
+	/*text-shadow: -1px 0 black;*/
 	-webkit-animation: wave 5s infinite;
 	transform-origin:30% 68%;
 }
