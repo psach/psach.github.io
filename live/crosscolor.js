@@ -529,6 +529,7 @@ function popWords(words){
 				
 				//if( prevActiveSetId == id ) twice++;
 				if(activeSet && activeSet.filter('.strikeout').length==activeSet.parent().length && activeSetWordlength==activeSet.parent().length){
+					activeSet.attr('style','-webkit-animation-delay:0s');
 					activeSet.addClass('wordSlide remove');
 					removeOver=true;
 					setTimeout(function(){
@@ -538,7 +539,7 @@ function popWords(words){
 					activeSet.removeAttr('word');
 					removeOver=false;
 					storeLevel();
-					},activeSet.length*500);
+					},500);
 					
 					return;
 				}
@@ -600,11 +601,32 @@ function showLevel(){
 	helpFlag=false;
 	if(gametype.indexOf('Fruit')>-1) {
 		
-		var temp = $('<table><tr ><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
+		var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
+		
+		var temp1 = $('<table ><tr><td class="cwd-tile-letter-inactive" style="font-size:10px" >🍂</td><td ></td></tr><tr><td></td><td class="cwd-tile-letter-inactive" style="font-size:7px">🌿</td></tr></table>');
+		
+		var div1 = $('<div class="cwd-tile-letter-inactive">🍂</div>');
+		var div2 = $('<div class="cwd-tile-letter-inactive">🌱</div>');
+		var div3 = $('<div class="cwd-tile-letter-inactive">🍁</div>');
+		var div4 = $('<div class="cwd-tile-letter-inactive">🌿</div>');
+				
 		temp.attr('style','position:absolute; top:-3px; left:-2px;');
+		temp1.attr('style','position:absolute; top:-3px; left:-2px;');
+		
+		div1.attr('style','position:absolute; top:-3px; left:2px;');
+		div2.attr('style','position:absolute; top:3px; left:15px;');
+		div3.attr('style','position:absolute; top:10px; left:7px; font-size:7px');
+		div4.attr('style','position:absolute; top:4px; left:13px; font-size:10px');
+		
 		$('.cwd-tile-inactive').removeClass('d3');
 		$('.cwd-tile-inactive').attr('style','position:relative');
-		$('.cwd-tile-inactive').html(temp);
+		//$('.cwd-tile-inactive').filter(':even').html(temp);
+		//$('.cwd-tile-inactive').filter(':odd').html(temp1);
+		$('.cwd-tile-inactive').filter(':even').append(div1).append(div2).append(div3);
+		div3 = div3.clone();
+		div3.attr('style','position:absolute; top:0px; left:3px; font-size:10px')
+		$('.cwd-tile-inactive').filter(':odd').append(div3).append(div4);
+		
 		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
 		
 	}
