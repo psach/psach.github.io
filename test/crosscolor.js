@@ -616,7 +616,7 @@ function showLevel(){
 		div1.attr('style','position:absolute; top:2px; left:2px;');
 		div2.attr('style','position:absolute; top:2px; left:11px;');
 		div3.attr('style','position:absolute; top:10px; left:11px; font-size:7px');
-		div4.attr('style','position:absolute; top:6px; left:12px; font-size:9px');
+		div4.attr('style','position:absolute; top:7px; left:12px; font-size:9px');
 		
 		$('.cwd-tile-inactive').removeClass('d3');
 		$('.cwd-tile-inactive').attr('style','position:relative');
