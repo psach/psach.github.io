@@ -236,6 +236,15 @@ function popWords(words){
 							
 							
 							
+						}else{
+							if(selectionTillLast.length==correctAns[currLevel].length){
+								console.log('try again');
+								$(".wrapperContainer > .wrapperRight").remove();
+	$(".wrapperContainer")
+	.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+	
+							}
+							
 						}
 					}
 					storeLevel();
