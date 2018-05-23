@@ -622,10 +622,10 @@ function showLevel(){
 		//temp.attr('style','position:absolute; top:-3px; left:-2px;');
 		//temp1.attr('style','position:absolute; top:-3px; left:-2px;');
 		
-		div1.attr('style','position:absolute; top:2px; left:2px;');
+		div1.attr('style','position:absolute; top:2px; left:2px;-webkit-animation-delay:2s');
 		div2.attr('style','position:absolute; top:2px; left:11px;');
 		div3.attr('style','position:absolute; top:10px; left:11px; font-size:7px');
-		div4.attr('style','position:absolute; top:8px; left:12px; font-size:9px');
+		div4.attr('style','position:absolute; top:8px; left:12px; font-size:9px;-webkit-animation-delay:5s');
 		
 		$('.cwd-tile-inactive').removeClass('d3');
 		$('.cwd-tile-inactive').attr('style','position:relative');
