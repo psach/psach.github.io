@@ -163,6 +163,7 @@
 	text-shadow: -1px 0px 6px black;
 	-webkit-animation: wave 5s infinite;
 	transform-origin:30% 68%;
+	-webkit-transform:scale(2);
 }
 
 /* .red {
