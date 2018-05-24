@@ -6,9 +6,10 @@
 
 
 			var tcorrectAns =[
+				["QUIZ","YOU","PIZZA","ZOO","COCONUT"],
 				["ROAD","RELAX","FLEX"/*,"LITTLEMAN","EXAM"*/],
-				["CARAMEL","TEA","STAR","WATER","MINT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/],
-				["QUIZ","YOU","PIZZA","ZOO","COCONUT"]];
+				["CARAMEL","TEA","STAR","WATER","MINT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]
+				];
 			
 			
 			var tmoreWords =[
