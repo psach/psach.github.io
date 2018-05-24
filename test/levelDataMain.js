@@ -4,7 +4,11 @@
 			var levelStartCell=[];
 			var levelEndCell=[];
 
-			var tcorrectAns =[["ROAD","RELAX","FLEX"/*,"LITTLEMAN","EXAM"*/],["CARAMEL","TEA","STAR","WATER","MINT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]];
+
+			var tcorrectAns =[
+				["ROAD","RELAX","FLEX"/*,"LITTLEMAN","EXAM"*/],
+				["CARAMEL","TEA","STAR","WATER","MINT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/],
+				["QUIZ","YOU","PIZZA","ZOO","COCONUT"]];
 			
 			
 			var tmoreWords =[
@@ -16,8 +20,8 @@
 			
 			];
 			
-			var tstartCell = [[8,2],[8,8]];
-			var tendCell=[[2,6],[2,4]];
+			var tstartCell = [[8,2],[8,8],[3,2]];
+			var tendCell=[[2,6],[2,4],[7,8]];
 			
 			levelMoreWords.push(tmoreWords);
 			levelCorrectAns.push(tcorrectAns);
