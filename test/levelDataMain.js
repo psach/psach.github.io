@@ -6,8 +6,8 @@
 
 
 			var tcorrectAns =[
-				["PAPER","USER","SEA","COCONUT"],
-				["YOU","QUIZ","PIZZA","ZOO","CARTOON"],
+				["PAPER","USER","SEA","CARTOON"],
+				["YOU","QUIZ","PIZZA","ZOO","COCONUT"],
 				["ROAD","RELAX","FLEX"/*,"LITTLEMAN","EXAM"*/],
 				["CARAMEL","TEA","STAR","WATER","MINT"/*,"ALPHABET","ALCOHOLIC","EXAM"*/]
 				];
