@@ -237,7 +237,7 @@ function popWords(words){
 							
 							
 						}else{
-							if(selectionTillLast.length==correctAns[currLevel].length){
+							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
 								$(".wrapperContainer > .wrapperRight").remove();
 	$(".wrapperContainer")
@@ -607,8 +607,8 @@ function showLevel(){
 	.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	
 	
-	helpFlag=false;
-	if(gametype.indexOf('Fruit')>-1) {
+
+	if(gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1) {
 		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
 		
@@ -622,10 +622,10 @@ function showLevel(){
 		//temp.attr('style','position:absolute; top:-3px; left:-2px;');
 		//temp1.attr('style','position:absolute; top:-3px; left:-2px;');
 		
-		div1.attr('style','position:absolute; top:2px; left:2px;');
+		div1.attr('style','position:absolute; top:2px; left:2px;-webkit-animation-delay:2s');
 		div2.attr('style','position:absolute; top:2px; left:11px;');
 		div3.attr('style','position:absolute; top:10px; left:11px; font-size:7px');
-		div4.attr('style','position:absolute; top:8px; left:12px; font-size:9px');
+		div4.attr('style','position:absolute; top:8px; left:12px; font-size:9px;-webkit-animation-delay:5s');
 		
 		$('.cwd-tile-inactive').removeClass('d3');
 		$('.cwd-tile-inactive').attr('style','position:relative');
@@ -644,7 +644,7 @@ function showLevel(){
 	
 	
 	setTimeout(function(){
-		helpFlag=true;
+		
 		getLevel();
 		clearLevelGrid();
 		setStartEnd(currLevel);
@@ -654,6 +654,8 @@ function showLevel(){
 		//$(".help").css('opacity','1');
 		
 	},1500);
+
+	
 	
 }
 		    
@@ -712,7 +714,7 @@ function getLevel(){
 }
 
 function home(){
-	if(helpFlag){
+	if(helpOver){
 	firstLoad=true;
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	$('.centerbody').html(indexMain);
@@ -721,26 +723,43 @@ function home(){
 }
 
 function clearAll(){
-	if(helpFlag){
+	if(helpOver){
 		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
+		clearLevelGrid();
 		clear(false);
 	}
 }
 
-var helpFlag=true;
+var helpOver=true;
+
+
+var realSelectionTillLast;
 
 
 
 function help(){
 	
-	if(helpFlag){
+	if(helpOver){
 		
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
-	
+		realSelectionTillLast=JSON.stringify(selectionTillLast);
+		var realCurrLevel= currLevel;
+		
+		var realRedChar=redChar;
+		var realGreenChar=greenChar;
+		greenChar="D";
+		redChar="F";
+		helpOver=false;
+		currLevel=2;
+		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
+		clearLevelGrid();
+		clear(false);
+		selectionTillLast=[];
 		popWords(helpMoreWords[0]);
 		
-		helpFlag=false;
+		
 		$('#crossword .cwd-tile-active').addClass('modal');
+		$('#crossword .cwd-tile-active').removeClass('cwd-tile-highlight cwd-tile-incorrect');
 		//$('#words').attr('style','-webkit-filter:sepia(50%)');
 		
 		// Start
@@ -764,15 +783,45 @@ function help(){
 		
 		
 		
+		var pathArray =[$('[downclueid="13"]').get().reverse(),
+						$('[acrossclueid="12"]'),
+						$('[downclueid="3"]').get().reverse()
+						
+					   ];
+		var stepCount=5;
+		var stepChar = "✍️";
+		if(gametype.indexOf('Fruit')>-1) stepChar = '🌱';
+		if(gametype.indexOf('Animal')>-1) stepChar='🐾';
+		if(gametype.indexOf('Sport')>-1) stepChar='🏃‍';
+		$.each(pathArray, function(i, activeSetItem) {
+			$(activeSetItem).addClass('cwd-tile-highlight');
+			$.each(activeSetItem, function(j, activeTd ) {
+				
+			
+				$(activeTd).find('.cwd-tile-letter:contains(" ")').attr('style',' -webkit-animation-delay:'+(stepCount++)+'s;').addClass('wordSlide add '+(i==1 && stepChar=='🐾'?' across ':'')).html(stepChar);
+			
+			});
+		
+		});
+	
+		var stepFrame=stepCount;
+		
+		setTimeout(function(){
+			$('.cwd-tile-highlight').removeClass('cwd-tile-highlight');
+			
+			$('.cwd-tile-letter:contains('+stepChar+')').removeClass('wordSlide add').html(' ');
+			
+		},(stepFrame*1000)+5000);
+		
 		var offset=$('[downclueid="13"]:eq(1)').offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+  (offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+6)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},8000);
+		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},(stepFrame*1000)+8000);
 		
 		
 		
@@ -781,11 +830,11 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+(offset.left+50)+'px; top:'+(offset.top+5)+
-		'px; background-color:transparent;  -webkit-animation-delay:9s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+9)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		//$('.wordset:eq(0)').attr('style','-webkit-animation-delay:11s;');
 		
-		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},12000);
+		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},(stepFrame*1000)+12000);
 		
 		
 		
@@ -797,12 +846,12 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+(offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+13)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
 		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight ');
 			$('[acrossclueid="12"]').addClass('cwd-tile-highlight ');
-		},15000);
+		},(stepFrame*1000)+15000);
 		
 			
 		var offset=$('.wordset:eq(1)').offset();
@@ -811,11 +860,11 @@ function help(){
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left+50)+'px; top:'+(offset.top+5)+
-		'px; background-color:transparent;  -webkit-animation-delay:16s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+16)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		//$('.wordset:eq(1)').attr('style','-webkit-animation-delay:18s;');
 		
-		setTimeout(function(){$('.wordset:eq(1)').find('.cwd-tile-letter').click();},19000);
+		setTimeout(function(){$('.wordset:eq(1)').find('.cwd-tile-letter').click();},(stepFrame*1000)+19000);
 		
 		
 		
@@ -828,13 +877,13 @@ function help(){
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+20)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 	
 		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight ');
 				      $('[downclueid="3"]').addClass('cwd-tile-highlight ');
 		
-		},22000);
+		},(stepFrame*1000)+22000);
 		
 		var offset=$('.wordset:eq(2)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
@@ -842,19 +891,27 @@ function help(){
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left+50)+'px; top:'+(offset.top+5)+
-		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+23)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		//$('.wordset:eq(2)').attr('style','-webkit-animation-delay:25s;');
 		
-		setTimeout(function(){$('.wordset:eq(2)').find('.cwd-tile-letter').click();},26000);
+		setTimeout(function(){$('.wordset:eq(2)').find('.cwd-tile-letter').click();},(stepFrame*1000)+26000);
 		
 		
 		
 		
 		
-		setTimeout(function(){showLevel();
-		$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
-		},27000);
+		setTimeout(function(){
+			//showLevel();
+			
+			$(".wrapperContainer > .wrapper").remove();
+			$(".wrapperContainer")
+			.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	
+	
+			$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
+		
+		},(stepFrame*1000)+27000);
 		
 		
 		
@@ -863,7 +920,7 @@ function help(){
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:32s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:'+(stepFrame+32)+'s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			
@@ -871,108 +928,24 @@ function help(){
 			
 			$('.wrapperHelpLClick').remove();
 			$('.bounceside').remove();	
-			helpFlag=true;			
-			clearAll();
+			activeId=-1;
+			selectionTillLast=JSON.parse(realSelectionTillLast);
+			currLevel= realCurrLevel;	
+			redChar  =realRedChar;
+			greenChar=realGreenChar;			
+			clear(true);
+			
+			helpOver=true;		
 			//$('#crossword').attr('style','-webkit-filter:none;');
 			//$('#words').attr('style','-webkit-filter:none;');
 			$('#crossword .cwd-tile-active').removeClass('modal');
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
-		},33000);
+		},(stepFrame*1000)+35000);
 		
 	}
 	
 }
 
-/*
-function help1(){
-	
-	if(helpFlag){
-		helpFlag=false;
-		var offset=$('.green').offset();
-		var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 1px dimgray; text-shadow:none;padding:2px;');
-		$('.centerbody').append(startHelp);
-		
-		var word = gametype.length==0?'word':'emoji word';
-		
-		var offset=$('.red').offset();
-		var startHelp = $('<div class="bounceside" >End here 👉 </div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
-				   (offset.left-70)+'px; top:'+offset.top+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:3s; padding:2px;');
-		$('.centerbody').append(startHelp);
-		
-		
-		var offset=$('[downclueid="18"]:eq(1)').offset();
-		
-		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
-		
-		
-		
-		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one <br/> across or down grid.</div>');
-		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
-				   (offset.left+20)+'px; top:'+(offset.top+10)+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:5s; padding:2px;');
-		$('.centerbody').append(startHelp);
-		
-		
-			
-		var offset=$('.d3word').offset();
-		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
-				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:10s;');
-		$('.centerbody').append(startHelp);
-		
-		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
-				   (offset.left-180)+'px; top:'+(offset.top-5)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:15s;');
-		$('.centerbody').append(startHelp);
-		
 
-		
-		var offset=$('[downclueid="2"]:eq(5)').offset();
-		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
-				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:19s;');
-		$('.centerbody').append(startHelp);
-		
-				
-		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},25000);
-		
-		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},26000);
-		
-		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},27000);
-		
-		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},28000);
-		
-		
-			
-		setTimeout(function(){
-			
-			$('.bouncesideright').attr('style','visibility:hidden;display:none');
-			
-			$('.wrapperHelpLClick').attr('style','visibility:hidden;display:none');
-			$('.bounceside').attr('style','visibility:hidden;display:none');
-			//$('.bounceside').removeClass('bounceside');
-			//$('.arrow').attr('style','visibility:visible;display:');
-			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
-		removeClass('cwd-tile-highlight');
-			helpFlag=true;
-			showLevel();
-		},31000);
-		
-	}
-	
-}*/

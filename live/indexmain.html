@@ -169,6 +169,30 @@ hr {
 		
 }
 
+.wordSlide.add
+{
+	
+		
+	-webkit-animation:add 0.7s ;
+    animation :add 0.7s ;
+	opacity:0;
+
+	
+		
+}
+
+.wordSlide.add.across
+{
+	
+		
+	-webkit-animation:addcross 1s ;
+    animation :addcross 1s ;
+	opacity:0;
+	
+	
+		
+}
+
 @-webkit-keyframes fadein {
   0%       { background-color : Yellow;color:black;}
   50%  { background-color: Yellow;color:black;}
@@ -216,6 +240,7 @@ hr {
 	-webkit-animation: clickeffect 1s;
 	opacity: 1;
 	
+	
 }
 
 
@@ -249,6 +274,56 @@ hr {
 
 }
 
+
+@-webkit-keyframes addcross {
+
+	
+  0% {
+    -webkit-transform: scale(0) rotate(90deg);
+	
+	opacity:0;visibility:hidden;
+   
+  }
+  20% {
+    -webkit-transform: scale(0.5) rotate(90deg);
+    opacity:0.5;visibility:visible;
+  }
+  30% {
+    -webkit-transform: scale(1) rotate(90deg);
+   opacity:1;visibility:visible;
+  }
+  100% {
+    -webkit-transform: scale(1) rotate(90deg);
+   opacity:1;visibility:visible;
+  }
+
+}
+
+@-webkit-keyframes add {
+
+	
+  0% {
+    -webkit-transform: scale(0);
+	
+	opacity:0;visibility:hidden;
+   
+  }
+  20% {
+    -webkit-transform: scale(0.5);
+    opacity:0.5;visibility:visible;
+  }
+   30% {
+    -webkit-transform: scale(1);
+   opacity:1;visibility:visible;
+  }
+  100% {
+    -webkit-transform: scale(1);
+   opacity:1;visibility:visible;
+  }
+
+}
+
+
 @-webkit-keyframes remove {
 
 	
@@ -272,15 +347,18 @@ hr {
 @-webkit-keyframes wave {
 
 	
-  0% {
+  0%,45% {
     -webkit-transform: rotate(20deg) scale(2);
 	
 	
   }
- 50% {
+50%{ 
+    -webkit-transform: rotate(20deg) scale(2);
+}
+
+ 75% {
     -webkit-transform: rotate(-20deg) scale(2);
-	
-	
+		
   }
   100% {
     -webkit-transform: rotate(20deg) scale(2);
@@ -900,9 +978,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			  
 		 
 			 
-		<td>
+		<!--td>
 			   <input type="radio" id="switch_4_foot" name="switch_4" value="Sport" onclick='gametype="Sport";selectGame();'/>
 				<label for="switch_4_foot">⚽</label>
+			 
+		</td -->
+		
+			 
+		<td>
+			   <input type="radio" id="switch_4_foot" name="switch_4" value="Animal" onclick='gametype="Animal";selectGame();'/>
+				<label for="switch_4_foot">🐮</label>
 			 
 		</td>
 			 
@@ -1084,8 +1169,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 /*{"A":'🍊',"B":'🍌',"C":'🍒',"D":'🍆',"E":'🎂',"F":'🍬',"G":'🍇',"H":'🍩',"I":'🍕',"J":'🍦',"K":'🍏',"L":'🍋',"M":'🍟',"N":'🌽',"O":'🍑',"P":'🍍',"Q":'🍈',"R":'🍎',"S":'🍓',"T":'🍅',"U":'🍄',"V":'🍐',"W":'🍰',"X":'🍚',"Y":'🍠',"Z":'🍡'};*/
 
 {"A":'🍊',"B":'🍌',"C":'🍒',"D":'🍆',"E":'🍈',"F":'🌹',"G":'🍇',"H":'🌷',"I":'🍀',"J":'🌼',"K":'🍏',"L":'🍋',"M":'🌵',"N":'🌽',"O":'🍑',"P":'🍍',"Q":'🌴',"R":'🍎',"S":'🍓',"T":'🍅',"U":'🍄',"V":'🍐',"W":'🌰',"X":'🌾',"Y":'🍠',"Z":'🌲'};
+
+if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',"E":'🐴',"F":'🐮',"G":'🐪',"H":'🐀',"I":'🐰',"J":'🐷',"K":'🐻',"L":'🐼',"M":'🐉',"N":'🐓',"O":'🐤',"P":'🐸',"Q":'🐃',"R":'🐍',"S":'🐛',"T":'🐜',"U":'🐝',"V":'🐞',"W":'🐂',"X":'🐐',"Y":'🐘',"Z":'🐺'};
 				
-					if(gametype=='Sport') emojiChar = {
+					/*if(gametype=='Sport') emojiChar = {
 										"A":'\ud83c\udfc0',
 										"B":'\ud83c\udfbe',
 										"C":'\ud83c\udfaf',
@@ -1112,7 +1199,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 										"X":'\ud83c\udfbb',
 										"Y":'\uD83C\uDFB0',
 										"Z":'\ud83c\udfad'
-					};
+					};*/
 			}
 	
 			var level=0;
