@@ -869,9 +869,11 @@ function help(){
 		
 		
 		
-		setTimeout(function(){showLevel();
-		$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
-		},28000);
+		setTimeout(function(){
+			//showLevel();
+			$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
+		
+		},27000);
 		
 		
 		
@@ -894,7 +896,7 @@ function help(){
 			redChar  =realRedChar;
 			greenChar=realGreenChar;			
 			clear(true);
-			
+			showLevel();
 			helpOver=true;		
 			//$('#crossword').attr('style','-webkit-filter:none;');
 			//$('#words').attr('style','-webkit-filter:none;');
