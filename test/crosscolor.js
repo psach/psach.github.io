@@ -871,7 +871,7 @@ function help(){
 		
 		setTimeout(function(){showLevel();
 		$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
-		},27000);
+		},28000);
 		
 		
 		
@@ -902,7 +902,7 @@ function help(){
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
-		},34000);
+		},35000);
 		
 	}
 	
