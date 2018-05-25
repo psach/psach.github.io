@@ -608,7 +608,7 @@ function showLevel(){
 	
 	
 	helpFlag=false;
-	if(gametype.indexOf('Fruit')>-1) {
+	if(gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1) {
 		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
 		
