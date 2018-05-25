@@ -19,22 +19,55 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 <!-- End Google Tag Manager -->
 	<script>
 		
-// Add to index.js or the first page that loads with your app.
-// For Intel XDK and please add this to your app.js.
-document.addEventListener('deviceready', function () {
-  // Enable to debug issues.
-  // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
-  
-  var notificationOpenedCallback = function(jsonData) {
-    console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-  };
-  window.plugins.OneSignal
-    .startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
-    //.startInit("2c824581-04af-45d5-97ec-975cb3444587")
-    .handleNotificationOpened(notificationOpenedCallback)
-    .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-    .endInit();
-}, false);
+var app = {
+    // Application Constructor
+    initialize: function() {
+        document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
+    },
+
+    // deviceready Event Handler
+    //
+    // Bind any cordova events here. Common events are:
+    // 'pause', 'resume', etc.
+    onDeviceReady: function() {
+        this.receivedEvent('deviceready');
+    },
+
+    // Update DOM on a Received Event
+    receivedEvent: function(id) {
+        console.log('Received Event: ' + id);
+        var push = PushNotification.init({
+            android: {
+            },
+            ios: {
+                alert: "true",
+                badge: true,
+                sound: 'false'
+            }
+        });
+
+        push.on('registration', function (data) {
+            console.log(data.registrationId);
+            console.log(data.registrationType);
+            document.getElementById("registration").appendChild(document.createTextNode(data.registrationId));
+        });
+
+        push.on('notification', function (data) {
+            var ul = document.getElementById("pushList");
+            var li = document.createElement("li");
+            li.appendChild(document.createTextNode(data.message));
+            ul.appendChild(li);
+            console.log(data.message);
+            console.log(data.title);
+            console.log(data.count);
+            console.log(data.sound);
+            console.log(data.image);
+            console.log(data.additionalData);
+        });
+    }
+};
+
+app.initialize();
 		
 var sto = window.localStorage?window.localStorage:localStorage;
 	  </script>
