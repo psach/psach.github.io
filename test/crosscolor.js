@@ -237,7 +237,7 @@ function popWords(words){
 							
 							
 						}else{
-							if(selectionTillLast.length==correctAns[currLevel].length){
+							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
 								$(".wrapperContainer > .wrapperRight").remove();
 	$(".wrapperContainer")
@@ -607,7 +607,7 @@ function showLevel(){
 	.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	
 	
-	helpFlag=false;
+if(helpOver){
 	if(gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1) {
 		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
@@ -644,7 +644,7 @@ function showLevel(){
 	
 	
 	setTimeout(function(){
-		helpFlag=true;
+		//helpOver=true;
 		getLevel();
 		clearLevelGrid();
 		setStartEnd(currLevel);
@@ -654,6 +654,8 @@ function showLevel(){
 		//$(".help").css('opacity','1');
 		
 	},1500);
+}
+	//helpOver=false;
 	
 }
 		    
@@ -712,7 +714,7 @@ function getLevel(){
 }
 
 function home(){
-	if(helpFlag){
+	if(helpOver){
 	firstLoad=true;
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	$('.centerbody').html(indexMain);
@@ -721,26 +723,41 @@ function home(){
 }
 
 function clearAll(){
-	if(helpFlag){
+	if(helpOver){
 		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
+		clearLevelGrid();
 		clear(false);
 	}
 }
 
-var helpFlag=true;
+var helpOver=true;
 
 
+var realSelectionTillLast;
 
 function help(){
 	
-	if(helpFlag){
+	if(helpOver){
 		
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
-	
+		realSelectionTillLast=JSON.stringify(selectionTillLast);
+		var realCurrLevel= currLevel;
+		
+		var realRedChar=redChar;
+		var realGreenChar=greenChar;
+		greenChar="D";
+		redChar="F";
+		helpOver=false;
+		currLevel=2;
+		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
+		clearLevelGrid();
+		clear(false);
+		selectionTillLast=[];
 		popWords(helpMoreWords[0]);
 		
-		helpFlag=false;
+		
 		$('#crossword .cwd-tile-active').addClass('modal');
+		$('#crossword .cwd-tile-active').removeClass('cwd-tile-highlight cwd-tile-incorrect');
 		//$('#words').attr('style','-webkit-filter:sepia(50%)');
 		
 		// Start
@@ -871,15 +888,21 @@ function help(){
 			
 			$('.wrapperHelpLClick').remove();
 			$('.bounceside').remove();	
-			helpFlag=true;			
-			clearAll();
+			activeId=-1;
+			selectionTillLast=JSON.parse(realSelectionTillLast);
+			currLevel= realCurrLevel;	
+			redChar  =realRedChar;
+			greenChar=realGreenChar;			
+			clear(true);
+			
+			helpOver=true;		
 			//$('#crossword').attr('style','-webkit-filter:none;');
 			//$('#words').attr('style','-webkit-filter:none;');
 			$('#crossword .cwd-tile-active').removeClass('modal');
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
-		},33000);
+		},35000);
 		
 	}
 	
@@ -888,8 +911,8 @@ function help(){
 /*
 function help1(){
 	
-	if(helpFlag){
-		helpFlag=false;
+	if(helpOver){
+		helpOver=false;
 		var offset=$('.green').offset();
 		var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
 		//alert(offset);
@@ -969,7 +992,7 @@ function help1(){
 			//$('.arrow').attr('style','visibility:visible;display:');
 			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
 		removeClass('cwd-tile-highlight');
-			helpFlag=true;
+			helpOver=true;
 			showLevel();
 		},31000);
 		
