@@ -49,14 +49,14 @@ var app = {
         push.on('registration', function (data) {
             console.log(data.registrationId);
             console.log(data.registrationType);
-            document.getElementById("registration").appendChild(document.createTextNode(data.registrationId));
+           // document.getElementById("registration").appendChild(document.createTextNode(data.registrationId));
         });
 
         push.on('notification', function (data) {
-            var ul = document.getElementById("pushList");
-            var li = document.createElement("li");
-            li.appendChild(document.createTextNode(data.message));
-            ul.appendChild(li);
+            //var ul = document.getElementById("pushList");
+            //var li = document.createElement("li");
+           // li.appendChild(document.createTextNode(data.message));
+            //ul.appendChild(li);
             console.log(data.message);
             console.log(data.title);
             console.log(data.count);
