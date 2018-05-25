@@ -902,7 +902,7 @@ function help(){
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
-		},35000);
+		},34000);
 		
 	}
 	
