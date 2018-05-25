@@ -5,7 +5,8 @@ var removeOver=false;
 
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
-			
+var showLevelTime;
+
 			
 function getRandomArbitrary(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -165,10 +166,11 @@ function popWords(words){
 						//$(activeSet[j]).toggleClass('SR');
 						$(activeSet[j]).attr('word',word);
 						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j/2)+'s');
-						
+						showLevelTime=j;
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
 					activeSet.parent().removeClass("cwd-tile-incorrect");
+					
 					
 					// MAIN LEVEL COMPLETED
 					if(levelAnswered==correctAns.length-1 && answered ){
@@ -602,13 +604,20 @@ function popWords(words){
 
 function showLevel(){
 	
-	$(".wrapperContainer > .wrapper").remove();
-	$(".wrapperContainer")
-	.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-	
+	setTimeout(function(){
+		$(".wrapperContainer > .wrapper").remove();
+		$(".wrapperContainer")
+		.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	},(showLevelTime*1000)-500);
 	
 
-	if(gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1) {
+	
+	//<tr><td><div class="cwd-tile-letter-inactive" >🌿</div></td><td><div class="cwd-tile-letter-inactive" >🍁</div></td></tr>
+	//$(".help").css('opacity','0');
+	
+	
+	setTimeout(function(){
+	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
 		
@@ -639,12 +648,6 @@ function showLevel(){
 		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
 		
 	}
-	//<tr><td><div class="cwd-tile-letter-inactive" >🌿</div></td><td><div class="cwd-tile-letter-inactive" >🍁</div></td></tr>
-	//$(".help").css('opacity','0');
-	
-	
-	setTimeout(function(){
-		
 		getLevel();
 		clearLevelGrid();
 		setStartEnd(currLevel);
@@ -653,7 +656,7 @@ function showLevel(){
 		
 		//$(".help").css('opacity','1');
 		
-	},1500);
+	},(showLevelTime*1000)+500);
 
 	
 	
