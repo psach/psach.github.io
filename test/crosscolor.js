@@ -789,7 +789,7 @@ function help(){
 						
 					   ];
 		var stepCount=5;
-		var stepChar = "";
+		var stepChar = "✍️";
 		if(gametype.indexOf('Fruit')>-1) stepChar = '🌱';
 		if(gametype.indexOf('Animal')>-1) stepChar='🐾';
 		if(gametype.indexOf('Sport')>-1) stepChar='🏃‍';
