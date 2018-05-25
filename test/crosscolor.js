@@ -6,7 +6,7 @@ var removeOver=false;
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
 var showLevelTime;
-var theme = false;
+
 			
 function getRandomArbitrary(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -617,8 +617,8 @@ function showLevel(){
 	
 	
 	setTimeout(function(){
-	if(( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) && !theme) {
-		theme=true;
+	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
+		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
 		
 		//var temp1 = $('<table ><tr><td class="cwd-tile-letter-inactive" style="font-size:10px" >🍂</td><td ></td></tr><tr><td></td><td class="cwd-tile-letter-inactive" style="font-size:7px">🌿</td></tr></table>');
