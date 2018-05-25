@@ -871,6 +871,12 @@ function help(){
 		
 		setTimeout(function(){
 			//showLevel();
+			
+			$(".wrapperContainer > .wrapper").remove();
+			$(".wrapperContainer")
+			.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	
+	
 			$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
 		
 		},27000);
@@ -896,7 +902,7 @@ function help(){
 			redChar  =realRedChar;
 			greenChar=realGreenChar;			
 			clear(true);
-			showLevel();
+			
 			helpOver=true;		
 			//$('#crossword').attr('style','-webkit-filter:none;');
 			//$('#words').attr('style','-webkit-filter:none;');
