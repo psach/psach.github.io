@@ -607,7 +607,7 @@ function showLevel(){
 	.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	
 	
-if(helpOver){
+
 	if(gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1) {
 		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
@@ -644,7 +644,7 @@ if(helpOver){
 	
 	
 	setTimeout(function(){
-		//helpOver=true;
+		
 		getLevel();
 		clearLevelGrid();
 		setStartEnd(currLevel);
@@ -654,8 +654,8 @@ if(helpOver){
 		//$(".help").css('opacity','1');
 		
 	},1500);
-}
-	//helpOver=false;
+
+	
 	
 }
 		    
@@ -948,94 +948,4 @@ function help(){
 	
 }
 
-/*
-function help1(){
-	
-	if(helpOver){
-		helpOver=false;
-		var offset=$('.green').offset();
-		var startHelp = $('<div class="bouncesideright" >👈 Start from here</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute; left:'+(offset.left+3)+'px; top:'+offset.top+'px; background-color:#DDFF96;  border-radius:3px; -webkit-animation-delay:0s;border: solid 1px dimgray; text-shadow:none;padding:2px;');
-		$('.centerbody').append(startHelp);
-		
-		var word = gametype.length==0?'word':'emoji word';
-		
-		var offset=$('.red').offset();
-		var startHelp = $('<div class="bounceside" >End here 👉 </div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
-				   (offset.left-70)+'px; top:'+offset.top+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:3s; padding:2px;');
-		$('.centerbody').append(startHelp);
-		
-		
-		var offset=$('[downclueid="18"]:eq(1)').offset();
-		
-		setTimeout(function(){$('[downclueid="18"]').addClass('cwd-tile-highlight');},8000);
-		
-		
-		
-		var startHelp = $('<div class="wrapperHelpL" >👈 Tap to select one <br/> across or down grid.</div>');
-		//alert(offset);
-		startHelp.attr('style','-webkit-animation-iteration-count: 1;position:absolute;text-shadow:none; left:'+
-				   (offset.left+20)+'px; top:'+(offset.top+10)+
-		'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:5s; padding:2px;');
-		$('.centerbody').append(startHelp);
-		
-		
-			
-		var offset=$('.d3word').offset();
-		var startHelp = $('<div class="wrapperHelpR">Check length and letter then,<br/>tap '+word+' 👇 to fill the selected grid.</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
-				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:10s;');
-		$('.centerbody').append(startHelp);
-		
-		var offset=$('.arrow:eq(1)').offset();
-		var startHelp = $('<div class="wrapperHelpL"> Use right/left arrows 👉 <br/> to get next set of '+word+'s.  </div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;width:180px;opacity:1;text-shadow:none;left:'+
-				   (offset.left-180)+'px; top:'+(offset.top-5)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:15s;');
-		$('.centerbody').append(startHelp);
-		
 
-		
-		var offset=$('[downclueid="2"]:eq(5)').offset();
-		var startHelp = $('<div class="wrapperHelpL">👈 Find path from start to end filling '+word+'s to complete level.</div>');
-		//alert(offset);
-		startHelp.attr('style','position:absolute;opacity:1;text-shadow:none;left:'+
-				   (offset.left+20)+'px; top:'+(offset.top-40)+
-				   'px; background-color:#DDFF96;  border-radius:3px;border: solid 1px dimgray; -webkit-animation-delay:19s;');
-		$('.centerbody').append(startHelp);
-		
-				
-		setTimeout(function(){$('[acrossclueid="17"]').addClass('cwd-tile-highlight');},25000);
-		
-		setTimeout(function(){$('[downclueid="2"]').addClass('cwd-tile-highlight');},26000);
-		
-		setTimeout(function(){$('[acrossclueid="10"]').addClass('cwd-tile-highlight');},27000);
-		
-		setTimeout(function(){$('[downclueid="3"]').addClass('cwd-tile-highlight');},28000);
-		
-		
-			
-		setTimeout(function(){
-			
-			$('.bouncesideright').attr('style','visibility:hidden;display:none');
-			
-			$('.wrapperHelpLClick').attr('style','visibility:hidden;display:none');
-			$('.bounceside').attr('style','visibility:hidden;display:none');
-			//$('.bounceside').removeClass('bounceside');
-			//$('.arrow').attr('style','visibility:visible;display:');
-			$('[downclueid="18"],[acrossclueid="17"],[downclueid="2"],[acrossclueid="10"],[downclueid="3"]').
-		removeClass('cwd-tile-highlight');
-			helpOver=true;
-			showLevel();
-		},31000);
-		
-	}
-	
-}*/
