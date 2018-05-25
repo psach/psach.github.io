@@ -169,6 +169,31 @@ hr {
 		
 }
 
+.wordSlide.add
+{
+	
+		
+	-webkit-animation:add 0.7s ;
+    animation :add 0.7s ;
+	opacity:0;
+	border-radius:6px;
+	background-color:yellow;
+		
+}
+
+.wordSlide.add.across
+{
+	
+		
+	-webkit-animation:addcross 1s ;
+    animation :addcross 1s ;
+	opacity:0;
+	border-radius:6px;
+	background-color:yellow;
+	
+		
+}
+
 @-webkit-keyframes fadein {
   0%       { background-color : Yellow;color:black;}
   50%  { background-color: Yellow;color:black;}
@@ -216,6 +241,7 @@ hr {
 	-webkit-animation: clickeffect 1s;
 	opacity: 1;
 	
+	
 }
 
 
@@ -248,6 +274,56 @@ hr {
   }
 
 }
+
+
+@-webkit-keyframes addcross {
+
+	
+  0% {
+    -webkit-transform: scale(0) rotate(90deg);
+	
+	opacity:0;visibility:hidden;
+   
+  }
+  20% {
+    -webkit-transform: scale(0.5) rotate(90deg);
+    opacity:0.5;visibility:visible;
+  }
+  30% {
+    -webkit-transform: scale(1) rotate(90deg);
+   opacity:1;visibility:visible;
+  }
+  100% {
+    -webkit-transform: scale(1) rotate(90deg);
+   opacity:1;visibility:visible;
+  }
+
+}
+
+@-webkit-keyframes add {
+
+	
+  0% {
+    -webkit-transform: scale(0);
+	
+	opacity:0;visibility:hidden;
+   
+  }
+  20% {
+    -webkit-transform: scale(0.5);
+    opacity:0.5;visibility:visible;
+  }
+   30% {
+    -webkit-transform: scale(1);
+   opacity:1;visibility:visible;
+  }
+  100% {
+    -webkit-transform: scale(1);
+   opacity:1;visibility:visible;
+  }
+
+}
+
 
 @-webkit-keyframes remove {
 

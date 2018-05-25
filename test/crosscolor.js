@@ -735,6 +735,8 @@ var helpOver=true;
 
 var realSelectionTillLast;
 
+
+
 function help(){
 	
 	if(helpOver){
@@ -781,15 +783,45 @@ function help(){
 		
 		
 		
+		var pathArray =[$('[downclueid="13"]').get().reverse(),
+						$('[acrossclueid="12"]'),
+						$('[downclueid="3"]').get().reverse()
+						
+					   ];
+		var stepCount=5;
+		var stepChar = "";
+		if(gametype.indexOf('Fruit')>-1) stepChar = '🌱';
+		if(gametype.indexOf('Animal')>-1) stepChar='🐾';
+		if(gametype.indexOf('Sport')>-1) stepChar='🏃‍';
+		$.each(pathArray, function(i, activeSetItem) {
+			$(activeSetItem).addClass('cwd-tile-highlight');
+			$.each(activeSetItem, function(j, activeTd ) {
+				
+			
+				$(activeTd).find('.cwd-tile-letter:contains(" ")').attr('style',' -webkit-animation-delay:'+(stepCount++)+'s;').addClass('wordSlide add '+(i==1 && stepChar=='🐾'?' across ':'')).html(stepChar);
+			
+			});
+		
+		});
+	
+		var stepFrame=stepCount;
+		
+		setTimeout(function(){
+			$('.cwd-tile-highlight').removeClass('cwd-tile-highlight');
+			
+			$('.cwd-tile-letter:contains('+stepChar+')').removeClass('wordSlide add').html(' ');
+			
+		},(stepFrame*1000)+5000);
+		
 		var offset=$('[downclueid="13"]:eq(1)').offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+  (offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:6s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+6)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},8000);
+		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},(stepFrame*1000)+8000);
 		
 		
 		
@@ -798,11 +830,11 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+(offset.left+50)+'px; top:'+(offset.top+5)+
-		'px; background-color:transparent;  -webkit-animation-delay:9s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+9)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		//$('.wordset:eq(0)').attr('style','-webkit-animation-delay:11s;');
 		
-		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},12000);
+		setTimeout(function(){$('.wordset:eq(0)').find('.cwd-tile-letter').click();},(stepFrame*1000)+12000);
 		
 		
 		
@@ -814,12 +846,12 @@ function help(){
 		//alert(offset);
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+(offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:13s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+13)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
 		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight ');
 			$('[acrossclueid="12"]').addClass('cwd-tile-highlight ');
-		},15000);
+		},(stepFrame*1000)+15000);
 		
 			
 		var offset=$('.wordset:eq(1)').offset();
@@ -828,11 +860,11 @@ function help(){
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left+50)+'px; top:'+(offset.top+5)+
-		'px; background-color:transparent;  -webkit-animation-delay:16s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+16)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		//$('.wordset:eq(1)').attr('style','-webkit-animation-delay:18s;');
 		
-		setTimeout(function(){$('.wordset:eq(1)').find('.cwd-tile-letter').click();},19000);
+		setTimeout(function(){$('.wordset:eq(1)').find('.cwd-tile-letter').click();},(stepFrame*1000)+19000);
 		
 		
 		
@@ -845,13 +877,13 @@ function help(){
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left)+'px; top:'+(offset.top+10)+
-		'px; background-color:transparent;  -webkit-animation-delay:20s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+20)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 	
 		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight ');
 				      $('[downclueid="3"]').addClass('cwd-tile-highlight ');
 		
-		},22000);
+		},(stepFrame*1000)+22000);
 		
 		var offset=$('.wordset:eq(2)').offset();
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
@@ -859,11 +891,11 @@ function help(){
 		startHelp.attr('style',
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+
 		(offset.left+50)+'px; top:'+(offset.top+5)+
-		'px; background-color:transparent;  -webkit-animation-delay:23s;font-size:30px');
+		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+23)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 		//$('.wordset:eq(2)').attr('style','-webkit-animation-delay:25s;');
 		
-		setTimeout(function(){$('.wordset:eq(2)').find('.cwd-tile-letter').click();},26000);
+		setTimeout(function(){$('.wordset:eq(2)').find('.cwd-tile-letter').click();},(stepFrame*1000)+26000);
 		
 		
 		
@@ -879,7 +911,7 @@ function help(){
 	
 			$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
 		
-		},27000);
+		},(stepFrame*1000)+27000);
 		
 		
 		
@@ -888,7 +920,7 @@ function help(){
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:32s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:'+(stepFrame+32)+'s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			
@@ -910,7 +942,7 @@ function help(){
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
-		},35000);
+		},(stepFrame*1000)+35000);
 		
 	}
 	
