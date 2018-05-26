@@ -3,7 +3,7 @@
 			var levelMoreWords=[];
 			var levelStartCell=[];
 			var levelEndCell=[];
-
+			
 
 			var tcorrectAns =[
 				["PAPER","USER","SEA","CARTOON"],
@@ -15,15 +15,15 @@
 			
 			var tmoreWords =[
 			["ABCDEFGH","IJKLMNOPQ","RSTUVWXYZ"],
-			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
+			["OX","ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
 			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
 			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JACK","MOBILE"],["SINGER","JUMPER","RISK"],
 			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZEBRA","SMALL","OBJECT"]
 			
 			];
 			
-			var tstartCell = [[3,0],[5,6],[8,2],[8,8]];
-			var tendCell=[[6,6],[1,0],[2,6],[2,4]];
+			var tstartCell = [[3,0],[1,0],[8,2],[8,8]];
+			var tendCell=[[6,6],[5,6],[2,6],[2,4]];
 		
 			
 			levelMoreWords.push(tmoreWords);

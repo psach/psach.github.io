@@ -122,7 +122,7 @@ function popWords(words){
 					
 					
 					 activeId=id;
-					selectionTillLast.push([clueid,id,word]);
+					selectionTillLast.push([clueid,id,word,startId]);
 				
 					var arr=[];
 					for (i = 0; i < selectionTillLast.length; i++) {
@@ -295,19 +295,22 @@ function popWords(words){
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
 							
-							
+							var tarr = $('['+activeList[0]+'='+activeList[1]+'] div').slice(activeList[3],activeList[3]+activeList[2].length);
 							$.each(activeList[2].split(''), function(j,character){
 						
 									//alert('['+activeList[0]+'='+activeList[1]+']');
 									
-									if(activeList[1]!=activeId){
-										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
-										tile.html(emojiChar[character]);
-										tile.addClass('d3char ' + character);
-										tile.attr('word',activeList[2]);
-										wordPanel.filter('[word="'+activeList[2]+'"]').
-										//$(,wordPanel.parent()).
-										addClass('strikeout strikeacross');
+									if(activeList[1]!=activeId || activeList[3]!=startId){
+										//if(j>=activeList[3]){
+											var tile = $(tarr[j]);
+																				
+											tile.html(emojiChar[character]);
+											tile.addClass('d3char ' + character);
+											tile.attr('word',activeList[2]);
+											wordPanel.filter('[word="'+activeList[2]+'"]').
+											//$(,wordPanel.parent()).
+											addClass('strikeout strikeacross');
+										//}
 										
 									}else{
 										removeElement=i;
@@ -319,7 +322,7 @@ function popWords(words){
 						});
 						
 						if(activeId!=-1)selectionTillLast.splice(removeElement,1);
-						//selectionTillLast.pop();
+						//selectionTillLast.pop(); 	
 						
 					}else{
 						selectionTillLast=[];
@@ -457,7 +460,7 @@ function popWords(words){
 			
 			
 			}
-			
+			var attrType, startId, endId, clickIndex;
 			function loadCW() {
 				
 			showLevel();
@@ -487,10 +490,10 @@ function popWords(words){
 			});
 				
 				
-				var attrType, start, end, clickIndex;
-
-			
-		
+				
+				 
+				
+				
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
 				if(removeOver)return;
@@ -514,7 +517,7 @@ function popWords(words){
 				//}
 				 
 				 
-tActiveSet = $('*['+clueid+'="'+id+'"]');
+				 tActiveSet = $('*['+clueid+'="'+id+'"]');
 				 attrType = clueid.indexOf('down')>-1?'row':'col';
 				
 				 start, end=0;
@@ -524,8 +527,8 @@ tActiveSet = $('*['+clueid+'="'+id+'"]');
 				
 				 //sliceArray(tActiveSet);
 				 var seq=true;
-				 start =0;
-				 end = tActiveSet.length;
+				 startId =0;
+				 endId = tActiveSet.length;
 				 var endSet=false;
 				 for(i=0;i<tActiveSet.length;i++){
 					// console.log($(tActiveSet[i]).attr(attrType));
@@ -538,9 +541,9 @@ tActiveSet = $('*['+clueid+'="'+id+'"]');
 						if(!seq){
 							
 							if(clickIndex<=i){
-								if(!endSet){end=i;endSet=true}
+								if(!endSet){endId=i;endSet=true}
 							}else{
-								start=i;
+								startId=i;
 							}
 						
 						}
@@ -554,10 +557,10 @@ tActiveSet = $('*['+clueid+'="'+id+'"]');
 				 //if(start==end)start=0;
 				 var tActiveSet = $('*['+clueid+'="'+id+'"]');
 				 //console.log(start + " : " + end );
-				 activeSet =tActiveSet.slice(start,end);
-				 			
+				 activeSet =tActiveSet.slice(startId,endId);
+				 
 				
-				
+				 
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
 				//activeSetWord=activeSet.find('[word]');
