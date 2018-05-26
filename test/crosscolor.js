@@ -487,6 +487,7 @@ function popWords(words){
 			});
 				
 				
+				var attrType, start, end, clickIndex;
 
 			
 		
@@ -513,9 +514,48 @@ function popWords(words){
 				//}
 				 
 				 
-				 
-				 activeSet= $('*['+clueid+'="'+id+'"]');
+tActiveSet = $('*['+clueid+'="'+id+'"]');
+				 attrType = clueid.indexOf('down')>-1?'row':'col';
 				
+				 start, end=0;
+				 clickIndex = $(this).attr(attrType);
+				console.log(" clickIndex :" + clickIndex);
+				
+				
+				 //sliceArray(tActiveSet);
+				 var seq=true;
+				 start =0;
+				 end = tActiveSet.length;
+				 var endSet=false;
+				 for(i=0;i<tActiveSet.length;i++){
+					// console.log($(tActiveSet[i]).attr(attrType));
+				
+					 if(i>0){
+						 
+						 seq = $(tActiveSet[i-1]).attr(attrType)==$(tActiveSet[i]).attr(attrType)-1;
+						 console.log(seq + " : " + i);
+						
+						if(!seq){
+							
+							if(clickIndex<=i){
+								if(!endSet){end=i;endSet=true}
+							}else{
+								start=i;
+							}
+						
+						}
+						
+						 
+					 }
+					 
+					 
+				 }
+				 
+				 //if(start==end)start=0;
+				 var tActiveSet = $('*['+clueid+'="'+id+'"]');
+				 //console.log(start + " : " + end );
+				 activeSet =tActiveSet.slice(start,end);
+				 			
 				
 				
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
@@ -640,7 +680,7 @@ function showLevel(){
 		$(".wrapperContainer > .wrapper").remove();
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-	},(showLevelTime*1000)-500);
+	},(showLevelTime*1000)-1000);
 	
 
 	

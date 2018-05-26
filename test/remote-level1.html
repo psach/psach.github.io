@@ -6,192 +6,54 @@
 <div id="cwd-divGrid" >
    <table id="cwd-grid" cellspacing="0" rowspacing="0" class='d3cross' >
       <tbody id='crossword' >
-        <tr>
+        <script> /*var grid = [
+			["||","XX","==","==","==","++","XX","||"],
+			["||","XX","XX","XX","XX","||","XX","||"],
+			["++","++","==","XX","==","++","==","++"],
+			["XX","||","XX","||","XX","||","XX","||"],
+			["==","++","XX","++","==","++","XX","||"],
+			["XX","XX","XX","||","XX","||","XX","XX"],
+			["==","++","XX","++","==","XX","==","++"],
+			["XX","||","XX","||","XX","XX","XX","||"]
+			]*/
+			var grid =[
+				["||","XX","||","XX","||","XX","||"],
+				["++","==","++","XX","++","==","++"],
+				["XX","XX","||","XX","||","XX","||"],
+				["++","==","++","++","++","XX","||"],
+				["||","XX","XX","||","XX","XX","||"],
+				["++","==","==","++","++","==","++"],
+				["||","XX","XX","XX","||","XX","||"]
+			];
+var crossbody = $('#crossword');
+
+		$.each(grid, function(i, row) {
+					
+					//alert(word);
+					var tr = $('<tr />');
+					
+					$.each(row, function(j,col){
+					 
+					   $('<td class="cwd-tile cwd-tile-'+(col=='XX'?'ina':'a')+'ctive '+
+					   (col=='XX'?'d3':'')+'"'+
+					   (col=='XX'?'':(' row="'+i+'" col="'+j+'" '))+
+					   (col=='=='?' acrossclueid="'+(i)+'"':'')+
+					   (col=='||'?' downclueid="'+j+'"':'')+
+					   
+					   (col=='++'?' acrossclueid="'+i+'" downclueid="'+j+'" >':'>')+
+					   
+					   (col!='XX'?'<div class="cwd-tile-letter" ></div>':'')+
+					   
+					   '</td>').appendTo(tr);
+					   
+					});
+					
+					tr.appendTo(crossbody);
+					
+			});
+		</script>
            
-            <td class="cwd-tile cwd-tile-active" row="2" col="2" downclueid="1" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="2" col="3" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="2" col="4" downclueid="2" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="2" col="5" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="2" col="6" downclueid="3" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="2" col="7" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="2" col="8" downclueid="8" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
- 
-
-         </tr>
-         <tr>
-            
-            <td class="cwd-tile cwd-tile-active" row="3" col="2" downclueid="1" acrossclueid="1"  >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="3" col="3" acrossclueid="1" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="3" col="4" downclueid="2" acrossclueid="1"  >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="3" col="5"  >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="3" col="6" downclueid="3" acrossclueid="10" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="3" col="7" acrossclueid="10" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="3" col="8" downclueid="8" acrossclueid="10" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-
-
-         </tr>
-         <tr>
-            
-            <td class="cwd-tile cwd-tile-inactive d3" row="4" col="2" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="4" col="3" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="4" col="4" downclueid="2" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="4" col="5" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active " row="4" col="6" downclueid="3" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="4" col="7" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="4" col="8" downclueid="8" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-       
-
-         </tr>
-         <tr>
            
-            <td class="cwd-tile cwd-tile-active" row="5" col="2" acrossclueid="12" downclueid="13" >
-               
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="5" col="3" acrossclueid="12" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="5" col="4" downclueid="2" acrossclueid="12" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="5" col="5" acrossclueid="12" downclueid="20">
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="5" col="6" acrossclueid="12" downclueid="3">
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="5" col="7"  >
-               
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="5" col="8" downclueid="8"  >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-
-  
-         </tr>
-         <tr>
-          
-            <td class="cwd-tile cwd-tile-active" row="6" col="2" downclueid="13" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="6" col="3" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="6" col="4" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active " row="6" col="5" downclueid="20">
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="6" col="6" >
-               
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="6" col="7" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="6" col="8" downclueid="8" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-         
-    
-         </tr>
-         <tr>
-           
-            <td class="cwd-tile cwd-tile-active" row="7" col="2" downclueid="13" acrossclueid="19" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="7" col="3" acrossclueid="19" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="7" col="4" acrossclueid="19" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active " row="7" col="5" acrossclueid="19" downclueid="20">
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="7" col="6" downclueid="16" acrossclueid="19" >
-               
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="7" col="7" acrossclueid="19" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="7" col="8" downclueid="8" acrossclueid="19" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-      
-       
-         </tr>
-         <tr>
-            
-            <td class="cwd-tile cwd-tile-active" row="8" col="2" downclueid="13" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="8" col="3" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="8" col="4" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="8" col="5" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="8" col="6" downclueid="16" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-inactive d3" row="8" col="7" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-            <td class="cwd-tile cwd-tile-active" row="8" col="8" downclueid="8" >
-               <div class="cwd-tile-letter" style="margin-top: 0px;"> </div>
-            </td>
-      
-
-         </tr>
       </tbody>
    </table>
 </div>

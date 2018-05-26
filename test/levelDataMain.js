@@ -22,8 +22,9 @@
 			
 			];
 			
-			var tstartCell = [[5,2],[3,2],[8,2],[8,8]];
-			var tendCell=[[8,8],[7,8],[2,6],[2,4]];
+			var tstartCell = [[3,0],[5,6],[8,2],[8,8]];
+			var tendCell=[[6,6],[1,0],[2,6],[2,4]];
+		
 			
 			levelMoreWords.push(tmoreWords);
 			levelCorrectAns.push(tcorrectAns);
