@@ -241,9 +241,12 @@ function popWords(words){
 							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
 								$(".wrapperContainer > .wrapperRight").remove();
-	$(".wrapperContainer")
-	.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
-	
+								$(".wrapperContainer")
+								.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+								setTimeout(function(){
+									$(".wrapperContainer > .wrapperRight").remove();
+								
+								},4200);
 							}
 							
 						}
@@ -688,12 +691,14 @@ function showLevel(){
 		
 	}
 	
-	setTimeout(function(){
+	//setTimeout(function(){
+		getLevel();
+		
 		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
 		$(".wrapperContainer > .wrapper").remove();
 		$(".wrapperContainer")
-		.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-	},(showLevelTime*1000)-1000);
+		.append($('<div class="wrapper" style="-webkit-animation-delay:'+(showLevelTime*0.6)+'s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	//},(showLevelTime*500));
 	
 
 	
@@ -703,7 +708,7 @@ function showLevel(){
 	
 	setTimeout(function(){
 		showLevelTime=0;
-		getLevel();
+		
 		clearLevelGrid();
 		setStartEnd(currLevel);
 		activeId =-1;
@@ -711,7 +716,7 @@ function showLevel(){
 		
 		//$(".help").css('opacity','1');
 		
-	},(showLevelTime*1000));
+	},(showLevelTime*600));
 
 	
 	
