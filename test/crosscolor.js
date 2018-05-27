@@ -784,7 +784,7 @@ function home(){
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	setTimeout(function(){
 		$('.centerbody').html(indexMain);
-	},500);
+	},800);
 	
 	
 	//$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
