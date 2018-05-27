@@ -1208,7 +1208,7 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 			var randomString='';
 			var firstLoad=true;
 			var emojiChar;
-			
+			var showLevelTime;
 				
 			//$(function(){
 			
@@ -1250,9 +1250,10 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 						start,end;
 						activeId;
 						randomString='';
-					
-						$('.centerbody').html(nextLevelHTML[level]);
-					
+						
+						setTimeout(function(){
+								$('.centerbody').html(nextLevelHTML[level]);
+						
 						
 						if( firstLoad ){
 							//if(prevData) $('#cwd-grid').html($(prevData.html));
@@ -1275,9 +1276,10 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 							
 										
 						//window.location.replace('level1.html');
-						
+						showLevelTime=0;
 						loadCW();
-					
+						
+						},(showLevelTime*1000));
 					
 							
 						 // this will create a banner on startup

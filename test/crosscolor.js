@@ -5,7 +5,6 @@ var removeOver=false;
 
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
-var showLevelTime;
 
 			
 function getRandomArbitrary(min, max) {
@@ -166,7 +165,7 @@ function popWords(words){
 						//$(activeSet[j]).toggleClass('SR');
 						$(activeSet[j]).attr('word',word);
 						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j/2)+'s');
-						showLevelTime=j;
+						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
 					activeSet.parent().removeClass("cwd-tile-incorrect");
@@ -636,6 +635,7 @@ function popWords(words){
 				}else{
 					
 					activeSet.parent().addClass("cwd-tile-highlight");
+					showLevelTime=activeSet.length;
 					
 				}
 				
@@ -655,7 +655,7 @@ function popWords(words){
 			
 
 function showLevel(){
-	
+	console.log(showLevelTime);
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
@@ -702,7 +702,7 @@ function showLevel(){
 	
 	
 	setTimeout(function(){
-	
+		showLevelTime=0;
 		getLevel();
 		clearLevelGrid();
 		setStartEnd(currLevel);
@@ -711,7 +711,7 @@ function showLevel(){
 		
 		//$(".help").css('opacity','1');
 		
-	},(showLevelTime*1000)+500);
+	},(showLevelTime*1000));
 
 	
 	
