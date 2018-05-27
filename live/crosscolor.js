@@ -5,7 +5,6 @@ var removeOver=false;
 
 var prevData=JSON.parse('{"selections":[],"currLevel":0,"level":0,"levelAnswered":0,"moreCount":0}');
 
-var showLevelTime;
 
 			
 function getRandomArbitrary(min, max) {
@@ -122,7 +121,7 @@ function popWords(words){
 					
 					
 					 activeId=id;
-					selectionTillLast.push([clueid,id,word]);
+					selectionTillLast.push([clueid,id,word,startId]);
 				
 					var arr=[];
 					for (i = 0; i < selectionTillLast.length; i++) {
@@ -166,7 +165,7 @@ function popWords(words){
 						//$(activeSet[j]).toggleClass('SR');
 						$(activeSet[j]).attr('word',word);
 						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j/2)+'s');
-						showLevelTime=j;
+						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
 					activeSet.parent().removeClass("cwd-tile-incorrect");
@@ -242,9 +241,12 @@ function popWords(words){
 							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
 								$(".wrapperContainer > .wrapperRight").remove();
-	$(".wrapperContainer")
-	.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
-	
+								$(".wrapperContainer")
+								.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+								setTimeout(function(){
+									$(".wrapperContainer > .wrapperRight").remove();
+								
+								},4200);
 							}
 							
 						}
@@ -295,19 +297,22 @@ function popWords(words){
 					var removeElement;
 						$.each(selectionTillLast, function(i, activeList) {
 							
-							
+							var tarr = $('['+activeList[0]+'='+activeList[1]+'] div').slice(activeList[3],activeList[3]+activeList[2].length);
 							$.each(activeList[2].split(''), function(j,character){
 						
 									//alert('['+activeList[0]+'='+activeList[1]+']');
 									
-									if(activeList[1]!=activeId){
-										var tile = $($('['+activeList[0]+'='+activeList[1]+'] div')[j]);
-										tile.html(emojiChar[character]);
-										tile.addClass('d3char ' + character);
-										tile.attr('word',activeList[2]);
-										wordPanel.filter('[word="'+activeList[2]+'"]').
-										//$(,wordPanel.parent()).
-										addClass('strikeout strikeacross');
+									if(activeList[0]!=clueid || activeList[1]!=activeId || activeList[3]!=startId){
+										//if(j>=activeList[3]){
+											var tile = $(tarr[j]);
+																				
+											tile.html(emojiChar[character]);
+											tile.addClass('d3char ' + character);
+											tile.attr('word',activeList[2]);
+											wordPanel.filter('[word="'+activeList[2]+'"]').
+											//$(,wordPanel.parent()).
+											addClass('strikeout strikeacross');
+										//}
 										
 									}else{
 										removeElement=i;
@@ -319,7 +324,7 @@ function popWords(words){
 						});
 						
 						if(activeId!=-1)selectionTillLast.splice(removeElement,1);
-						//selectionTillLast.pop();
+						//selectionTillLast.pop(); 	
 						
 					}else{
 						selectionTillLast=[];
@@ -403,10 +408,16 @@ function popWords(words){
 				
 				var correctAnsItem=correctAns[lvl];
 				currlvl=lvl;
-				//alert(endCell[lvl][0]<startCell[lvl][0]);
 				
-				if (endCell[lvl][0]<startCell[lvl][0]){
-					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
+				//greenChar =startCell[lvl][2];
+				//redChar =endCell[lvl][2];
+				//alert(endCell[lvl][0]<startCell[lvl][0]);
+				greenChar=startCell[lvl][2]==0?correctAnsItem[0][0]:correctAnsItem[0][correctAnsItem[0].length-1];
+				
+				redChar=endCell[lvl][2]==0?correctAnsItem[correctAnsItem.length-1][0]:correctAnsItem[correctAnsItem.length-1][correctAnsItem[correctAnsItem.length-1].length-1];
+				
+				/*if (startCell[lvl][0]){
+					greenChar=startCell[lvl][1]<=endCell[lvl][1]?correctAnsItem[0][0]:correctAnsItem[0][correctAnsItem[0].length-1];
 					redChar = correctAnsItem[correctAnsItem.length-1][0];
 					
 				}else{
@@ -414,7 +425,7 @@ function popWords(words){
 					redChar = correctAnsItem[correctAnsItem.length-1][correctAnsItem[correctAnsItem.length-1].length-1];
 					
 					
-				}
+				}*/
 				
 				//alert(greenChar);
 				//alert(redChar);
@@ -457,7 +468,7 @@ function popWords(words){
 			
 			
 			}
-			
+			var attrType, startId, endId, clickIndex;
 			function loadCW() {
 				
 			showLevel();
@@ -487,9 +498,10 @@ function popWords(words){
 			});
 				
 				
-
-			
-		
+				
+				 
+				
+				
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
 				if(removeOver)return;
@@ -513,11 +525,53 @@ function popWords(words){
 				//}
 				 
 				 
+				 tActiveSet = $('*['+clueid+'="'+id+'"]');
+				 attrType = clueid.indexOf('down')>-1?'row':'col';
+				
+				 start, end=0;
+				 clickIndex = $(this).attr(attrType);
+				//console.log(" clickIndex :" + clickIndex);
+				
+				
+				 //sliceArray(tActiveSet);
+				 var seq=true;
+				 startId =0;
+				 endId = tActiveSet.length;
+				 var endSet=false;
+				 for(i=0;i<tActiveSet.length;i++){
+					// console.log($(tActiveSet[i]).attr(attrType));
+				
+					 if(i>0){
+						 
+						 seq = $(tActiveSet[i-1]).attr(attrType)==$(tActiveSet[i]).attr(attrType)-1;
+						 //console.log(seq + " : " + i);
+						
+						if(!seq){
+							
+							if(clickIndex<=i){
+								if(!endSet){
+									endId=i;
+									endSet=true
+								}
+							}else{
+								startId=i;
+							}
+						
+						}
+						
+						 
+					 }
+					 
+					 
+				 }
 				 
-				 activeSet= $('*['+clueid+'="'+id+'"]');
+				 //if(start==end)start=0;
+				 var tActiveSet = $('*['+clueid+'="'+id+'"]');
+				 //console.log(start + " : " + end );
+				 activeSet =tActiveSet.slice(startId,endId);
+				 
 				
-				
-				
+				 
 				//activeSet=activeSet.length>0?activeSet:$('*[downclueid="'+id+'"]');
 				
 				//activeSetWord=activeSet.find('[word]');
@@ -584,6 +638,7 @@ function popWords(words){
 				}else{
 					
 					activeSet.parent().addClass("cwd-tile-highlight");
+					showLevelTime=activeSet.length;
 					
 				}
 				
@@ -603,7 +658,7 @@ function popWords(words){
 			
 
 function showLevel(){
-	
+	console.log(showLevelTime);
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
 		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
@@ -636,11 +691,13 @@ function showLevel(){
 		
 	}
 	
-	setTimeout(function(){
+	//setTimeout(function(){
+		
+		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
 		$(".wrapperContainer > .wrapper").remove();
 		$(".wrapperContainer")
-		.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-	},(showLevelTime*1000)-500);
+		.append($('<div class="wrapper" style="-webkit-animation-delay:'+(showLevelTime*0.6)+'s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	//},(showLevelTime*500));
 	
 
 	
@@ -649,8 +706,9 @@ function showLevel(){
 	
 	
 	setTimeout(function(){
-	
+		showLevelTime=0;
 		getLevel();
+		
 		clearLevelGrid();
 		setStartEnd(currLevel);
 		activeId =-1;
@@ -658,7 +716,7 @@ function showLevel(){
 		
 		//$(".help").css('opacity','1');
 		
-	},(showLevelTime*1000)+500);
+	},(showLevelTime*600));
 
 	
 	
@@ -788,9 +846,9 @@ function help(){
 		
 		
 		
-		var pathArray =[$('[downclueid="13"]').get().reverse(),
-						$('[acrossclueid="12"]'),
-						$('[downclueid="3"]').get().reverse()
+		var pathArray =[$('[downclueid="0"]').get().slice(2,6).reverse(),
+						$('[acrossclueid="3"]'),
+						$('[downclueid="4"]').get().slice(0,4).reverse()
 						
 					   ];
 		var stepCount=5;
@@ -818,7 +876,7 @@ function help(){
 			
 		},(stepFrame*1000)+5000);
 		
-		var offset=$('[downclueid="13"]:eq(1)').offset();
+		var offset=$(pathArray[0][2]).offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -826,7 +884,7 @@ function help(){
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+  (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+6)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},(stepFrame*1000)+8000);
+		setTimeout(function(){$(pathArray[0]).addClass('cwd-tile-highlight');},(stepFrame*1000)+8000);
 		
 		
 		
@@ -845,7 +903,7 @@ function help(){
 		
 		
 		
-		var offset=$('[acrossclueid="12"]:eq(2)').offset();
+		var offset=$(pathArray[1][2]).offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -854,8 +912,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+13)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
-		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight ');
-			$('[acrossclueid="12"]').addClass('cwd-tile-highlight ');
+		setTimeout(function(){$(pathArray[0]).removeClass('cwd-tile-highlight ');
+			$(pathArray[1]).addClass('cwd-tile-highlight ');
 		},(stepFrame*1000)+15000);
 		
 			
@@ -875,7 +933,7 @@ function help(){
 		
 		
 		
-		var offset=$('[downclueid="3"]:eq(2)').offset();
+		var offset=$(pathArray[2][2]).offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -885,8 +943,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+20)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 	
-		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight ');
-				      $('[downclueid="3"]').addClass('cwd-tile-highlight ');
+		setTimeout(function(){$(pathArray[1]).removeClass('cwd-tile-highlight ');
+				      $(pathArray[2]).addClass('cwd-tile-highlight ');
 		
 		},(stepFrame*1000)+22000);
 		
@@ -914,7 +972,7 @@ function help(){
 			.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	
 	
-			$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
+			$(pathArray[2]).removeClass('cwd-tile-highlight ');
 		
 		},(stepFrame*1000)+27000);
 		

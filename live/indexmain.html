@@ -4,7 +4,7 @@
  <link id="css" href="crossword.css" rel="stylesheet" type="text/css" />
  <link id="cssFruit" href="crosswordFruit.css" rel="stylesheet" type="text/css" />
  <link id="cssSport" href="crosswordSport.css" rel="stylesheet" type="text/css" />
-
+ <link id="cssAnimal" href="crosswordAnimal.css" rel="stylesheet" type="text/css" />
 	  
   <script src="cordova.js"></script>
  
@@ -17,24 +17,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
 	  </script>
 <!-- End Google Tag Manager -->
+ <script src="one-signal.js"></script>
 	<script>
 		
-// Add to index.js or the first page that loads with your app.
-// For Intel XDK and please add this to your app.js.
-document.addEventListener('deviceready', function () {
-  // Enable to debug issues.
-  // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
-  
-  var notificationOpenedCallback = function(jsonData) {
-    console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-  };
-  window.plugins.OneSignal
-    //.startInit("d8131c11-f747-48c9-8288-2ee20f86cd6d")
-    .startInit("2c824581-04af-45d5-97ec-975cb3444587")
-    .handleNotificationOpened(notificationOpenedCallback)
-    .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-    .endInit();
-}, false);
+
 		
 var sto = window.localStorage?window.localStorage:localStorage;
 	  </script>
@@ -1222,7 +1208,7 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 			var randomString='';
 			var firstLoad=true;
 			var emojiChar;
-			
+			var showLevelTime;
 				
 			//$(function(){
 			
@@ -1264,9 +1250,10 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 						start,end;
 						activeId;
 						randomString='';
-					
-						$('.centerbody').html(nextLevelHTML[level]);
-					
+						
+						setTimeout(function(){
+								$('.centerbody').html(nextLevelHTML[level]);
+						
 						
 						if( firstLoad ){
 							//if(prevData) $('#cwd-grid').html($(prevData.html));
@@ -1289,9 +1276,10 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 							
 										
 						//window.location.replace('level1.html');
-						
+						showLevelTime=0;
 						loadCW();
-					
+						
+						},(showLevelTime*600));
 					
 							
 						 // this will create a banner on startup
