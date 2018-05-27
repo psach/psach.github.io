@@ -300,7 +300,7 @@ function popWords(words){
 						
 									//alert('['+activeList[0]+'='+activeList[1]+']');
 									
-									if(activeList[1]!=activeId || activeList[3]!=startId){
+									if(activeList[0]!=clueid || activeList[1]!=activeId || activeList[3]!=startId){
 										//if(j>=activeList[3]){
 											var tile = $(tarr[j]);
 																				
@@ -406,10 +406,16 @@ function popWords(words){
 				
 				var correctAnsItem=correctAns[lvl];
 				currlvl=lvl;
-				//alert(endCell[lvl][0]<startCell[lvl][0]);
 				
-				if (endCell[lvl][0]<startCell[lvl][0]){
-					greenChar=correctAnsItem[0][correctAnsItem[0].length-1];
+				//greenChar =startCell[lvl][2];
+				//redChar =endCell[lvl][2];
+				//alert(endCell[lvl][0]<startCell[lvl][0]);
+				greenChar=startCell[lvl][2]==0?correctAnsItem[0][0]:correctAnsItem[0][correctAnsItem[0].length-1];
+				
+				redChar=endCell[lvl][2]==0?correctAnsItem[correctAnsItem.length-1][0]:correctAnsItem[correctAnsItem.length-1][correctAnsItem[correctAnsItem.length-1].length-1];
+				
+				/*if (startCell[lvl][0]){
+					greenChar=startCell[lvl][1]<=endCell[lvl][1]?correctAnsItem[0][0]:correctAnsItem[0][correctAnsItem[0].length-1];
 					redChar = correctAnsItem[correctAnsItem.length-1][0];
 					
 				}else{
@@ -417,7 +423,7 @@ function popWords(words){
 					redChar = correctAnsItem[correctAnsItem.length-1][correctAnsItem[correctAnsItem.length-1].length-1];
 					
 					
-				}
+				}*/
 				
 				//alert(greenChar);
 				//alert(redChar);
@@ -522,7 +528,7 @@ function popWords(words){
 				
 				 start, end=0;
 				 clickIndex = $(this).attr(attrType);
-				console.log(" clickIndex :" + clickIndex);
+				//console.log(" clickIndex :" + clickIndex);
 				
 				
 				 //sliceArray(tActiveSet);
@@ -536,12 +542,15 @@ function popWords(words){
 					 if(i>0){
 						 
 						 seq = $(tActiveSet[i-1]).attr(attrType)==$(tActiveSet[i]).attr(attrType)-1;
-						 console.log(seq + " : " + i);
+						 //console.log(seq + " : " + i);
 						
 						if(!seq){
 							
 							if(clickIndex<=i){
-								if(!endSet){endId=i;endSet=true}
+								if(!endSet){
+									endId=i;
+									endSet=true
+								}
 							}else{
 								startId=i;
 							}
@@ -680,6 +689,7 @@ function showLevel(){
 	}
 	
 	setTimeout(function(){
+		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
 		$(".wrapperContainer > .wrapper").remove();
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:3s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
@@ -831,9 +841,9 @@ function help(){
 		
 		
 		
-		var pathArray =[$('[downclueid="13"]').get().reverse(),
-						$('[acrossclueid="12"]'),
-						$('[downclueid="3"]').get().reverse()
+		var pathArray =[$('[downclueid="0"]').get().slice(2,6).reverse(),
+						$('[acrossclueid="3"]'),
+						$('[downclueid="4"]').get().slice(0,4).reverse()
 						
 					   ];
 		var stepCount=5;
@@ -861,7 +871,7 @@ function help(){
 			
 		},(stepFrame*1000)+5000);
 		
-		var offset=$('[downclueid="13"]:eq(1)').offset();
+		var offset=$(pathArray[0][2]).offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -869,7 +879,7 @@ function help(){
 		'-webkit-animation-iteration-count: 1;position:absolute; left:'+  (offset.left)+'px; top:'+(offset.top+10)+
 		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+6)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
-		setTimeout(function(){$('[downclueid="13"]').addClass('cwd-tile-highlight');},(stepFrame*1000)+8000);
+		setTimeout(function(){$(pathArray[0]).addClass('cwd-tile-highlight');},(stepFrame*1000)+8000);
 		
 		
 		
@@ -888,7 +898,7 @@ function help(){
 		
 		
 		
-		var offset=$('[acrossclueid="12"]:eq(2)').offset();
+		var offset=$(pathArray[1][2]).offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -897,8 +907,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+13)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 				
-		setTimeout(function(){$('[downclueid="13"]').removeClass('cwd-tile-highlight ');
-			$('[acrossclueid="12"]').addClass('cwd-tile-highlight ');
+		setTimeout(function(){$(pathArray[0]).removeClass('cwd-tile-highlight ');
+			$(pathArray[1]).addClass('cwd-tile-highlight ');
 		},(stepFrame*1000)+15000);
 		
 			
@@ -918,7 +928,7 @@ function help(){
 		
 		
 		
-		var offset=$('[downclueid="3"]:eq(2)').offset();
+		var offset=$(pathArray[2][2]).offset();
 		
 		var startHelp = $('<div class="wrapperHelpLClick" >👆</div>');
 		//alert(offset);
@@ -928,8 +938,8 @@ function help(){
 		'px; background-color:transparent;  -webkit-animation-delay:'+(stepFrame+20)+'s;font-size:30px');
 		$('.centerbody').append(startHelp);
 	
-		setTimeout(function(){$('[acrossclueid="12"]').removeClass('cwd-tile-highlight ');
-				      $('[downclueid="3"]').addClass('cwd-tile-highlight ');
+		setTimeout(function(){$(pathArray[1]).removeClass('cwd-tile-highlight ');
+				      $(pathArray[2]).addClass('cwd-tile-highlight ');
 		
 		},(stepFrame*1000)+22000);
 		
@@ -957,7 +967,7 @@ function help(){
 			.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	
 	
-			$('[downclueid="3"]').removeClass('cwd-tile-highlight ');
+			$(pathArray[2]).removeClass('cwd-tile-highlight ');
 		
 		},(stepFrame*1000)+27000);
 		
