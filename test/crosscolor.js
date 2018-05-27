@@ -504,7 +504,7 @@ function popWords(words){
 				
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
-				if(removeOver)return;
+				if(removeOver || !helpOver ) return;
 				//var prevActiveSetId = id
 				
 				//var prevActiveSet= activeSet;
@@ -778,15 +778,30 @@ function getLevel(){
 
 function home(){
 	if(helpOver){
+	clickEffect($('.home'));
 	firstLoad=true;
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
-	$('.centerbody').html(indexMain);
+	setTimeout(function(){
+		$('.centerbody').html(indexMain);
+	},500);
+	
+	
 	//$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	}
 }
 
+function clickEffect(item){
+	
+	$(item).addClass('clickWord');
+	setTimeout(function(){
+		
+		$(item).removeClass('clickWord');
+	},500);
+}
+
 function clearAll(){
 	if(helpOver){
+		clickEffect($('.clear'));
 		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
 		clearLevelGrid();
 		clear(false);
@@ -801,7 +816,7 @@ var realSelectionTillLast;
 
 
 function help(){
-	
+	clickEffect($('.help'));
 	if(helpOver){
 		
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
@@ -815,12 +830,13 @@ function help(){
 		helpOver=false;
 		currLevel=2;
 		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
+		$('.home, .clear').css('background-color','lightgray');	
 		clearLevelGrid();
 		clear(false);
 		selectionTillLast=[];
 		popWords(helpMoreWords[0]);
 		
-		
+		$('.word-container').css('position','relative').append($('<div class="word-dis" style="position:absolute; left:0px; top:0px; width:100%;height:100% ;background-color:transperant;z-index:10" />'));
 		$('#crossword .cwd-tile-active').addClass('modal');
 		$('#crossword .cwd-tile-active').removeClass('cwd-tile-highlight cwd-tile-incorrect');
 		//$('#words').attr('style','-webkit-filter:sepia(50%)');
@@ -867,7 +883,7 @@ function help(){
 		
 		});
 	
-		var stepFrame=stepCount;
+		var stepFrame=stepCount-5;
 		
 		setTimeout(function(){
 			$('.cwd-tile-highlight').removeClass('cwd-tile-highlight');
@@ -1005,6 +1021,8 @@ function help(){
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
+			$('.home, .clear').css('background-color','#A5DC86');	
+			$('.word-dis').remove();
 		},(stepFrame*1000)+35000);
 		
 	}
