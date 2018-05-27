@@ -504,7 +504,7 @@ function popWords(words){
 				
 			$("#crossword").find(".cwd-tile-active").click(function() {
 				
-				if(removeOver)return;
+				if(removeOver || !helpOver ) return;
 				//var prevActiveSetId = id
 				
 				//var prevActiveSet= activeSet;
@@ -693,11 +693,7 @@ function showLevel(){
 	
 	//setTimeout(function(){
 		
-		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
-		$(".wrapperContainer > .wrapper").remove();
-		$(".wrapperContainer")
-		.append($('<div class="wrapper" style="-webkit-animation-delay:'+(showLevelTime*0.6)+'s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-	//},(showLevelTime*500));
+		
 	
 
 	
@@ -706,6 +702,11 @@ function showLevel(){
 	
 	
 	setTimeout(function(){
+		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
+		$(".wrapperContainer > .wrapper").remove();
+		$(".wrapperContainer")
+		.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	//},(showLevelTime*500));
 		showLevelTime=0;
 		getLevel();
 		
@@ -778,15 +779,30 @@ function getLevel(){
 
 function home(){
 	if(helpOver){
+	clickEffect($('.home'));
 	firstLoad=true;
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
-	$('.centerbody').html(indexMain);
+	setTimeout(function(){
+		$('.centerbody').html(indexMain);
+	},800);
+	
+	
 	//$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	}
 }
 
+function clickEffect(item){
+	
+	$(item).addClass('clickWord');
+	setTimeout(function(){
+		
+		$(item).removeClass('clickWord');
+	},500);
+}
+
 function clearAll(){
 	if(helpOver){
+		clickEffect($('.clear'));
 		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
 		clearLevelGrid();
 		clear(false);
@@ -801,7 +817,7 @@ var realSelectionTillLast;
 
 
 function help(){
-	
+	clickEffect($('.help'));
 	if(helpOver){
 		
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
@@ -815,12 +831,13 @@ function help(){
 		helpOver=false;
 		currLevel=2;
 		$('#words .strikeout').removeClass('strikeout strikeacrossclueid');	
+		$('.home, .clear').css('background-color','lightgray');	
 		clearLevelGrid();
 		clear(false);
 		selectionTillLast=[];
 		popWords(helpMoreWords[0]);
 		
-		
+		$('.word-container').css('position','relative').append($('<div class="word-dis" style="position:absolute; left:0px; top:0px; width:100%;height:100% ;background-color:transperant;z-index:10" />'));
 		$('#crossword .cwd-tile-active').addClass('modal');
 		$('#crossword .cwd-tile-active').removeClass('cwd-tile-highlight cwd-tile-incorrect');
 		//$('#words').attr('style','-webkit-filter:sepia(50%)');
@@ -867,7 +884,7 @@ function help(){
 		
 		});
 	
-		var stepFrame=stepCount;
+		var stepFrame=stepCount-5;
 		
 		setTimeout(function(){
 			$('.cwd-tile-highlight').removeClass('cwd-tile-highlight');
@@ -1005,6 +1022,8 @@ function help(){
 			moreCount=0;
 			popWords(moreWords[moreCount]);
 			moreCount++;
+			$('.home, .clear').css('background-color','#A5DC86');	
+			$('.word-dis').remove();
 		},(stepFrame*1000)+35000);
 		
 	}
