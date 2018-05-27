@@ -692,7 +692,6 @@ function showLevel(){
 	}
 	
 	//setTimeout(function(){
-		getLevel();
 		
 		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
 		$(".wrapperContainer > .wrapper").remove();
@@ -708,6 +707,7 @@ function showLevel(){
 	
 	setTimeout(function(){
 		showLevelTime=0;
+		getLevel();
 		
 		clearLevelGrid();
 		setStartEnd(currLevel);
