@@ -6,7 +6,7 @@
 			
 
 			var tcorrectAns =[
-			    ["SEA","LAMB","ZERO","IDEA","DOG"],
+			    ["SEA","LAMB","ZEBRA","IDEA","DOG"],
 				["PAPER"/*,"USER","SEA","CARTOON"*/],
 				["YOU"/*,"QUIZ","PIZZA","ZOO","COCONUT"*/],
 				["ROAD"/*,"RELAX","FLEX"*/],
