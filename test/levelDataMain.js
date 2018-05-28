@@ -6,12 +6,12 @@
 			
 
 			var tcorrectAns =[
-			    ["SEA","LAMB","ZEBRA","IDEA","DOG"],
+			   
 				["PAPER"/*,"USER","SEA","CARTOON"*/],
 				["YOU"/*,"QUIZ","PIZZA","ZOO","COCONUT"*/],
 				["ROAD"/*,"RELAX","FLEX"*/],
-				["CARAMEL"/*,"TEA","STAR","WATER","MINT"*/]
-				
+				["CARAMEL"/*,"TEA","STAR","WATER","MINT"*/],
+				["SEA"/*,"LAMB","ZEBRA","IDEA","DOG"*/]
 				];
 			
 			
@@ -24,8 +24,8 @@
 			
 			];
 			
-			var tstartCell = [[1,0,0],[3,0,0],[1,0,0],[6,0,1],[6,6,1]];
-			var tendCell   = [[1,6,1],[6,6,1],[5,6,1],[0,4,0],[0,2,0]];
+			var tstartCell = [[3,0,0],[1,0,0],[6,0,1],[6,6,1],[1,0,0]];
+			var tendCell   = [[6,6,1],[5,6,1],[0,4,0],[0,2,0],[1,6,1]];
 		
 			
 			levelMoreWords.push(tmoreWords);
