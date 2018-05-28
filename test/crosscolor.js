@@ -878,7 +878,7 @@ function help(){
 			$.each(activeSetItem, function(j, activeTd ) {
 				
 			
-				$(activeTd).find('.cwd-tile-letter:contains(" ")').attr('style',' -webkit-animation-delay:'+(stepCount++)+'s;').addClass('wordSlide add '+(i==1 && stepChar=='🐾'?' across ':'')).html(stepChar);
+				$(activeTd).find('.cwd-tile-letter:contains(" ")').attr('style',' -webkit-animation-delay:'+(stepCount++)+'s;font-size:5px;').addClass('wordSlide add '+(i==1 && stepChar=='🐾'?' across ':'')).html(stepChar);
 			
 			});
 		
