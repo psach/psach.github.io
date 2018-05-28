@@ -35,7 +35,7 @@
 			
 			
 			var tcorrectAns =[
-				["TOY","LIGHT","LEG","SONG","SKY"],
+				["TOY","LIGHT","LEG","SHOES","SKY"],
 				["NOBLE"/*,"BIG","GOLD","DROP","OLD"*/]
 				];
 			
