@@ -686,12 +686,7 @@ function showLevel(){
 	}
 	
 	
-	$(".wrapperContainer > .wrapper").remove();
-	totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
-		
-		$(".wrapperContainer")
-		.append($('<div class="wrapper" style="-webkit-animation-delay:'+(showLevelTime+1)+'s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
-			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	
 	setTimeout(function(){
 		
 	//},(showLevelTime*500));
@@ -706,8 +701,15 @@ function showLevel(){
 		//$(".help").css('opacity','1');
 		
 	},(showLevelTime*600));
-
 	
+	setTimeout(function(){
+	$(".wrapperContainer > .wrapper").remove();
+	totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
+		
+		$(".wrapperContainer")
+		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
+			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	},(showLevelTime*600)+500);
 	
 }
 		    
