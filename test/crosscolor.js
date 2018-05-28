@@ -308,6 +308,7 @@ function popWords(words){
 																				
 											tile.html(emojiChar[character]);
 											tile.addClass('d3char ' + character);
+											tile.removeClass(' bounce ');
 											tile.attr('word',activeList[2]);
 											wordPanel.filter('[word="'+activeList[2]+'"]').
 											//$(,wordPanel.parent()).
