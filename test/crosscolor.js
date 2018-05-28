@@ -695,7 +695,7 @@ function showLevel(){
 		.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	//},(showLevelTime*500));
-		showLevelTime=0;
+		showLevelTime=0.1;
 		getLevel();
 		
 		clearLevelGrid();
