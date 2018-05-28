@@ -687,15 +687,15 @@ function showLevel(){
 	
 	
 	$(".wrapperContainer > .wrapper").remove();
-	
-	setTimeout(function(){
-		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
+	totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
 		
 		$(".wrapperContainer")
-		.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
+		.append($('<div class="wrapper" style="-webkit-animation-delay:'+(showLevelTime+1)+'s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+	setTimeout(function(){
+		
 	//},(showLevelTime*500));
-		showLevelTime=0.1;
+		showLevelTime=0;
 		getLevel();
 		
 		clearLevelGrid();
