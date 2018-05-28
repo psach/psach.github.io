@@ -661,17 +661,12 @@ function showLevel(){
 	console.log(showLevelTime);
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
-		//var temp = $('<table><tr><td class="cwd-tile-letter-inactive">🍂</td><td class="cwd-tile-letter-inactive" >🌱</td></tr><tr><td class="cwd-tile-letter-inactive" >🌿</td></td><td class="cwd-tile-letter-inactive" >🍁</td></tr></table>');
-		
-		//var temp1 = $('<table ><tr><td class="cwd-tile-letter-inactive" style="font-size:10px" >🍂</td><td ></td></tr><tr><td></td><td class="cwd-tile-letter-inactive" style="font-size:7px">🌿</td></tr></table>');
-		
 		var div1 = $('<div class="cwd-tile-letter-inactive">🍂</div>');
 		var div2 = $('<div class="cwd-tile-letter-inactive">🌱</div>');
 		var div3 = $('<div class="cwd-tile-letter-inactive">🍁</div>');
 		var div4 = $('<div class="cwd-tile-letter-inactive">🌿</div>');
 				
-		//temp.attr('style','position:absolute; top:-3px; left:-2px;');
-		//temp1.attr('style','position:absolute; top:-3px; left:-2px;');
+		
 		
 		div1.attr('style','position:absolute; top:2px; left:2px;-webkit-animation-delay:2s');
 		div2.attr('style','position:absolute; top:2px; left:11px;');
@@ -680,32 +675,25 @@ function showLevel(){
 		
 		$('.cwd-tile-inactive').removeClass('d3');
 		$('.cwd-tile-inactive').attr('style','position:relative');
-		//$('.cwd-tile-inactive').filter(':even').html(temp);
-		//$('.cwd-tile-inactive').filter(':odd').html(temp1);
+		
 		$('.cwd-tile-inactive').filter(':even').append(div1).append(div2).append(div3);
 		div3 = div3.clone();
 		div3.attr('style','position:absolute; top:2px; left:2px; font-size:10px')
 		$('.cwd-tile-inactive').filter(':odd').append(div3).append(div4);
 		
-		//$('<div class="cwd-tile-letter-inactive" >🍁</div>')
+		
 		
 	}
 	
-	//setTimeout(function(){
-		
-		
 	
-
-	
-	//<tr><td><div class="cwd-tile-letter-inactive" >🌿</div></td><td><div class="cwd-tile-letter-inactive" >🍁</div></td></tr>
-	//$(".help").css('opacity','0');
-	
+	$(".wrapperContainer > .wrapper").remove();
 	
 	setTimeout(function(){
 		totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
-		$(".wrapperContainer > .wrapper").remove();
+		
 		$(".wrapperContainer")
-		.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+(totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+		.append($('<div class="wrapper" style="-webkit-animation-delay:1s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
+			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 	//},(showLevelTime*500));
 		showLevelTime=0;
 		getLevel();
