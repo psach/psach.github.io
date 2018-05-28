@@ -6,10 +6,12 @@
 			
 
 			var tcorrectAns =[
+			   
 				["PAPER","USER","SEA","CARTOON"],
 				["YOU","QUIZ","PIZZA","ZOO","COCONUT"],
 				["ROAD","RELAX","FLEX"],
-				["CARAMEL","TEA","STAR","WATER","MINT"]
+				["CARAMEL","TEA","STAR","WATER","MINT"],
+				["SEA","LAMB","ZEBRA","IDEA","DOG"]
 				];
 			
 			
@@ -18,12 +20,12 @@
 			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
 			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
 			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JACK","MOBILE"],["SINGER","JUMPER","RISK"],
-			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZEBRA","SMALL","OBJECT"]
+			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZERO","SMALL","OBJECT"]
 			
 			];
 			
-			var tstartCell = [[3,0,0],[1,0,0],[6,0,1],[6,6,1]];
-			var tendCell=[[6,6,1],[5,6,1],[0,4,0],[0,2,0]];
+			var tstartCell = [[3,0,0],[1,0,0],[6,0,1],[6,6,1],[1,0,0]];
+			var tendCell   = [[6,6,1],[5,6,1],[0,4,0],[0,2,0],[1,6,1]];
 		
 			
 			levelMoreWords.push(tmoreWords);
@@ -33,6 +35,7 @@
 			
 			
 			var tcorrectAns =[
+				["TOY","LIGHT","LEG","SONGS","SKY"],
 				["NOBLE","BIG","GOLD","DROP","OLD"]
 				];
 			
@@ -42,12 +45,12 @@
 			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
 			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
 			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JACK","MOBILE"],["SINGER","JUMPER","RISK"],
-			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZEBRA","SMALL","OBJECT"]
+			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZERO","SMALL","OBJECT"]
 			
 			];
 			
-			var tstartCell = [[2,0,0]];
-			var tendCell=[[6,7,1]];
+			var tstartCell = [[2,7,1],[2,0,0]];
+			var tendCell   = [[4,0,1],[6,7,1]];
 		
 			
 			levelMoreWords.push(tmoreWords);
@@ -66,7 +69,7 @@
 			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
 			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
 			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JACK","MOBILE"],["SINGER","JUMPER","RISK"],
-			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZEBRA","SMALL","OBJECT"]
+			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZERO","SMALL","OBJECT"]
 			
 			];
 			
@@ -80,10 +83,7 @@
 			levelEndCell.push(tendCell);
 			
 							 
-			var tcorrectAns =[
-			["RAM","RANGE","APPLEPIE","LITTLEMAN","EXAM"],
-			["DIAL","EAT","ALPHABET","ALCOHOLIC","EIGHT"]
-			];
+			var tcorrectAns =[["RAM","RANGE","APPLEPIE","LITTLEMAN","EXAM"],["DIAL","EAT","ALPHABET","ALCOHOLIC","EIGHT"]];
 			
 			
 			var tmoreWords =[
@@ -91,7 +91,7 @@
 			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","GOAT","HUGE"],
 			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
 			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JACK","MOBILE"],["SINGER","JUMPER","RISK"],
-			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZEBRA","SMALL","OBJECT"]
+			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZERO","SMALL","OBJECT"]
 			
 			];
 			
@@ -104,14 +104,11 @@
 			levelEndCell.push(tendCell);
 			
 			
-			/*correctAns =[["TIME","ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"],
-			["GOOGLE","LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"]];*/
+			
 			tcorrectAns =[
-			["MIND","CREAM","ONE","GOOGLE","TUNNEL","NURSE","ELEPHANT","CHAT","JACKET"],
-			["TIME","TEACH","HOME","MORE","DIARY","ICE","BALANCED","MEDAL","RHYMES","GRASSY","JOKING"]
-			];
+			["MIND","CREAM","ONE","GOOGLE","TUNNEL","NURSE","ELEPHANT","CHAT","JACKET"],["TIME","TEACH","HOME","MORE","DIARY","ICE","BALANCED","MEDAL","RHYMES","GRASSY","JOKING"]];
 				
-			tmoreWords =[
+			 tmoreWords =[
 			["SIN","TAX","SOFT"],["FOUR","HIKE","EIGHTY"],["CARD","MISTY","RIDER"],["YOUNG","EAT","HUGE"],
 			["RANGE","LIME","THRICE"],["BABY","PART","LIKE"],["GOAL","GHOST","LITTLE"],["GOLDEN","SUN","AUDIO"],
 			["RIGHT","KITE","LOCK"],["DONKEY","ROCK","GRASS"],["BOXES","CRAZY","VIEW"],["JEWEL","JUMPER","RISK"],

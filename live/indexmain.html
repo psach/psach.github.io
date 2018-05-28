@@ -17,7 +17,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
 	  </script>
 <!-- End Google Tag Manager -->
-<script src="one-signal.js"></script>
+ <script src="one-signal.js"></script>
 	<script>
 		
 
@@ -34,13 +34,14 @@ var sto = window.localStorage?window.localStorage:localStorage;
 		
 	html{
 		
-		
+	  text-shadow: 2px 1px 2px rgba(255,255,255,0.7);
 	  padding: 1px 1px;
 	  border: 1px solid darkseagreen;
 	  border-radius: 0px;
-	 background-image: url(back.png);
+	  background-image: url(back.png);
 	  background-size:15%;
 	  background-color: lightseagreen;
+	  color:dimgray;
 	}
 	
 .d3main {
@@ -52,7 +53,7 @@ var sto = window.localStorage?window.localStorage:localStorage;
   background: #A5DC86;
   border: 0px solid rgba(0,0,0,0.15);
   border-radius: 6px;
-  -webkit-animation: all 0.3s ease-out;
+  /*-webkit-animation: all 0.3s ease-out;*/
  /*  -ms-transition: all 0.3s ease-out;
   -webkit-animation: all 0.3s ease-out;
   -o-animation: all 0.3s ease-out;
@@ -275,11 +276,11 @@ hr {
     opacity:0.5;visibility:visible;
   }
   30% {
-    -webkit-transform: scale(1) rotate(90deg);
+    -webkit-transform: scale(1.5) rotate(90deg);
    opacity:1;visibility:visible;
   }
   100% {
-    -webkit-transform: scale(1) rotate(90deg);
+    -webkit-transform: scale(1.5) rotate(90deg);
    opacity:1;visibility:visible;
   }
 
@@ -299,11 +300,11 @@ hr {
     opacity:0.5;visibility:visible;
   }
    30% {
-    -webkit-transform: scale(1);
+    -webkit-transform: scale(1.5);
    opacity:1;visibility:visible;
   }
   100% {
-    -webkit-transform: scale(1);
+    -webkit-transform: scale(1.5);
    opacity:1;visibility:visible;
   }
 
@@ -1208,7 +1209,7 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 			var randomString='';
 			var firstLoad=true;
 			var emojiChar;
-			var showLevelTime;
+			var showLevelTime=0;
 				
 			//$(function(){
 			
