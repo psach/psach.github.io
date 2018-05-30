@@ -238,6 +238,7 @@ function popWords(words){
 							
 							
 						}else{
+							alert(selectionTillLast+"");
 							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
 								$(".wrapperContainer > .wrapperRight").remove();
