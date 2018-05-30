@@ -141,7 +141,7 @@ function popWords(words){
 
 					$.each(arr, function(j,selword){
 						
-						stringCorrect = stringCorrect.replace(selword,"|");
+						stringCorrect = stringCorrect.replace(new RegExp("\\b"+selword+"\\b"),"|");
 					});
 					
 					//alert(stringCorrect);
@@ -238,6 +238,7 @@ function popWords(words){
 							
 							
 						}else{
+							//alert(selectionTillLast+"");
 							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
 								$(".wrapperContainer > .wrapperRight").remove();
