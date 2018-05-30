@@ -7,7 +7,11 @@
 
 			var tcorrectAns =[
 			   
-				["PAPER"/*,"USER","SEA","CARTOON"*/]
+				["PAPER"/*,"USER","SEA","CARTOON"*/],
+				["YOU","QUIZ"/*,"PIZZA","ZOO","COCONUT"*/],
+				["ROAD"/*,"RELAX","FLEX"*/],
+				["CARAMEL"/*,"TEA","STAR","WATER","MINT"*/],
+				["SEA"/*,"LAMB","ZEBRA","IDEA","DOG"*/]
 				];
 			
 			
@@ -31,8 +35,8 @@
 			
 			
 			var tcorrectAns =[
-				["TOY"/*LIGHT","LEG","SONGS","SKY"*/],
-				["NOBLE","BIG","GOLD","DROP","OLD"]
+				["TOY"/*,"LIGHT","LEG","SONGS","SKY"*/],
+				["NOBLE"/*,"BIG","GOLD","DROP","OLD"*/]
 				];
 			
 			
