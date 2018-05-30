@@ -141,7 +141,7 @@ function popWords(words){
 
 					$.each(arr, function(j,selword){
 						
-						stringCorrect = stringCorrect.replace(selword,"|");
+						stringCorrect = stringCorrect.replace(new RegExp("\\b"+selword+"\\b"),"|");
 					});
 					
 					//alert(stringCorrect);
