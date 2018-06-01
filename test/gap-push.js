@@ -26,8 +26,8 @@ var app = {
         });
 
         push.on('registration', function (data) {
-            console.log(data.registrationId);
-            console.log(data.registrationType);
+            alert(data.registrationId);
+            alert(data.registrationType);
            // document.getElementById("registration").appendChild(document.createTextNode(data.registrationId));
         });
 
