@@ -14,7 +14,7 @@ var app = {
 
     // Update DOM on a Received Event
     receivedEvent: function(id) {
-        console.log('Received Event: ' + id);
+        alert('Received Event: ' + id);
         var push = PushNotification.init({
             android: {
             },
@@ -36,12 +36,12 @@ var app = {
             //var li = document.createElement("li");
            // li.appendChild(document.createTextNode(data.message));
             //ul.appendChild(li);
-            console.log(data.message);
-            console.log(data.title);
-            console.log(data.count);
+            alert(data.message);
+            alert(data.title);
+            /*console.log(data.count);
             console.log(data.sound);
             console.log(data.image);
-            console.log(data.additionalData);
+            console.log(data.additionalData);*/
         });
     }
 };
