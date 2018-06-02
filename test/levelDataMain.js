@@ -83,7 +83,10 @@
 			levelEndCell.push(tendCell);
 			
 							 
-			var tcorrectAns =[["RAM","RANGE"/*,"APPLEPIE","LITTLEMAN","EXAM"*/],["DIAL","EAT"/*,"ALPHABET","ALCOHOLIC","EIGHT"*/]];
+			var tcorrectAns =[
+				["RAM","RANGE"/*,"APPLEPIE","LITTLEMAN","EXAM"*/],
+				["DIAL","EAT"/*,"ALPHABET","ALCOHOLIC","EIGHT"*/]
+			];
 			
 			
 			var tmoreWords =[
@@ -107,7 +110,9 @@
 			/*correctAns =[["TIME","ACTIVITY","COTTAGE","ONE","TAILORED","JOKERS","NATURE"],
 			["GOOGLE","LOVE","EAGLE","STATUE","ATTITUDE","EIGHT","FIREWOOD","YELLOW","FAMILY"]];*/
 			tcorrectAns =[
-			["MIND","CREAM",/*"ONE","GOOGLE","TUNNEL","NURSE","ELEPHANT","CHAT","JACKET"*/],["TIME","TEACH"/*,"HOME","MORE","DIARY","ICE","BALANCED","MEDAL","RHYMES","GRASSY","JOKING"*/]];
+			["MIND","CREAM",/*"ONE","GOOGLE","TUNNEL","NURSE","ELEPHANT","CHAT","JACKET"*/],
+			["TIME","TEACH"/*,"HOME","MORE","DIARY","ICE","BALANCED","MEDAL","RHYMES","GRASSY","JOKING"*/]
+			];
 				
 			 tmoreWords =[
 			["SIN","TAX","SOFT"],["FOUR","HIKE","EIGHTY"],["CARD","MISTY","RIDER"],["YOUNG","EAT","HUGE"],

@@ -706,7 +706,10 @@ function showLevel(){
 	
 	setTimeout(function(){
 	$(".wrapperContainer > .wrapper").remove();
-	totalLevels = (totalLevels==0?mainTotalLevel:totalLevels);
+	if (totalLevels==0){
+		totalLevels = mainTotalLevel;
+		
+	};
 		
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
