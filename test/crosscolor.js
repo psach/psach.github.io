@@ -839,19 +839,19 @@ function help(){
 		
 		// Start
 		var offset=$('.green').offset();
-		var startHelp = $('<div class="bounceside" ><font style="background-color:transparent;font-size:30px" >👈</font><font style="border-radius:6px;border:1px solid dimgray;padding:2px;background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);" >Start</font></div>');
+		var startHelp = $('<div class="bounceside" ><font style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; background-color:transparent;font-size:30px" >👈</font><font style="border-radius:6px;border:1px solid dimgray;padding:2px;background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);" >Start</font></div>');
 				//alert(offset);
 		startHelp.attr('style','position:absolute; left:'+(offset.left+20)+
 		'px; top:'+(offset.top-10)+
-		'px; background-color:transparent; -webkit-animation-delay:0s;text-shadow:none;width:100px;');
+		'px; background-color:transparent; -webkit-animation-delay:0s;width:100px;');
 		$('.centerbody').append(startHelp);
 		
 		// End
 		
 		var offset=$('.red').offset();
-		var startHelp = $('<div class="bounceside" ><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >End</font> <font style="background-color:transparent;font-size:30px" >👉 </font></div>');
+		var startHelp = $('<div class="bounceside" ><font style=" background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >End</font> <font style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; background-color:transparent;font-size:30px" >👉 </font></div>');
 		//alert(offset);
-		startHelp.attr('style','position:absolute;text-shadow:none; left:'+
+		startHelp.attr('style','position:absolute; left:'+
 				   (offset.left-50)+'px; top:'+(offset.top-10)+
 		'px; background-color:transparent; -webkit-animation-delay:3s;width:100px ');
 		$('.centerbody').append(startHelp);
