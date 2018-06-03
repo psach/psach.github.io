@@ -17,7 +17,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 	
 	  </script>
 <!-- End Google Tag Manager -->
-  <script src="gap-push.js"></script>
+<!-- script src="one-signal.js"></script -->
+ <script src="gap-push.js"></script>
 	<script>
 		
 
@@ -73,7 +74,17 @@ var sto = window.localStorage?window.localStorage:localStorage;
 		-webkit-touch-callout: none;              
 		-webkit-text-size-adjust: none;             
 		-webkit-user-select: none;   
+		padding-top: 17%;
+		
 }
+
+@media (orientation:landscape){
+    .centerbody{
+		padding-top: 9%;
+		
+	}
+}
+
 		
 hr {
     border: none;
@@ -598,7 +609,7 @@ hr {
   -webkit-animation-delay: 4s;
   opacity: 0;
   text-align:center;
-  text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
+  /*text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;*/
   -webkit-animation-iteration-count: 3;
   }
 /*@-webkit-keyframes bounce {
@@ -640,7 +651,7 @@ hr {
   -webkit-animation-delay: 4s;
   opacity: 0;
   text-align:center;
-  text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;
+  /*text-shadow: 2px 2px black, 2px 2px black, 2px 2px black, 2px 2px black;*/
   -webkit-animation-iteration-count: 3;
   }
 /*@-webkit-keyframes bounce {
@@ -671,7 +682,7 @@ hr {
 
 
 
-@media (min-width:400px){
+@media (orientation:landscape){
     #cwd-grid-sp{
         width: 100%;
 		height: 80%;
@@ -679,7 +690,7 @@ hr {
 }
 
 
-@media (min-width:400px){
+@media (orientation:landscape){
     .word-container{
      padding-top:50%;
 }
@@ -811,7 +822,7 @@ hr {
     width: 100%;
 }
 
-@media (min-width:400px){
+@media (orientation:landscape){
     .inner{
 	
         width: 50%;
@@ -943,7 +954,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 
-<div class='centerbody' style='padding-top: 50px;' >
+<div class='centerbody'  >
 	
 	<table align='center' height='40%' class='centerChild' >
 		<tr>
@@ -966,7 +977,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		 <tr>
 		 
 		 <td style='padding-right:4px;'>
-				<input type="radio" id="switch_4_center" name="switch_4" value="Fruit" onclick='gametype="Fruit";selectGame();'/>
+				<input type="radio" id="switch_4_center" name="switch_4" value="Fruit" onclick='gameCount=0;gametype="Fruit";selectGame();'/>
 				<label for="switch_4_center">🍉</label>
 		</td>
 			  
@@ -980,13 +991,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		
 			 
 		<td>
-			   <input type="radio" id="switch_4_foot" name="switch_4" value="Animal" onclick='gametype="Animal";selectGame();'/>
+			   <input type="radio" id="switch_4_foot" name="switch_4" value="Animal" onclick='gameCount=1;gametype="Animal";selectGame();'/>
 				<label for="switch_4_foot">🐮</label>
 			 
 		</td>
 			 
 		<td style='padding-right:4px;'>
-				<input type="radio" id="switch_4_left" name="switch_4" value="Char" onclick='gametype="";selectGame();' />
+				<input type="radio" id="switch_4_left" name="switch_4" value="Char" onclick='gameCount=2;gametype="";selectGame();' />
 				<label for="switch_4_left">🇦</label>
 		 </td>
 		 
@@ -1016,7 +1027,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 	  
 	  
 	  
-	   
+	   var gameArray=['Fruit','Animal',''];
+	   var gameCount=0;
 		var grid =[
 			
 			['a','a','i','a','e','i'],
@@ -1238,7 +1250,15 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 							getLevel();
 						}
 						
-						if(level==levelMoreWords.length)level=0;
+						if(level==levelMoreWords.length){
+							level=0;
+							console.log("gameCount : " + gameCount);
+							gameCount++;
+							if(gameCount==gameArray.length)gameCount=0;
+							gametype=gameArray[gameCount];
+							
+								
+						}
 						correctAns =levelCorrectAns[level];
 						
 						moreWords =levelMoreWords[level];
@@ -1260,6 +1280,7 @@ if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
 						randomString='';
 						
 						setTimeout(function(){
+							selectGame();
 								$('.centerbody').html(nextLevelHTML[level]);
 						
 						
