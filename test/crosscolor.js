@@ -779,8 +779,8 @@ function home(){
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	setTimeout(function(){
 		$('.centerbody').html(indexMain);
-		$(indexMain).find('.switch_4_'+gameType).click();
-	},800);
+		$('.centerbody').find('.switch_4_'+gametype).click();
+	},800centerbody
 	
 	
 	//$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
