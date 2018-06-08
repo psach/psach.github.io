@@ -780,7 +780,7 @@ function home(){
 	setTimeout(function(){
 		$('.centerbody').html(indexMain);
 		$('.centerbody').find('#switch_4_'+gametype).click();
-	},800centerbody
+	},800);
 	
 	
 	//$('.centerbody').find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
