@@ -717,7 +717,19 @@ function showLevel(){
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 		
 		refreshIntervalId = setInterval(function(){
-		  clearAll();
+			clearAll();
+			
+			var glowClone=$('.glow').clone();
+			$(".glow").remove();
+			$('.glow').parent().append(glowClone);
+			$(".wrapperContainer > .wrapperRight").remove();
+			$(".wrapperContainer")
+			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+			setTimeout(function(){
+				$(".wrapperContainer > .wrapperRight").remove();
+
+			},65200);
+			
 		}, 61000);
 
 
