@@ -1018,7 +1018,7 @@ function help(){
 		var offset=$('.glow').offset();
 		var startHelp = $('<div class="bounceside"><font style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;background-color:transparent;font-size:30px" >👈</font><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >🕑</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
-				   (offset.left-10)+'px; top:'+(offset.top+5)+
+				   (offset.left+30)+'px; top:'+(offset.top+5)+
 				   'px; background-color:transparent; -webkit-animation-delay:'+(stepFrame+32)+'s;width:100px;');
 		$('.centerbody').append(startHelp);
 		
