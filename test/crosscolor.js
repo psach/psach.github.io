@@ -662,10 +662,7 @@ function popWords(words){
 function showLevel(){
 	console.log(showLevelTime);
 	if(refreshIntervalId) clearInterval(refreshIntervalId);
-	var glow_par=$('.glow').parent();
-	var glowClone=$('.glow').clone();
-	$(".glow").remove();
-	glow_par.append(glowClone);
+	
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
 		var div1 = $('<div class="cwd-tile-letter-inactive">🍂</div>');
@@ -715,7 +712,10 @@ function showLevel(){
 		totalLevels = mainTotalLevel;
 		
 	};
-		
+	var glow_par=$('.glow').parent();
+	var glowClone=$('.glow').clone();
+	$(".glow").remove();
+	glow_par.append(glowClone);	
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
@@ -734,7 +734,7 @@ function showLevel(){
 			
 			},4200);
 			
-		}, 61000);
+		}, 60500);
 
 
 	},(showLevelTime*600)+800);
