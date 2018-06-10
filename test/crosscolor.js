@@ -718,17 +718,17 @@ function showLevel(){
 		
 		refreshIntervalId = setInterval(function(){
 			clearAll();
-			
+			var glow_par=$('.glow').parent();
 			var glowClone=$('.glow').clone();
 			$(".glow").remove();
-			$('.glow').parent().append(glowClone);
+			glow_par.append(glowClone);
 			$(".wrapperContainer > .wrapperRight").remove();
 			$(".wrapperContainer")
 			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
 
-			},65200);
+			},4200);
 			
 		}, 61000);
 
