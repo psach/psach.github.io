@@ -662,6 +662,10 @@ function popWords(words){
 function showLevel(){
 	console.log(showLevelTime);
 	if(refreshIntervalId) clearInterval(refreshIntervalId);
+	var glow_par=$('.glow').parent();
+	var glowClone=$('.glow').clone();
+	$(".glow").remove();
+	glow_par.append(glowClone);
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
 		var div1 = $('<div class="cwd-tile-letter-inactive">🍂</div>');
