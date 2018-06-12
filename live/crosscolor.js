@@ -661,6 +661,8 @@ function popWords(words){
 
 function showLevel(){
 	console.log(showLevelTime);
+	if(refreshIntervalId) clearInterval(refreshIntervalId);
+	
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
 		var div1 = $('<div class="cwd-tile-letter-inactive">🍂</div>');
@@ -710,10 +712,31 @@ function showLevel(){
 		totalLevels = mainTotalLevel;
 		
 	};
-		
+	var glow_par=$('.glow').parent();
+	var glowClone=$('.glow').clone();
+	$(".glow").remove();
+	glow_par.append(glowClone);	
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+		
+		refreshIntervalId = setInterval(function(){
+			$(".wrapperContainer > .wrapperRight").remove();
+			$(".wrapperContainer")
+			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+			setTimeout(function(){
+				$(".wrapperContainer > .wrapperRight").remove();
+				clearAll();
+				var glow_par=$('.glow').parent();
+				var glowClone=$('.glow').clone();
+				$(".glow").remove();
+				glow_par.append(glowClone);
+			
+			},4200);
+			
+		}, 60500);
+
+
 	},(showLevelTime*600)+800);
 	
 }
@@ -779,6 +802,7 @@ function home(){
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
 	setTimeout(function(){
 		$('.centerbody').html(indexMain);
+		$('.centerbody').find('#switch_4_'+gametype).click();
 	},800);
 	
 	
@@ -991,13 +1015,19 @@ function help(){
 		},(stepFrame*1000)+27000);
 		
 		
+		var offset=$('.glow').offset();
+		var startHelp = $('<div class="bounceside"><font style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;background-color:transparent;font-size:30px" >👈</font><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >🕑</font></div>');
+		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
+				   (offset.left+30)+'px; top:'+(offset.top+5)+
+				   'px; background-color:transparent; -webkit-animation-delay:'+(stepFrame+32)+'s;width:100px;');
+		$('.centerbody').append(startHelp);
 		
 		
 		var offset=$('.arrow:eq(1)').offset();
 		var startHelp = $('<div class="bounceside"><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >More words</font> <font style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;background-color:transparent;font-size:30px" >👉</font></div>');
 		startHelp.attr('style','position:absolute;text-shadow:none;left:'+
 				   (offset.left-130)+'px; top:'+(offset.top-15)+
-				   'px; background-color:transparent; -webkit-animation-delay:'+(stepFrame+32)+'s;width:200px;');
+				   'px; background-color:transparent; -webkit-animation-delay:'+(stepFrame+35)+'s;width:200px;');
 		$('.centerbody').append(startHelp);
 		
 			
@@ -1021,7 +1051,7 @@ function help(){
 			moreCount++;
 			$('.home, .clear').css('background-color','#A5DC86');	
 			$('.word-dis').remove();
-		},(stepFrame*1000)+35000);
+		},(stepFrame*1000)+37000);
 		
 	}
 	
