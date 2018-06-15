@@ -713,7 +713,7 @@ function showLevel(){
 		
 	};
 	var glow_par=$('.glow').parent();
-	var glowClone=$('.glow').clone().css('-webkit-animation-duration','60s');;
+	var glowClone=$('.glow').clone().css('-webkit-animation-duration','60s');
 	$(".glow").remove();
 	glow_par.append(glowClone);	
 		$(".wrapperContainer")
@@ -728,7 +728,7 @@ function showLevel(){
 				$(".wrapperContainer > .wrapperRight").remove();
 				clearAll();
 				var glow_par=$('.glow').parent();
-				var glowClone=$('.glow').clone();
+				var glowClone=$('.glow').clone().css('-webkit-animation-duration','60s');
 				$(".glow").remove();
 				glow_par.append(glowClone);
 			
