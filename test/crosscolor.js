@@ -836,9 +836,11 @@ var realSelectionTillLast;
 
 
 function help(){
-	clickEffect($('.help'));
+	
+	
 	if(helpOver){
-		
+		clickEffect($('.help'));
+		if(refreshIntervalId) clearInterval(refreshIntervalId);
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
 		realSelectionTillLast=JSON.stringify(selectionTillLast);
 		var realCurrLevel= currLevel;
