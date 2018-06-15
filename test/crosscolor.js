@@ -1014,6 +1014,10 @@ function help(){
 		
 		},(stepFrame*1000)+27000);
 		
+		var glow_par=$('.glow').parent();
+		var glowClone=$('.glow').clone().css('-webkit-animation-duration','2s');
+		$(".glow").remove();
+		glow_par.append(glowClone);
 		
 		var offset=$('.glow').offset();
 		var startHelp = $('<div class="bounceside"><font style="text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;background-color:transparent;font-size:30px" >👈</font><font style="background: linear-gradient(#EEEEEE, #DDFF96,#DDFF96);border-radius:6px;border:1px solid dimgray;padding:2px;" >🕑</font></div>');
