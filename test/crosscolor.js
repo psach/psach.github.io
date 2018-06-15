@@ -713,7 +713,7 @@ function showLevel(){
 		
 	};
 	var glow_par=$('.glow').parent();
-	var glowClone=$('.glow').clone();
+	var glowClone=$('.glow').clone().css('-webkit-animation-duration','60s');;
 	$(".glow").remove();
 	glow_par.append(glowClone);	
 		$(".wrapperContainer")
@@ -1016,7 +1016,7 @@ function help(){
 		
 		setTimeout(function(){
 			var glow_par=$('.glow').parent();
-			var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','2s');
+			var glowClone=$('.glow').clone().css('-webkit-animation-duration','2s');
 			$(".glow").remove();
 			glow_par.append(glowClone);
 		},(stepFrame*1000)+31000);
