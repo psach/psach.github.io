@@ -1299,7 +1299,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 				$.each($('.mword'), function(i, item) {
 					
 					$(item).html( emojiChar[alphabetArray[i]] );
-				
+					if(gametype!=='') $(item).css('text-shadow','-1px 0px 6px black');
 				});
 					
 			}
