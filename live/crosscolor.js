@@ -797,6 +797,7 @@ function getLevel(){
 
 function home(){
 	if(helpOver){
+	if(refreshIntervalId) clearInterval(refreshIntervalId);
 	clickEffect($('.home'));
 	firstLoad=true;
 	//$(indexMain).find('.switch-field').attr('style',"visibility:hidden; -webkit-animation-delay:0s ;background-color:transparent; border:0px");
