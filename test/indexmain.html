@@ -1163,7 +1163,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					   ' '+(col=='e'?' red d3sp':'')+
 					   ' '+(col=='h'?' cwd-tile-highlight ':'')+
 					   ' " row="0" col="0" downclueid="0" >'+
-					   '<div class="cwd-tile-letter-sp '+(col=='i'?'d3sp':'')+' " style="margin-top: 0px;">'+
+					   '<div class="cwd-tile-letter-sp '+
+					   (col=='i'?'d3sp':'')+
+					   (col=='h'?'mword':'')+
+					   ' " style="margin-top: 0px;">'+
 					   (col=='h'?alphabetArray[alpha++]:'')+
 					   (col=='s'?'P':'')+
 					   (col=='e'?'C':'')+
@@ -1261,7 +1264,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			head.append(csslink);
 			
 							
-			if(gametype=='') emojiChar = {"A":"A","B":"B","C":"C","D":"D",
+			if(gametype=='') emojiChar = 
+			{"A":"A","B":"B","C":"C","D":"D", 
 			 "E":"E","F":"F","G":"G","H":"H",
 			 "I":"I","J":"J","K":"K","L":"L",
 			 "M":"M","N":"N","O":"O","P":"P",
@@ -1269,48 +1273,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			 "U":"U","V":"V","W":"W","X":"X",
 			 "Y":"Y","Z":"Z"};  
 				
-			/*if(gametype=='Fruit') emojiChar = {"A":'\ud83c\udf4a',"B":'\ud83c\udf4c',"C":'\ud83c\udf52',"D":'\ud83c\udf46',
-				 "E":'\ud83c\udf82',"F":'\ud83c\udf6c',"G":'\ud83c\udf47',"H":'\ud83c\udf69',
-				 "I":'\ud83c\udf55',"J":'\ud83c\udf66',"K":'\ud83c\udf4f',"L":'\ud83c\udf4b',
-				 "M":'\ud83c\udf5f',"N":'\ud83c\udf3d',"O":'\ud83c\udf51',"P":'\ud83c\udf4d',
-				 "Q":'\ud83c\udf48',"R":'\ud83c\udf4e',"S":'\ud83c\udf53',"T":'\ud83c\udf45',
-				 "U":'\ud83c\udf44',"V":'\ud83c\udf50',"W":'\ud83c\udf70',"X":'\ud83c\udf5a',
-				 "Y":'\ud83c\udf60',"Z":'\ud83c\udf61'};*/
-				 if(gametype=='Fruit') emojiChar = 
-/*{"A":'🍊',"B":'🍌',"C":'🍒',"D":'🍆',"E":'🎂',"F":'🍬',"G":'🍇',"H":'🍩',"I":'🍕',"J":'🍦',"K":'🍏',"L":'🍋',"M":'🍟',"N":'🌽',"O":'🍑',"P":'🍍',"Q":'🍈',"R":'🍎',"S":'🍓',"T":'🍅',"U":'🍄',"V":'🍐',"W":'🍰',"X":'🍚',"Y":'🍠',"Z":'🍡'};*/
+			if(gametype=='Fruit') emojiChar = 
+			{"A":'🍊',"B":'🍌',"C":'🍒',"D":'🍆',
+			"E":'🍈',"F":'🌹',"G":'🍇',"H":'🌷',
+			"I":'🍀',"J":'🌼',"K":'🍏',"L":'🍋',
+			"M":'🌵',"N":'🌽',"O":'🍑',"P":'🍍',
+			"Q":'🌴',"R":'🍎',"S":'🍓',"T":'🍅',
+			"U":'🍄',"V":'🍐',"W":'🌰',"X":'🌾',
+			"Y":'🍠',"Z":'🌲'};
 
-{"A":'🍊',"B":'🍌',"C":'🍒',"D":'🍆',"E":'🍈',"F":'🌹',"G":'🍇',"H":'🌷',"I":'🍀',"J":'🌼',"K":'🍏',"L":'🍋',"M":'🌵',"N":'🌽',"O":'🍑',"P":'🍍',"Q":'🌴',"R":'🍎',"S":'🍓',"T":'🍅',"U":'🍄',"V":'🍐',"W":'🌰',"X":'🌾',"Y":'🍠',"Z":'🌲'};
-
-if(gametype=='Animal') emojiChar = {"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',"E":'🐴',"F":'🐮',"G":'🐪',"H":'🐀',"I":'🐰',"J":'🐷',"K":'🐻',"L":'🐼',"M":'🐉',"N":'🐓',"O":'🐤',"P":'🐸',"Q":'🐃',"R":'🐍',"S":'🐛',"T":'🐜',"U":'🐝',"V":'🐞',"W":'🐂',"X":'🐐',"Y":'🐘',"Z":'🐺'};
+			if(gametype=='Animal') emojiChar =
+			{"A":'🐵',"B":'🐶',"C":'🐩',"D":'🐯',
+			"E":'🐴',"F":'🐮',"G":'🐪',"H":'🐀',
+			"I":'🐰',"J":'🐷',"K":'🐻',"L":'🐼',
+			"M":'🐉',"N":'🐓',"O":'🐤',"P":'🐸',
+			"Q":'🐃',"R":'🐍',"S":'🐛',"T":'🐜',
+			"U":'🐝',"V":'🐞',"W":'🐂',"X":'🐐',
+			"Y":'🐘',"Z":'🐺'};
 				
-					/*if(gametype=='Sport') emojiChar = {
-										"A":'\ud83c\udfc0',
-										"B":'\ud83c\udfbe',
-										"C":'\ud83c\udfaf',
-										"D":'\ud83c\udfb1',
-										"E":'\ud83c\udfb2',
-										"F":'\ud83c\udfae',
-										"G":'\ud83c\udfc3',
-										"H":'\ud83c\udfc1',
-										"I":'\ud83c\udfc7',
-										"J":'\ud83c\udfc2',
-										"K":'\uD83C\uDFBC', 
-										"L":'\uD83C\uDFCA',
-										"M":'\uD83D\uDEA3', 
-										"N":'\ud83c\udfb7', 
-										"O":'\ud83c\udfa7', 
-										"P":'\ud83c\udfa4',
-										"Q":'\ud83c\udfa8',
-										"R":'\ud83c\udfc8',
-										"S":'\ud83c\udfc9',
-										"T":'\ud83d\udeb4',
-										"U":'\uD83C\uDFB8',
-										"V":'\ud83c\udfc4',
-										"W":'\ud83c\udfb9',
-										"X":'\ud83c\udfbb',
-										"Y":'\uD83C\uDFB0',
-										"Z":'\ud83c\udfad'
-					};*/
+				
+				$.each($('.mword'), function(i, item) {
+					
+					$(item).html( emojiChar[alphabetArray[i]] );
+				
+				});
+					
 			}
 	
 			var level=0;
