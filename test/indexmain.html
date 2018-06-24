@@ -29,7 +29,42 @@ var sto = window.localStorage?window.localStorage:localStorage;
 
 	document.addEventListener('admob.interstitial.events.CLOSE', function(event) {
 			if(refreshIntervalId) clearInterval(refreshIntervalId);
+			refreshIntervalId = setInterval(function(){
+			$(".wrapperContainer > .wrapperRight").remove();
+			$(".wrapperContainer")
+			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+			
+	
+			setTimeout(function(){
+				$(".wrapperContainer > .wrapperRight").remove();
+				clearAll();
+				var glow_par=$('.glow').parent();
+				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
+				$(".glow").remove();
+				glow_par.append(glowClone);
+				clearInterval(countDown);
+				countDown = setInterval(function(){
+			
+				//var time_par=$('.timer').parent();
+				//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
+				//$(".timer").remove();
+				//time_par.append(timeClone);	
 				
+				$(".timer").html(countDownVal--);
+				if(countDownVal==-1){
+					countDownVal=60;
+					//clearInterval(countDown);
+				}
+					
+				},1000);
+	
+			},4200);
+			
+				
+				
+		}, 60500);
+		
+		
 			if(countDown)clearInterval(countDown);
 			countDownVal=60;
 			countDown = setInterval(function(){
