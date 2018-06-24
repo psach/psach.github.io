@@ -23,13 +23,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
 		
 var countDown;
 var refreshIntervalId;
-		
+var countDownVal=60;
+
 var sto = window.localStorage?window.localStorage:localStorage;
 
 	document.addEventListener('admob.interstitial.events.CLOSE', function(event) {
 			if(refreshIntervalId) clearInterval(refreshIntervalId);
 				
 			if(countDown)clearInterval(countDown);
+			countDownVal=60;
 			countDown = setInterval(function(){
 		
 			//var time_par=$('.timer').parent();

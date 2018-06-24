@@ -709,7 +709,7 @@ function showLevel(){
 		//$(".help").css('opacity','1');
 		
 	},(showLevelTime*600));
-	var countDownVal=60;
+
 	
 	
 	
