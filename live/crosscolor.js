@@ -659,9 +659,13 @@ function popWords(words){
 
 			
 
+
 function showLevel(){
 	console.log(showLevelTime);
+	
+	
 	if(refreshIntervalId) clearInterval(refreshIntervalId);
+	
 	
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
@@ -705,6 +709,9 @@ function showLevel(){
 		//$(".help").css('opacity','1');
 		
 	},(showLevelTime*600));
+
+	
+	
 	
 	setTimeout(function(){
 	$(".wrapperContainer > .wrapper").remove();
@@ -719,11 +726,29 @@ function showLevel(){
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
+			clearInterval(countDown);
+			countDown = setInterval(function(){
 		
+			//var time_par=$('.timer').parent();
+			//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
+			//$(".timer").remove();
+			//time_par.append(timeClone);	
+			
+			$(".timer").html(countDownVal--);
+			if(countDownVal==-1){
+				countDownVal=60;
+				//clearInterval(countDown);
+			}
+				
+			},1000);
+	
+	
 		refreshIntervalId = setInterval(function(){
 			$(".wrapperContainer > .wrapperRight").remove();
 			$(".wrapperContainer")
 			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+			
+	
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
 				clearAll();
@@ -731,9 +756,26 @@ function showLevel(){
 				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
 				$(".glow").remove();
 				glow_par.append(glowClone);
+				clearInterval(countDown);
+				countDown = setInterval(function(){
 			
+				//var time_par=$('.timer').parent();
+				//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
+				//$(".timer").remove();
+				//time_par.append(timeClone);	
+				
+				$(".timer").html(countDownVal--);
+				if(countDownVal==-1){
+					countDownVal=60;
+					//clearInterval(countDown);
+				}
+					
+				},1000);
+	
 			},4200);
 			
+				
+				
 		}, 60500);
 
 

@@ -21,9 +21,70 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
  <script src="gap-push.js"></script>
 	<script>
 		
+var countDown;
+var refreshIntervalId;
+var countDownVal=60;
 
-		
 var sto = window.localStorage?window.localStorage:localStorage;
+
+	document.addEventListener('admob.interstitial.events.CLOSE', function(event) {
+			if(refreshIntervalId) clearInterval(refreshIntervalId);
+			refreshIntervalId = setInterval(function(){
+			$(".wrapperContainer > .wrapperRight").remove();
+			$(".wrapperContainer")
+			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+			
+	
+			setTimeout(function(){
+				$(".wrapperContainer > .wrapperRight").remove();
+				clearAll();
+				var glow_par=$('.glow').parent();
+				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
+				$(".glow").remove();
+				glow_par.append(glowClone);
+				clearInterval(countDown);
+				countDown = setInterval(function(){
+			
+				//var time_par=$('.timer').parent();
+				//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
+				//$(".timer").remove();
+				//time_par.append(timeClone);	
+				
+				$(".timer").html(countDownVal--);
+				if(countDownVal==-1){
+					countDownVal=60;
+					//clearInterval(countDown);
+				}
+					
+				},1000);
+	
+			},4200);
+			
+				
+				
+		}, 60500);
+		
+		
+			if(countDown)clearInterval(countDown);
+			countDownVal=60;
+			countDown = setInterval(function(){
+		
+			//var time_par=$('.timer').parent();
+			//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
+			//$(".timer").remove();
+			//time_par.append(timeClone);	
+			
+			$(".timer").html(countDownVal--);
+			if(countDownVal==-1){
+				countDownVal=60;
+				//clearInterval(countDown);
+			}
+				
+			},1000);
+			
+     });
+	 
+	 
 	  </script>
 	
 
@@ -933,6 +994,67 @@ img {
     width: 97%;
 	
 }
+
+.timer{
+  
+  text-shadow: 0 0 20px black;
+  -webkit-animation: smoky 5s infinite forwards ;
+  color:transparent;
+  
+}
+
+
+@-webkit-keyframes smoky {
+  
+  0% {
+    -webkit-transform:
+      translate3d(-1rem,0rem,0)
+      rotate(45deg)
+      skewX(10deg)
+      scale(1);
+      text-shadow: 0 0 20px black;
+      opacity: 1;
+  }
+  
+   25% {
+    -webkit-transform:
+      translate3d(-2rem,-2rem,0)
+      rotate(-45deg)
+      skewX(10deg)
+      scale(1);
+      text-shadow: 0 0 15px black;
+      opacity: 1;
+  }
+  50% {
+    -webkit-transform:
+        translate3d(0rem,-4rem,0)
+      rotate(45deg)
+      skewX(30deg)
+      scale(1);
+      text-shadow: 0 0 10px black;
+      opacity: 1;
+  }
+  70% {
+    -webkit-transform:
+       translate3d(-3rem,-7rem,0)
+      rotate(-45deg)
+      skewX(50deg)
+      scale(1.5);
+      text-shadow: 0 0 2px black;
+      opacity: 0.8;
+  }
+  100% {
+    -webkit-transform:
+      translate3d(-2rem,-8rem,0)
+      rotate(0deg)
+      skewX(0deg)
+      scale(2);
+	  text-shadow: 0 0 1px black;
+	  opacity: 0.2;
+  }
+}
+
+
 @-webkit-keyframes burn {
   0% {
        -webkit-transform: translateX(0px) scale(1); 
