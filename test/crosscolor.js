@@ -658,8 +658,7 @@ function popWords(words){
 		}
 
 			
-var countDown;
-var refreshIntervalId;
+
 
 function showLevel(){
 	console.log(showLevelTime);
