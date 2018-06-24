@@ -933,6 +933,67 @@ img {
     width: 97%;
 	
 }
+
+.timer{
+  
+
+  -webkit-animation: smoky 5s 1s infinite forwards ;
+  color:transparent;
+  
+}
+
+
+@-webkit-keyframes smoky {
+  
+  0% {
+    -webkit-transform:
+      translate3d(-1rem,0rem,0)
+      rotate(45deg)
+      skewX(10deg)
+      scale(1);
+      text-shadow: 0 0 20px black;
+      opacity: 1;
+  }
+  
+   25% {
+    -webkit-transform:
+      translate3d(-2rem,-2rem,0)
+      rotate(-45deg)
+      skewX(10deg)
+      scale(1);
+      text-shadow: 0 0 2px black;
+      opacity: 1;
+  }
+  50% {
+    -webkit-transform:
+        translate3d(0rem,-4rem,0)
+      rotate(45deg)
+      skewX(30deg)
+      scale(1);
+      text-shadow: 0 0 3px black;
+      opacity: 1;
+  }
+  70% {
+    -webkit-transform:
+       translate3d(-3rem,-7rem,0)
+      rotate(-45deg)
+      skewX(50deg)
+      scale(1.5);
+      text-shadow: 0 0 2px black;
+      opacity: 0.8;
+  }
+  100% {
+    -webkit-transform:
+      translate3d(-2rem,-8rem,0)
+      rotate(0deg)
+      skewX(0deg)
+      scale(2);
+	  text-shadow: 0 0 0px black;
+	  opacity: 0.2;
+  }
+}
+
+
 @-webkit-keyframes burn {
   0% {
        -webkit-transform: translateX(0px) scale(1); 
