@@ -21,9 +21,33 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://ww
  <script src="gap-push.js"></script>
 	<script>
 		
-
+var countDown;
+var refreshIntervalId;
 		
 var sto = window.localStorage?window.localStorage:localStorage;
+
+	document.addEventListener('admob.interstitial.events.CLOSE', (event) => {
+			if(refreshIntervalId) clearInterval(refreshIntervalId);
+				
+			if(countDown)clearInterval(countDown);
+			countDown = setInterval(function(){
+		
+			//var time_par=$('.timer').parent();
+			//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
+			//$(".timer").remove();
+			//time_par.append(timeClone);	
+			
+			$(".timer").html(countDownVal--);
+			if(countDownVal==-1){
+				countDownVal=60;
+				//clearInterval(countDown);
+			}
+				
+			},1000);
+			
+     });
+	 
+	 
 	  </script>
 	
 
@@ -937,7 +961,7 @@ img {
 .timer{
   
 
-  -webkit-animation: smoky 5s 1s infinite forwards ;
+  -webkit-animation: smoky 5s infinite forwards ;
   color:transparent;
   
 }
@@ -961,7 +985,7 @@ img {
       rotate(-45deg)
       skewX(10deg)
       scale(1);
-      text-shadow: 0 0 5px black;
+      text-shadow: 0 0 15px black;
       opacity: 1;
   }
   50% {
@@ -970,7 +994,7 @@ img {
       rotate(45deg)
       skewX(30deg)
       scale(1);
-      text-shadow: 0 0 3px black;
+      text-shadow: 0 0 10px black;
       opacity: 1;
   }
   70% {
