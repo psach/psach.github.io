@@ -722,7 +722,7 @@ function showLevel(){
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 			
 			countDown = setInterval(function(){
-			
+			clearInterval(prevCD);
 			//var time_par=$('.timer').parent();
 			//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
 			//$(".timer").remove();
@@ -730,6 +730,7 @@ function showLevel(){
 			
 				$(".timer").html(countDownVal--);
 				if(countDownVal==-1){
+					prevCD=countDown;
 					countDownVal=60;
 					showThumbsDown();
 				}
