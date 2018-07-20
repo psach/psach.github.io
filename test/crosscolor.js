@@ -664,8 +664,8 @@ function showLevel(){
 	console.log(showLevelTime);
 	
 	
-	if(refreshIntervalId) clearInterval(refreshIntervalId);
-	
+	 clearInterval(refreshIntervalId);
+	 clearInterval(countDown);
 	
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
@@ -726,7 +726,7 @@ function showLevel(){
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-			clearInterval(countDown);
+			
 			countDown = setInterval(function(){
 		
 			//var time_par=$('.timer').parent();
