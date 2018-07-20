@@ -663,9 +663,9 @@ function popWords(words){
 function showLevel(){
 	console.log(showLevelTime);
 	
-	
-	if(refreshIntervalId) clearInterval(refreshIntervalId);
-	
+	countDownVal=60;
+	 clearInterval(refreshIntervalId);
+	 clearInterval(countDown);
 	
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
 		
@@ -726,7 +726,7 @@ function showLevel(){
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-			clearInterval(countDown);
+			
 			countDown = setInterval(function(){
 		
 			//var time_par=$('.timer').parent();
@@ -743,7 +743,13 @@ function showLevel(){
 			},1000);
 	
 	
-		refreshIntervalId = setInterval(function(){
+		
+
+
+	},(showLevelTime*600)+800);
+	
+	
+	refreshIntervalId = setInterval(function(){
 			$(".wrapperContainer > .wrapperRight").remove();
 			$(".wrapperContainer")
 			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
@@ -752,6 +758,7 @@ function showLevel(){
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
 				clearAll();
+				countDownVal=60;
 				var glow_par=$('.glow').parent();
 				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
 				$(".glow").remove();
@@ -777,10 +784,7 @@ function showLevel(){
 				
 				
 		}, 60500);
-
-
-	},(showLevelTime*600)+800);
-	
+		
 }
 		    
 function storeLevel(){
