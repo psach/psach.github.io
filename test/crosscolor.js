@@ -656,7 +656,7 @@ function popWords(words){
 
 function showLevel(){
 	 console.log(showLevelTime);
-	
+	 prevCD
 	 countDownVal=60;
 	 clearInterval(refreshIntervalId);
 	 clearInterval(countDown);
@@ -722,8 +722,7 @@ function showLevel(){
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 			
 			countDown = setInterval(function(){
-			clearInterval(prevCD);
-			prevCD=countDown;
+			
 			//var time_par=$('.timer').parent();
 			//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
 			//$(".timer").remove();
