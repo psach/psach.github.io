@@ -663,7 +663,7 @@ function popWords(words){
 function showLevel(){
 	console.log(showLevelTime);
 	
-	
+	countDownVal=60;
 	 clearInterval(refreshIntervalId);
 	 clearInterval(countDown);
 	
@@ -743,7 +743,13 @@ function showLevel(){
 			},1000);
 	
 	
-		refreshIntervalId = setInterval(function(){
+		
+
+
+	},(showLevelTime*600)+800);
+	
+	
+	refreshIntervalId = setInterval(function(){
 			$(".wrapperContainer > .wrapperRight").remove();
 			$(".wrapperContainer")
 			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
@@ -752,6 +758,7 @@ function showLevel(){
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
 				clearAll();
+				countDownVal=60;
 				var glow_par=$('.glow').parent();
 				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
 				$(".glow").remove();
@@ -777,10 +784,7 @@ function showLevel(){
 				
 				
 		}, 60500);
-
-
-	},(showLevelTime*600)+800);
-	
+		
 }
 		    
 function storeLevel(){
