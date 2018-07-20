@@ -734,11 +734,11 @@ function showLevel(){
 			//$(".timer").remove();
 			//time_par.append(timeClone);	
 			
-			$(".timer").html(countDownVal--);
-			if(countDownVal==-1){
-				countDownVal=60;
-				//clearInterval(countDown);
-			}
+				$(".timer").html(countDownVal--);
+				if(countDownVal==-1){
+					countDownVal=60;
+					showThumbsDown();
+				}
 				
 			},1000);
 	
@@ -750,20 +750,10 @@ function showLevel(){
 	
 	
 	refreshIntervalId = setInterval(function(){
-			$(".wrapperContainer > .wrapperRight").remove();
-			$(".wrapperContainer")
-			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
 			
-	
-			setTimeout(function(){
-				$(".wrapperContainer > .wrapperRight").remove();
-				clearAll();
-				countDownVal=60;
-				var glow_par=$('.glow').parent();
-				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
-				$(".glow").remove();
-				glow_par.append(glowClone);
 				clearInterval(countDown);
+				countDownVal=60;
+				
 				countDown = setInterval(function(){
 			
 				//var time_par=$('.timer').parent();
@@ -774,17 +764,35 @@ function showLevel(){
 				$(".timer").html(countDownVal--);
 				if(countDownVal==-1){
 					countDownVal=60;
-					//clearInterval(countDown);
+					showThumbsDown();
 				}
 					
 				},1000);
 	
-			},4200);
 			
 				
 				
-		}, 60500);
+	}, 60500);
 		
+}
+
+function showThumbsDown(){
+	
+	$(".wrapperContainer > .wrapperRight").remove();
+			$(".wrapperContainer")
+			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+			
+			setTimeout(function(){
+				$(".wrapperContainer > .wrapperRight").remove();
+				clearAll();
+				
+				var glow_par=$('.glow').parent();
+				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
+				$(".glow").remove();
+				glow_par.append(glowClone);
+				
+			},4200);
+				
 }
 		    
 function storeLevel(){
