@@ -241,13 +241,7 @@ function popWords(words){
 							//alert(selectionTillLast+"");
 							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
-								$(".wrapperContainer > .wrapperRight").remove();
-								$(".wrapperContainer")
-								.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
-								setTimeout(function(){
-									$(".wrapperContainer > .wrapperRight").remove();
-								
-								},4200);
+								showThumbsDown();
 							}
 							
 						}
@@ -661,10 +655,10 @@ function popWords(words){
 
 
 function showLevel(){
-	console.log(showLevelTime);
+	 console.log(showLevelTime);
 	
-	countDownVal=60;
-	 clearInterval(refreshIntervalId);
+	 countDownVal=60;
+	
 	 clearInterval(countDown);
 	
 	if($('.cwd-tile-letter-inactive').length==0 && ( gametype.indexOf('Fruit')>-1 || gametype.indexOf('Animal')>-1 ) ) {
@@ -728,17 +722,18 @@ function showLevel(){
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
 			
 			countDown = setInterval(function(){
-		
+			
 			//var time_par=$('.timer').parent();
 			//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
 			//$(".timer").remove();
 			//time_par.append(timeClone);	
 			
-			$(".timer").html(countDownVal--);
-			if(countDownVal==-1){
-				countDownVal=60;
-				//clearInterval(countDown);
-			}
+				$(".timer").html(countDownVal--);
+				if(countDownVal==-1){
+					
+					countDownVal=60;
+					showThumbsDown();
+				}
 				
 			},1000);
 	
@@ -749,42 +744,46 @@ function showLevel(){
 	},(showLevelTime*600)+800);
 	
 	
-	refreshIntervalId = setInterval(function(){
-			$(".wrapperContainer > .wrapperRight").remove();
-			$(".wrapperContainer")
-			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+	/* refreshIntervalId = setInterval(function(){
 			
-	
-			setTimeout(function(){
-				$(".wrapperContainer > .wrapperRight").remove();
-				clearAll();
-				countDownVal=60;
-				var glow_par=$('.glow').parent();
-				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
-				$(".glow").remove();
-				glow_par.append(glowClone);
 				clearInterval(countDown);
+				
+				
 				countDown = setInterval(function(){
 			
-				//var time_par=$('.timer').parent();
-				//var timeClone=$('.timer').clone(true);//.css('-webkit-animation-duration','60s');
-				//$(".timer").remove();
-				//time_par.append(timeClone);	
+				
 				
 				$(".timer").html(countDownVal--);
 				if(countDownVal==-1){
 					countDownVal=60;
-					//clearInterval(countDown);
+					showThumbsDown();
 				}
 					
 				},1000);
 	
-			},4200);
 			
 				
 				
-		}, 60500);
+	}, 60500); */
 		
+}
+
+function showThumbsDown(){
+	
+	$(".wrapperContainer > .wrapperRight").remove();
+	$(".wrapperContainer").append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+			
+			setTimeout(function(){
+				$(".wrapperContainer > .wrapperRight").remove();
+				clearAll();
+				
+				var glow_par=$('.glow').parent();
+				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
+				$(".glow").remove();
+				glow_par.append(glowClone);
+				
+			},4200);
+				
 }
 		    
 function storeLevel(){
