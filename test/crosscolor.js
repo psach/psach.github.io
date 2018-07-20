@@ -661,9 +661,9 @@ function popWords(words){
 
 
 function showLevel(){
-	console.log(showLevelTime);
+	 console.log(showLevelTime);
 	
-	countDownVal=60;
+	 countDownVal=60;
 	 clearInterval(refreshIntervalId);
 	 clearInterval(countDown);
 	
@@ -752,7 +752,7 @@ function showLevel(){
 	refreshIntervalId = setInterval(function(){
 			
 				clearInterval(countDown);
-				countDownVal=60;
+				//countDownVal=60;
 				
 				countDown = setInterval(function(){
 			
@@ -779,8 +779,7 @@ function showLevel(){
 function showThumbsDown(){
 	
 	$(".wrapperContainer > .wrapperRight").remove();
-			$(".wrapperContainer")
-			.append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
+	$(".wrapperContainer").append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
 			
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
