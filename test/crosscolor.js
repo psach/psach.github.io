@@ -656,7 +656,7 @@ function popWords(words){
 
 function showLevel(){
 	 console.log(showLevelTime);
-	 prevCD
+	
 	 countDownVal=60;
 	 clearInterval(refreshIntervalId);
 	 clearInterval(countDown);
