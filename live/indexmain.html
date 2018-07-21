@@ -44,7 +44,7 @@ var sto = window.localStorage?window.localStorage:localStorage;
 			$(".timer").html(countDownVal--);
 			if(countDownVal==-1){
 				countDownVal=60;
-				showThumbsDown();
+				showThumbsDown(true);
 			}
 				
 			},1000);
