@@ -241,7 +241,7 @@ function popWords(words){
 							//alert(selectionTillLast+"");
 							if(helpOver)if(selectionTillLast.length==correctAns[currLevel].length){
 								console.log('try again');
-								showThumbsDown();
+								showThumbsDown(false);
 							}
 							
 						}
@@ -732,7 +732,7 @@ function showLevel(){
 				if(countDownVal==-1){
 					
 					countDownVal=60;
-					showThumbsDown();
+					showThumbsDown(true);
 				}
 				
 			},1000);
@@ -768,14 +768,14 @@ function showLevel(){
 		
 }
 
-function showThumbsDown(){
+function showThumbsDown(clearFlag){
 	
 	$(".wrapperContainer > .wrapperRight").remove();
 	$(".wrapperContainer").append($('<div class="wrapperRight" style="-webkit-animation-delay:0s;" >👎</div>'));
 			
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
-				clearAll();
+				if(clearFlag) clearAll();
 				
 				var glow_par=$('.glow').parent();
 				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
