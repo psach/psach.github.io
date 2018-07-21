@@ -36,7 +36,8 @@
 			
 			var tcorrectAns =[
 				["TOY"/*,"LIGHT","LEG","SONGS","SKY"*/],
-				["NOBLE"/*,"BIG","GOLD","DROP","OLD"*/]
+				["NOBLE"/*,"BIG","GOLD","DROP","OLD"*/],
+				["GOOD","DUDE","ADDS","RED","COLOR","EGO"]
 				];
 			
 			
@@ -49,8 +50,8 @@
 			
 			];
 			
-			var tstartCell = [[2,7,1],[2,0,0]];
-			var tendCell   = [[4,0,1],[6,7,1]];
+			var tstartCell = [[2,7,1],[2,0,0],[6,0,0]];
+			var tendCell   = [[4,0,1],[6,7,1],[0,3,0]];
 		
 			
 			levelMoreWords.push(tmoreWords);
