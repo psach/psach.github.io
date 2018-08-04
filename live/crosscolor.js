@@ -787,7 +787,7 @@ function showThumbsDown(clearFlag){
 					}else{
 						wrongAnswerCount++;
 					};
-				dataLayer.push({'event': (clearFlag?'TimeUp':'WrongAnswer')});	
+				dataLayer.push({'event': 'levelFailure'});	
 				var glow_par=$('.glow').parent();
 				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
 				$(".glow").remove();
