@@ -652,12 +652,14 @@ function popWords(words){
 		}
 
 			
-
+var timeUpCount=0;
+var wrongAnswerCount=0;
 
 function showLevel(){
 	 console.log(showLevelTime);
 	 
-	 
+	  timeUpCount=0;
+      wrongAnswerCount=0;
 	
 	 countDownVal=60;
 	
@@ -770,6 +772,8 @@ function showLevel(){
 		
 }
 
+
+
 function showThumbsDown(clearFlag){
 	
 	$(".wrapperContainer > .wrapperRight").remove();
@@ -777,15 +781,20 @@ function showThumbsDown(clearFlag){
 			
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
-				if(clearFlag) clearAll();
-				
+				if(clearFlag) {
+						timeUpCount++;
+						clearAll()
+					}else{
+						wrongAnswerCount++;
+					};
+				dataLayer.push({'event': (clearFlag?'TimeUp':'WrongAnswer')});	
 				var glow_par=$('.glow').parent();
 				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
 				$(".glow").remove();
 				glow_par.append(glowClone);
 				
 			},4200);
-				
+			
 }
 		    
 function storeLevel(){
