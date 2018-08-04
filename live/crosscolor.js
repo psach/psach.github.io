@@ -656,6 +656,8 @@ function popWords(words){
 
 function showLevel(){
 	 console.log(showLevelTime);
+	 
+	 
 	
 	 countDownVal=60;
 	
@@ -720,7 +722,7 @@ function showLevel(){
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-			
+			dataLayer.push({'event': 'levelCompleted','level': totalLevels});
 			countDown = setInterval(function(){
 			
 			//var time_par=$('.timer').parent();
