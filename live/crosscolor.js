@@ -896,6 +896,7 @@ function help(){
 	
 	
 	if(helpOver){
+		dataLayer.push({'event': 'help'});	
 		clickEffect($('.help'));
 		if(refreshIntervalId) clearInterval(refreshIntervalId);
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
