@@ -830,7 +830,7 @@ function clearLevelGrid(){
 
 function getLevel(){
 	var storage = window.localStorage?window.localStorage:localStorage;
-	
+	helpCount=0;
 	prevData=JSON.parse(storage.getItem(gametype+'prevData'));
 	if(prevData){
 		currLevel=prevData.currLevel;
@@ -897,6 +897,7 @@ function help(){
 	
 	
 	if(helpOver){
+		helpCount++;
 		dataLayer.push({'event': 'help','helpCount': helpCount});	
 		clickEffect($('.help'));
 		if(refreshIntervalId) clearInterval(refreshIntervalId);
