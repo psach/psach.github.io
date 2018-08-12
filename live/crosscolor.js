@@ -828,6 +828,9 @@ function clearLevelGrid(){
 	gridChild.addClass('cwd-tile-letter');
 }
 
+
+var helpCount=0;
+
 function getLevel(){
 	var storage = window.localStorage?window.localStorage:localStorage;
 	helpCount=0;
@@ -890,7 +893,7 @@ var helpOver=true;
 
 var realSelectionTillLast;
 
-var helpCount=0;
+
 
 
 function help(){
