@@ -890,13 +890,14 @@ var helpOver=true;
 
 var realSelectionTillLast;
 
+var helpCount=0;
 
 
 function help(){
 	
 	
 	if(helpOver){
-		dataLayer.push({'event': 'help'});	
+		dataLayer.push({'event': 'help','helpCount': helpCount});	
 		clickEffect($('.help'));
 		if(refreshIntervalId) clearInterval(refreshIntervalId);
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
