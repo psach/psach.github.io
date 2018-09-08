@@ -173,7 +173,7 @@ td.red>div, td.green>div
 }
  */
 .A {
-	background: DodgerBlue ;
+background:DodgerBlue  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -182,7 +182,7 @@ td.red>div, td.green>div
 }
 
 .B {
-	background: Yellow;
+background:Yellow !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -192,20 +192,20 @@ td.red>div, td.green>div
 
 
 .C {
-	background: HotPink;
+background:HotPink !important;
 	/**/ color: black;
 }
 
 
 .D {
-	background: GreenYellow;
+background:GreenYellow !important;
 	/**/ color: black;
 }
 
 
 
 .E {
-	background: Orange ;
+background:Orange  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -214,7 +214,7 @@ td.red>div, td.green>div
 }
 
 .F {
-	background: MediumPurple ;
+background:MediumPurple  !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -223,22 +223,22 @@ td.red>div, td.green>div
 }
 
 .G {
-	background: Cyan;
+background:Cyan !important;
 	/**/ color: black;
 }
 
 
 .H {
-	background: Tomato ;
+background:Tomato  !important;
 	/**/ color: black;
 }
 
 .I {
-	background: Gold;
+background:Gold !important;
 	/**/ color: black;
 }
 .J {
-	background: Aqua ;
+background:Aqua  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -248,7 +248,7 @@ td.red>div, td.green>div
 
 
 .K {
-	background: CadetBlue ;
+background:CadetBlue  !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -256,19 +256,19 @@ td.red>div, td.green>div
 	*/ color: black;
 }
 .L {
-	background: DarkKhaki ;
+background:DarkKhaki  !important;
 	/**/ color: black;
 }
 
 .M {
-	background: Magenta  ;
+background:Magenta   !important;
 	/**/ color: black;
 }
 
 
 
  .N {
-	background: LawnGreen  ;
+background:LawnGreen   !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -277,7 +277,7 @@ td.red>div, td.green>div
 }
 
 .O {
-	background: OliveDrab   ;
+background:OliveDrab    !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -285,18 +285,18 @@ td.red>div, td.green>div
 	*/ color: black;
 }
 .P {
-	background: LightSeaGreen ;
+background:LightSeaGreen  !important;
 	/**/ color: black;
 }
 
 .Q {
-	background: IndianRed ;
+background:IndianRed  !important;
 	/**/ color: black;
 }
 
 
 .R {
-	background: DeepSkyBlue ;
+background:DeepSkyBlue  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -306,7 +306,7 @@ td.red>div, td.green>div
 
 
 .S {
-	background: BurlyWood ;
+background:BurlyWood  !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -317,7 +317,7 @@ td.red>div, td.green>div
 
 
 .T {
-	background: DeepPink;
+background:DeepPink !important;
 	/**/ color: black;
 }
 
@@ -325,18 +325,18 @@ td.red>div, td.green>div
 
 
  .U {
-	background: SpringGreen;
+background:SpringGreen !important;
 	/**/ color: black;
 }
 
  .V {
-	background: SlateBlue ;
+background:SlateBlue  !important;
 	/**/ color: black;
 }
 
 
 .W {
-	background: Salmon  ;
+background:Salmon   !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -347,7 +347,7 @@ td.red>div, td.green>div
 
 
 .X {
-	background: PeachPuff  ;
+background:PeachPuff   !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -359,7 +359,7 @@ td.red>div, td.green>div
 
 
 .Y {
-	background: MediumVioletRed  ;
+background:MediumVioletRed   !important;
 	/**/ color: black;
 }
 
@@ -368,7 +368,7 @@ td.red>div, td.green>div
 
 
 .Z {
-	background: Lime ;
+background:Lime  !important;
 	/**/ color: black;
 }
 
