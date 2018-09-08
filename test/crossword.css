@@ -69,10 +69,11 @@
 
  
  
-td.red>div, td.green>div
+td.red > div, td.green > div
 {
     
     transform: rotate(-51deg);
+	-webkit-transform: rotate(-51deg);
 }
 
 
