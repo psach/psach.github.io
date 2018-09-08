@@ -1287,7 +1287,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					   (col=='h'?'mword':'')+
 					   ' " style="margin-top: 0px;">'+
 					   (col=='h'?alphabetArray[alpha++]:'')+
-					   (col=='s'?'🐵':'')+
+					   (col=='s'?'P':'')+
 					   (col=='e'?'C':'')+
 					   '</div>'+
 					   '</td>').appendTo(tr);
@@ -1417,8 +1417,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					if(gametype!=='') $(item).css('text-shadow','-1px 0px 6px black');
 				});
 				
-				//$('.green div').html( emojiChar["P"] );
-				//$('.red div').html( emojiChar["C"] );
+				$('.green div').html( emojiChar["P"] );
+				$('.red div').html( emojiChar["C"] );
 				
 			}
 	
