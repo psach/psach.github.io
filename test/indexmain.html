@@ -766,7 +766,7 @@ hr {
 {
     background-color: Red !important;
 	color: White !important;
-	border: 1px solid black;
+	border: 2px solid black;
 }
 
 
@@ -774,7 +774,7 @@ hr {
 {
     background-color: Green !important;
 	color: White !important;
-	border: 1px solid black;
+	border: 2px solid black;
 }
 
 
@@ -1399,7 +1399,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					$(item).html( emojiChar[alphabetArray[i]] );
 					if(gametype!=='') $(item).css('text-shadow','-1px 0px 6px black');
 				});
-					
+				
+				$('.green div').html( emojiChar['P'] );
+				$('.red div').html( emojiChar['C'] );
+				
 			}
 	
 			var level=0;
