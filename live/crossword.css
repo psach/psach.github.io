@@ -63,10 +63,17 @@
 {
     background-color: Red !important;
 	color: White !important;
+	border-radius: 50% 50% 0% 50%;
+    transform: rotate(51deg) translate(-5px,-5px);
 }
 
  
  
+td.red>div, td.green>div
+{
+    
+    transform: rotate(-51deg);
+}
 
 
 
@@ -75,6 +82,8 @@
 {
     background-color: Green !important;
 	color: White !important;
+	border-radius: 50% 50% 0% 50%;
+    transform: rotate(51deg) translate(-5px,-5px);
 }
 
 #cwd-grid td.cwd-tile-highlight
@@ -164,7 +173,7 @@
 }
  */
 .A {
-	background: DodgerBlue ;
+background:DodgerBlue  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -173,7 +182,7 @@
 }
 
 .B {
-	background: Yellow;
+background:Yellow !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -183,20 +192,20 @@
 
 
 .C {
-	background: HotPink;
+background:HotPink !important;
 	/**/ color: black;
 }
 
 
 .D {
-	background: GreenYellow;
+background:GreenYellow !important;
 	/**/ color: black;
 }
 
 
 
 .E {
-	background: Orange ;
+background:Orange  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -205,7 +214,7 @@
 }
 
 .F {
-	background: MediumPurple ;
+background:MediumPurple  !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -214,22 +223,22 @@
 }
 
 .G {
-	background: Cyan;
+background:Cyan !important;
 	/**/ color: black;
 }
 
 
 .H {
-	background: Tomato ;
+background:Tomato  !important;
 	/**/ color: black;
 }
 
 .I {
-	background: Gold;
+background:Gold !important;
 	/**/ color: black;
 }
 .J {
-	background: Aqua ;
+background:Aqua  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -239,7 +248,7 @@
 
 
 .K {
-	background: CadetBlue ;
+background:CadetBlue  !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -247,19 +256,19 @@
 	*/ color: black;
 }
 .L {
-	background: DarkKhaki ;
+background:DarkKhaki  !important;
 	/**/ color: black;
 }
 
 .M {
-	background: Magenta  ;
+background:Magenta   !important;
 	/**/ color: black;
 }
 
 
 
  .N {
-	background: LawnGreen  ;
+background:LawnGreen   !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -268,7 +277,7 @@
 }
 
 .O {
-	background: OliveDrab   ;
+background:OliveDrab    !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -276,18 +285,18 @@
 	*/ color: black;
 }
 .P {
-	background: LightSeaGreen ;
+background:LightSeaGreen  !important;
 	/**/ color: black;
 }
 
 .Q {
-	background: IndianRed ;
+background:IndianRed  !important;
 	/**/ color: black;
 }
 
 
 .R {
-	background: DeepSkyBlue ;
+background:DeepSkyBlue  !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -297,7 +306,7 @@
 
 
 .S {
-	background: BurlyWood ;
+background:BurlyWood  !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -308,7 +317,7 @@
 
 
 .T {
-	background: DeepPink;
+background:DeepPink !important;
 	/**/ color: black;
 }
 
@@ -316,18 +325,18 @@
 
 
  .U {
-	background: SpringGreen;
+background:SpringGreen !important;
 	/**/ color: black;
 }
 
  .V {
-	background: SlateBlue ;
+background:SlateBlue  !important;
 	/**/ color: black;
 }
 
 
 .W {
-	background: Salmon  ;
+background:Salmon   !important;
 	/* background-image: url("a.png");
     background-size:     cover;                     
     background-repeat:   no-repeat;
@@ -338,7 +347,7 @@
 
 
 .X {
-	background: PeachPuff  ;
+background:PeachPuff   !important;
 	/*background-image: url("d.gif");
     background-size:     contain;                     
     background-repeat:   no-repeat;
@@ -350,7 +359,7 @@
 
 
 .Y {
-	background: MediumVioletRed  ;
+background:MediumVioletRed   !important;
 	/**/ color: black;
 }
 
@@ -359,7 +368,7 @@
 
 
 .Z {
-	background: Lime ;
+background:Lime  !important;
 	/**/ color: black;
 }
 

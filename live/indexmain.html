@@ -614,7 +614,7 @@ hr {
  }
  
  
-.bounce {
+.bounce, td.red, td.green{
   position:relative;
   -webkit-animation:bounce  1s infinite;
   animation:bounce  1s infinite;
@@ -628,10 +628,11 @@ hr {
   100% {bottom:0px;}
 }*/
 @-webkit-keyframes bounce {
-  0%       { transform: translateY(-9px); -webkit-transform: translateY(-9px); }
-  25%, 75% { transform: translateY(1px); -webkit-transform: translateY(1px); }
-  50%      { transform: translateY(-4px); -webkit-transform: translateY(-4px); }
-  100%    {transform: translateY(-9px); -webkit-transform: translateY(-9px); }
+  0%       { transform: translateY(-9px) rotate(51deg);  -webkit-transform: translateY(-9px) rotate(51deg);}
+  25%, 75% { transform: translateY(1px) rotate(51deg);   -webkit-transform: translateY(1px) rotate(51deg); }
+  50%      { transform: translateY(-4px) rotate(51deg);  -webkit-transform: translateY(-4px) rotate(51deg);}
+  100%     { transform: translateY(-9px) rotate(51deg);  -webkit-transform: translateY(-9px) rotate(51deg);}
+
 }
  
 .bounceside {
@@ -766,15 +767,31 @@ hr {
 {
     background-color: Red !important;
 	color: White !important;
-	border: 1px solid black;
+	border: 2px solid pink;
+
 }
+
+td.red, td.green
+{
+	border-radius: 50% 50% 0% 50%;
+    
+	
+}
+td.red>div, td.green>div
+{
+    
+    transform: rotate(-51deg);
+	-webkit-transform: rotate(-51deg);
+}
+
 
 
 #cwd-grid-sp td.green
 {
     background-color: Green !important;
 	color: White !important;
-	border: 1px solid black;
+	border: 2px solid lightgreen;
+	
 }
 
 
@@ -1399,7 +1416,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					$(item).html( emojiChar[alphabetArray[i]] );
 					if(gametype!=='') $(item).css('text-shadow','-1px 0px 6px black');
 				});
-					
+				
+				$('.green div').html( emojiChar['P'] );
+				$('.red div').html( emojiChar['C'] );
+				
 			}
 	
 			var level=0;
