@@ -159,7 +159,7 @@ function popWords(words){
 					$.each(word.split(''), function(j,character){
 					
 						
-						$(activeSet[j]).addClass(character+' d3char ' );
+						$(activeSet[j]).parent().not('red green').addClass(character+' d3char ' );
 						$(activeSet[j]).html(emojiChar[character]);
 						$(activeSet[j]).addClass('wordSlide');
 						//$(activeSet[j]).toggleClass('SR');
@@ -169,7 +169,7 @@ function popWords(words){
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
 					activeSet.parent().removeClass("cwd-tile-incorrect");
-					
+					//activeSet.parent().removeClass('red green');
 					
 					// MAIN LEVEL COMPLETED
 					if(levelAnswered==correctAns.length-1 && answered ){
@@ -285,8 +285,8 @@ function popWords(words){
 					start.find('.cwd-tile-letter').html(emojiChar[greenChar]);
 					end.addClass("d3 red");
 					end.find('.cwd-tile-letter').html(emojiChar[redChar]);
-					start.find('.cwd-tile-letter').addClass('bounce');
-					end.find('.cwd-tile-letter').addClass('bounce');
+					//start.find('.cwd-tile-letter').addClass('bounce');
+					//end.find('.cwd-tile-letter').addClass('bounce');
 					
 					if(add){
 					var removeElement;
@@ -302,8 +302,8 @@ function popWords(words){
 											var tile = $(tarr[j]);
 																				
 											tile.html(emojiChar[character]);
-											tile.addClass('d3char ' + character);
-											tile.removeClass(' bounce ');
+											tile.parent().not('red green').addClass('d3char ' + character);
+											//tile.removeClass(' bounce ');
 											tile.attr('word',activeList[2]);
 											wordPanel.filter('[word="'+activeList[2]+'"]').
 											//$(,wordPanel.parent()).
