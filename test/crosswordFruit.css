@@ -94,6 +94,11 @@
  
  
 
+td.red>div, td.green>div
+{
+    
+    transform: rotate(-51deg);
+}
 
 
 
