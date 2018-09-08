@@ -90,18 +90,11 @@
     background-color: Red !important;
 	color: White !important;
 	transform: rotate(51deg) translate(-5px,-5px);
-	-webkit-transform: rotate(51deg) translate(-5px,-5px);
+	
 }
 
  
  
-
-td.red >div, td.green > div
-{
-    
-    transform: rotate(-51deg);
-	-webkit-transform: rotate(-51deg);
-}
 
 
 
@@ -110,7 +103,7 @@ td.red >div, td.green > div
     background-color: Green !important;
 	color: White !important;
 	transform: rotate(51deg) translate(-5px,-5px);
-	-webkit-transform: rotate(51deg) translate(-5px,-5px);
+	
 }
 
 #cwd-grid td.cwd-tile-highlight

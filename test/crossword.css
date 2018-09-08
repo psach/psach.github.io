@@ -64,19 +64,11 @@
     background-color: Red !important;
 	color: White !important;
 	border-radius: 50% 50% 0% 50%;
-    transform: rotate(51deg) translate(-5px,-5px);
+  
 }
 
  
  
-td.red > div, td.green > div
-{
-    
-    transform: rotate(-51deg);
-	-webkit-transform: rotate(-51deg);
-}
-
-
 
 
 #cwd-grid td.green
@@ -84,7 +76,7 @@ td.red > div, td.green > div
     background-color: Green !important;
 	color: White !important;
 	border-radius: 50% 50% 0% 50%;
-    transform: rotate(51deg) translate(-5px,-5px);
+   
 }
 
 #cwd-grid td.cwd-tile-highlight
