@@ -89,6 +89,8 @@
 {
     background-color: Red !important;
 	color: White !important;
+	
+	
 }
 
  
@@ -96,11 +98,12 @@
 
 
 
-
 #cwd-grid td.green
 {
     background-color: Green !important;
 	color: White !important;
+	
+	
 }
 
 #cwd-grid td.cwd-tile-highlight

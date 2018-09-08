@@ -777,11 +777,11 @@ td.red, td.green
     
 	
 }
-td.red>div, td.green>div
+td.red > div, td.green > div
 {
     
-    transform: rotate(-51deg);
-	-webkit-transform: rotate(-51deg);
+    transform: rotate(-51deg) perspective(0) ;
+	-webkit-transform: rotate(-51deg) perspective(0);
 }
 
 
@@ -1409,7 +1409,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 			"Q":'🐃',"R":'🐍',"S":'🐛',"T":'🐜',
 			"U":'🐝',"V":'🐞',"W":'🐂',"X":'🐐',
 			"Y":'🐘',"Z":'🐺'};
-				
+				 
 				
 				$.each($('.mword'), function(i, item) {
 					
@@ -1417,8 +1417,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 					if(gametype!=='') $(item).css('text-shadow','-1px 0px 6px black');
 				});
 				
-				$('.green div').html( emojiChar['P'] );
-				$('.red div').html( emojiChar['C'] );
+				$('.green div').html( emojiChar["P"] );
+				$('.red div').html( emojiChar["C"] );
 				
 			}
 	
