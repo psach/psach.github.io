@@ -652,10 +652,14 @@ function popWords(words){
 		}
 
 			
-
+var timeUpCount=0;
+var wrongAnswerCount=0;
 
 function showLevel(){
 	 console.log(showLevelTime);
+	 
+	  timeUpCount=0;
+      wrongAnswerCount=0;
 	
 	 countDownVal=60;
 	
@@ -720,7 +724,7 @@ function showLevel(){
 		$(".wrapperContainer")
 		.append($('<div class="wrapper" style="-webkit-animation-delay:0s" ><table width=100% ><tr><td></td><td class="score" align="left" >'+
 			  (totalLevels)+'</td><td width="85%"></td></tr></table></div>'));
-			
+			dataLayer.push({'event': 'levelCompleted','level': totalLevels,'gametype':gametype});
 			countDown = setInterval(function(){
 			
 			//var time_par=$('.timer').parent();
@@ -768,6 +772,8 @@ function showLevel(){
 		
 }
 
+
+
 function showThumbsDown(clearFlag){
 	
 	$(".wrapperContainer > .wrapperRight").remove();
@@ -775,15 +781,20 @@ function showThumbsDown(clearFlag){
 			
 			setTimeout(function(){
 				$(".wrapperContainer > .wrapperRight").remove();
-				if(clearFlag) clearAll();
-				
+				if(clearFlag) {
+						timeUpCount++;
+						clearAll()
+					}else{
+						wrongAnswerCount++;
+					};
+				dataLayer.push({'event': 'levelFailure','clearFlag':clearFlag});	
 				var glow_par=$('.glow').parent();
 				var glowClone=$('.glow').clone();//.css('-webkit-animation-duration','60s');
 				$(".glow").remove();
 				glow_par.append(glowClone);
 				
 			},4200);
-				
+			
 }
 		    
 function storeLevel(){
@@ -817,9 +828,12 @@ function clearLevelGrid(){
 	gridChild.addClass('cwd-tile-letter');
 }
 
+
+var helpCount=0;
+
 function getLevel(){
 	var storage = window.localStorage?window.localStorage:localStorage;
-	
+	helpCount=0;
 	prevData=JSON.parse(storage.getItem(gametype+'prevData'));
 	if(prevData){
 		currLevel=prevData.currLevel;
@@ -881,10 +895,13 @@ var realSelectionTillLast;
 
 
 
+
 function help(){
 	
 	
 	if(helpOver){
+		helpCount++;
+		dataLayer.push({'event': 'help'});	
 		clickEffect($('.help'));
 		if(refreshIntervalId) clearInterval(refreshIntervalId);
 		var helpMoreWords=[['MAID','MONEY','FOGY']];
