@@ -158,15 +158,13 @@ function popWords(words){
 					// SET VALID WORD
 					$.each(word.split(''), function(j,character){
 					
-						var skipRedGreen = $(activeSet[j]).parent().attr('class');
-						if(skipRedGreen.indexOf('red')==-1 && skipRedGreen.indexOf('green')==-1 ){
-						$(activeSet[j]).addClass(character+' d3char ' );
+						
+						$(activeSet[j]).parent().not('red green').addClass(character+' d3char ' );
 						$(activeSet[j]).html(emojiChar[character]);
 						$(activeSet[j]).addClass('wordSlide');
 						//$(activeSet[j]).toggleClass('SR');
 						$(activeSet[j]).attr('word',word);
 						$(activeSet[j]).attr('style','-webkit-animation-delay:'+(j/2)+'s');
-						}
 						
 					});
 					activeSet.parent().removeClass("cwd-tile-highlight");
