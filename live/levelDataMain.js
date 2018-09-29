@@ -62,21 +62,22 @@
 			
 			
 			var tcorrectAns =[
-				["QUEEN","BEE","BABIES","SUPERB"]
+				["QUEEN","BEE","BABIES","SUPERB"],
+				["SACRED","RAGAS","MESSAGES","ONE","GOD"]
 				];
 			
 			
 			var tmoreWords =[
 			
-			["ONE","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
+			["TEN","TWO","THREE"],["FOUR","FIVE","EIGHTY"],["RAID","RAJU","MOTOR"],["FINE","EAT","HUGE"],
 			["ULTRA","NIKE","THRICE"],["STRONG","ALERT","LIKE"],["GOAL","CRICKET","SOMEONE"],["COUPON","DANCE","TIME"],
 			["MIGHT","KITE","JOCKEY"],["MOCKEY","TALK","TABLE"],["JOKER","JACK","MOBILE"],["SINGER","JUMPER","RISK"],
 			["TAXI","HINDI","MARATHI"],["AXE","ENGLISH","APPLE"],["NIGHT","DOWN","CLOWN"],["ZERO","SMALL","OBJECT"]
 			
 			];
 			
-			var tstartCell = [[7,0,0]];
-			var tendCell=[[0,0,0]];
+			var tstartCell = [[7,0,0],[0,4,0]];
+			var tendCell=[[0,0,0],[8,6,1]];
 		
 			
 			levelMoreWords.push(tmoreWords);
