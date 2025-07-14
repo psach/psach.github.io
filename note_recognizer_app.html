@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Recognizer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .detected-note {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffeb3b;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin: 10px 0;
+        }
+
+        .frequency {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        .piano-container {
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .piano {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            position: relative;
+            height: 200px;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        .key {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s ease;
+        }
+
+        .white-key {
+            width: 50px;
+            height: 180px;
+            background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+            border: 2px solid #ccc;
+            border-radius: 0 0 8px 8px;
+            margin: 0 1px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .black-key {
+            width: 30px;
+            height: 120px;
+            background: linear-gradient(to bottom, #333, #111);
+            border: 2px solid #000;
+            border-radius: 0 0 5px 5px;
+            position: absolute;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .key:hover {
+            transform: translateY(2px);
+        }
+
+        .key.active {
+            background: linear-gradient(to bottom, #ff6b6b, #ee5a6f) !important;
+            transform: translateY(3px);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .key-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .black-key .key-label {
+            color: #fff;
+            bottom: 8px;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .status.listening {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+        }
+
+        .status.stopped {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+        }
+
+        .volume-indicator {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .volume-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b, #ff5722);
+            border-radius: 5px;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Musical Note Recognizer</h1>
+        
+        <div class="controls">
+            <button id="startBtn" class="btn">Start Listening</button>
+            <button id="stopBtn" class="btn" disabled>Stop Listening</button>
+        </div>
+
+        <div id="status" class="status stopped">Microphone: Stopped</div>
+
+        <div class="info-panel">
+            <div class="detected-note" id="detectedNote">-</div>
+            <div class="frequency" id="frequency">Frequency: - Hz</div>
+            <div class="volume-indicator">
+                <div class="volume-bar" id="volumeBar"></div>
+            </div>
+        </div>
+
+        <div class="piano-container">
+            <div class="piano" id="piano">
+                <!-- Piano keys will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class NoteRecognizer {
+            constructor() {
+                this.audioContext = null;
+                this.microphone = null;
+                this.analyser = null;
+                this.dataArray = null;
+                this.isListening = false;
+                this.animationId = null;
+                
+                // Musical notes and their frequencies (A4 = 440 Hz)
+                this.noteFrequencies = {
+                    'C': [65.41, 130.81, 261.63, 523.25, 1046.50],
+                    'C#': [69.30, 138.59, 277.18, 554.37, 1108.73],
+                    'D': [73.42, 146.83, 293.66, 587.33, 1174.66],
+                    'D#': [77.78, 155.56, 311.13, 622.25, 1244.51],
+                    'E': [82.41, 164.81, 329.63, 659.25, 1318.51],
+                    'F': [87.31, 174.61, 349.23, 698.46, 1396.91],
+                    'F#': [92.50, 185.00, 369.99, 739.99, 1479.98],
+                    'G': [98.00, 196.00, 392.00, 783.99, 1567.98],
+                    'G#': [103.83, 207.65, 415.30, 830.61, 1661.22],
+                    'A': [110.00, 220.00, 440.00, 880.00, 1760.00],
+                    'A#': [116.54, 233.08, 466.16, 932.33, 1864.66],
+                    'B': [123.47, 246.94, 493.88, 987.77, 1975.53]
+                };
+                
+                this.setupPiano();
+                this.setupEventListeners();
+            }
+
+            setupPiano() {
+                const piano = document.getElementById('piano');
+                const whiteKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+                const blackKeys = ['C#', 'D#', null, 'F#', 'G#', 'A#', null];
+                
+                // Create white keys
+                whiteKeys.forEach(note => {
+                    const key = document.createElement('div');
+                    key.className = 'key white-key';
+                    key.dataset.note = note;
+                    
+                    const label = document.createElement('div');
+                    label.className = 'key-label';
+                    label.textContent = note;
+                    key.appendChild(label);
+                    
+                    piano.appendChild(key);
+                });
+                
+                // Create black keys
+                blackKeys.forEach((note, index) => {
+                    if (note) {
+                        const key = document.createElement('div');
+                        key.className = 'key black-key';
+                        key.dataset.note = note;
+                        key.style.left = `${(index + 1) * 51 - 15}px`;
+                        
+                        const label = document.createElement('div');
+                        label.className = 'key-label';
+                        label.textContent = note;
+                        key.appendChild(label);
+                        
+                        piano.appendChild(key);
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                document.getElementById('startBtn').addEventListener('click', () => this.startListening());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stopListening());
+            }
+
+            async startListening() {
+                try {
+                    // Check if getUserMedia is supported
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        throw new Error('getUserMedia is not supported in this browser');
+                    }
+
+                    // First check current permission status
+                    let permissionStatus;
+                    try {
+                        permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+                    } catch (e) {
+                        console.log('Permission API not supported, trying direct access');
+                    }
+
+                    // If permission is denied, show helpful message
+                    if (permissionStatus && permissionStatus.state === 'denied') {
+                        throw new Error('Microphone permission denied. Please enable microphone access in your browser settings.');
+                    }
+
+                    // Request microphone access with constraints
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: false,
+                            noiseSuppression: false,
+                            autoGainControl: false,
+                            sampleRate: 44100
+                        } 
+                    });
+                    
+                    // Set up audio context
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Resume context if it's suspended (required by some browsers)
+                    if (this.audioContext.state === 'suspended') {
+                        await this.audioContext.resume();
+                    }
+                    
+                    this.microphone = this.audioContext.createMediaStreamSource(stream);
+                    this.analyser = this.audioContext.createAnalyser();
+                    
+                    // Configure analyser
+                    this.analyser.fftSize = 8192;
+                    this.analyser.smoothingTimeConstant = 0.8;
+                    
+                    this.microphone.connect(this.analyser);
+                    
+                    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                    
+                    this.isListening = true;
+                    this.updateUI();
+                    this.analyze();
+                    
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                    
+                    let errorMessage = 'Could not access microphone. ';
+                    
+                    if (error.name === 'NotAllowedError') {
+                        errorMessage += 'Please allow microphone access and try again. You may need to click the microphone icon in your browser\'s address bar.';
+                    } else if (error.name === 'NotFoundError') {
+                        errorMessage += 'No microphone found. Please check your microphone connection.';
+                    } else if (error.name === 'NotSupportedError') {
+                        errorMessage += 'Your browser does not support audio capture.';
+                    } else if (error.name === 'NotReadableError') {
+                        errorMessage += 'Microphone is being used by another application.';
+                    } else {
+                        errorMessage += error.message;
+                    }
+                    
+                    alert(errorMessage);
+                    this.updateUI();
+                }
+            }
+
+            stopListening() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+                
+                // Stop all audio tracks
+                if (this.microphone && this.microphone.mediaStream) {
+                    this.microphone.mediaStream.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                }
+                
+                if (this.audioContext) {
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+                
+                this.isListening = false;
+                this.clearActiveKeys();
+                this.updateUI();
+                
+                document.getElementById('detectedNote').textContent = '-';
+                document.getElementById('frequency').textContent = 'Frequency: - Hz';
+                document.getElementById('volumeBar').style.width = '0%';
+            }
+
+            analyze() {
+                if (!this.isListening) return;
+                
+                this.analyser.getByteFrequencyData(this.dataArray);
+                
+                // Calculate volume
+                const volume = this.dataArray.reduce((sum, value) => sum + value, 0) / this.dataArray.length;
+                const volumePercent = (volume / 255) * 100;
+                document.getElementById('volumeBar').style.width = `${volumePercent}%`;
+                
+                // Find dominant frequency
+                const dominantFrequency = this.getDominantFrequency();
+                
+                if (dominantFrequency > 0 && volume > 20) {
+                    const note = this.frequencyToNote(dominantFrequency);
+                    this.displayNote(note, dominantFrequency);
+                    this.highlightKey(note);
+                } else {
+                    document.getElementById('detectedNote').textContent = '-';
+                    document.getElementById('frequency').textContent = 'Frequency: - Hz';
+                    this.clearActiveKeys();
+                }
+                
+                this.animationId = requestAnimationFrame(() => this.analyze());
+            }
+
+            getDominantFrequency() {
+                const nyquist = this.audioContext.sampleRate / 2;
+                const binSize = nyquist / this.analyser.frequencyBinCount;
+                
+                let maxIndex = 0;
+                let maxValue = 0;
+                
+                // Find the bin with the highest amplitude
+                for (let i = 0; i < this.dataArray.length; i++) {
+                    if (this.dataArray[i] > maxValue) {
+                        maxValue = this.dataArray[i];
+                        maxIndex = i;
+                    }
+                }
+                
+                return maxIndex * binSize;
+            }
+
+            frequencyToNote(frequency) {
+                let closestNote = null;
+                let minDifference = Infinity;
+                
+                for (const [note, frequencies] of Object.entries(this.noteFrequencies)) {
+                    for (const freq of frequencies) {
+                        const difference = Math.abs(frequency - freq);
+                        if (difference < minDifference) {
+                            minDifference = difference;
+                            closestNote = note;
+                        }
+                    }
+                }
+                
+                // Only return the note if the frequency is reasonably close
+                return minDifference < 30 ? closestNote : null;
+            }
+
+            displayNote(note, frequency) {
+                document.getElementById('detectedNote').textContent = note || '-';
+                document.getElementById('frequency').textContent = `Frequency: ${frequency.toFixed(2)} Hz`;
+            }
+
+            highlightKey(note) {
+                this.clearActiveKeys();
+                
+                if (note) {
+                    const key = document.querySelector(`[data-note="${note}"]`);
+                    if (key) {
+                        key.classList.add('active');
+                    }
+                }
+            }
+
+            clearActiveKeys() {
+                document.querySelectorAll('.key.active').forEach(key => {
+                    key.classList.remove('active');
+                });
+            }
+
+            updateUI() {
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const status = document.getElementById('status');
+                
+                if (this.isListening) {
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    status.textContent = 'Microphone: Listening...';
+                    status.className = 'status listening';
+                } else {
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    status.textContent = 'Microphone: Stopped';
+                    status.className = 'status stopped';
+                }
+            }
+        }
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new NoteRecognizer();
+        });
+    </script>
+</body>
+</html>
