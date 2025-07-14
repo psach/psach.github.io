@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markerless AR Selfie with Sri Sri Ravi Shankar</title>
+    <!-- A-Frame and AR.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ar.js/2.2.2/aframe-ar-nft.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .ar-scene {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 0 0 20px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.3); }
+            to { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6); }
+        }
+
+        .controls {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            pointer-events: auto;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #captureBtn {
+            background: linear-gradient(45deg, #10ac84, #1dd1a1);
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+
+        #toggleGuruBtn {
+            background: linear-gradient(45deg, #ffd700, #ffb347);
+            color: #333;
+        }
+
+        #resetBtn {
+            background: linear-gradient(45deg, #5f27cd, #341f97);
+        }
+
+        .status {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .status.show {
+            opacity: 1;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 1002;
+        }
+
+        .loading::after {
+            content: '';
+            display: block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin: 10px auto 0;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.9);
+            color: #333;
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            max-width: 300px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.4em;
+            }
+            
+            .controls {
+                padding: 15px;
+                gap: 10px;
+            }
+            
+            button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            #captureBtn {
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-overlay">
+        <div class="header">
+            <h1>🕉️ AR Selfie with Sri Sri Ravi Shankar ✨</h1>
+        </div>
+        
+        <div class="instructions">
+            📱 Move your device to position the guru figure
+        </div>
+        
+        <div class="controls">
+            <button id="toggleGuruBtn">🎭 Toggle Guru</button>
+            <button id="captureBtn">📸 Capture</button>
+            <button id="resetBtn">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="loading" id="loading" style="display: none;">
+        Loading AR Experience...
+    </div>
+
+    <a-scene
+        class="ar-scene"
+        embedded
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best; sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;"
+        vr-mode-ui="enabled: false;"
+        renderer="logarithmicDepthBuffer: true; antialias: true; alpha: true; precision: medium;"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="enabled: false;">
+        
+        <!-- Assets -->
+        <a-assets>
+            <a-mixin id="guru-mixin"
+                geometry="primitive: plane; width: 2; height: 3;"
+                material="color: #f0f0f0; opacity: 0.9; transparent: true; alphaTest: 0.1;"
+                text="value: 🕉️\nSri Sri\nRavi Shankar; align: center; color: #333; width: 8; position: 0 0 0.01;">
+            </a-mixin>
+        </a-assets>
+
+        <!-- Camera -->
+        <a-camera
+            id="camera"
+            position="0 0 0"
+            look-controls="enabled: false;"
+            wasd-controls="enabled: false;"
+            cursor="rayOrigin: mouse;">
+        </a-camera>
+
+        <!-- Guru Figure -->
+        <a-entity
+            id="guru"
+            position="0 0 -3"
+            visible="true"
+            animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear;">
+            
+            <!-- Main figure -->
+            <a-plane
+                mixin="guru-mixin"
+                position="0 0 0"
+                rotation="0 0 0">
+            </a-plane>
+            
+            <!-- Spiritual aura -->
+            <a-ring
+                color="#FFD700"
+                radius-inner="1.5"
+                radius-outer="2"
+                position="0 0 -0.1"
+                material="opacity: 0.3; transparent: true;"
+                animation="property: rotation; to: 0 0 360; loop: true; dur: 10000; easing: linear;">
+            </a-ring>
+            
+            <!-- Floating Om symbols -->
+            <a-text
+                value="🕉️"
+                position="2 2 0"
+                scale="0.5 0.5 0.5"
+                color="#FFD700"
+                animation="property: position; to: 2 3 0; loop: true; dur: 3000; dir: alternate; easing: easeInOutSine;">
+            </a-text>
+            
+            <a-text
+                value="🕉️"
+                position="-2 2 0"
+                scale="0.5 0.5 0.5"
+                color="#FFD700"
+                animation="property: position; to: -2 3 0; loop: true; dur: 4000; dir: alternate; easing: easeInOutSine;">
+            </a-text>
+            
+            <!-- Blessing particles -->
+            <a-entity id="particles" position="0 1.5 0">
+                <a-text value="✨" position="0 0 0" scale="0.3 0.3 0.3" color="#FFD700"
+                    animation="property: position; to: 0 2 0; loop: true; dur: 2000; dir: alternate; easing: easeInOutSine;"></a-text>
+                <a-text value="✨" position="0.5 0 0" scale="0.3 0.3 0.3" color="#FFD700"
+                    animation="property: position; to: 0.5 2 0; loop: true; dur: 2500; dir: alternate; easing: easeInOutSine;"></a-text>
+                <a-text value="✨" position="-0.5 0 0" scale="0.3 0.3 0.3" color="#FFD700"
+                    animation="property: position; to: -0.5 2 0; loop: true; dur: 1800; dir: alternate; easing: easeInOutSine;"></a-text>
+            </a-entity>
+        </a-entity>
+
+        <!-- Ambient spiritual environment -->
+        <a-text
+            value="🙏 Blessings & Peace 🙏"
+            position="0 4 -5"
+            align="center"
+            color="#FFD700"
+            scale="1.5 1.5 1.5"
+            animation="property: rotation; to: 0 360 0; loop: true; dur: 30000; easing: linear;">
+        </a-text>
+        
+        <!-- Floating lotus petals -->
+        <a-text value="🌸" position="3 1 -4" scale="0.8 0.8 0.8" color="#FFB6C1"
+            animation="property: position; to: 3 2 -4; loop: true; dur: 5000; dir: alternate; easing: easeInOutSine;"></a-text>
+        <a-text value="🌸" position="-3 1 -4" scale="0.8 0.8 0.8" color="#FFB6C1"
+            animation="property: position; to: -3 2 -4; loop: true; dur: 4500; dir: alternate; easing: easeInOutSine;"></a-text>
+        
+        <!-- Ambient light -->
+        <a-light type="ambient" color="#FFD700" intensity="0.5"></a-light>
+        <a-light type="directional" position="0 5 0" color="#ffffff" intensity="0.3"></a-light>
+    </a-scene>
+
+    <script>
+        class MarkerlessARApp {
+            constructor() {
+                this.scene = null;
+                this.guru = null;
+                this.camera = null;
+                this.isGuruVisible = true;
+                this.isCapturing = false;
+                this.isInitialized = false;
+                
+                this.init();
+            }
+
+            init() {
+                try {
+                    // Wait for scene to be ready
+                    const waitForScene = () => {
+                        this.scene = document.querySelector('a-scene');
+                        if (this.scene && this.scene.hasLoaded) {
+                            this.setupScene();
+                        } else {
+                            setTimeout(waitForScene, 100);
+                        }
+                    };
+                    
+                    waitForScene();
+                    
+                } catch (error) {
+                    console.error('Init error:', error);
+                    this.handleError('Failed to initialize AR scene');
+                }
+            }
+
+            setupScene() {
+                try {
+                    this.guru = document.getElementById('guru');
+                    this.camera = document.getElementById('camera');
+                    
+                    if (!this.guru || !this.camera) {
+                        console.error('Required elements not found');
+                        this.handleError('AR elements not found');
+                        return;
+                    }
+                    
+                    this.setupEventListeners();
+                    this.showStatus('AR Ready! Move your device to position elements', 4000);
+                    this.hideLoading();
+                    this.isInitialized = true;
+                    
+                    // Scene loaded successfully
+                    this.scene.addEventListener('renderstart', () => {
+                        console.log('AR scene rendering started');
+                    });
+                    
+                } catch (error) {
+                    console.error('Scene setup error:', error);
+                    this.handleError('Failed to setup AR scene');
+                }
+            }
+
+            handleError(message) {
+                console.error(message);
+                this.hideLoading();
+                this.showStatus(`Error: ${message}`, 5000);
+            }
+
+            setupEventListeners() {
+                document.getElementById('toggleGuruBtn').addEventListener('click', () => {
+                    this.toggleGuru();
+                });
+
+                document.getElementById('captureBtn').addEventListener('click', () => {
+                    this.captureScreen();
+                });
+
+                document.getElementById('resetBtn').addEventListener('click', () => {
+                    this.resetPosition();
+                });
+
+                // Handle device orientation changes
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => {
+                        this.showStatus('Orientation changed - reorienting AR', 2000);
+                    }, 500);
+                });
+            }
+
+            toggleGuru() {
+                if (!this.isInitialized || !this.guru) {
+                    this.showStatus('AR not ready yet', 2000);
+                    return;
+                }
+                
+                this.isGuruVisible = !this.isGuruVisible;
+                this.guru.setAttribute('visible', this.isGuruVisible);
+                
+                const btn = document.getElementById('toggleGuruBtn');
+                btn.textContent = this.isGuruVisible ? '🎭 Hide Guru' : '🎭 Show Guru';
+                
+                this.showStatus(this.isGuruVisible ? 'Guru figure shown' : 'Guru figure hidden', 2000);
+            }
+
+            captureScreen() {
+                if (this.isCapturing || !this.isInitialized) {
+                    this.showStatus('AR not ready or already capturing', 2000);
+                    return;
+                }
+                
+                this.isCapturing = true;
+                this.showStatus('Capturing AR selfie...', 2000);
+                
+                // Flash effect
+                const flash = document.createElement('div');
+                flash.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(255, 255, 255, 0.8);
+                    z-index: 2000;
+                    animation: flash 0.5s ease-out;
+                `;
+                
+                // Add flash animation
+                if (!document.querySelector('#flash-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'flash-style';
+                    style.textContent = `
+                        @keyframes flash {
+                            0% { opacity: 1; }
+                            100% { opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                document.body.appendChild(flash);
+                
+                setTimeout(() => {
+                    flash.remove();
+                    this.isCapturing = false;
+                    this.showStatus('Use your device screenshot feature to capture this AR view!', 4000);
+                }, 500);
+            }
+
+            resetPosition() {
+                if (!this.isInitialized || !this.guru) {
+                    this.showStatus('AR not ready yet', 2000);
+                    return;
+                }
+                
+                this.guru.setAttribute('position', '0 0 -3');
+                this.guru.setAttribute('rotation', '0 0 0');
+                
+                this.showStatus('AR elements reset to default position', 2000);
+            }
+
+            showStatus(message, duration = 3000) {
+                const statusEl = document.getElementById('status');
+                statusEl.textContent = message;
+                statusEl.classList.add('show');
+                
+                setTimeout(() => {
+                    statusEl.classList.remove('show');
+                }, duration);
+            }
+
+            hideLoading() {
+                const loading = document.getElementById('loading');
+                loading.style.display = 'none';
+            }
+        }
+
+        // Initialize the AR app
+        window.addEventListener('load', () => {
+            // Show loading initially
+            document.getElementById('loading').style.display = 'block';
+            
+            // Wait for A-Frame to be ready
+            if (typeof AFRAME !== 'undefined') {
+                // Start AR app after a short delay
+                setTimeout(() => {
+                    try {
+                        new MarkerlessARApp();
+                    } catch (error) {
+                        console.error('AR App initialization error:', error);
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('status').textContent = 'AR initialization failed. Please refresh the page.';
+                        document.getElementById('status').classList.add('show');
+                    }
+                }, 1000);
+            } else {
+                console.error('A-Frame not loaded');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('status').textContent = 'AR library failed to load. Please refresh the page.';
+                document.getElementById('status').classList.add('show');
+            }
+        });
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('AR paused');
+            } else {
+                console.log('AR resumed');
+            }
+        });
+    </script>
+</body>
+</html>
