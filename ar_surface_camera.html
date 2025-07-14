@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Surface Recognition Camera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .camera-container {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #videoFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .overlay-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 30;
+            pointer-events: all;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.active {
+            background: rgba(0, 255, 150, 0.3);
+            border-color: rgba(0, 255, 150, 0.6);
+        }
+
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.active {
+            background: #44ff44;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        .crosshair::before,
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .crosshair::before {
+            top: 50%;
+            left: -10px;
+            right: -10px;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        .crosshair::after {
+            left: 50%;
+            top: -10px;
+            bottom: -10px;
+            width: 2px;
+            transform: translateX(-50%);
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 40;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ar-object {
+            position: absolute;
+            color: #00ff96;
+            font-size: 14px;
+            font-weight: bold;
+            background: rgba(0, 255, 150, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 150, 0.5);
+            backdrop-filter: blur(5px);
+            pointer-events: none;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .detection-box {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            pointer-events: none;
+            animation: detectPulse 2s infinite;
+        }
+
+        @keyframes detectPulse {
+            0%, 100% { border-color: rgba(255, 255, 255, 0.8); }
+            50% { border-color: rgba(0, 255, 150, 0.8); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="camera-container">
+            <video id="videoFeed" autoplay playsinline></video>
+            <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+            <div class="ui-overlay" id="uiOverlay"></div>
+            <div class="crosshair"></div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot" id="cameraStatus"></div>
+                <span id="cameraStatusText">Camera: Initializing...</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="detectionStatus"></div>
+                <span id="detectionStatusText">Surface Detection: Inactive</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot" id="arStatus"></div>
+                <span id="arStatusText">AR Objects: 0</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="toggleDetection">Start Detection</button>
+            <button class="btn" id="clearAR">Clear AR</button>
+            <button class="btn" id="toggleCamera">Switch Camera</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Initializing Camera...</div>
+        </div>
+    </div>
+
+    <script>
+        class ARSurfaceRecognition {
+            constructor() {
+                this.video = document.getElementById('videoFeed');
+                this.canvas = document.getElementById('overlayCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.uiOverlay = document.getElementById('uiOverlay');
+                this.loading = document.getElementById('loading');
+                
+                this.isDetectionActive = false;
+                this.currentCamera = 'user';
+                this.detectedSurfaces = [];
+                this.arObjects = [];
+                this.frameCount = 0;
+                
+                this.initializeCamera();
+                this.setupEventListeners();
+                this.startDetectionLoop();
+            }
+
+            async initializeCamera() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { 
+                            facingMode: this.currentCamera,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    });
+                    
+                    this.video.srcObject = stream;
+                    this.video.onloadedmetadata = () => {
+                        this.resizeCanvas();
+                        this.updateStatus('camera', true, 'Camera: Active');
+                        this.loading.style.display = 'none';
+                    };
+                } catch (error) {
+                    this.updateStatus('camera', false, 'Camera: Error');
+                    this.loading.innerHTML = '<div>Camera access denied or unavailable</div>';
+                }
+            }
+
+            resizeCanvas() {
+                const rect = this.video.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+            }
+
+            setupEventListeners() {
+                document.getElementById('toggleDetection').addEventListener('click', () => {
+                    this.toggleDetection();
+                });
+
+                document.getElementById('clearAR').addEventListener('click', () => {
+                    this.clearAR();
+                });
+
+                document.getElementById('toggleCamera').addEventListener('click', () => {
+                    this.switchCamera();
+                });
+
+                window.addEventListener('resize', () => {
+                    this.resizeCanvas();
+                });
+            }
+
+            toggleDetection() {
+                this.isDetectionActive = !this.isDetectionActive;
+                const btn = document.getElementById('toggleDetection');
+                
+                if (this.isDetectionActive) {
+                    btn.textContent = 'Stop Detection';
+                    btn.classList.add('active');
+                    this.updateStatus('detection', true, 'Surface Detection: Active');
+                } else {
+                    btn.textContent = 'Start Detection';
+                    btn.classList.remove('active');
+                    this.updateStatus('detection', false, 'Surface Detection: Inactive');
+                }
+            }
+
+            clearAR() {
+                this.arObjects = [];
+                this.detectedSurfaces = [];
+                this.updateARStatus();
+                this.clearOverlay();
+            }
+
+            async switchCamera() {
+                this.currentCamera = this.currentCamera === 'user' ? 'environment' : 'user';
+                await this.initializeCamera();
+            }
+
+            startDetectionLoop() {
+                const detect = () => {
+                    if (this.isDetectionActive) {
+                        this.detectSurfaces();
+                        this.renderAR();
+                    }
+                    this.frameCount++;
+                    requestAnimationFrame(detect);
+                };
+                detect();
+            }
+
+            detectSurfaces() {
+                // Simulate surface detection with edge detection-like algorithm
+                const rect = this.video.getBoundingClientRect();
+                
+                // Every 30 frames, simulate finding new surfaces
+                if (this.frameCount % 30 === 0) {
+                    const numSurfaces = Math.floor(Math.random() * 3) + 1;
+                    this.detectedSurfaces = [];
+                    
+                    for (let i = 0; i < numSurfaces; i++) {
+                        const surface = {
+                            x: Math.random() * (rect.width - 100),
+                            y: Math.random() * (rect.height - 100),
+                            width: 80 + Math.random() * 120,
+                            height: 60 + Math.random() * 100,
+                            confidence: 0.6 + Math.random() * 0.4,
+                            type: Math.random() > 0.5 ? 'horizontal' : 'vertical'
+                        };
+                        this.detectedSurfaces.push(surface);
+                    }
+                    
+                    this.generateARObjects();
+                }
+            }
+
+            generateARObjects() {
+                this.arObjects = [];
+                
+                this.detectedSurfaces.forEach((surface, index) => {
+                    if (surface.confidence > 0.7) {
+                        const arObject = {
+                            x: surface.x + surface.width / 2,
+                            y: surface.y + surface.height / 2,
+                            text: `Surface ${index + 1}`,
+                            type: surface.type,
+                            confidence: surface.confidence,
+                            timestamp: Date.now()
+                        };
+                        this.arObjects.push(arObject);
+                    }
+                });
+                
+                this.updateARStatus();
+            }
+
+            renderAR() {
+                this.clearOverlay();
+                
+                // Draw detection boxes
+                this.detectedSurfaces.forEach(surface => {
+                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${surface.confidence})`;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeRect(surface.x, surface.y, surface.width, surface.height);
+                    
+                    // Draw confidence indicator
+                    this.ctx.fillStyle = `rgba(0, 255, 150, ${surface.confidence * 0.3})`;
+                    this.ctx.fillRect(surface.x, surface.y, surface.width, surface.height);
+                });
+                
+                // Render AR objects in UI overlay
+                this.uiOverlay.innerHTML = '';
+                this.arObjects.forEach((obj, index) => {
+                    const arElement = document.createElement('div');
+                    arElement.className = 'ar-object';
+                    arElement.style.left = `${obj.x}px`;
+                    arElement.style.top = `${obj.y}px`;
+                    arElement.style.animationDelay = `${index * 0.2}s`;
+                    arElement.innerHTML = `
+                        ${obj.text}<br>
+                        <small>${obj.type} • ${Math.round(obj.confidence * 100)}%</small>
+                    `;
+                    this.uiOverlay.appendChild(arElement);
+                });
+            }
+
+            clearOverlay() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            updateStatus(type, active, text) {
+                const statusDot = document.getElementById(`${type}Status`);
+                const statusText = document.getElementById(`${type}StatusText`);
+                
+                statusDot.classList.toggle('active', active);
+                statusText.textContent = text;
+            }
+
+            updateARStatus() {
+                this.updateStatus('ar', this.arObjects.length > 0, `AR Objects: ${this.arObjects.length}`);
+            }
+        }
+
+        // Initialize the AR app when the page loads
+        window.addEventListener('load', () => {
+            new ARSurfaceRecognition();
+        });
+    </script>
+</body>
+</html>
