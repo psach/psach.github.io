@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano AR Note Stickers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+            color: white;
+            overflow: hidden;
+        }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        #status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 0 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .control-group {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .control-group label {
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .note-sticker {
+            position: absolute;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .black-key-sticker {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="canvas"></canvas>
+        
+        <div id="controls">
+            <div class="control-group">
+                <button id="startBtn">Start Camera</button>
+                <button id="calibrateBtn" disabled>Calibrate Piano</button>
+            </div>
+            <div class="control-group">
+                <label>Show Notes:</label>
+                <label class="switch">
+                    <input type="checkbox" id="showNotes" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="control-group">
+                <label>Show Letters:</label>
+                <label class="switch">
+                    <input type="checkbox" id="showLetters" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div id="status">
+            <div id="statusText">Click Start Camera to begin</div>
+        </div>
+
+        <div id="instructions">
+            <strong>Instructions:</strong><br>
+            1. Click "Start Camera" to begin<br>
+            2. Point camera at a 61-key piano<br>
+            3. Click "Calibrate Piano" when piano is visible<br>
+            4. Virtual stickers will appear on keys showing notes and letters
+        </div>
+    </div>
+
+    <script>
+        class PianoARApp {
+            constructor() {
+                this.video = document.getElementById('video');
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.startBtn = document.getElementById('startBtn');
+                this.calibrateBtn = document.getElementById('calibrateBtn');
+                this.showNotes = document.getElementById('showNotes');
+                this.showLetters = document.getElementById('showLetters');
+                this.statusText = document.getElementById('statusText');
+                
+                this.stream = null;
+                this.isCalibrated = false;
+                this.pianoKeys = [];
+                this.animationId = null;
+                
+                this.setupEventListeners();
+                this.setupCanvas();
+                this.generatePianoKeyData();
+            }
+
+            setupEventListeners() {
+                this.startBtn.addEventListener('click', () => this.startCamera());
+                this.calibrateBtn.addEventListener('click', () => this.calibratePiano());
+                this.showNotes.addEventListener('change', () => this.updateStickers());
+                this.showLetters.addEventListener('change', () => this.updateStickers());
+                
+                window.addEventListener('resize', () => this.setupCanvas());
+            }
+
+            setupCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            generatePianoKeyData() {
+                const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const whiteKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+                const blackKeys = ['C#', 'D#', 'F#', 'G#', 'A#'];
+                
+                this.keyData = [];
+                let octave = 2;
+                let noteIndex = 0;
+                
+                // Generate 61 keys starting from C2
+                for (let i = 0; i < 61; i++) {
+                    const note = notes[noteIndex % 12];
+                    const isBlack = blackKeys.includes(note);
+                    const letter = whiteKeys[whiteKeys.indexOf(note.replace('#', ''))] || note[0];
+                    
+                    this.keyData.push({
+                        note: note + octave,
+                        letter: letter,
+                        isBlack: isBlack,
+                        index: i
+                    });
+                    
+                    noteIndex++;
+                    if (noteIndex % 12 === 0) {
+                        octave++;
+                    }
+                }
+            }
+
+            async startCamera() {
+                try {
+                    this.stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 },
+                            facingMode: 'environment'
+                        }
+                    });
+                    
+                    this.video.srcObject = this.stream;
+                    this.video.onloadedmetadata = () => {
+                        this.startBtn.disabled = true;
+                        this.calibrateBtn.disabled = false;
+                        this.statusText.textContent = 'Camera started - Point at piano and calibrate';
+                        this.startProcessing();
+                    };
+                } catch (error) {
+                    console.error('Error accessing camera:', error);
+                    this.statusText.textContent = 'Error: Cannot access camera';
+                }
+            }
+
+            startProcessing() {
+                const process = () => {
+                    this.detectPianoKeys();
+                    this.drawStickers();
+                    this.animationId = requestAnimationFrame(process);
+                };
+                process();
+            }
+
+            detectPianoKeys() {
+                // Simulate piano key detection
+                // In a real implementation, this would use computer vision
+                if (!this.isCalibrated) return;
+                
+                const videoWidth = this.video.videoWidth;
+                const videoHeight = this.video.videoHeight;
+                const canvasWidth = this.canvas.width;
+                const canvasHeight = this.canvas.height;
+                
+                // Simulate detected piano keyboard area
+                const keyboardArea = {
+                    x: canvasWidth * 0.1,
+                    y: canvasHeight * 0.4,
+                    width: canvasWidth * 0.8,
+                    height: canvasHeight * 0.3
+                };
+                
+                this.pianoKeys = [];
+                
+                // Generate white keys
+                const whiteKeyWidth = keyboardArea.width / 36; // 36 white keys in 61-key piano
+                let whiteKeyIndex = 0;
+                
+                for (let i = 0; i < this.keyData.length; i++) {
+                    const keyInfo = this.keyData[i];
+                    
+                    if (!keyInfo.isBlack) {
+                        const x = keyboardArea.x + (whiteKeyIndex * whiteKeyWidth);
+                        const y = keyboardArea.y;
+                        const width = whiteKeyWidth;
+                        const height = keyboardArea.height;
+                        
+                        this.pianoKeys.push({
+                            ...keyInfo,
+                            x: x + width / 2,
+                            y: y + height * 0.3, // Position sticker in upper portion
+                            width: width,
+                            height: height
+                        });
+                        
+                        whiteKeyIndex++;
+                    }
+                }
+                
+                // Generate black keys
+                const blackKeyPositions = [0.5, 1.5, 3.5, 4.5, 5.5]; // Relative positions within each octave
+                let blackKeyIndex = 0;
+                
+                for (let octaveIndex = 0; octaveIndex < 6; octaveIndex++) {
+                    for (let pos of blackKeyPositions) {
+                        if (blackKeyIndex >= this.keyData.filter(k => k.isBlack).length) break;
+                        
+                        const actualPos = octaveIndex * 7 + pos;
+                        if (actualPos * whiteKeyWidth + keyboardArea.x < keyboardArea.x + keyboardArea.width) {
+                            const keyInfo = this.keyData.find(k => k.isBlack && k.index === this.keyData.filter(k => k.isBlack)[blackKeyIndex].index);
+                            if (keyInfo) {
+                                const x = keyboardArea.x + (actualPos * whiteKeyWidth);
+                                const y = keyboardArea.y;
+                                const width = whiteKeyWidth * 0.6;
+                                const height = keyboardArea.height * 0.6;
+                                
+                                this.pianoKeys.push({
+                                    ...keyInfo,
+                                    x: x,
+                                    y: y + height * 0.3,
+                                    width: width,
+                                    height: height
+                                });
+                                
+                                blackKeyIndex++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            calibratePiano() {
+                this.isCalibrated = true;
+                this.statusText.textContent = 'Piano calibrated - AR stickers active';
+                
+                // Add some visual feedback
+                this.ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                setTimeout(() => {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }, 500);
+            }
+
+            drawStickers() {
+                if (!this.isCalibrated) return;
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let key of this.pianoKeys) {
+                    this.drawSticker(key);
+                }
+            }
+
+            drawSticker(key) {
+                const showNotes = this.showNotes.checked;
+                const showLetters = this.showLetters.checked;
+                
+                if (!showNotes && !showLetters) return;
+                
+                let text = '';
+                if (showNotes && showLetters) {
+                    text = `${key.note}\n${key.letter}`;
+                } else if (showNotes) {
+                    text = key.note;
+                } else {
+                    text = key.letter;
+                }
+                
+                // Create sticker background
+                const padding = 12;
+                const fontSize = 14;
+                this.ctx.font = `bold ${fontSize}px Arial`;
+                
+                const lines = text.split('\n');
+                const lineHeight = fontSize + 4;
+                const textWidth = Math.max(...lines.map(line => this.ctx.measureText(line).width));
+                const textHeight = lines.length * lineHeight;
+                
+                const stickerWidth = textWidth + padding * 2;
+                const stickerHeight = textHeight + padding * 2;
+                
+                // Draw sticker background with gradient
+                const gradient = this.ctx.createLinearGradient(
+                    key.x - stickerWidth/2, key.y - stickerHeight/2,
+                    key.x + stickerWidth/2, key.y + stickerHeight/2
+                );
+                
+                if (key.isBlack) {
+                    gradient.addColorStop(0, '#667eea');
+                    gradient.addColorStop(1, '#764ba2');
+                } else {
+                    gradient.addColorStop(0, '#ff6b6b');
+                    gradient.addColorStop(1, '#ffd93d');
+                }
+                
+                this.ctx.fillStyle = gradient;
+                this.ctx.beginPath();
+                this.ctx.roundRect(
+                    key.x - stickerWidth/2, 
+                    key.y - stickerHeight/2, 
+                    stickerWidth, 
+                    stickerHeight, 
+                    10
+                );
+                this.ctx.fill();
+                
+                // Draw border
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                
+                // Draw text
+                this.ctx.fillStyle = key.isBlack ? 'white' : '#333';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                lines.forEach((line, index) => {
+                    const y = key.y + (index - (lines.length - 1) / 2) * lineHeight;
+                    this.ctx.fillText(line, key.x, y);
+                });
+            }
+
+            updateStickers() {
+                // Stickers will be updated in the next frame
+            }
+        }
+
+        // Add roundRect polyfill for older browsers
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+        }
+
+        // Initialize the app
+        const app = new PianoARApp();
+    </script>
+</body>
+</html>
