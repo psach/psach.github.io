@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aryabhata JEE Solver</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+      color: #333;
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #response {
+      white-space: pre-wrap;
+      background: #ecf0f1;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧠 Aryabhata JEE Solver</h2>
+  <p>Select a sample JEE question or type your own below:</p>
+
+  <select id="sampleQuestions">
+    <option value="">-- Select Sample JEE Question --</option>
+    <option value="A particle is moving in a circular path of radius r with a constant speed v. What is the acceleration of the particle?">
+      Physics: Circular motion acceleration
+    </option>
+    <option value="What is the pH of a 0.001 M HCl solution?">
+      Chemistry: pH of HCl
+    </option>
+    <option value="Find the derivative of x^2 * sin(x).">
+      Math: Derivative of x^2*sin(x)
+    </option>
+  </select>
+
+  <textarea id="questionInput" placeholder="Or type your JEE question here..."></textarea>
+  <button onclick="askModel()">Get Solution</button>
+
+  <h3>📝 Answer:</h3>
+  <div id="response">--</div>
+
+  <script>
+    const HF_API_TOKEN = 'hf_fYuPDJzNUUgdPvUdJEWWPqcOzRuhjWP'; // Replace with your actual key
+
+    document.getElementById('sampleQuestions').addEventListener('change', function () {
+      document.getElementById('questionInput').value = this.value;
+    });
+
+    async function askModel() {
+      const input = document.getElementById('questionInput').value.trim();
+      const outputDiv = document.getElementById('response');
+
+      if (!input) {
+        outputDiv.innerText = 'Please enter or select a question.';
+        return;
+      }
+
+      outputDiv.innerText = 'Loading...';
+
+      try {
+        const response = await fetch('https://api-inference.huggingface.co/models/PhysicsWallahAI/Aryabhata-1.0', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${HF_API_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ inputs: input })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        outputDiv.innerText = result[0]?.generated_text || 'No response from model.';
+
+      } catch (error) {
+        outputDiv.innerText = 'Error: ' + error.message;
+      }
+    }
+  </script>
+
+</body>
+</html>
