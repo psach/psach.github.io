@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Aryabhata AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .panel h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .ai-chat {
+            grid-column: span 2;
+        }
+
+        .chat-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e9ecef;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-container input:focus {
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .question-title {
+            font-weight: 600;
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+
+        .status-indicator.connected {
+            background: #28a745;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #e9ecef;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-chat {
+                grid-column: span 1;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 JEE Aryabhata AI Assistant</h1>
+            <p>Physics Wallah's AI-powered JEE preparation tool with latest sample questions</p>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>📚 Sample JEE Questions</h2>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchSubject('physics')">Physics</div>
+                    <div class="tab" onclick="switchSubject('chemistry')">Chemistry</div>
+                    <div class="tab" onclick="switchSubject('mathematics')">Mathematics</div>
+                </div>
+                
+                <div id="questions-container">
+                    <!-- Questions will be loaded here -->
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>🤖 Aryabhata-1.0 Integration</h2>
+                <div class="api-status">
+                    <div class="status-indicator" id="status-indicator"></div>
+                    <span id="status-text">Connecting to Hugging Face API...</span>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="api-key" style="display: block; margin-bottom: 5px; font-weight: 500;">Hugging Face API Token:</label>
+                    <input type="password" id="api-key" placeholder="hf_..." style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px;">
+                    <small style="color: #666; margin-top: 5px; display: block;">Get your token from huggingface.co/settings/tokens</small>
+                </div>
+                
+                <button class="btn" onclick="testConnection()" style="width: 100%;">Test Connection</button>
+            </div>
+
+            <div class="panel ai-chat">
+                <h2>💬 AI Chat Assistant</h2>
+                <div class="chat-container" id="chat-container">
+                    <div class="message ai-message">
+                        <strong>Aryabhata:</strong> Hello! I'm Aryabhata-1.0 by Physics Wallah. I can help you with JEE Physics, Chemistry, and Mathematics questions. Ask me anything!
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <input type="text" id="user-input" placeholder="Ask about JEE questions, concepts, or solutions..." onkeypress="handleKeyPress(event)">
+                    <button class="btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample JEE Questions Data
+        const jeeQuestions = {
+            physics: [
+                {
+                    title: "Mechanics - Projectile Motion",
+                    question: "A projectile is launched at an angle of 45° with initial velocity 20 m/s. Find the maximum height reached. (g = 10 m/s²)",
+                    options: ["5 m", "10 m", "15 m", "20 m"],
+                    correct: 1,
+                    solution: "At maximum height, vy = 0. Using v² = u² + 2as, where u = 20sin45° = 14.14 m/s. h = u²/(2g) = (14.14)²/(2×10) = 10 m"
+                },
+                {
+                    title: "Thermodynamics - Heat Transfer",
+                    question: "An ideal gas undergoes an isothermal process at temperature T. If the volume changes from V to 2V, what is the work done by the gas?",
+                    options: ["nRT ln(2)", "nRT ln(1/2)", "2nRT", "nRT/2"],
+                    correct: 0,
+                    solution: "For isothermal process: W = nRT ln(Vf/Vi) = nRT ln(2V/V) = nRT ln(2)"
+                },
+                {
+                    title: "Waves - Sound Waves",
+                    question: "A sound wave of frequency 340 Hz travels in air with speed 340 m/s. What is its wavelength?",
+                    options: ["0.5 m", "1 m", "2 m", "340 m"],
+                    correct: 1,
+                    solution: "Using v = fλ, where v = 340 m/s, f = 340 Hz. Therefore λ = v/f = 340/340 = 1 m"
+                }
+            ],
+            chemistry: [
+                {
+                    title: "Organic Chemistry - Alkanes",
+                    question: "What is the IUPAC name of the compound CH₃-CH₂-CH(CH₃)-CH₂-CH₃?",
+                    options: ["2-methylbutane", "3-methylpentane", "2-methylpentane", "isohexane"],
+                    correct: 1,
+                    solution: "The longest chain has 5 carbons (pentane). The methyl group is attached to carbon-3. Hence, 3-methylpentane."
+                },
+                {
+                    title: "Physical Chemistry - Atomic Structure",
+                    question: "Which of the following orbitals has the highest energy in a multi-electron atom?",
+                    options: ["3s", "3p", "3d", "4s"],
+                    correct: 2,
+                    solution: "Energy order: 3s < 3p < 4s < 3d. The 3d orbital has highest energy due to greater shielding effect."
+                },
+                {
+                    title: "Inorganic Chemistry - Periodic Trends",
+                    question: "Which element has the highest first ionization energy?",
+                    options: ["F", "Ne", "Na", "Mg"],
+                    correct: 1,
+                    solution: "Neon (Ne) has the highest first ionization energy due to its stable noble gas configuration and high nuclear charge."
+                }
+            ],
+            mathematics: [
+                {
+                    title: "Calculus - Differentiation",
+                    question: "Find dy/dx if y = x² sin(x)",
+                    options: ["2x sin(x) + x² cos(x)", "x² cos(x) - 2x sin(x)", "2x cos(x) + x² sin(x)", "x² cos(x) + 2x sin(x)"],
+                    correct: 0,
+                    solution: "Using product rule: d/dx[uv] = u'v + uv'. Here u = x², v = sin(x). So dy/dx = 2x sin(x) + x² cos(x)"
+                },
+                {
+                    title: "Coordinate Geometry - Circles",
+                    question: "Find the equation of circle with center (3, 4) and radius 5",
+                    options: ["(x-3)² + (y-4)² = 25", "(x+3)² + (y+4)² = 25", "(x-3)² + (y-4)² = 5", "x² + y² = 25"],
+                    correct: 0,
+                    solution: "Standard form of circle: (x-h)² + (y-k)² = r². With h=3, k=4, r=5: (x-3)² + (y-4)² = 25"
+                },
+                {
+                    title: "Algebra - Quadratic Equations",
+                    question: "If the roots of x² - 6x + k = 0 are equal, find the value of k",
+                    options: ["6", "9", "12", "36"],
+                    correct: 1,
+                    solution: "For equal roots, discriminant = 0. b² - 4ac = 0. Here: 36 - 4(1)(k) = 0. So k = 9"
+                }
+            ]
+        };
+
+        let currentSubject = 'physics';
+        let isConnected = false;
+        let apiKey = '';
+
+        // Initialize the app
+        function init() {
+            loadQuestions(currentSubject);
+            updateConnectionStatus();
+        }
+
+        // Switch subject tabs
+        function switchSubject(subject) {
+            currentSubject = subject;
+            
+            // Update tab styles
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            loadQuestions(subject);
+        }
+
+        // Load questions for selected subject
+        function loadQuestions(subject) {
+            const container = document.getElementById('questions-container');
+            const questions = jeeQuestions[subject];
+            
+            container.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                questionCard.innerHTML = `
+                    <div class="question-title">${q.title}</div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="options">
+                        ${q.options.map((option, i) => `
+                            <div class="option" onclick="selectOption(${index}, ${i}, this)">
+                                ${String.fromCharCode(65 + i)}. ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="solution" id="solution-${index}" style="display: none; background: #e8f5e8; padding: 10px; border-radius: 8px; margin-top: 10px;">
+                        <strong>Solution:</strong> ${q.solution}
+                    </div>
+                `;
+                container.appendChild(questionCard);
+            });
+        }
+
+        // Handle option selection
+        function selectOption(questionIndex, optionIndex, element) {
+            const question = jeeQuestions[currentSubject][questionIndex];
+            const allOptions = element.parentElement.querySelectorAll('.option');
+            
+            // Reset all options
+            allOptions.forEach(opt => {
+                opt.style.background = 'white';
+                opt.style.color = '#333';
+            });
+            
+            // Highlight selected option
+            element.style.background = optionIndex === question.correct ? '#28a745' : '#dc3545';
+            element.style.color = 'white';
+            
+            // Show solution
+            document.getElementById(`solution-${questionIndex}`).style.display = 'block';
+            
+            // Highlight correct answer if wrong selection
+            if (optionIndex !== question.correct) {
+                allOptions[question.correct].style.background = '#28a745';
+                allOptions[question.correct].style.color = 'white';
+            }
+        }
+
+        // Test Hugging Face API connection
+        async function testConnection() {
+            const apiKeyInput = document.getElementById('api-key');
+            apiKey = apiKeyInput.value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter your Hugging Face API token');
+                return;
+            }
+            
+            updateConnectionStatus('connecting');
+            
+            try {
+                const response = await fetch('https://api-inference.huggingface.co/models/PhysicsWallahAI/Aryabhata-1.0', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: "Test connection"
+                    })
+                });
+                
+                if (response.ok) {
+                    isConnected = true;
+                    updateConnectionStatus('connected');
+                    addMessage('ai', 'Great! I\'m now connected to the Aryabhata-1.0 model. How can I help you with JEE preparation?');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                isConnected = false;
+                updateConnectionStatus('error', `Connection failed: ${error.message}`);
+            }
+        }
+
+        // Update connection status
+        function updateConnectionStatus(status = 'disconnected', message = '') {
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            switch (status) {
+                case 'connecting':
+                    indicator.style.background = '#ffc107';
+                    statusText.textContent = 'Connecting...';
+                    break;
+                case 'connected':
+                    indicator.classList.add('connected');
+                    statusText.textContent = 'Connected to Aryabhata-1.0';
+                    break;
+                case 'error':
+                    indicator.style.background = '#dc3545';
+                    statusText.textContent = message || 'Connection failed';
+                    break;
+                default:
+                    indicator.style.background = '#dc3545';
+                    statusText.textContent = 'Not connected';
+            }
+        }
+
+        // Send message to AI
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            if (!isConnected) {
+                addMessage('ai', 'Please connect to the Aryabhata-1.0 model first using your Hugging Face API token.');
+                return;
+            }
+            
+            // Show loading
+            const loadingId = 'loading-' + Date.now();
+            addMessage('ai', '<div class="loading"></div>Thinking...', loadingId);
+            
+            try {
+                const response = await fetch('https://api-inference.huggingface.co/models/PhysicsWallahAI/Aryabhata-1.0', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: `Question: ${message}\nPlease provide a detailed explanation suitable for JEE preparation.`,
+                        parameters: {
+                            max_length: 500,
+                            temperature: 0.7,
+                            do_sample: true
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                let aiResponse = data[0]?.generated_text || 'Sorry, I could not process your question.';
+                
+                // Clean up the response
+                aiResponse = aiResponse.replace(`Question: ${message}\nPlease provide a detailed explanation suitable for JEE preparation.`, '').trim();
+                
+                // Remove loading message and add actual response
+                removeMessage(loadingId);
+                addMessage('ai', aiResponse);
+                
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage('ai', `Error: ${error.message}. Please check your API token and try again.`);
+            }
+        }
+
+        // Add message to chat
+        function addMessage(sender, content, id = null) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            if (id) messageDiv.id = id;
+            
+            if (sender === 'ai') {
+                messageDiv.innerHTML = `<strong>Aryabhata:</strong> ${content}`;
+            } else {
+                messageDiv.innerHTML = `<strong>You:</strong> ${content}`;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Remove message from chat
+        function removeMessage(id) {
+            const message = document.getElementById(id);
+            if (message) {
+                message.remove();
+            }
+        }
+
+        // Handle Enter key press
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Initialize app when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
