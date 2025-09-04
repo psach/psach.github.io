@@ -202,8 +202,7 @@ Best regards,
 [Title]"
                 ></textarea>
                 <div class="placeholder-hint">
-                    <strong>Tip:</strong> Use square brackets to create form fields. For example: [Name], [Date], [Email], etc.<br>
-                    <strong>Smart Fields:</strong> Fields like [Address], [Comments], [Description] become multiline boxes. Fields like [Name], [Email], [Phone Number] auto-expand as needed.
+                    <strong>Tip:</strong> Use square brackets to create form fields. For example: [Name], [Date], [Email], etc.
                 </div>
             </div>
             
@@ -314,8 +313,7 @@ Best regards,
                         yPosition = newPage.getSize().height - margin - fontSize;
                     }
                     
-                    const processedLine = await processLineWithWrapping(line, page, pdfDoc, margin, yPosition, maxWidth, fieldCounter,lineHeight);
-                                                                      
+                    const processedLine = await processLineWithFields(line, page, pdfDoc, margin, yPosition, maxWidth, fieldCounter);
                     yPosition -= lineHeight;
                     fieldCounter = processedLine.fieldCounter;
                 }
@@ -379,84 +377,16 @@ Best regards,
             }
         }
 
-        async function processLineWithWrapping(line, page, pdfDoc, x, y, maxWidth, fieldCounter, lineHeight) {
+        async function processLineWithFields(line, page, pdfDoc, x, y, maxWidth, fieldCounter) {
             const form = pdfDoc.getForm();
             const fontSize = 12;
             let currentX = x;
-            let currentY = y;
             let currentFieldCounter = fieldCounter;
-            let currentPage = page;
             
-            // Split line by placeholders and spaces for better wrapping
-            const parts = line.split(/(\[[^\]]+\]|\s+)/);
-            let lineContent = [];
-            let currentLineWidth = 0;
+            // Split line by placeholders
+            const parts = line.split(/(\[[^\]]+\])/);
             
             for (const part of parts) {
-                if (!part) continue;
-                
-                const placeholderMatch = part.match(/\[([^\]]+)\]/);
-                let partWidth;
-                
-                if (placeholderMatch) {
-                    // This is a placeholder - estimate field width
-                    const fieldName = placeholderMatch[1];
-                    partWidth = Math.max(80, fieldName.length * 7);
-                } else {
-                    // Regular text - estimate width
-                    partWidth = part.length * (fontSize * 0.6);
-                }
-                
-                // Check if adding this part would exceed the line width
-                if (currentLineWidth + partWidth > maxWidth && lineContent.length > 0) {
-                    // Process current line content
-                    const result = await renderLineContent(lineContent, currentPage, pdfDoc, x, currentY, currentFieldCounter);
-                    currentFieldCounter = result.fieldCounter;
-                    
-                    // Move to next line
-                    currentY -= lineHeight;
-                    
-                    // Check if we need a new page
-                    if (currentY < 50) {
-                        currentPage = pdfDoc.addPage([612, 792]);
-                        currentY = currentPage.getSize().height - 50 - fontSize;
-                    }
-                    
-                    // Start new line
-                    lineContent = [];
-                    currentLineWidth = 0;
-                }
-                
-                // Add part to current line
-                if (part.trim() || placeholderMatch) {
-                    lineContent.push(part);
-                    currentLineWidth += partWidth;
-                }
-            }
-            
-            // Process remaining line content
-            if (lineContent.length > 0) {
-                const result = await renderLineContent(lineContent, currentPage, pdfDoc, x, currentY, currentFieldCounter);
-                currentFieldCounter = result.fieldCounter;
-            }
-            
-            // Move to next line for the next input line
-            currentY -= lineHeight;
-            
-            return { 
-                yPosition: currentY, 
-                fieldCounter: currentFieldCounter,
-                currentPage: currentPage 
-            };
-        }
-
-        async function renderLineContent(lineContent, page, pdfDoc, x, y, fieldCounter) {
-            const form = pdfDoc.getForm();
-            const fontSize = 12;
-            let currentX = x;
-            let currentFieldCounter = fieldCounter;
-            
-            for (const part of lineContent) {
                 const placeholderMatch = part.match(/\[([^\]]+)\]/);
                 
                 if (placeholderMatch) {
@@ -464,8 +394,8 @@ Best regards,
                     const fieldName = placeholderMatch[1];
                     const uniqueFieldName = `${fieldName}_${currentFieldCounter}`;
                     
-                    // Calculate field width
-                    const fieldWidth = Math.max(80, fieldName.length * 7);
+                    // Estimate field width based on placeholder text length
+                    const fieldWidth = Math.max(100, fieldName.length * 8);
                     
                     // Create text field with no border or background
                     const textField = form.createTextField(uniqueFieldName);
@@ -475,14 +405,14 @@ Best regards,
                         width: fieldWidth,
                         height: 16,
                         borderWidth: 0,
-                        backgroundColor: PDFLib.rgb(1, 1, 1),
+                        backgroundColor: PDFLib.rgb(1, 1, 1), // White background (transparent)
                     });
                     
                     // Set placeholder text as the default value inside the field
                     textField.setText(fieldName);
                     textField.setAlignment(PDFLib.TextAlignment.Left);
                     
-                    currentX += fieldWidth;
+                    currentX += fieldWidth + 5;
                     currentFieldCounter++;
                     
                 } else if (part.trim()) {
@@ -494,10 +424,14 @@ Best regards,
                         color: PDFLib.rgb(0, 0, 0),
                     });
                     
+                    // Estimate text width (rough approximation)
                     currentX += part.length * (fontSize * 0.6);
-                } else {
-                    // Space
-                    currentX += fontSize * 0.3;
+                }
+                
+                // Check if we need to wrap to next line
+                if (currentX > x + maxWidth) {
+                    currentX = x;
+                    y -= fontSize * 1.5;
                 }
             }
             
