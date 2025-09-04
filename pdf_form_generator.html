@@ -314,7 +314,7 @@ Best regards,
                         yPosition = newPage.getSize().height - margin - fontSize;
                     }
                     
-                    const processedLine = await processLineWithFields(line, page, pdfDoc, margin, yPosition, maxWidth, fieldCounter);
+                    const processedLine = await processLineWithWrapping(line, page, pdfDoc, margin, yPosition, maxWidth, fieldCounter);
                     yPosition -= lineHeight;
                     fieldCounter = processedLine.fieldCounter;
                 }
