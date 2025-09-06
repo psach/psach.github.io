@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Table to CSV Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .file-input-wrapper:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .file-input-wrapper input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .preview-section {
+            margin: 30px 0;
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .extracted-text {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .table-preview {
+            margin: 20px 0;
+            overflow-x: auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-preview table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-preview th,
+        .table-preview td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-preview th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        .table-preview tr:hover {
+            background: #f8fafc;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .alert-info {
+            background: #e6f3ff;
+            color: #0369a1;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .alert-warning {
+            background: #fef3cd;
+            color: #b45309;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .settings-panel {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .settings-panel h3 {
+            color: #374151;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .setting-group {
+            margin-bottom: 15px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .setting-group input,
+        .setting-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .setting-group input:focus,
+        .setting-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Image Table to CSV</h1>
+            <p>Upload an image containing table data and convert it to CSV format</p>
+        </div>
+
+        <div class="upload-section">
+            <label class="file-input-wrapper">
+                <input type="file" id="imageInput" accept="image/*">
+                📁 Choose Image File
+            </label>
+        </div>
+
+        <div class="settings-panel">
+            <h3>⚙️ Processing Settings</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div class="setting-group">
+                    <label for="delimiter">CSV Delimiter:</label>
+                    <select id="delimiter">
+                        <option value=",">Comma (,)</option>
+                        <option value=";">Semicolon (;)</option>
+                        <option value="\t">Tab</option>
+                        <option value="|">Pipe (|)</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label for="language">OCR Language:</label>
+                    <select id="language">
+                        <option value="eng">English</option>
+                        <option value="spa">Spanish</option>
+                        <option value="fra">French</option>
+                        <option value="deu">German</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h3>📷 Image Preview</h3>
+            <img id="imagePreview" class="image-preview" alt="Preview">
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Initializing OCR...</div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="processBtn" disabled>
+                🔍 Extract Table Data
+            </button>
+            <button class="btn btn-secondary" id="clearBtn">
+                🗑️ Clear
+            </button>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h3>📝 Extracted Text</h3>
+            <div class="extracted-text" id="extractedText"></div>
+            
+            <h3>📋 Table Preview</h3>
+            <div class="table-preview" id="tablePreview"></div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="downloadBtn">
+                    💾 Download CSV
+                </button>
+                <button class="btn btn-secondary" id="copyBtn">
+                    📋 Copy to Clipboard
+                </button>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <strong>💡 Tips:</strong>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Ensure your image has good contrast and resolution</li>
+                <li>Tables with clear borders work best</li>
+                <li>Amount columns should be clearly visible</li>
+                <li>Supported formats: JPG, PNG, GIF, BMP, WEBP</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        class ImageTableConverter {
+            constructor() {
+                this.imageInput = document.getElementById('imageInput');
+                this.imagePreview = document.getElementById('imagePreview');
+                this.previewSection = document.getElementById('previewSection');
+                this.processBtn = document.getElementById('processBtn');
+                this.clearBtn = document.getElementById('clearBtn');
+                this.progressContainer = document.getElementById('progressContainer');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                this.resultsSection = document.getElementById('resultsSection');
+                this.extractedText = document.getElementById('extractedText');
+                this.tablePreview = document.getElementById('tablePreview');
+                this.downloadBtn = document.getElementById('downloadBtn');
+                this.copyBtn = document.getElementById('copyBtn');
+                this.delimiter = document.getElementById('delimiter');
+                this.language = document.getElementById('language');
+                
+                this.currentImageData = null;
+                this.extractedData = null;
+                this.csvData = null;
+                
+                this.initEventListeners();
+            }
+
+            initEventListeners() {
+                this.imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
+                this.processBtn.addEventListener('click', () => this.processImage());
+                this.clearBtn.addEventListener('click', () => this.clearAll());
+                this.downloadBtn.addEventListener('click', () => this.downloadCSV());
+                this.copyBtn.addEventListener('click', () => this.copyToClipboard());
+            }
+
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    this.showAlert('Please select a valid image file.', 'warning');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.currentImageData = e.target.result;
+                    this.imagePreview.src = this.currentImageData;
+                    this.previewSection.style.display = 'block';
+                    this.processBtn.disabled = false;
+                    this.resultsSection.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            async processImage() {
+                if (!this.currentImageData) return;
+
+                this.processBtn.disabled = true;
+                this.progressContainer.style.display = 'block';
+                this.updateProgress(0, 'Initializing OCR...');
+
+                try {
+                    const worker = await Tesseract.createWorker(this.language.value);
+                    
+                    this.updateProgress(20, 'Loading OCR engine...');
+                    
+                    const { data: { text } } = await worker.recognize(this.currentImageData, {
+                        logger: (m) => {
+                            if (m.status === 'recognizing text') {
+                                const progress = 20 + (m.progress * 60);
+                                this.updateProgress(progress, `Recognizing text... ${Math.round(m.progress * 100)}%`);
+                            }
+                        }
+                    });
+
+                    this.updateProgress(90, 'Processing extracted text...');
+                    
+                    await worker.terminate();
+                    
+                    this.extractedData = text;
+                    this.processExtractedText(text);
+                    
+                    this.updateProgress(100, 'Processing complete!');
+                    
+                    setTimeout(() => {
+                        this.progressContainer.style.display = 'none';
+                        this.resultsSection.style.display = 'block';
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('OCR Error:', error);
+                    this.showAlert('Error processing image. Please try again.', 'warning');
+                    this.progressContainer.style.display = 'none';
+                } finally {
+                    this.processBtn.disabled = false;
+                }
+            }
+
+            processExtractedText(text) {
+                this.extractedText.textContent = text;
+                
+                // Clean and parse the text into table data
+                const lines = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+                
+                if (lines.length === 0) {
+                    this.showAlert('No text could be extracted from the image.', 'warning');
+                    return;
+                }
+
+                // Try to detect table structure
+                const tableData = this.parseTableData(lines);
+                
+                if (tableData.length === 0) {
+                    this.showAlert('Could not detect table structure. The extracted text will be used as-is.', 'warning');
+                    // Fallback: treat each line as a row
+                    const fallbackData = lines.map(line => [line]);
+                    this.generateCSV(fallbackData);
+                    this.displayTable(fallbackData);
+                } else {
+                    this.generateCSV(tableData);
+                    this.displayTable(tableData);
+                }
+            }
+
+            parseTableData(lines) {
+                const tableData = [];
+                
+                // Try different parsing strategies
+                for (const line of lines) {
+                    // Skip empty lines
+                    if (!line.trim()) continue;
+                    
+                    // Try to split by common separators
+                    let row = [];
+                    
+                    // Strategy 1: Split by multiple spaces (common in OCR output)
+                    if (line.includes('  ')) {
+                        row = line.split(/\s{2,}/).map(cell => cell.trim()).filter(cell => cell);
+                    }
+                    // Strategy 2: Split by pipe or vertical bar
+                    else if (line.includes('|')) {
+                        row = line.split('|').map(cell => cell.trim()).filter(cell => cell);
+                    }
+                    // Strategy 3: Try to detect patterns with amounts (numbers)
+                    else {
+                        // Look for patterns like "Item Name 123.45" or "Description $123.45"
+                        const amountMatch = line.match(/^(.+?)(\$?\d+(?:[.,]\d{2})?|\d+(?:[.,]\d{2})?\$?)$/);
+                        if (amountMatch) {
+                            row = [amountMatch[1].trim(), amountMatch[2].trim()];
+                        } else {
+                            // Fallback: single column
+                            row = [line.trim()];
+                        }
+                    }
+                    
+                    if (row.length > 0) {
+                        tableData.push(row);
+                    }
+                }
+                
+                return tableData;
+            }
+
+            generateCSV(data) {
+                if (!data || data.length === 0) return;
+                
+                const delimiter = this.delimiter.value === '\\t' ? '\t' : this.delimiter.value;
+                
+                this.csvData = data.map(row => 
+                    row.map(cell => {
+                        // Escape quotes and wrap in quotes if needed
+                        const cellStr = String(cell || '');
+                        if (cellStr.includes(delimiter) || cellStr.includes('"') || cellStr.includes('\n')) {
+                            return '"' + cellStr.replace(/"/g, '""') + '"';
+                        }
+                        return cellStr;
+                    }).join(delimiter)
+                ).join('\n');
+            }
+
+            displayTable(data) {
+                if (!data || data.length === 0) {
+                    this.tablePreview.innerHTML = '<p>No table data to display</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr>';
+                
+                // Use first row as headers or generate generic headers
+                const maxCols = Math.max(...data.map(row => row.length));
+                const headers = data[0].length === maxCols ? data[0] : 
+                    Array.from({length: maxCols}, (_, i) => `Column ${i + 1}`);
+                
+                headers.forEach(header => {
+                    html += `<th>${this.escapeHtml(String(header))}</th>`;
+                });
+                html += '</tr></thead><tbody>';
+                
+                // Skip first row if it was used as headers
+                const dataRows = data[0].length === maxCols ? data.slice(1) : data;
+                
+                dataRows.forEach(row => {
+                    html += '<tr>';
+                    for (let i = 0; i < maxCols; i++) {
+                        const cell = row[i] || '';
+                        html += `<td>${this.escapeHtml(String(cell))}</td>`;
+                    }
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table>';
+                this.tablePreview.innerHTML = html;
+            }
+
+            downloadCSV() {
+                if (!this.csvData) return;
+                
+                const blob = new Blob([this.csvData], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `extracted_table_${new Date().getTime()}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showAlert('CSV file downloaded successfully!', 'success');
+            }
+
+            async copyToClipboard() {
+                if (!this.csvData) return;
+                
+                try {
+                    await navigator.clipboard.writeText(this.csvData);
+                    this.showAlert('CSV data copied to clipboard!', 'success');
+                } catch (err) {
+                    console.error('Failed to copy: ', err);
+                    this.showAlert('Failed to copy to clipboard. Please try downloading instead.', 'warning');
+                }
+            }
+
+            clearAll() {
+                this.imageInput.value = '';
+                this.currentImageData = null;
+                this.extractedData = null;
+                this.csvData = null;
+                this.previewSection.style.display = 'none';
+                this.resultsSection.style.display = 'none';
+                this.progressContainer.style.display = 'none';
+                this.processBtn.disabled = true;
+            }
+
+            updateProgress(percent, message) {
+                this.progressFill.style.width = `${percent}%`;
+                this.progressText.textContent = message;
+            }
+
+            showAlert(message, type) {
+                // Remove existing alerts
+                const existingAlerts = document.querySelectorAll('.alert-dynamic');
+                existingAlerts.forEach(alert => alert.remove());
+                
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type} alert-dynamic`;
+                alert.textContent = message;
+                
+                const container = document.querySelector('.container');
+                container.appendChild(alert);
+                
+                setTimeout(() => alert.remove(), 5000);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new ImageTableConverter();
+        });
+    </script>
+</body>
+</html>
