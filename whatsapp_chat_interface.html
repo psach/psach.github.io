@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Chat - WhatsApp Style</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .chat-header {
+            background: linear-gradient(135deg, #25D366, #20b358);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #128C7E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .chat-info h3 {
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .chat-info p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .status-indicator {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .connection-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Messages Container */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
+            position: relative;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.assistant {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #25D366, #20b358);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-bubble {
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #333;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.assistant .message-time {
+            text-align: left;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none;
+            margin-bottom: 16px;
+        }
+
+        .typing-bubble {
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 18px;
+            padding: 12px 16px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Input Area */
+        .input-area {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid #333;
+        }
+
+        .attachment-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .attachment-btn:hover {
+            background: #333;
+            color: #25D366;
+        }
+
+        .message-input {
+            flex: 1;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 20px;
+            padding: 12px 16px;
+            color: #e0e0e0;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            min-height: 20px;
+            max-height: 100px;
+        }
+
+        .message-input:focus {
+            border-color: #25D366;
+        }
+
+        .message-input::placeholder {
+            color: #666;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #25D366, #20b358);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background: #1a1a1a;
+            border-left: 1px solid #333;
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .close-settings {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            color: #e0e0e0;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .setting-input {
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .connect-btn {
+            background: linear-gradient(135deg, #25D366, #20b358);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Settings toggle */
+        .settings-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: auto;
+        }
+
+        /* Document info panel */
+        .document-info {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            color: #e0e0e0;
+        }
+
+        .document-info h4 {
+            color: #25D366;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .document-list {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 85%;
+            }
+            
+            .settings-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-header">
+        <div class="avatar">📄</div>
+        <div class="chat-info">
+            <h3>Document Assistant</h3>
+            <p id="connectionStatus">Ready to connect</p>
+        </div>
+        <div class="status-indicator">
+            <div class="connection-status" id="statusDot"></div>
+            <button class="settings-toggle" onclick="toggleSettings()">⚙️</button>
+        </div>
+    </div>
+
+    <div class="messages-container" id="messagesContainer">
+        <div class="document-info">
+            <h4>📚 Document Session</h4>
+            <div class="document-list" id="documentList">
+                Connect to view uploaded documents
+            </div>
+        </div>
+
+        <div class="message assistant">
+            <div class="message-bubble">
+                <div>Welcome! I'm ready to help you chat with your uploaded documents. Please configure your ChatGPT session details in the settings panel (⚙️) to get started.</div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-bubble">
+            <div class="typing-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <button class="attachment-btn" onclick="showDocumentInfo()" title="Document Info">📎</button>
+        <textarea 
+            class="message-input" 
+            id="messageInput" 
+            placeholder="Ask about your documents..."
+            rows="1"
+            onkeydown="handleKeydown(event)"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+            <span>➤</span>
+        </button>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h3>ChatGPT Connection</h3>
+            <button class="close-settings" onclick="toggleSettings()">✕</button>
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">API Endpoint</label>
+            <input type="text" class="setting-input" id="apiEndpoint" 
+                   placeholder="https://api.openai.com/v1/chat/completions" 
+                   value="https://api.openai.com/v1/chat/completions">
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">API Key</label>
+            <input type="password" class="setting-input" id="apiKey" 
+                   placeholder="sk-...">
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">Session/Thread ID (Optional)</label>
+            <input type="text" class="setting-input" id="sessionId" 
+                   placeholder="For maintaining document context">
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">Model</label>
+            <input type="text" class="setting-input" id="model" 
+                   value="gpt-4" placeholder="gpt-4, gpt-3.5-turbo, etc.">
+        </div>
+        
+        <button class="connect-btn" onclick="testConnection()">Test Connection</button>
+        <button class="connect-btn" onclick="saveSettings()">Save Settings</button>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+        let isConnected = false;
+        let settings = {
+            apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+            apiKey: '',
+            sessionId: '',
+            model: 'gpt-4'
+        };
+
+        // Load settings from memory
+        function loadSettings() {
+            const saved = window.chatSettings;
+            if (saved) {
+                settings = {...settings, ...saved};
+                document.getElementById('apiEndpoint').value = settings.apiEndpoint;
+                document.getElementById('apiKey').value = settings.apiKey;
+                document.getElementById('sessionId').value = settings.sessionId;
+                document.getElementById('model').value = settings.model;
+            }
+        }
+
+        // Save settings to memory
+        function saveSettings() {
+            settings.apiEndpoint = document.getElementById('apiEndpoint').value;
+            settings.apiKey = document.getElementById('apiKey').value;
+            settings.sessionId = document.getElementById('sessionId').value;
+            settings.model = document.getElementById('model').value;
+            
+            window.chatSettings = settings;
+            
+            if (settings.apiKey) {
+                updateConnectionStatus('Connected', true);
+                document.getElementById('sendBtn').disabled = false;
+                updateDocumentInfo();
+            }
+            
+            showMessage('Settings saved successfully!', 'assistant');
+            toggleSettings();
+        }
+
+        // Test connection
+        async function testConnection() {
+            const apiKey = document.getElementById('apiKey').value;
+            const endpoint = document.getElementById('apiEndpoint').value;
+            const model = document.getElementById('model').value;
+            
+            if (!apiKey) {
+                alert('Please enter an API key');
+                return;
+            }
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            {
+                                role: 'user',
+                                content: 'Test connection - please respond with "Connection successful"'
+                            }
+                        ],
+                        max_tokens: 50
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage('✅ Connection test successful!', 'assistant');
+                    updateConnectionStatus('Connected', true);
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                showMessage(`❌ Connection failed: ${error.message}`, 'assistant');
+                updateConnectionStatus('Connection failed', false);
+            }
+        }
+
+        // Toggle settings panel
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('open');
+        }
+
+        // Update connection status
+        function updateConnectionStatus(status, connected) {
+            document.getElementById('connectionStatus').textContent = status;
+            const statusDot = document.getElementById('statusDot');
+            statusDot.style.background = connected ? '#4CAF50' : '#f44336';
+            isConnected = connected;
+        }
+
+        // Update document info
+        function updateDocumentInfo() {
+            const docList = document.getElementById('documentList');
+            if (settings.sessionId) {
+                docList.innerHTML = `Session ID: ${settings.sessionId}<br>Model: ${settings.model}<br>Status: Ready to chat with documents`;
+            } else {
+                docList.innerHTML = `Model: ${settings.model}<br>Direct API connection<br>Note: For document context, use a session ID`;
+            }
+        }
+
+        // Show document info
+        function showDocumentInfo() {
+            if (isConnected) {
+                showMessage(`📋 Current Session:\n• Model: ${settings.model}\n• Session ID: ${settings.sessionId || 'Direct connection'}\n• Documents: Available in your ChatGPT session`, 'assistant');
+            } else {
+                showMessage('Please connect to ChatGPT first using the settings panel.', 'assistant');
+            }
+        }
+
+        // Handle input keydown
+        function handleKeydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+            
+            // Auto-resize textarea
+            const textarea = event.target;
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || !isConnected) return;
+            
+            // Show user message
+            showMessage(message, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Show typing indicator
+            showTypingIndicator(true);
+            
+            try {
+                await sendToGPT(message);
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'assistant');
+            }
+            
+            showTypingIndicator(false);
+        }
+
+        // Send to GPT
+        async function sendToGPT(message) {
+            const messages = [
+                {
+                    role: 'system',
+                    content: 'You are a helpful assistant with access to previously uploaded documents. Please provide informative responses based on the document content when relevant.'
+                },
+                ...conversationHistory.slice(-10), // Keep last 10 messages for context
+                {
+                    role: 'user',
+                    content: message
+                }
+            ];
+
+            const response = await fetch(settings.apiEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${settings.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: settings.model,
+                    messages: messages,
+                    max_tokens: 1000,
+                    temperature: 0.7
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const assistantMessage = data.choices[0].message.content;
+            
+            // Add to conversation history
+            conversationHistory.push(
+                { role: 'user', content: message },
+                { role: 'assistant', content: assistantMessage }
+            );
+            
+            showMessage(assistantMessage, 'assistant');
+        }
+
+        // Show message in chat
+        function showMessage(content, sender) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    <div>${content.replace(/\n/g, '<br>')}</div>
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Show/hide typing indicator
+        function showTypingIndicator(show) {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.style.display = show ? 'block' : 'none';
+            
+            if (show) {
+                const messagesContainer = document.getElementById('messagesContainer');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            loadSettings();
+            if (settings.apiKey) {
+                updateConnectionStatus('Ready', true);
+                document.getElementById('sendBtn').disabled = false;
+                updateDocumentInfo();
+            }
+        };
+
+        // Auto-focus input
+        document.getElementById('messageInput').focus();
+    </script>
+</body>
+</html>
