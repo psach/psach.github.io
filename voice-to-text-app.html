@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice to Text</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #startBtn {
+            background: #10b981;
+            color: white;
+        }
+
+        #startBtn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        #stopBtn {
+            background: #ef4444;
+            color: white;
+        }
+
+        #stopBtn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        #clearBtn {
+            background: #6b7280;
+            color: white;
+        }
+
+        #clearBtn:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .status.listening {
+            background: #dcfce7;
+            color: #166534;
+            animation: pulse 2s infinite;
+        }
+
+        .status.stopped {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.ready {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .output {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1f2937;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output:empty::before {
+            content: 'Your transcribed text will appear here...';
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .language-select {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .language-select label {
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .language-select select {
+            padding: 8px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mic-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Voice to Text</h1>
+        <p class="subtitle">100% Local - No APIs or Cloud Services</p>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div class="language-select">
+            <label for="language">Language:</label>
+            <select id="language">
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="es-ES">Spanish</option>
+                <option value="fr-FR">French</option>
+                <option value="de-DE">German</option>
+                <option value="it-IT">Italian</option>
+                <option value="ja-JP">Japanese</option>
+                <option value="zh-CN">Chinese (Mandarin)</option>
+                <option value="hi-IN">Hindi</option>
+                <option value="pt-BR">Portuguese (Brazil)</option>
+            </select>
+        </div>
+
+        <div id="status" class="status ready">Ready to listen</div>
+
+        <div class="controls">
+            <button id="startBtn">
+                <span>▶</span> Start Recording
+            </button>
+            <button id="stopBtn" disabled>
+                <span>⏹</span> Stop
+            </button>
+            <button id="clearBtn">
+                <span>🗑</span> Clear
+            </button>
+        </div>
+
+        <div id="output" class="output"></div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        const errorDiv = document.getElementById('error');
+        const languageSelect = document.getElementById('language');
+
+        let recognition;
+        let finalTranscript = '';
+
+        // Check if browser supports Web Speech API
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            errorDiv.textContent = 'Sorry, your browser does not support the Web Speech API. Please use Chrome, Edge, or Safari.';
+            errorDiv.style.display = 'block';
+            startBtn.disabled = true;
+        } else {
+            // Initialize speech recognition
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = languageSelect.value;
+
+            recognition.onstart = () => {
+                status.textContent = '🎤 Listening...';
+                status.className = 'status listening';
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            };
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                output.textContent = finalTranscript + interimTranscript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                status.textContent = `Error: ${event.error}`;
+                status.className = 'status stopped';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            };
+
+            recognition.onend = () => {
+                status.textContent = 'Stopped';
+                status.className = 'status stopped';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            };
+        }
+
+        startBtn.addEventListener('click', () => {
+            recognition.lang = languageSelect.value;
+            recognition.start();
+        });
+
+        stopBtn.addEventListener('click', () => {
+            recognition.stop();
+        });
+
+        clearBtn.addEventListener('click', () => {
+            finalTranscript = '';
+            output.textContent = '';
+            status.textContent = 'Ready to listen';
+            status.className = 'status ready';
+        });
+
+        languageSelect.addEventListener('change', () => {
+            if (recognition && !startBtn.disabled) {
+                recognition.lang = languageSelect.value;
+            }
+        });
+    </script>
+</body>
+</html>
