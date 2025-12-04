@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pure JS Camera App (Debugged)</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;}
+    body{display:flex;flex-direction:column;gap:12px;align-items:center;padding:18px;margin:0;background:#f7f7fb;color:#111}
+    h1{font-size:20px;margin:0}
+    .stage{display:grid;grid-template-columns:1fr 300px;gap:12px;width:min(980px,96%)}
+    video{width:100%;height:auto;border-radius:12px;background:#000;box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+    canvas{display:none}
+    .controls{display:flex;flex-direction:column;gap:8px}
+    .row{display:flex;gap:8px;align-items:center}
+    button,select{padding:8px 10px;border-radius:8px;border:1px solid #d0d6e0;background:#fff;cursor:pointer}
+    button:active{transform:translateY(1px)}
+    .thumbs{display:flex;flex-direction:column;gap:8px}
+    img.thumb{width:100%;border-radius:8px;object-fit:cover}
+    small{color:#555}
+    .muted{color:#666;font-size:13px}
+    .error{color:#b00020}
+    footer{font-size:13px;color:#666;margin-top:6px}
+    .diag{font-size:13px;padding:8px;border-radius:8px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+  </style>
+</head>
+<body>
+  <h1>Pure JavaScript Camera App — Debugged</h1>
+  <div class="stage">
+    <div>
+      <!-- muted added to allow autoplay on some browsers -->
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="row">
+        <label for="deviceSelect">Camera</label>
+        <select id="deviceSelect"><option value="">(loading...)</option></select>
+      </div>
+
+      <div class="row">
+        <label for="resolution">Resolution</label>
+        <select id="resolution">
+          <option value="default">Default</option>
+          <option value="qvga">320x240 (QVGA)</option>
+          <option value="vga">640x480 (VGA)</option>
+          <option value="hd">1280x720 (HD)</option>
+          <option value="fullhd">1920x1080 (Full HD)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <button id="startBtn">Start Camera</button>
+        <button id="stopBtn" disabled>Stop</button>
+      </div>
+
+      <div class="row">
+        <button id="captureBtn" disabled>Capture Photo</button>
+        <button id="downloadBtn" disabled>Download</button>
+      </div>
+
+      <div class="row">
+        <label><input type="checkbox" id="mirror"> Mirror preview</label>
+      </div>
+
+      <div class="row muted">
+        <small>Tip: choose camera from the dropdown to switch front/back. On phones, "environment" is usually the rear camera.</small>
+      </div>
+
+      <div class="diag">
+        <div class="thumbs">
+          <img id="thumb" class="thumb" alt="Last capture" src="" style="display:none">
+        </div>
+        <div style="margin-top:8px">
+          <small id="status" class="muted">Initializing...</small>
+          <div id="errorMsg" class="error" style="display:none;margin-top:6px"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:8px;display:flex;gap:8px;flex-direction:column">
+        <button id="requestPerm">Request Camera Permission</button>
+        <small class="muted">If you see "Permission denied", make sure your browser has camera permission and no other app is using the camera.</small>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>Built with pure HTML, CSS and JavaScript — no libraries. Debug helpers included.</footer>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const deviceSelect = document.getElementById('deviceSelect');
+    const resolutionSelect = document.getElementById('resolution');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const mirrorCheckbox = document.getElementById('mirror');
+    const thumb = document.getElementById('thumb');
+    const status = document.getElementById('status');
+    const errorMsg = document.getElementById('errorMsg');
+    const requestPerm = document.getElementById('requestPerm');
+
+    let currentStream = null;
+    let lastBlob = null;
+
+    function logStatus(text){
+      status.textContent = text;
+      console.log('[CameraApp]', text);
+    }
+    function showError(err){
+      errorMsg.style.display = 'block';
+      const msg = err && (err.message || err.name) ? `${err.name || ''}: ${err.message || ''}` : String(err);
+      errorMsg.textContent = msg;
+      console.error('[CameraApp] Error:', err);
+    }
+    function clearError(){ errorMsg.style.display = 'none'; errorMsg.textContent = ''; }
+
+    async function enumerateCameras(){
+      try{
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cams = devices.filter(d => d.kind === 'videoinput');
+        deviceSelect.innerHTML = '';
+        if(cams.length === 0){
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.text = '(No camera found)';
+          deviceSelect.appendChild(opt);
+          return;
+        }
+        cams.forEach((c, i) => {
+          const opt = document.createElement('option');
+          opt.value = c.deviceId || '';
+          // Provide friendly label or fallback
+          opt.text = c.label || (i === 0 ? 'Default Camera' : `Camera ${i+1}`);
+          deviceSelect.appendChild(opt);
+        });
+      }catch(e){
+        console.warn('enumerateDevices failed', e);
+        showError(e);
+      }
+    }
+
+    function resolutionConstraint(value){
+      switch(value){
+        case 'qvga': return {width: {exact: 320}, height: {exact:240}};
+        case 'vga': return {width: {exact:640}, height: {exact:480}};
+        case 'hd': return {width: {exact:1280}, height: {exact:720}};
+        case 'fullhd': return {width: {exact:1920}, height: {exact:1080}};
+        default: return {};
+      }
+    }
+
+    // Try to acquire camera with graceful fallbacks and helpful error messages
+    async function startCamera(){
+      clearError();
+      stopStream();
+
+      const deviceId = deviceSelect.value || undefined; // '' => undefined
+      const res = resolutionConstraint(resolutionSelect.value);
+
+      // prefer explicit deviceId when available, otherwise try facingMode
+      let videoConstraints = {};
+      if(deviceId) videoConstraints = Object.assign({}, res, {deviceId: {exact: deviceId}});
+      else videoConstraints = Object.assign({}, res, {facingMode: {ideal: 'environment'}});
+
+      const constraints = {audio:false, video: videoConstraints};
+
+      try{
+        logStatus('Requesting camera...');
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = currentStream;
+        await video.play().catch(()=>{}); // some browsers need play()
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        captureBtn.disabled = false;
+        downloadBtn.disabled = true;
+
+        // repopulate devices again (labels may now be available)
+        await enumerateCameras();
+
+        logStatus('Camera running');
+      }catch(err){
+        // Provide actionable error messages based on common errors
+        if(err && err.name){
+          switch(err.name){
+            case 'NotAllowedError':
+            case 'SecurityError':
