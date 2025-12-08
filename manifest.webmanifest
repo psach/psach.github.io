@@ -1,0 +1,9 @@
+{
+  "name": "Mini Excel Spreadsheet",
+  "short_name": "MiniExcel",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#3b82f6",
+  "icons": []
+}
