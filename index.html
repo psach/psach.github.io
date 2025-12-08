@@ -1,15 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<title>Mini Excel PWA</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="theme-color" content="#3b82f6"/>
-<link rel="manifest" href="manifest.webmanifest"/>
+  <meta charset="UTF-8" />
+  <title>Mini Excel - JS Spreadsheet (PWA)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#3b82f6" />
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f7;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar .label {
+      font-size: 14px;
+      color: #444;
+    }
+
+    #formulaBar {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      min-width: 200px;
+    }
+
+    #selectedCellLabel {
+      min-width: 40px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    #installBtn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      background: #3b82f6;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #installBtn[disabled] {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .sheet-container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 10px;
+      overflow: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      user-select: none;
+      min-width: 500px;
+    }
+
+    th, td {
+      border: 1px solid #d0d0d7;
+      font-size: 13px;
+      text-align: center;
+      padding: 0;
+      height: 26px;
+    }
+
+    thead th {
+      background: #fafafa;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    tbody th {
+      background: #fafafa;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      min-width: 30px;
+    }
+
+    .cell-input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 2px 4px;
+      box-sizing: border-box;
+      text-align: right;
+      font: inherit;
+      background: transparent;
+      outline: none;
+    }
+
+    td.selected {
+      outline: 2px solid #3b82f6;
+      outline-offset: -2px;
+    }
+
+    .help {
+      font-size: 12px;
+      color: #555;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .help code {
+      background: #eee;
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+  </style>
 </head>
 <body>
-<h2>Mini Excel PWA</h2>
-<p>Open over HTTPS and use Install App</p>
-<script src="app.js"></script>
+  <h1>Mini Excel (HTML + JavaScript) – PWA</h1>
+
+  <div class="toolbar">
+    <span class="label">Cell:</span>
+    <span id="selectedCellLabel">A1</span>
+    <span class="label">Formula:</span>
+    <input id="formulaBar" type="text" placeholder="Type =A1+B1*2 or just 123" />
+    <button id="installBtn" disabled title="Install as app">
+      Install App
+    </button>
+  </div>
+
+  <div class="sheet-container">
+    <table id="sheet"></table>
+  </div>
+
+  <div class="help">
+    <strong>How to use:</strong><br>
+    • Click a cell and type numbers or text.<br>
+    • Use formulas starting with <code>=</code>, e.g. <code>=A1+B1</code>, <code>=A1*2+B2/3</code>.<br>
+    • Supports operators <code>+ - * / ( )</code> and cell references A1–J10.<br>
+    • All formula cells recalculate automatically when any cell changes.<br><br>
+    <strong>Install:</strong><br>
+    • Serve this folder via HTTPS or on <code>http://localhost</code>.<br>
+    • Open it in Chrome / Edge / other PWA‑capable browser.<br>
+    • When the browser fires the install prompt, the <em>Install App</em> button becomes active. Click it to install.
+  </div>
+
+  <script>
+    // =====================
+    // Spreadsheet logic
+    // =====================
+
+    // Configuration
+    const COLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").slice(0, 10); // A-J
+    const ROWS = 10;
+
+    const sheetEl = document.getElementById("sheet");
+    const formulaBar = document.getElementById("formulaBar");
+    const selectedCellLabel = document.getElementById("selectedCellLabel");
+
+    // Core state: { "A1": { expression: string, value: any }, ... }
+    const cellData = {};
+    let selectedCellName = "A1";
+
+    function cellName(colIndex, rowIndex) {
+      return COLS[colIndex] + (rowIndex + 1);
+    }
+
+    function buildSheet() {
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+
+      // Corner empty cell
+      const corner = document.createElement("th");
+      corner.textContent = "";
+      headRow.appendChild(corner);
+
+      // Column headers
+      COLS.forEach(col => {
+        const th = document.createElement("th");
+        th.textContent = col;
+        headRow.appendChild(th);
+      });
+
+      thead.appendChild(headRow);
+      sheetEl.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      for (let r = 0; r < ROWS; r++) {
+        const tr = document.createElement("tr");
+
+        // Row header
+        const rowHeader = document.createElement("th");
+        rowHeader.textContent = r + 1;
+        tr.appendChild(rowHeader);
+
+        for (let c = 0; c < COLS.length; c++) {
+          const td = document.createElement("td");
+          const input = document.createElement("input");
+          const name = cellName(c, r);
+
+          cellData[name] = { expression: "", value: "" };
+
+          input.type = "text";
+          input.className = "cell-input";
+          input.dataset.cell = name;
+
+          // Focus: show formula/expression
+          input.addEventListener("focus", (e) => {
+            setSelectedCell(name);
+            input.value = cellData[name].expression;
+          });
+
+          // Blur: store expression and recalculate
+          input.addEventListener("blur", (e) => {
+            cellData[name].expression = input.value.trim();
+            recalcAll();
+          });
+
+          // Enter key: move down
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              const nextRow = Math.min(ROWS - 1, r + 1);
+              const nextName = cellName(c, nextRow);
+              focusCell(nextName);
+            }
+          });
+
+          td.appendChild(input);
+          td.dataset.cell = name;
+          tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+      }
+
+      sheetEl.appendChild(tbody);
+    }
+
+    function setSelectedCell(name) {
+      selectedCellName = name;
+      selectedCellLabel.textContent = name;
+
+      // Update selected cell highlight
+      sheetEl.querySelectorAll("td").forEach(td => td.classList.remove("selected"));
+      const td = sheetEl.querySelector(`td[data-cell="${name}"]`);
+      if (td) td.classList.add("selected");
+
+      // Sync formula bar with expression
+      formulaBar.value = cellData[name].expression || "";
+    }
+
+    function focusCell(name) {
+      const input = sheetEl.querySelector(`input[data-cell="${name}"]`);
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+
+    // Evaluate a single cell, recursively, with cycle detection
+    function evaluateCell(name, visited) {
+      if (visited.has(name)) {
+        return "#CYCLE";
+      }
+      visited.add(name);
+
+      const cell = cellData[name];
+      if (!cell) return "";
+
+      const expr = cell.expression;
+      if (!expr) return "";
+
+      // If it's a formula
+      if (expr.startsWith("=")) {
+        let formula = expr.slice(1);
+
+        // Replace cell references A1-J10 with their numeric values
+        formula = formula.replace(/\b([A-J](?:10|[1-9]))\b/g, (match, refName) => {
+          const val = evaluateCell(refName, new Set(visited));
+          const num = parseFloat(val);
+          return isNaN(num) ? "0" : num.toString();
+        });
+
+        try {
+          // Evaluate arithmetic expression safely-ish
+          const result = Function('"use strict"; return (' + formula + ')')();
+          if (typeof result === "number" && !isNaN(result)) {
+            return result;
+          }
+          return String(result);
+        } catch (e) {
+          return "#ERR";
+        }
+      } else {
+        // Not a formula: treat as number if possible, else text
+        const num = parseFloat(expr);
+        if (!isNaN(num) && expr.match(/^\s*-?\d+(\.\d+)?\s*$/)) {
+          return num;
+        }
+        return expr;
+      }
+    }
+
+    // Recalculate all cells and update DOM
+    function recalcAll() {
+      // First, clear values
+      Object.keys(cellData).forEach(name => {
+        cellData[name].value = "";
+      });
+
+      // Evaluate each cell
+      Object.keys(cellData).forEach(name => {
+        cellData[name].value = evaluateCell(name, new Set());
+      });
+
+      // Update displayed values
+      Object.keys(cellData).forEach(name => {
+        const input = sheetEl.querySelector(`input[data-cell="${name}"]`);
+        if (!input) return;
+        // If the cell is currently focused, keep showing its expression
+        if (document.activeElement === input) {
+          input.value = cellData[name].expression;
+        } else {
+          const val = cellData[name].value;
+          input.value = val === undefined || val === null ? "" : String(val);
+        }
+      });
+    }
+
+    // Formula bar edits the currently selected cell
+    formulaBar.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyFormulaBarToCell();
+      }
+    });
+
+    formulaBar.addEventListener("blur", () => {
+      // Optional: you can comment this out if you want only Enter to apply
+      applyFormulaBarToCell();
+    });
+
+    function applyFormulaBarToCell() {
+      const name = selectedCellName;
+      if (!name) return;
+      const value = formulaBar.value.trim();
+      cellData[name].expression = value;
+      recalcAll();
+      focusCell(name);
+    }
+
+    // Initialize sheet
+    buildSheet();
+    setSelectedCell("A1");
+    recalcAll();
+
+    // =====================
+    // PWA: Service Worker + Install Button
+    // =====================
+
+    const installBtn = document.getElementById('installBtn');
+    let deferredPrompt = null;
+
+    // Listen for the beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installBtn.disabled = false;
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.disabled = true;
+    });
+
+    // Register service worker (expects sw.js in same folder)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err) => {
+          console.error('Service worker registration failed:', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
