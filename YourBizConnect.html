@@ -1,0 +1,2319 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizConnect - Business Marketplace Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a472a;
+            --secondary: #2d5f3f;
+            --accent: #f4a261;
+            --accent-light: #e9c46a;
+            --bg-light: #fafaf9;
+            --bg-dark: #0f1e13;
+            --text-dark: #1a1a1a;
+            --text-light: #666666;
+            --border: #e5e5e5;
+            --success: #2a9d8f;
+            --error: #e76f51;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .cta-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(244, 162, 97, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+            background-size: 50px 50px;
+            animation: drift 20s linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(244, 162, 97, 0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            background: var(--accent-light);
+            color: var(--text-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge.verified {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Forms */
+        .form-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .form-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .form-progress::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+            z-index: 1;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .progress-circle {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .progress-step.completed .progress-circle {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .progress-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .required::after {
+            content: ' *';
+            color: var(--error);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 71, 42, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .radio-item input[type="radio"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(26, 71, 42, 0.02);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-text {
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        .uploaded-files {
+            margin-top: 1rem;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-light);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-remove {
+            color: var(--error);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .btn-back:hover {
+            background: var(--border);
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit {
+            background: var(--success);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: #248277;
+            transform: translateY(-2px);
+        }
+
+        .helper-text {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .error-text {
+            font-size: 0.875rem;
+            color: var(--error);
+            margin-top: 0.25rem;
+        }
+
+        /* Listings */
+        .listing-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .listing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .listing-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .listing-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .listing-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .listing-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .detail-item {
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .listing-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-view {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-interest {
+            flex: 1;
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Filters */
+        .filters {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feature-desc {
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 3rem 2rem 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--error);
+        }
+
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .success-message h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-progress {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+    
+/* === Mobile Navigation Enhancements === */
+.hamburger {
+    display: none;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    nav {
+        display: none;
+        flex-direction: column;
+        gap: 0.5rem;
+        background: white;
+        width: 100%;
+        padding: 1rem 0;
+        border-top: 1px solid var(--border);
+    }
+
+    nav.active {
+        display: flex;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .nav-btn,
+    .cta-btn {
+        width: 90%;
+        margin: 0 auto;
+        text-align: center;
+    }
+}
+
+</style>
+
+
+
+<script>
+function toggleMenu() {
+    document.querySelector("nav").classList.toggle("active");
+}
+</script>
+
+
+<script>
+/* ================================
+   GOOGLE FORM AJAX SUBMIT
+================================ */
+
+const GOOGLE_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSdW52NI-s0WbLknnhe4m0thLqu7S2OQQlS1ZV5W_iQM3D1-lw/formResponse";
+
+/* Serialize form as CSV or | separated */
+function serializeForm(form, separator = "|") {
+  const data = [];
+  const formData = new FormData(form);
+
+  formData.forEach((value, key) => {
+    if (value instanceof File) return; // skip files
+    data.push(value.toString().replace(/\s+/g, " ").trim());
+  });
+
+  return data.join(separator);
+}
+
+/* Generic submit handler */
+function submitToGoogleForm(type, formElement) {
+  const payload = new URLSearchParams();
+
+  if (type === "Inquiry") {
+    payload.append("entry.1533598684", serializeForm(formElement, "|"));
+  }
+
+  if (type === "Buyer") {
+    payload.append("entry.1868268690", serializeForm(formElement, "|"));
+  }
+
+  if (type === "Seller") {
+    payload.append("entry.220921278", serializeForm(formElement, "|"));
+  }
+
+  fetch(GOOGLE_FORM_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: payload
+  })
+  .then(() => {
+    showSuccessModal();
+    formElement.reset();
+  })
+  .catch(() => {
+    alert("Submission failed. Please try again.");
+  });
+}
+
+/* ================================
+   FORM HOOKS
+================================ */
+
+
+/* ================================
+   SUCCESS MODAL
+================================ */
+
+function showSuccessModal() {
+  const modal = document.getElementById("successModal");
+  modal.classList.add("active");
+}
+
+function closeSuccessModal() {
+  document.getElementById("successModal").classList.remove("active");
+}
+</script>
+
+
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">Biz<span>Connect</span></div><button class="hamburger" onclick="toggleMenu()">☰</button>
+            <nav>
+                <button class="nav-btn" onclick="showSection('home')">Home</button>
+                <button class="nav-btn" onclick="showSection('browse')">Browse Listings</button>
+                <button class="nav-btn" onclick="showSection('about')">About</button>
+                <button class="cta-btn" onclick="showSection('register-buyer')">Register as Buyer</button>
+                <button class="cta-btn" onclick="showSection('register-seller')">List Your Business</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Buy &amp; Sell Businesses with Confidence</h1>
+            <p>India's premier marketplace for business acquisitions with professional due diligence and valuation services</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="showSection('register-buyer')">I Want to Buy</button>
+                <button class="btn-secondary" onclick="showSection('register-seller')">I Want to Sell</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Home Section -->
+        <section id="home" class="section">
+            <h2 class="section-title">Why Choose BizConnect?</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Active Listings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">₹100Cr+</div>
+                    <div class="stat-label">Total Transaction Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">250+</div>
+                    <div class="stat-label">Successful Deals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Customer Satisfaction</div>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Due Diligence</h3>
+                    <p class="feature-desc">Comprehensive verification of financials, legal compliance, and business operations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">Professional Valuation</h3>
+                    <p class="feature-desc">Multiple valuation methods including automated tools and certified appraisers</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure Transactions</h3>
+                    <p class="feature-desc">Escrow services, digital contracts, and compliance with Indian regulations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✓</div>
+                    <h3 class="feature-title">Verified Listings</h3>
+                    <p class="feature-desc">All businesses verified through PAN, Aadhar, GST, and MCA checks</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Full Transparency</h3>
+                    <p class="feature-desc">Complete financial records, audited statements, and business metrics</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤝</div>
+                    <h3 class="feature-title">Expert Support</h3>
+                    <p class="feature-desc">Access to CAs, lawyers, and business advisors throughout the process</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Browse Listings Section -->
+        <section id="browse" class="section">
+            <h2 class="section-title">Browse Available Businesses</h2>
+            
+            <div class="filters">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Industry</label>
+                        <select>
+                            <option>All Industries</option>
+                            <option>Technology</option>
+                            <option>Manufacturing</option>
+                            <option>Retail</option>
+                            <option>Healthcare</option>
+                            <option>Education</option>
+                            <option>Food &amp; Beverage</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Price Range</label>
+                        <select>
+                            <option>Any Price</option>
+                            <option>Under ₹10L</option>
+                            <option>₹10L - ₹50L</option>
+                            <option>₹50L - ₹1Cr</option>
+                            <option>₹1Cr - ₹5Cr</option>
+                            <option>Above ₹5Cr</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Location</label>
+                        <select>
+                            <option>All Locations</option>
+                            <option>Mumbai</option>
+                            <option>Delhi</option>
+                            <option>Bangalore</option>
+                            <option>Hyderabad</option>
+                            <option>Chennai</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Business Type</label>
+                        <select>
+                            <option>All Types</option>
+                            <option>Private Limited</option>
+                            <option>LLP</option>
+                            <option>Partnership</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <!-- Sample Listing 1 -->
+                <div class="listing-card">
+                    <div class="listing-image">TM</div>
+                    <div class="listing-meta">
+                        <h3 class="card-title">Tech Manufacturing Co.</h3>
+                        <span class="badge verified">✓ Verified</span>
+                    </div>
+                    <div class="listing-price">₹2.5 Cr</div>
+                    <p style="color: var(--text-light); margin: 0.5rem 0;">Electronics manufacturing unit with established client base</p>
+                    <div class="listing-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Revenue</div>
+                            <div class="detail-value">₹5Cr/year</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Profit Margin</div>
+                            <div class="detail-value">18%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Established</div>
+                            <div class="detail-value">2015</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value">Pune</div>
+                        </div>
+                    </div>
+                    <div class="listing-actions">
+                        <button class="btn btn-view" onclick="alert('View details - Full functionality would show detailed listing')">View Details</button>
+                        <button class="btn btn-interest" onclick="showSection('inquiry'); scrollToTop();">Show Interest</button>
+                    </div>
+                </div>
+
+                <!-- Sample Listing 2 -->
+                <div class="listing-card">
+                    <div class="listing-image">RP</div>
+                    <div class="listing-meta">
+                        <h3 class="card-title">Retail Paradise Chain</h3>
+                        <span class="badge verified">✓ Verified</span>
+                    </div>
+                    <div class="listing-price">₹1.2 Cr</div>
+                    <p style="color: var(--text-light); margin: 0.5rem 0;">3 retail stores with loyal customer base in prime locations</p>
+                    <div class="listing-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Revenue</div>
+                            <div class="detail-value">₹3Cr/year</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Profit Margin</div>
+                            <div class="detail-value">22%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Established</div>
+                            <div class="detail-value">2012</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value">Mumbai</div>
+                        </div>
+                    </div>
+                    <div class="listing-actions">
+                        <button class="btn btn-view" onclick="alert('View details - Full functionality would show detailed listing')">View Details</button>
+                        <button class="btn btn-interest" onclick="showSection('inquiry'); scrollToTop();">Show Interest</button>
+                    </div>
+                </div>
+
+                <!-- Sample Listing 3 -->
+                <div class="listing-card">
+                    <div class="listing-image">ST</div>
+                    <div class="listing-meta">
+                        <h3 class="card-title">SaaS Tech Platform</h3>
+                        <span class="badge verified">✓ Verified</span>
+                    </div>
+                    <div class="listing-price">₹4.8 Cr</div>
+                    <p style="color: var(--text-light); margin: 0.5rem 0;">B2B SaaS platform with 500+ enterprise customers</p>
+                    <div class="listing-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Revenue</div>
+                            <div class="detail-value">₹8Cr/year</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Profit Margin</div>
+                            <div class="detail-value">35%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Established</div>
+                            <div class="detail-value">2018</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value">Bangalore</div>
+                        </div>
+                    </div>
+                    <div class="listing-actions">
+                        <button class="btn btn-view" onclick="alert('View details - Full functionality would show detailed listing')">View Details</button>
+                        <button class="btn btn-interest" onclick="showSection('inquiry'); scrollToTop();">Show Interest</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Buyer Registration Section -->
+        <section id="register-buyer" class="section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Buyer Registration</h2>
+                    <p>Register to access verified business listings and start your acquisition journey</p>
+                </div>
+
+                <div class="form-progress">
+                    <div class="progress-line" id="buyerProgressLine" style="width: 20%"></div>
+                    <div class="progress-step active" data-step="1">
+                        <div class="progress-circle">1</div>
+                        <div class="progress-label">Basic Info</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="progress-circle">2</div>
+                        <div class="progress-label">Requirements</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="progress-circle">3</div>
+                        <div class="progress-label">Financials</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="progress-circle">4</div>
+                        <div class="progress-label">Key Person</div>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="progress-circle">5</div>
+                        <div class="progress-label">Review</div>
+                    </div>
+                </div>
+
+                <form id="buyerForm">
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-step active" data-step="1">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Basic Information</h3>
+                        
+                        <div class="form-group">
+                            <label class="required">Investment Type</label>
+                            <div class="radio-group">
+                                <label class="radio-item">
+                                    <input type="radio" name="investmentType" value="shares" required="">
+                                    <span>Shares in Company</span>
+                                </label>
+                                <label class="radio-item">
+                                    <input type="radio" name="investmentType" value="llp">
+                                    <span>Percentage Share in LLP</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Name of Buyer (Legal Name)</label>
+                            <input type="text" name="buyerName" required="" placeholder="Enter legal name as per registration">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Status of Buyer</label>
+                            <select name="buyerStatus" required="">
+                                <option value="">Select buyer status</option>
+                                <option value="individual">Individual</option>
+                                <option value="partnership">Partnership Firm</option>
+                                <option value="llp">LLP</option>
+                                <option value="private">Private Limited Company</option>
+                                <option value="public">Public Limited Company</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">PAN of Buyer Entity</label>
+                                <input type="text" name="buyerPan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" maxlength="10" required="" placeholder="ABCDE1234F">
+                                <span class="helper-text">Format: ABCDE1234F</span>
+                            </div>
+                            <div class="form-group">
+                                <label>CIN/LLPIN (if applicable)</label>
+                                <input type="text" name="cinLlpin" placeholder="For companies/LLPs only">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Requirements -->
+                    <div class="form-step" data-step="2">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Business Requirements</h3>
+                        
+                        <div class="form-group">
+                            <label class="required">Nature of Business to be Bought Out</label>
+                            <textarea name="businessNature" required="" placeholder="Describe the type of business, industry, and specific characteristics you're looking for"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">Budget (Min)</label>
+                                <input type="number" name="budgetMin" required="" placeholder="₹" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Budget (Max)</label>
+                                <input type="number" name="budgetMax" required="" placeholder="₹" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Core Strengths You're Looking For</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="customer-base">
+                                    <span>Strong Customer Base</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="brand">
+                                    <span>Established Brand</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="technology">
+                                    <span>Technology/IP Assets</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="workforce">
+                                    <span>Skilled Workforce</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="distribution">
+                                    <span>Distribution Network</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="profitability">
+                                    <span>Profitability Track Record</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="growth">
+                                    <span>Growth Potential</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="coreStrength" value="market-leader">
+                                    <span>Market Leadership</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Acquisition Timeline</label>
+                            <select name="timeline" required="">
+                                <option value="">Select timeline</option>
+                                <option value="immediate">Immediate (0-3 months)</option>
+                                <option value="short">Short-term (3-6 months)</option>
+                                <option value="medium">Medium-term (6-12 months)</option>
+                                <option value="flexible">Flexible (12+ months)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Financial Capacity -->
+                    <div class="form-step" data-step="3">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Financial Capacity</h3>
+                        
+                        <div class="form-group">
+                            <label class="required">Networth of Buyer Entity</label>
+                            <input type="number" name="networth" required="" placeholder="₹" min="0">
+                            <span class="helper-text">To justify capacity for budget mentioned</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label >Networth Certificate</label>
+                            <div class="file-upload" onclick="document.getElementById('networthCert').click()">
+                                <input type="file" id="networthCert" accept=".pdf,.jpg,.png">
+                                <div>📄 Click to upload Networth Certificate</div>
+                                <div class="file-upload-text">PDF, JPG, PNG (Max 5MB)</div>
+                            </div>
+                            <div class="uploaded-files" id="networthFiles"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >Audited Profit &amp; Loss Statement (Last 3 Years)</label>
+                            <div class="file-upload" onclick="document.getElementById('plStatement').click()">
+                                <input type="file" id="plStatement" accept=".pdf" multiple="">
+                                <div>📊 Click to upload P&amp;L Statements</div>
+                                <div class="file-upload-text">3 PDF files - FY 2021-22, 2022-23, 2023-24</div>
+                            </div>
+                            <div class="uploaded-files" id="plFiles"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >Audited Balance Sheet (Last 3 Years)</label>
+                            <div class="file-upload" onclick="document.getElementById('balanceSheet').click()">
+                                <input type="file" id="balanceSheet" accept=".pdf" multiple="">
+                                <div>📈 Click to upload Balance Sheets</div>
+                                <div class="file-upload-text">3 PDF files - FY 2021-22, 2022-23, 2023-24</div>
+                            </div>
+                            <div class="uploaded-files" id="balanceFiles"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Source of Funds</label>
+                            <select name="fundsSource" required="">
+                                <option value="">Select source</option>
+                                <option value="self">Self-funded</option>
+                                <option value="loan">Bank Loan</option>
+                                <option value="investor">Investor Backed</option>
+                                <option value="mixed">Mixed Financing</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Key Person Details -->
+                    <div class="form-step" data-step="4">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Key Person / Authorized Representative</h3>
+                        
+                        <div class="form-group">
+                            <label class="required">Name of Key Person</label>
+                            <input type="text" name="keyPersonName" required="" placeholder="Full name">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Designation/Authority</label>
+                            <input type="text" name="designation" required="" placeholder="e.g., Director, Partner, Proprietor">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Complete Address</label>
+                            <input type="text" name="address" required="" placeholder="House/Flat No., Building Name, Street">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">City</label>
+                                <input type="text" name="city" required="">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">State</label>
+                                <select name="state" required="">
+                                    <option value="">Select state</option>
+                                    <option value="maharashtra">Maharashtra</option>
+                                    <option value="delhi">Delhi</option>
+                                    <option value="karnataka">Karnataka</option>
+                                    <option value="tamil-nadu">Tamil Nadu</option>
+                                    <option value="gujarat">Gujarat</option>
+                                    <!-- Add more states -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="required">PIN Code</label>
+                                <input type="text" name="pincode" pattern="[0-9]{6}" maxlength="6" required="" placeholder="000000">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">Aadhar Number</label>
+                                <input type="text" name="aadhar" pattern="[0-9]{12}" maxlength="12" required="" placeholder="XXXX XXXX XXXX">
+                                <span class="helper-text">12 digits, will be verified via OTP</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="required">PAN of Key Person</label>
+                                <input type="text" name="keyPersonPan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" maxlength="10" required="" placeholder="ABCDE1234F">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">Mobile Number</label>
+                                <input type="tel" name="mobile" pattern="[0-9]{10}" maxlength="10" required="" placeholder="10 digit mobile">
+                                <span class="helper-text">OTP will be sent for verification</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Email ID</label>
+                                <input type="email" name="email" required="" placeholder="your.email@example.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Review & Submit -->
+                    <div class="form-step" data-step="5">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Review &amp; Submit</h3>
+                        
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h4 style="color: var(--primary); margin-bottom: 1rem;">Review Your Information</h4>
+                            <p style="color: var(--text-light); margin-bottom: 1rem;">Please review all information carefully before submitting. Once submitted, your application will be verified within 24-48 hours.</p>
+                            <div id="reviewContent" style="background: var(--bg-light); padding: 1rem; border-radius: 8px; line-height: 2;">
+                                <!-- Review content will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-item" style="display: flex; align-items: start; gap: 0.5rem;">
+                                <input type="checkbox" name="termsAgree" required="" style="margin-top: 0.25rem;">
+                                <span>I confirm that all information provided is true and accurate. I authorize the platform to verify documents with respective authorities and agree to the Terms &amp; Conditions and Privacy Policy.</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-submit">
+                            Submit Registration
+                        </button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-back" onclick="previousStep('buyer')" id="buyerBackBtn" style="display: none;">Back</button>
+                        <button type="button" class="btn btn-next" onclick="nextStep('buyer')" id="buyerNextBtn" style="display: block;">Next</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Seller Registration Section -->
+        <section id="register-seller" class="section active">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Seller Registration</h2>
+                    <p>List your business and connect with verified buyers</p>
+                </div>
+
+                <div class="form-progress">
+                    <div class="progress-line" id="sellerProgressLine" style="width: 20%"></div>
+                    <div class="progress-step active" data-step="1">
+                        <div class="progress-circle">1</div>
+                        <div class="progress-label">Entity Details</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="progress-circle">2</div>
+                        <div class="progress-label">Business Info</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="progress-circle">3</div>
+                        <div class="progress-label">Financials</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="progress-circle">4</div>
+                        <div class="progress-label">Documents</div>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="progress-circle">5</div>
+                        <div class="progress-label">Review</div>
+                    </div>
+                </div>
+
+                <form id="sellerForm">
+                    <!-- Step 1: Entity Details -->
+                    <div class="form-step active" data-step="1">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Business Entity Details</h3>
+                        
+                        <div class="form-group">
+                            <label class="required">Legal Name of Company/LLP</label>
+                            <input type="text" name="businessName" required="" placeholder="As per registration certificate">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">What are you selling?</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="sellingType" value="full-company">
+                                    <span>Full Company (100% shares)</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="sellingType" value="partial-shares">
+                                    <span>Partial Shares in Company</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="sellingType" value="llp-stake">
+                                    <span>Percentage Share in LLP</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="sellingType" value="assets">
+                                    <span>Business Assets Only</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Percentage/Stake being sold (if partial)</label>
+                            <input type="number" name="stakePercentage" min="1" max="100" placeholder="%">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Business Structure</label>
+                            <select name="businessStructure" required="">
+                                <option value="">Select structure</option>
+                                <option value="private">Private Limited Company</option>
+                                <option value="public">Public Limited Company</option>
+                                <option value="llp">LLP</option>
+                                <option value="partnership">Partnership Firm</option>
+                                <option value="proprietorship">Sole Proprietorship</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">CIN/LLPIN</label>
+                                <input type="text" name="cinLlpin" required="" placeholder="Corporate/LLP Identification Number">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Date of Incorporation</label>
+                                <input type="date" name="incorporationDate" required="">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">PAN of Business</label>
+                                <input type="text" name="businessPan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" maxlength="10" required="">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">GST Number</label>
+                                <input type="text" name="gst" required="" placeholder="15 digit GSTIN">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Business Information -->
+                    <div class="form-step" data-step="2">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Business Information</h3>
+                        
+                        <div class="form-group">
+                            <label class="required">Industry/Sector</label>
+                            <select name="industry" required="">
+                                <option value="">Select industry</option>
+                                <option value="technology">Technology</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="retail">Retail</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="food">Food &amp; Beverage</option>
+                                <option value="real-estate">Real Estate</option>
+                                <option value="services">Services</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Nature of Business (Detailed Description)</label>
+                            <textarea name="businessDescription" required="" rows="4" placeholder="Describe what your business does, products/services offered, target market, etc."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">Location</label>
+                                <input type="text" name="location" required="" placeholder="City, State">
+                            </div>
+                            <div class="form-group">
+                                <label>Website URL</label>
+                                <input type="url" name="website" placeholder="https://">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Core Strengths</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="brand">
+                                    <span>Established Brand</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="customers">
+                                    <span>Strong Customer Base</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="technology">
+                                    <span>Proprietary Technology/IP</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="team">
+                                    <span>Skilled Workforce</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="location">
+                                    <span>Prime Location</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="margins">
+                                    <span>High Profit Margins</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="growth">
+                                    <span>Consistent Growth</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="strengths" value="market-leader">
+                                    <span>Market Leadership</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Reason for Sale</label>
+                            <select name="reasonForSale" required="">
+                                <option value="">Select reason</option>
+                                <option value="retirement">Retirement</option>
+                                <option value="health">Health Issues</option>
+                                <option value="new-venture">New Venture</option>
+                                <option value="partnership-dispute">Partnership Dispute</option>
+                                <option value="relocation">Relocation</option>
+                                <option value="restructuring">Financial Restructuring</option>
+                                <option value="focus">Focus on Core Business</option>
+                                <option value="exit">Market Exit</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Detailed Explanation for Sale</label>
+                            <textarea name="saleReason" required="" rows="3" placeholder="Provide detailed explanation"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Financial Information -->
+                    <div class="form-step" data-step="3">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Financial Information</h3>
+                        
+                        <div class="form-group">
+                            <label class="required">Asking Price</label>
+                            <input type="number" name="askingPrice" required="" placeholder="₹" min="0">
+                            <span class="helper-text">Enter your expected selling price</span>
+                        </div>
+
+                        <h4 style="margin: 2rem 0 1rem; color: var(--primary);">Annual Revenue</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">FY 2021-22</label>
+                                <input type="number" name="revenue2122" required="" placeholder="₹" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">FY 2022-23</label>
+                                <input type="number" name="revenue2223" required="" placeholder="₹" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">FY 2023-24</label>
+                                <input type="number" name="revenue2324" required="" placeholder="₹" min="0">
+                            </div>
+                        </div>
+
+                        <h4 style="margin: 2rem 0 1rem; color: var(--primary);">Annual Net Profit</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">FY 2021-22</label>
+                                <input type="number" name="profit2122" required="" placeholder="₹" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">FY 2022-23</label>
+                                <input type="number" name="profit2223" required="" placeholder="₹" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">FY 2023-24</label>
+                                <input type="number" name="profit2324" required="" placeholder="₹" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">EBITDA Margin (%)</label>
+                                <input type="number" name="ebitda" required="" placeholder="%" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Total Assets Value</label>
+                                <input type="number" name="assets" required="" placeholder="₹" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Total Liabilities</label>
+                                <input type="number" name="liabilities" placeholder="₹" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Number of Employees</label>
+                                <input type="number" name="employees" required="" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Documents -->
+                    <div class="form-step" data-step="4">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Document Upload</h3>
+                        
+                        <div class="form-group">
+                            <label >Registration Certificate</label>
+                            <div  onclick="document.getElementById('regCert').click()">
+                                <input type="file" id="regCert" accept=".pdf">
+                                <div>📄 Click to upload Registration Certificate</div>
+                                <div class="file-upload-text">PDF (Max 5MB)</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >Audited P&amp;L Statement (3 Years)</label>
+                            <div class="file-upload" onclick="document.getElementById('sellerPL').click()">
+                                <input type="file" id="sellerPL" accept=".pdf" multiple="">
+                                <div>📊 Click to upload P&amp;L Statements</div>
+                                <div class="file-upload-text">3 PDF files</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >Audited Balance Sheet (3 Years)</label>
+                            <div class="file-upload" onclick="document.getElementById('sellerBS').click()">
+                                <input type="file" id="sellerBS" accept=".pdf" multiple="">
+                                <div>📈 Click to upload Balance Sheets</div>
+                                <div class="file-upload-text">3 PDF files</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >ITR (3 Years)</label>
+                            <div class="file-upload" onclick="document.getElementById('itr').click()">
+                                <input type="file" id="itr" accept=".pdf" multiple="">
+                                <div>📋 Click to upload ITR</div>
+                                <div class="file-upload-text">3 PDF files</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >GST Returns (Last 12 Months)</label>
+                            <div class="file-upload" onclick="document.getElementById('gstReturns').click()">
+                                <input type="file" id="gstReturns" accept=".pdf" multiple="">
+                                <div>💼 Click to upload GST Returns</div>
+                                <div class="file-upload-text">PDF files</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="required">Key Person - Name</label>
+                            <input type="text" name="keyPersonName" required="" placeholder="Promoter/Director name">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">Aadhar Number</label>
+                                <input type="text" name="keyAadhar" pattern="[0-9]{12}" maxlength="12" required="">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">PAN</label>
+                                <input type="text" name="keyPan" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" maxlength="10" required="">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">Mobile Number</label>
+                                <input type="tel" name="keyMobile" pattern="[0-9]{10}" maxlength="10" required="">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Email ID</label>
+                                <input type="email" name="keyEmail" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Review -->
+                    <div class="form-step" data-step="5">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Review &amp; Submit</h3>
+                        
+                        <div class="card" style="margin-bottom: 2rem;">
+                            <h4 style="color: var(--primary); margin-bottom: 1rem;">Review Your Listing</h4>
+                            <p style="color: var(--text-light); margin-bottom: 1rem;">Your listing will be reviewed by our team within 24-48 hours. Once approved, it will be visible to verified buyers.</p>
+                            <div id="sellerReviewContent" style="background: var(--bg-light); padding: 1rem; border-radius: 8px; line-height: 2;">
+                                <!-- Review content will be populated -->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-item" style="display: flex; align-items: start; gap: 0.5rem;">
+                                <input type="checkbox" name="sellerTerms" required="" style="margin-top: 0.25rem;">
+                                <span>I confirm that all information provided is accurate and I agree to the Terms &amp; Conditions. I understand that misrepresentation may lead to legal action.</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-submit">
+                            Submit Listing for Review
+                        </button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-back" onclick="previousStep('seller')" id="sellerBackBtn" style="display: none;">Back</button>
+                        <button type="button" class="btn btn-next" onclick="nextStep('seller')" id="sellerNextBtn" style="display: block;">Next</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Inquiry Section -->
+        <section id="inquiry" class="section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Express Interest</h2>
+                    <p>Fill in the details to show your interest in this business</p>
+                </div>
+
+                <form id="inquiryForm">
+                    <div class="form-group">
+                        <label class="required">Investment Type</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="inquiryType" value="shares" required="">
+                                <span>Shares in Company</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="inquiryType" value="llp">
+                                <span>Share in LLP</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Interest Level</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="interestLevel" value="full" required="">
+                                <span>Full Acquisition (100%)</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="interestLevel" value="partial">
+                                <span>Partial Stake</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stake Percentage (if partial)</label>
+                        <input type="number" name="stakePercent" min="1" max="99" placeholder="%">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Your Offered Budget</label>
+                        <input type="number" name="offeredBudget" required="" placeholder="₹" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Why This Business Interests You</label>
+                        <textarea name="interest" required="" rows="4" placeholder="Describe what attracts you to this business and how it aligns with your goals"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Core Requirements Match</label>
+                        <textarea name="requirementsMatch" required="" rows="3" placeholder="List the specific strengths of this business that match your requirements"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Proposed Timeline for Closing</label>
+                        <select name="closingTimeline" required="">
+                            <option value="">Select timeline</option>
+                            <option value="1month">Within 1 month</option>
+                            <option value="3months">Within 3 months</option>
+                            <option value="6months">Within 6 months</option>
+                            <option value="flexible">Flexible</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Queries or Conditions</label>
+                        <textarea name="additionalNotes" rows="3" placeholder="Any specific questions or conditions"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ndaAgree" required="">
+                            <span>I agree to sign an NDA before receiving detailed business information</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit">
+                        Submit Inquiry
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section">
+            <h2 class="section-title">About BizConnect</h2>
+            
+            <div class="card" style="max-width: 900px; margin: 2rem auto; padding: 3rem;">
+                <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-dark); margin-bottom: 1.5rem;">
+                    BizConnect is India's premier marketplace for business acquisitions, connecting verified buyers with quality business opportunities. We provide comprehensive due diligence, professional valuation services, and secure transaction management to ensure successful deals.
+                </p>
+                
+                <h3 style="color: var(--primary); margin: 2rem 0 1rem;">Our Mission</h3>
+                <p style="line-height: 1.8; color: var(--text-light);">
+                    To create a transparent, secure, and efficient marketplace for business transactions in India, leveraging technology and professional expertise to facilitate successful business acquisitions and exits.
+                </p>
+
+                <h3 style="color: var(--primary); margin: 2rem 0 1rem;">Why Choose Us?</h3>
+                <ul style="line-height: 2; color: var(--text-light); margin-left: 2rem;">
+                    <li>100% verified listings through PAN, Aadhar, GST, and MCA checks</li>
+                    <li>Professional due diligence and valuation services</li>
+                    <li>Secure escrow and digital contract management</li>
+                    <li>Compliance with all Indian regulations (Companies Act, LLP Act, Income Tax, FEMA)</li>
+                    <li>Access to verified CAs, lawyers, and business advisors</li>
+                    <li>Confidential and secure transaction process</li>
+                </ul>
+
+                <h3 style="color: var(--primary); margin: 2rem 0 1rem;">Contact Us</h3>
+                <p style="line-height: 1.8; color: var(--text-light);">
+                    <strong>Email:</strong> info@bizconnect.in<br>
+                    <strong>Phone:</strong> +91 22 1234 5678<br>
+                    <strong>Address:</strong> 123 Business Tower, Mumbai - 400001
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">×</span>
+            <div class="success-message">
+                <div class="success-icon">✓</div>
+                <h2>Registration Successful!</h2>
+                <p style="color: var(--text-light); margin-bottom: 2rem;">Your application has been submitted successfully. Our team will verify your documents within 24-48 hours and activate your account.</p>
+                <p style="color: var(--text-light);">You will receive email and SMS notifications regarding your application status.</p>
+                <button class="btn btn-primary" onclick="closeModal(); showSection('home');" style="margin-top: 2rem;">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BizConnect</h3>
+                <p style="color: rgba(255,255,255,0.8); margin-top: 1rem;">India's trusted marketplace for business acquisitions with professional due diligence and valuation services.</p>
+            </div>
+            <div class="footer-section">
+                <h3>For Buyers</h3>
+                <ul>
+                    <li><a href="#" onclick="showSection('browse'); return false;">Browse Listings</a></li>
+                    <li><a href="#" onclick="showSection('register-buyer'); return false;">Register as Buyer</a></li>
+                    <li><a href="#">Due Diligence Services</a></li>
+                    <li><a href="#">Valuation Services</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>For Sellers</h3>
+                <ul>
+                    <li><a href="#" onclick="showSection('register-seller'); return false;">List Your Business</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Success Stories</a></li>
+                    <li><a href="#">Seller Resources</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#" onclick="showSection('about'); return false;">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Terms &amp; Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 BizConnect. All rights reserved. | Designed for the Indian Market</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const navBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
+                btn.textContent.toLowerCase().includes(sectionId.replace('register-', '').replace('-', ' '))
+            );
+            if (navBtn) navBtn.classList.add('active');
+            
+            window.scrollTo(0, 0);
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Multi-step Form Functions
+        let currentBuyerStep = 1;
+        let currentSellerStep = 1;
+        const totalSteps = 5;
+
+        function updateProgress(formType, step) {
+            const progressLine = document.getElementById(`${formType}ProgressLine`);
+            const progressSteps = document.querySelectorAll(`#register-${formType} .progress-step`);
+            const percentage = (step / totalSteps) * 100;
+            progressLine.style.width = percentage + '%';
+            
+            progressSteps.forEach((stepEl, index) => {
+                if (index + 1 < step) {
+                    stepEl.classList.add('completed');
+                    stepEl.classList.remove('active');
+                } else if (index + 1 === step) {
+                    stepEl.classList.add('active');
+                    stepEl.classList.remove('completed');
+                } else {
+                    stepEl.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        function showStep(formType, step) {
+            const formSteps = document.querySelectorAll(`#${formType}Form .form-step`);
+            formSteps.forEach((stepEl, index) => {
+                if (index + 1 === step) {
+                    stepEl.classList.add('active');
+                } else {
+                    stepEl.classList.remove('active');
+                }
+            });
+            
+            const backBtn = document.getElementById(`${formType}BackBtn`);
+            const nextBtn = document.getElementById(`${formType}NextBtn`);
+            
+            backBtn.style.display = step === 1 ? 'none' : 'block';
+            nextBtn.style.display = step === totalSteps ? 'none' : 'block';
+            
+            updateProgress(formType, step);
+        }
+
+        function nextStep(formType) {
+            const currentStep = formType === 'buyer' ? currentBuyerStep : currentSellerStep;
+            
+            // Validate current step
+            const currentStepEl = document.querySelector(`#${formType}Form .form-step[data-step="${currentStep}"]`);
+            const inputs = currentStepEl.querySelectorAll('input[required], select[required], textarea[required]');
+            let valid = true;
+            
+            inputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    valid = false;
+                    input.reportValidity();
+                }
+            });
+            
+            if (!valid) return;
+            
+            if (currentStep < totalSteps) {
+                if (formType === 'buyer') {
+                    currentBuyerStep++;
+                    if (currentBuyerStep === totalSteps) {
+                        populateReview('buyer');
+                    }
+                    showStep('buyer', currentBuyerStep);
+                } else {
+                    currentSellerStep++;
+                    if (currentSellerStep === totalSteps) {
+                        populateReview('seller');
+                    }
+                    showStep('seller', currentSellerStep);
+                }
+            }
+        }
+
+        function previousStep(formType) {
+            if (formType === 'buyer' && currentBuyerStep > 1) {
+                currentBuyerStep--;
+                showStep('buyer', currentBuyerStep);
+            } else if (formType === 'seller' && currentSellerStep > 1) {
+                currentSellerStep--;
+                showStep('seller', currentSellerStep);
+            }
+        }
+
+        function populateReview(formType) {
+            const form = document.getElementById(`${formType}Form`);
+            const formData = new FormData(form);
+            const reviewContent = document.getElementById(formType === 'buyer' ? 'reviewContent' : 'sellerReviewContent');
+            
+            let html = '<div style="display: grid; gap: 1rem;">';
+            
+            for (let [key, value] of formData.entries()) {
+                if (value && !key.includes('terms') && !key.includes('agree')) {
+                    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                    html += `<div><strong>${label}:</strong> ${value}</div>`;
+                }
+            }
+            
+            html += '</div>';
+            reviewContent.innerHTML = html;
+        }
+
+       
+document.getElementById("buyerForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  submitToGoogleForm("Buyer", this);
+});
+
+document.getElementById("sellerForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  submitToGoogleForm("Seller", this);
+});
+
+document.getElementById("inquiryForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  submitToGoogleForm("Inquiry", document.getElementById("inquiryForm"));
+});
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // File Upload Handlers
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileList = this.parentElement.parentElement.querySelector('.uploaded-files');
+                if (fileList) {
+                    fileList.innerHTML = '';
+                    for (let file of this.files) {
+                        const fileEl = document.createElement('div');
+                        fileEl.className = 'uploaded-file';
+                        fileEl.innerHTML = `
+                            <span>📎 ${file.name}</span>
+                            <span class="file-remove" onclick="this.parentElement.remove()">Remove</span>
+                        `;
+                        fileList.appendChild(fileEl);
+                    }
+                }
+            });
+        });
+
+        // Initialize
+        showStep('buyer', 1);
+        showStep('seller', 1);
+    </script>
+</body></html>
