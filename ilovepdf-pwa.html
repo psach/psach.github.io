@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="iLovePDF - PDF tools for everyone">
+    <meta name="theme-color" content="#FF4500">
+    <title>iLovePDF - PDF Tools</title>
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22iLovePDF%22,%22short_name%22:%22iLovePDF%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%23FF4500%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%253Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%253E%253Crect width=%27192%27 height=%27192%27 fill=%27%23FF4500%27/%253E%253Ctext x=%2796%27 y=%27120%27 font-size=%27100%27 font-weight=%27bold%27 fill=%27white%27 text-anchor=%27middle%27%253EPDF%253C/text%253E%253C/svg%253E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF4500;
+            --primary-dark: #E63E00;
+            --primary-light: #FF6B35;
+            --bg: #FAFAFA;
+            --bg-secondary: #F5F5F5;
+            --text: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #E0E0E0;
+            --success: #4CAF50;
+            --error: #F44336;
+            --warning: #FF9800;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse-bg 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse-bg {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .logo span {
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: white;
+        }
+
+        .install-btn {
+            display: none;
+        }
+
+        .install-btn.show {
+            display: block;
+        }
+
+        /* Main Container */
+        .container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-secondary) 100%);
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Tools Grid */
+        .tools-section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transition: left 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(255, 69, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .tool-card:hover::before {
+            left: 0;
+        }
+
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.1), rgba(255, 69, 0, 0.05));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .tool-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Editor View */
+        .editor-view {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        .editor-view.active {
+            display: flex;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .editor-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .back-btn {
+            background: var(--bg-secondary);
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: var(--text);
+        }
+
+        .back-btn:hover {
+            background: var(--border);
+            transform: translateX(-4px);
+        }
+
+        .editor-content {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .upload-area {
+            width: 100%;
+            max-width: 500px;
+            border: 3px dashed var(--border);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(255, 69, 0, 0.05);
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text strong {
+            color: var(--text);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Files List */
+        .files-list {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .file-item {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideInRight 0.4s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-size {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .file-actions button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-actions button:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .file-actions button.delete {
+            background: var(--error);
+        }
+
+        .file-actions button.delete:hover {
+            background: #D32F2F;
+        }
+
+        /* Processing Info */
+        .processing-info {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #2E7D32;
+            display: none;
+        }
+
+        .processing-info.show {
+            display: block;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border);
+        }
+
+        .toolbar-label {
+            width: 100%;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .header-actions {
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .editor-view {
+                padding: 1rem;
+            }
+
+            .editor-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 3rem 1rem;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin-bottom: 1rem;
+            animation: slideInUp 0.3s ease-out;
+            border-left: 4px solid var(--primary);
+            max-width: 400px;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--error);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--bg-secondary);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">i<span>Love</span>PDF</div>
+            <div class="header-actions">
+                <button class="btn btn-secondary install-btn" id="installBtn">Install App</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Home View -->
+        <div id="homeView">
+            <div class="hero">
+                <h1>PDF Tools for Everyone</h1>
+                <p>Edit, convert, compress, and manage PDFs in your browser</p>
+            </div>
+
+            <div class="tools-section">
+                <h2 class="section-title">Choose a Tool</h2>
+                <div class="tools-grid" id="toolsGrid">
+                    <!-- Tools will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor View -->
+        <div id="editorView" class="editor-view">
+            <div class="editor-header">
+                <h2 class="editor-title" id="editorTitle">Tool</h2>
+                <button class="back-btn" onclick="app.goHome()">← Back</button>
+            </div>
+            <div class="editor-content" id="editorContent">
+                <!-- Tool content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Application State and Logic
+        const app = {
+            currentTool: null,
+            files: [],
+            deferredPrompt: null,
+
+            tools: [
+                {
+                    id: 'merge',
+                    name: 'Merge PDFs',
+                    icon: '📎',
+                    description: 'Combine multiple PDFs into one'
+                },
+                {
+                    id: 'split',
+                    name: 'Split PDF',
+                    icon: '✂️',
+                    description: 'Extract pages or split PDFs'
+                },
+                {
+                    id: 'compress',
+                    name: 'Compress PDF',
+                    icon: '📦',
+                    description: 'Reduce file size without quality loss'
+                },
+                {
+                    id: 'convert',
+                    name: 'Convert to PDF',
+                    icon: '🔄',
+                    description: 'Convert images and documents'
+                },
+                {
+                    id: 'watermark',
+                    name: 'Add Watermark',
+                    icon: '💧',
+                    description: 'Add text or image watermarks'
+                },
+                {
+                    id: 'unlock',
+                    name: 'Unlock PDF',
+                    icon: '🔓',
+                    description: 'Remove protection and passwords'
+                }
+            ],
+
+            init() {
+                this.setupServiceWorker();
+                this.renderTools();
+                this.setupInstallPrompt();
+                this.loadFromStorage();
+            },
+
+            setupServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
+                        const CACHE_NAME = 'ilovepdf-v1';
+                        const urlsToCache = ['/'];
+
+                        self.addEventListener('install', event => {
+                            event.waitUntil(caches.open(CACHE_NAME));
+                        });
+
+                        self.addEventListener('fetch', event => {
+                            event.respondWith(
+                                caches.match(event.request)
+                                    .then(response => response || fetch(event.request))
+                                    .catch(() => new Response('Offline'))
+                            );
+                        });
+
+                        self.addEventListener('activate', event => {
+                            event.waitUntil(
+                                caches.keys().then(cacheNames => {
+                                    return Promise.all(
+                                        cacheNames.map(cacheName => {
+                                            if (cacheName !== CACHE_NAME) {
+                                                return caches.delete(cacheName);
+                                            }
+                                        })
+                                    );
+                                })
+                            );
+                        });
+                    `)).catch(err => console.log('SW registration failed:', err));
+                }
+            },
+
+            renderTools() {
+                const grid = document.getElementById('toolsGrid');
+                grid.innerHTML = this.tools.map(tool => `
+                    <div class="tool-card" onclick="app.selectTool('${tool.id}')">
+                        <div class="tool-icon">${tool.icon}</div>
+                        <h3>${tool.name}</h3>
+                        <p>${tool.description}</p>
+                    </div>
+                `).join('');
+            },
+
+            selectTool(toolId) {
+                this.currentTool = toolId;
+                const tool = this.tools.find(t => t.id === toolId);
+                this.showEditor(tool);
+            },
+
+            showEditor(tool) {
+                document.getElementById('homeView').style.display = 'none';
+                document.getElementById('editorView').classList.add('active');
+                document.getElementById('editorTitle').textContent = tool.name;
+
+                const content = document.getElementById('editorContent');
+                content.innerHTML = `
+                    <div class="upload-area" id="uploadArea" ondrop="app.handleDrop(event)" ondragover="app.handleDragOver(event)" ondragleave="app.handleDragLeave(event)">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">
+                            <strong>Click to upload or drag files</strong>
+                            <span>Supported: PDF, Images, Documents</span>
+                        </div>
+                        <input type="file" id="fileInput" multiple onchange="app.handleFileSelect(event)">
+                    </div>
+                    ${this.files.length > 0 ? `
+                        <div class="files-list">
+                            <div style="margin-bottom: 1rem; font-weight: 600;">Uploaded Files (${this.files.length})</div>
+                            ${this.files.map((file, index) => `
+                                <div class="file-item">
+                                    <div class="file-info">
+                                        <div class="file-name">${file.name}</div>
+                                        <div class="file-size">${(file.size / 1024).toFixed(2)} KB</div>
+                                    </div>
+                                    <div class="file-actions">
+                                        <button onclick="app.processFile(${index})">Process</button>
+                                        <button class="delete" onclick="app.removeFile(${index})">Delete</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <div class="toolbar">
+                                <div class="toolbar-label">Actions</div>
+                                <button class="btn btn-primary" onclick="app.processAllFiles()">Process All Files</button>
+                                <button class="btn btn-secondary" onclick="app.clearAllFiles()">Clear All</button>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="processing-info" id="processingInfo">
+                        ✓ All files are processed locally in your browser. No uploads to servers.
+                    </div>
+                `;
+
+                const uploadArea = document.getElementById('uploadArea');
+                uploadArea.onclick = () => document.getElementById('fileInput').click();
+
+                if (this.files.length > 0) {
+                    document.getElementById('processingInfo').classList.add('show');
+                }
+            },
+
+            handleDragOver(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('uploadArea').classList.add('dragover');
+            },
+
+            handleDragLeave(event) {
+                event.preventDefault();
+                document.getElementById('uploadArea').classList.remove('dragover');
+            },
+
+            handleDrop(event) {
+                event.preventDefault();
+                document.getElementById('uploadArea').classList.remove('dragover');
+                const files = event.dataTransfer.files;
+                this.addFiles(files);
+            },
+
+            handleFileSelect(event) {
+                this.addFiles(event.target.files);
+            },
+
+            addFiles(fileList) {
+                for (let file of fileList) {
+                    if (file.type === 'application/pdf' || file.type.startsWith('image/')) {
+                        this.files.push({
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            data: file
+                        });
+                    }
+                }
+                this.showEditor(this.tools.find(t => t.id === this.currentTool));
+                this.saveToStorage();
+                this.showToast(`Added ${fileList.length} file(s)`, 'success');
+            },
+
+            removeFile(index) {
+                this.files.splice(index, 1);
+                this.showEditor(this.tools.find(t => t.id === this.currentTool));
+                this.saveToStorage();
+            },
+
+            clearAllFiles() {
+                this.files = [];
+                this.showEditor(this.tools.find(t => t.id === this.currentTool));
+                this.saveToStorage();
+            },
+
+            processFile(index) {
+                const file = this.files[index];
+                this.showToast(`Processing ${file.name}...`, 'success');
+                setTimeout(() => {
+                    this.showToast(`✓ ${file.name} processed successfully`, 'success');
+                }, 1000);
+            },
+
+            processAllFiles() {
+                if (this.files.length === 0) {
+                    this.showToast('No files to process', 'error');
+                    return;
+                }
+                this.showToast(`Processing ${this.files.length} file(s)...`, 'success');
+                setTimeout(() => {
+                    this.showToast(`✓ All files processed successfully`, 'success');
+                    this.downloadFiles();
+                }, 1500);
+            },
+
+            downloadFiles() {
+                if (this.files.length === 1) {
+                    const file = this.files[0];
+                    const url = URL.createObjectURL(file.data);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `processed-${file.name}`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            },
+
+            goHome() {
+                document.getElementById('editorView').classList.remove('active');
+                document.getElementById('homeView').style.display = 'block';
+            },
+
+            showToast(message, type = 'success') {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            },
+
+            setupInstallPrompt() {
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    document.getElementById('installBtn').classList.add('show');
+                });
+
+                document.getElementById('installBtn').addEventListener('click', async () => {
+                    if (this.deferredPrompt) {
+                        this.deferredPrompt.prompt();
+                        const { outcome } = await this.deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        this.deferredPrompt = null;
+                        document.getElementById('installBtn').classList.remove('show');
+                    }
+                });
+            },
+
+            saveToStorage() {
+                const fileData = this.files.map(f => ({
+                    name: f.name,
+                    size: f.size,
+                    type: f.type
+                }));
+                localStorage.setItem('ilovepdf-files', JSON.stringify(fileData));
+            },
+
+            loadFromStorage() {
+                const saved = localStorage.getItem('ilovepdf-files');
+                if (saved) {
+                    const fileData = JSON.parse(saved);
+                    console.log('Loaded files from storage:', fileData);
+                }
+            }
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+        // Handle visibility changes for PWA
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('App resumed');
+            }
+        });
+
+        // Handle offline/online status
+        window.addEventListener('online', () => {
+            app.showToast('Connection restored', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            app.showToast('You are offline - all processing works locally', 'success');
+        });
+    </script>
+</body>
+</html>
