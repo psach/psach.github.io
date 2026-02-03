@@ -1049,6 +1049,40 @@ function closeSuccessModal() {
 </script>
 
 
+
+<style>
+/* === Fullscreen Forms === */
+.section.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: var(--bg-light);
+  overflow-y: auto;
+  padding-top: 1rem;
+}
+.fullscreen .form-container{
+  max-width: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+.fullscreen-close{
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 3100;
+  font-size: 28px;
+  cursor: pointer;
+  background: #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,.15);
+}
+</style>
+
 </head>
 <body>
     <!-- Header -->
@@ -2316,4 +2350,81 @@ document.getElementById("inquiryForm").addEventListener("submit", function (e) {
         showStep('buyer', 1);
         showStep('seller', 1);
     </script>
+
+<script>
+/* === Fullscreen toggle for Buyer, Seller, Inquiry === */
+const FS_IDS = ['register-buyer','register-seller','inquiry'];
+
+function enterFullscreen(sectionId){
+  const sec = document.getElementById(sectionId);
+  if(!sec) return;
+  FS_IDS.forEach(id=>document.getElementById(id)?.classList.remove('fullscreen'));
+  sec.classList.add('fullscreen');
+  document.body.style.overflow = 'hidden';
+  let btn = document.querySelector('.fullscreen-close');
+  if(!btn){
+    btn = document.createElement('div');
+    btn.className = 'fullscreen-close';
+    btn.innerHTML = '✕';
+    btn.onclick = exitFullscreen;
+    document.body.appendChild(btn);
+  }
+  btn.style.display = 'flex';
+}
+
+function exitFullscreen(){
+  FS_IDS.forEach(id=>document.getElementById(id)?.classList.remove('fullscreen'));
+  document.body.style.overflow = '';
+  const btn = document.querySelector('.fullscreen-close');
+  if(btn) btn.style.display = 'none';
+}
+
+/* Patch showSection to enable fullscreen for forms */
+const _showSection = window.showSection || function(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+window.showSection = function(id){
+  _showSection(id);
+  if(FS_IDS.includes(id)) enterFullscreen(id);
+  else exitFullscreen();
+};
+</script>
+
+
+<script>
+/* === Auto-scroll to Browse Listings === */
+function scrollToBrowse(){
+  const browseSection = document.getElementById('browse');
+  if(browseSection){
+    browseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+/* Patch showSection to auto-scroll when browsing */
+const __showSection = window.showSection;
+window.showSection = function(id){
+  __showSection(id);
+  if(id === 'browse'){
+    setTimeout(scrollToBrowse, 100);
+  }
+};
+</script>
+
+
+<script>
+/* === Exit fullscreen on form submit === */
+['buyerForm','sellerForm','inquiryForm'].forEach(id=>{
+  const f = document.getElementById(id);
+  if(f){
+    f.addEventListener('submit', ()=>{
+      setTimeout(()=>{
+        if(typeof exitFullscreen === 'function') exitFullscreen();
+      }, 300);
+    });
+  }
+});
+</script>
+
 </body></html>
