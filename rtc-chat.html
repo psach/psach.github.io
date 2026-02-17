@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Peer-to-peer encrypted chat using WebRTC">
+    <meta name="theme-color" content="#0f172a">
+    <title>P2P Chat</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,{
+        \"name\": \"P2P Chat\",
+        \"short_name\": \"P2P\",
+        \"description\": \"Encrypted peer-to-peer chat\",
+        \"start_url\": \"./\",
+        \"display\": \"standalone\",
+        \"background_color\": \"#0f172a\",
+        \"theme_color\": \"#0f172a\",
+        \"orientation\": \"portrait-primary\",
+        \"icons\": [{
+            \"src\": \"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230f172a' width='192' height='192'/><circle cx='96' cy='60' r='20' fill='%2306b6d4'/><circle cx='60' cy='120' r='16' fill='%2306b6d4'/><circle cx='132' cy='120' r='16' fill='%2306b6d4'/><path d='M 80 140 Q 96 160 112 140' stroke='%2306b6d4' stroke-width='4' fill='none'/></svg>\",
+            \"sizes\": \"192x192\",
+            \"type\": \"image/svg+xml\",
+            \"purpose\": \"any\"
+        }]
+    }">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-400: #cbd5e1;
+            --cyan-400: #22d3ee;
+            --cyan-500: #06b6d4;
+            --emerald-500: #10b981;
+            --rose-400: #f472b6;
+            --amber-400: #fbbf24;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, var(--slate-900) 0%, #1a2942 100%);
+            color: var(--slate-400);
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            padding: 1rem 1.5rem;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--cyan-400);
+            letter-spacing: 0.05em;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .status-dot.connected {
+            background: var(--emerald-500);
+        }
+
+        .status-dot.connecting {
+            background: var(--amber-400);
+            animation: pulse-amber 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .status-dot.disconnected {
+            background: var(--rose-400);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes pulse-amber {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .status-text {
+            font-size: 0.875rem;
+            color: var(--slate-400);
+        }
+
+        /* Main content */
+        .main {
+            display: flex;
+            flex: 1;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .messages-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            scroll-behavior: smooth;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: var(--slate-600);
+            border-radius: 3px;
+        }
+
+        .messages::-webkit-scrollbar-thumb:hover {
+            background: var(--slate-500);
+        }
+
+        .message {
+            display: flex;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.local {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message.remote .message-content {
+            background: var(--slate-700);
+            color: var(--slate-100);
+            border: 1px solid var(--slate-600);
+        }
+
+        .message.local .message-content {
+            background: linear-gradient(135deg, var(--cyan-500), var(--cyan-600));
+            color: white;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--slate-500);
+            align-self: flex-end;
+            opacity: 0.7;
+        }
+
+        .system-message {
+            text-align: center;
+            padding: 1rem;
+            color: var(--slate-500);
+            font-size: 0.875rem;
+            font-style: italic;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+
+        /* Setup Panel */
+        .setup-panel {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(51, 65, 85, 0.5);
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .setup-panel.hidden {
+            display: none;
+        }
+
+        .setup-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .setup-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--cyan-400);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .setup-description {
+            font-size: 0.8rem;
+            color: var(--slate-500);
+            line-height: 1.4;
+        }
+
+        textarea, input {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--slate-600);
+            color: var(--slate-400);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            min-height: 80px;
+            transition: all 0.2s ease;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--cyan-500);
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan-500), var(--cyan-600));
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--cyan-400);
+            border: 1px solid var(--cyan-500);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(6, 182, 212, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Input Area */
+        .input-area {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(51, 65, 85, 0.5);
+            padding: 1.25rem;
+            flex-shrink: 0;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-area.hidden {
+            display: none;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            min-height: 44px;
+            padding: 0.75rem 1rem;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--cyan-500), var(--cyan-600));
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.2rem;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Toggle Setup Button */
+        .toggle-setup {
+            background: transparent;
+            color: var(--cyan-400);
+            border: 1px solid var(--cyan-500);
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .toggle-setup:hover {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--slate-800);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--slate-700);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--cyan-400);
+            margin-bottom: 1rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--slate-400);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:hover {
+            color: var(--cyan-400);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main {
+                flex-direction: column;
+            }
+
+            .setup-panel {
+                width: 100%;
+                max-width: none;
+                border-left: none;
+                border-top: 1px solid rgba(51, 65, 85, 0.5);
+                display: none;
+                max-height: 40vh;
+            }
+
+            .setup-panel.show-mobile {
+                display: flex;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .messages {
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+
+            .header {
+                padding: 0.75rem 1rem;
+            }
+
+            .input-area {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <span class="status-dot connected" id="statusDot"></span>
+                <span id="statusText">Ready</span>
+            </div>
+            <button class="toggle-setup" id="toggleSetup">Setup</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Messages Panel -->
+            <div class="messages-panel">
+                <div class="messages" id="messages">
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">No messages yet</div>
+                            <div style="font-size: 0.85rem; color: var(--slate-500);">Exchange codes to connect with a peer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Setup Panel -->
+            <div class="setup-panel" id="setupPanel">
+                <div class="setup-section">
+                    <div class="setup-label">Step 1: Copy Your Code</div>
+                    <div class="setup-description">Share this with the other person</div>
+                    <textarea id="myOffer" readonly></textarea>
+                    <button class="btn-primary btn-small" onclick="copyToClipboard('myOffer')">Copy Code</button>
+                </div>
+
+                <div class="setup-section">
+                    <div class="setup-label">Step 2: Paste Their Code</div>
+                    <div class="setup-description">Once they share their code, paste it here</div>
+                    <textarea id="theirOffer" placeholder="Paste their code here..."></textarea>
+                    <button class="btn-primary btn-small" onclick="connectPeer()">Connect</button>
+                </div>
+
+                <div class="setup-section">
+                    <button class="btn-secondary" onclick="resetConnection()">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area" id="inputArea" style="display: none;">
+            <div class="input-wrapper">
+                <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">📤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', (event) => {
+    if (event.request.method === 'GET') {
+        event.respondWith(
+            caches.match(event.request)
+                .then(response => response || fetch(event.request))
+                .catch(() => new Response('Offline', {status: 503}))
+        );
+    }
+});
+            `;
+            
+            const blob = new Blob([swCode], {type: 'application/javascript'});
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl).catch(() => {});
+        }
+
+        // WebRTC Configuration
+        const config = {
+            iceServers: [
+                { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
+            ]
+        };
+
+        let peerConnection;
+        let dataChannel;
+        let isInitiator = false;
+        const messagesList = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const inputArea = document.getElementById('inputArea');
+        const setupPanel = document.getElementById('setupPanel');
+        const myOfferEl = document.getElementById('myOffer');
+        const theirOfferEl = document.getElementById('theirOffer');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+
+        function updateStatus(status, className) {
+            const statuses = {
+                'connecting': { text: 'Connecting...', class: 'connecting' },
+                'connected': { text: 'Connected', class: 'connected' },
+                'disconnected': { text: 'Disconnected', class: 'disconnected' },
+                'ready': { text: 'Ready', class: 'disconnected' }
+            };
+            const current = statuses[status] || statuses.ready;
+            statusDot.className = `status-dot ${current.class}`;
+            statusText.textContent = current.text;
+        }
+
+        function initPeerConnection() {
+            peerConnection = new RTCPeerConnection(config);
+
+            peerConnection.onconnectionstatechange = () => {
+                console.log('Connection state:', peerConnection.connectionState);
+                if (peerConnection.connectionState === 'connected') {
+                    updateStatus('connected');
+                    inputArea.style.display = 'flex';
+                    messageInput.focus();
+                } else if (peerConnection.connectionState === 'disconnected' || 
+                           peerConnection.connectionState === 'failed') {
+                    updateStatus('disconnected');
+                    inputArea.style.display = 'none';
+                }
+            };
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate === null) {
+                    const offer = peerConnection.localDescription;
+                    myOfferEl.value = btoa(JSON.stringify(offer));
+                    if (isInitiator) {
+                        addSystemMessage('Your code is ready to share');
+                    }
+                }
+            };
+
+            peerConnection.ondatachannel = (event) => {
+                dataChannel = event.channel;
+                setupDataChannel();
+            };
+
+            return peerConnection;
+        }
+
+        function setupDataChannel() {
+            dataChannel.onopen = () => {
+                console.log('Data channel opened');
+                updateStatus('connected');
+                inputArea.style.display = 'flex';
+                messageInput.focus();
+            };
+
+            dataChannel.onclose = () => {
+                console.log('Data channel closed');
+                updateStatus('disconnected');
+                inputArea.style.display = 'none';
+            };
+
+            dataChannel.onmessage = (event) => {
+                addMessage(event.data, 'remote');
+            };
+        }
+
+        async function createOffer() {
+            updateStatus('connecting');
+            isInitiator = true;
+            initPeerConnection();
+
+            dataChannel = peerConnection.createDataChannel('chat', {ordered: true});
+            setupDataChannel();
+
+            try {
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                addSystemMessage('Step 1: Copy your code to share');
+            } catch (err) {
+                console.error('Error creating offer:', err);
+                addSystemMessage('Error: ' + err.message);
+            }
+        }
+
+        async function connectPeer() {
+            const theirCode = theirOfferEl.value.trim();
+            if (!theirCode) {
+                alert('Please paste the other person\'s code');
+                return;
+            }
+
+            try {
+                const theirOffer = JSON.parse(atob(theirCode));
+                updateStatus('connecting');
+
+                if (!peerConnection) {
+                    isInitiator = false;
+                    initPeerConnection();
+                }
+
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(theirOffer));
+
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                
+                addSystemMessage('Code processed. Ready to connect!');
+                myOfferEl.value = btoa(JSON.stringify(answer));
+                addSystemMessage('Step 2: Copy and send your response code back');
+            } catch (err) {
+                console.error('Error connecting:', err);
+                addSystemMessage('Error: Invalid code or connection failed');
+                updateStatus('ready');
+            }
+        }
+
+        async function receiveAnswer() {
+            const answerCode = theirOfferEl.value.trim();
+            if (!answerCode || !isInitiator) return;
+
+            try {
+                const answer = JSON.parse(atob(answerCode));
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+                addSystemMessage('Connected! Start chatting');
+            } catch (err) {
+                console.error('Error receiving answer:', err);
+            }
+        }
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text || !dataChannel || dataChannel.readyState !== 'open') return;
+
+            addMessage(text, 'local');
+            dataChannel.send(text);
+            messageInput.value = '';
+            messageInput.focus();
+        }
+
+        function addMessage(text, sender) {
+            clearEmptyState();
+            const msgEl = document.createElement('div');
+            msgEl.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+            
+            msgEl.innerHTML = `
+                <div class="message-content">${escapeHtml(text)}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            messagesList.appendChild(msgEl);
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        function addSystemMessage(text) {
+            clearEmptyState();
+            const msgEl = document.createElement('div');
+            msgEl.className = 'system-message';
+            msgEl.textContent = text;
+            messagesList.appendChild(msgEl);
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        function clearEmptyState() {
+            if (messagesList.querySelector('.empty-state')) {
+                messagesList.innerHTML = '';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            el.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
+        }
+
+        function resetConnection() {
+            if (peerConnection) {
+                peerConnection.close();
+            }
+            peerConnection = null;
+            dataChannel = null;
+            messagesList.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><div><div style="font-weight: 600; margin-bottom: 0.5rem;">No messages yet</div><div style="font-size: 0.85rem; color: var(--slate-500);">Exchange codes to connect with a peer</div></div></div>';
+            myOfferEl.value = '';
+            theirOfferEl.value = '';
+            inputArea.style.display = 'none';
+            updateStatus('ready');
+        }
+
+        // Event Listeners
+        document.getElementById('toggleSetup').addEventListener('click', () => {
+            setupPanel.classList.toggle('show-mobile');
+        });
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        // Initialize
+        createOffer();
+
+        // Handle focus
+        window.addEventListener('focus', () => {
+            messageInput.focus();
+        });
+    </script>
+</body>
+</html>
