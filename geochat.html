@@ -21,570 +21,462 @@
     --mine-border: #00e5a0;
     --other-bg: #111c2a;
     --other-border: #0090ff;
-    --radius-ring: rgba(0,229,160,0.15);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-weight: 400;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    background:var(--bg); color:var(--text);
+    font-family:'Barlow',sans-serif; font-weight:400;
+    height:100dvh; display:flex; flex-direction:column; overflow:hidden;
   }
 
-  /* ─── HEADER ─── */
+  /* HEADER */
   header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 10;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:10px 18px; display:flex; align-items:center;
+    justify-content:space-between; flex-shrink:0; z-index:10;
   }
-
   .logo {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.1rem;
-    color: var(--accent);
-    letter-spacing: 0.08em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-family:'Share Tech Mono',monospace; font-size:1.05rem;
+    color:var(--accent); letter-spacing:.08em;
+    display:flex; align-items:center; gap:8px;
   }
-
   .logo-pulse {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s ease-in-out infinite;
+    width:8px; height:8px; border-radius:50%;
+    background:var(--accent); animation:pulse 2s ease-in-out infinite;
   }
-
   @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,229,160,0.5); }
-    50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(0,229,160,0); }
+    0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,160,.5);}
+    50%{opacity:.6;box-shadow:0 0 0 6px rgba(0,229,160,0);}
   }
-
   .header-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 0.72rem;
-    font-family: 'Share Tech Mono', monospace;
-    color: var(--text-dim);
+    display:flex; align-items:center; gap:10px;
+    font-size:.72rem; font-family:'Share Tech Mono',monospace; color:var(--text-dim);
   }
-
   .status-badge {
-    display: flex; align-items: center; gap: 5px;
-    padding: 3px 8px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    background: var(--surface2);
+    display:flex; align-items:center; gap:5px; padding:3px 8px;
+    border:1px solid var(--border); border-radius:3px;
+    background:var(--surface2); white-space:nowrap;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--text-dim);}
+  .dot.ok  {background:var(--accent);box-shadow:0 0 6px var(--accent);}
+  .dot.warn{background:var(--warn);  box-shadow:0 0 6px var(--warn);}
+  .dot.blue{background:var(--accent2);box-shadow:0 0 6px var(--accent2);}
+  .icon-btn{
+    background:none;border:none;color:var(--text-dim);
+    cursor:pointer;padding:4px;font-size:1rem;transition:color .15s;
+  }
+  .icon-btn:hover{color:var(--text);}
+
+  /* SETUP */
+  #setup-overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(10,12,15,.96);
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(6px);
+  }
+  .setup-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    padding:36px 40px;width:min(420px,92vw);
+    box-shadow:0 0 60px rgba(0,229,160,.05);
+  }
+  .setup-card h2{
+    font-family:'Share Tech Mono',monospace;color:var(--accent);
+    font-size:1rem;letter-spacing:.1em;margin-bottom:6px;
+  }
+  .setup-card p{color:var(--text-dim);font-size:.82rem;margin-bottom:24px;line-height:1.5;}
+  .field-label{
+    font-size:.72rem;font-family:'Share Tech Mono',monospace;
+    color:var(--text-dim);letter-spacing:.08em;margin-bottom:6px;text-transform:uppercase;
+  }
+  .field-input{
+    width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;
+    color:var(--text);font-family:'Barlow',sans-serif;font-size:.95rem;
+    padding:10px 12px;outline:none;transition:border-color .2s;margin-bottom:18px;
+  }
+  .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,160,.1);}
+  .btn-primary{
+    width:100%;background:var(--accent);color:#000;border:none;border-radius:4px;padding:12px;
+    font-family:'Share Tech Mono',monospace;font-size:.9rem;letter-spacing:.08em;
+    cursor:pointer;transition:opacity .15s,transform .1s;
+  }
+  .btn-primary:hover{opacity:.9;}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.35;cursor:not-allowed;}
+  .geo-status{
+    font-family:'Share Tech Mono',monospace;font-size:.72rem;
+    text-align:center;margin-top:12px;color:var(--text-dim);min-height:16px;
   }
 
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--text-dim);
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+  /* STATUS BAR */
+  .status-bar{
+    background:var(--surface2);border-bottom:1px solid var(--border);
+    padding:6px 18px;display:flex;align-items:center;gap:18px;
+    font-family:'Share Tech Mono',monospace;font-size:.68rem;
+    color:var(--text-dim);flex-shrink:0;overflow-x:auto;
+  }
+  .sb-item{display:flex;align-items:center;gap:5px;white-space:nowrap;}
+  .sb-val{color:var(--text-mono);}
+
+  /* CONTENT AREA */
+  .content-area{flex:1;display:flex;overflow:hidden;}
+
+  /* MESSAGES */
+  #messages{
+    flex:1;overflow-y:auto;padding:16px 18px;
+    display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;
+  }
+  #messages::-webkit-scrollbar{width:4px;}
+  #messages::-webkit-scrollbar-track{background:transparent;}
+  #messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .msg{max-width:78%;animation:msgIn .25s ease-out;}
+  @keyframes msgIn{
+    from{opacity:0;transform:translateY(8px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .msg.mine {align-self:flex-end;}
+  .msg.other{align-self:flex-start;}
+  .msg-bubble{
+    padding:10px 14px;border-radius:6px;border-left:3px solid transparent;
+    line-height:1.5;font-size:.9rem;word-break:break-word;
+  }
+  .msg.mine  .msg-bubble{background:var(--mine-bg); border-left-color:var(--mine-border); color:#d0f5e8;}
+  .msg.other .msg-bubble{background:var(--other-bg);border-left-color:var(--other-border);color:#cde0f5;}
+  .msg-meta{
+    display:flex;align-items:center;gap:8px;margin-bottom:4px;
+    font-family:'Share Tech Mono',monospace;font-size:.65rem;
+  }
+  .msg.mine .msg-meta{flex-direction:row-reverse;}
+  .msg-user{color:var(--accent);}
+  .msg.other .msg-user{color:var(--accent2);}
+  .msg-time{color:var(--text-dim);}
+  .msg-dist{
+    color:var(--text-dim);font-size:.6rem;
+    padding:1px 5px;border:1px solid var(--border);border-radius:2px;
+  }
+  .empty-state{
+    flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:12px;color:var(--text-dim);
+    font-family:'Share Tech Mono',monospace;font-size:.78rem;
+    letter-spacing:.05em;opacity:.5;
+  }
+  .empty-icon{
+    width:60px;height:60px;border:1px solid var(--border);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem;position:relative;
+  }
+  .empty-icon::before,.empty-icon::after{
+    content:'';position:absolute;
+    border:1px solid var(--border);border-radius:50%;
+    animation:radarRing 3s ease-out infinite;
+  }
+  .empty-icon::before{inset:-12px;animation-delay:0s;}
+  .empty-icon::after {inset:-24px;animation-delay:.8s;}
+  @keyframes radarRing{
+    0%  {opacity:.6;transform:scale(1);}
+    100%{opacity:0; transform:scale(1.3);}
   }
 
-  .dot.ok { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-  .dot.warn { background: var(--warn); box-shadow: 0 0 6px var(--warn); }
+  /* ── NEARBY USERS SIDEBAR ── */
+  #users-sidebar{
+    width:220px;min-width:220px;
+    background:var(--surface);border-left:1px solid var(--border);
+    display:flex;flex-direction:column;overflow:hidden;
+    transition:width .25s,min-width .25s;flex-shrink:0;
+  }
+  #users-sidebar.collapsed{width:36px;min-width:36px;}
 
-  /* ─── USER SETUP OVERLAY ─── */
-  #setup-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(10,12,15,0.96);
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
+  .sidebar-header{
+    padding:10px 12px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  }
+  #users-sidebar.collapsed .sidebar-header{justify-content:center;padding:10px 6px;}
+  .sidebar-title{
+    font-family:'Share Tech Mono',monospace;font-size:.65rem;
+    color:var(--accent);letter-spacing:.1em;white-space:nowrap;overflow:hidden;
+  }
+  #users-sidebar.collapsed .sidebar-title{display:none;}
+  .sidebar-toggle{
+    background:none;border:none;color:var(--text-dim);
+    cursor:pointer;font-size:.8rem;padding:2px;flex-shrink:0;transition:color .15s;
+  }
+  .sidebar-toggle:hover{color:var(--text);}
+
+  /* RADAR */
+  .radar-wrap{
+    padding:12px;display:flex;justify-content:center;
+    border-bottom:1px solid var(--border);flex-shrink:0;
+  }
+  #users-sidebar.collapsed .radar-wrap{display:none;}
+  .radar-canvas-wrap{position:relative;width:140px;height:140px;}
+  #radar-canvas{border-radius:50%;display:block;}
+  .radar-center-dot{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:8px;height:8px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 8px var(--accent);z-index:2;
+  }
+  .radar-label{
+    font-family:'Share Tech Mono',monospace;
+    font-size:.58rem;color:var(--text-dim);
+    text-align:center;margin-top:6px;letter-spacing:.05em;
   }
 
-  .setup-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 36px 40px;
-    width: min(420px, 92vw);
-    box-shadow: 0 0 60px rgba(0,229,160,0.05);
+  /* USER LIST */
+  .users-list-wrap{flex:1;overflow-y:auto;padding:0;}
+  .users-list-wrap::-webkit-scrollbar{width:3px;}
+  .users-list-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  #users-sidebar.collapsed .users-list-wrap{display:none;}
+
+  .users-list-empty{
+    padding:16px 12px;font-family:'Share Tech Mono',monospace;
+    font-size:.62rem;color:var(--text-dim);text-align:center;line-height:1.6;
   }
 
-  .setup-card h2 {
-    font-family: 'Share Tech Mono', monospace;
-    color: var(--accent);
-    font-size: 1rem;
-    letter-spacing: 0.1em;
-    margin-bottom: 6px;
+  .user-card{
+    padding:9px 12px;display:flex;align-items:center;gap:9px;
+    border-bottom:1px solid var(--border);
+    animation:userIn .3s ease-out;transition:background .15s;cursor:default;
+  }
+  .user-card:hover{background:var(--surface2);}
+  @keyframes userIn{
+    from{opacity:0;transform:translateX(8px);}
+    to{opacity:1;transform:translateX(0);}
   }
 
-  .setup-card p {
-    color: var(--text-dim);
-    font-size: 0.82rem;
-    margin-bottom: 24px;
-    line-height: 1.5;
+  .user-avatar{
+    width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Share Tech Mono',monospace;font-size:.78rem;font-weight:700;
+    flex-shrink:0;border:1.5px solid transparent;
+  }
+  .user-avatar.hot-ring{animation:avatarPulse 2.5s ease-in-out infinite;}
+  @keyframes avatarPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(0,229,160,.4);}
+    50%{box-shadow:0 0 0 5px rgba(0,229,160,0);}
   }
 
-  .field-label {
-    font-size: 0.72rem;
-    font-family: 'Share Tech Mono', monospace;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
-    text-transform: uppercase;
+  .user-info{flex:1;overflow:hidden;}
+  .user-name{
+    font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .user-meta{display:flex;align-items:center;gap:6px;margin-top:3px;}
+  .user-dist{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--accent2);}
+  .user-lastseen{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--text-dim);}
+
+  .activity-pill{
+    font-family:'Share Tech Mono',monospace;font-size:.52rem;
+    padding:1px 5px;border-radius:2px;white-space:nowrap;flex-shrink:0;
+    border:1px solid transparent;
+  }
+  .activity-pill.hot {background:#0d2a1e;border-color:var(--accent);color:var(--accent);}
+  .activity-pill.warm{background:#0a1a2a;border-color:var(--accent2);color:var(--accent2);}
+  .activity-pill.cold{background:transparent;border-color:var(--border);color:var(--text-dim);}
+
+  /* Collapsed mini avatars */
+  .sidebar-mini-users{
+    display:none;flex-direction:column;align-items:center;
+    gap:5px;padding:6px 4px;overflow:hidden;
+  }
+  #users-sidebar.collapsed .sidebar-mini-users{display:flex;}
+  .mini-avatar{
+    width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Share Tech Mono',monospace;font-size:.62rem;
+    border:1.5px solid transparent;
   }
 
-  .field-input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-size: 0.95rem;
-    padding: 10px 12px;
-    outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 18px;
+  /* INPUT */
+  .input-area{
+    background:var(--surface);border-top:1px solid var(--border);
+    padding:14px 18px;flex-shrink:0;
   }
-
-  .field-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(0,229,160,0.1);
+  .input-row{display:flex;gap:10px;align-items:flex-end;}
+  #msg-input{
+    flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:4px;
+    color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;
+    padding:10px 14px;outline:none;resize:none;min-height:42px;max-height:120px;
+    transition:border-color .2s;line-height:1.4;
   }
-
-  .btn-primary {
-    width: 100%;
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: 4px;
-    padding: 12px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
+  #msg-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,160,.08);}
+  #msg-input::placeholder{color:var(--text-dim);}
+  #send-btn{
+    background:var(--accent);border:none;border-radius:4px;color:#000;
+    font-family:'Share Tech Mono',monospace;font-size:.8rem;
+    padding:10px 18px;cursor:pointer;letter-spacing:.06em;
+    transition:opacity .15s,transform .1s;
+    align-self:stretch;display:flex;align-items:center;gap:6px;white-space:nowrap;
   }
-
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-primary:active { transform: scale(0.98); }
-  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
-
-  .geo-status {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    text-align: center;
-    margin-top: 12px;
-    color: var(--text-dim);
-    min-height: 16px;
+  #send-btn:hover{opacity:.88;}
+  #send-btn:active{transform:scale(.97);}
+  #send-btn:disabled{opacity:.3;cursor:not-allowed;}
+  .sending-spinner{
+    width:10px;height:10px;
+    border:2px solid rgba(0,0,0,.3);border-top-color:#000;
+    border-radius:50%;animation:spin .6s linear infinite;
   }
-
-  /* ─── MAIN LAYOUT ─── */
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .input-footer{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:8px;font-family:'Share Tech Mono',monospace;
+    font-size:.63rem;color:var(--text-dim);
   }
-
-  /* ─── STATUS BAR ─── */
-  .status-bar {
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    padding: 6px 18px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--text-dim);
-    flex-shrink: 0;
-    overflow-x: auto;
+  .scan-indicator{display:flex;align-items:center;gap:5px;}
+  .scan-dot{
+    width:5px;height:5px;border-radius:50%;
+    background:var(--accent2);animation:scanPulse 2s ease-in-out infinite;
   }
+  @keyframes scanPulse{0%,100%{opacity:1}50%{opacity:.2}}
 
-  .sb-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
-  .sb-val { color: var(--text-mono); }
-
-  /* ─── MESSAGES ─── */
-  #messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    scroll-behavior: smooth;
+  /* CONFIG MODAL */
+  #config-modal{
+    position:fixed;inset:0;z-index:80;
+    background:rgba(10,12,15,.9);
+    display:none;align-items:center;justify-content:center;
+    backdrop-filter:blur(4px);
   }
-
-  #messages::-webkit-scrollbar { width: 4px; }
-  #messages::-webkit-scrollbar-track { background: transparent; }
-  #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .msg {
-    max-width: 72%;
-    animation: msgIn 0.25s ease-out;
+  #config-modal.open{display:flex;}
+  .config-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    padding:28px 32px;width:min(460px,92vw);max-height:85vh;overflow-y:auto;
   }
-
-  @keyframes msgIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+  .config-card h3{
+    font-family:'Share Tech Mono',monospace;color:var(--accent);
+    font-size:.85rem;letter-spacing:.1em;margin-bottom:20px;
   }
-
-  .msg.mine { align-self: flex-end; }
-  .msg.other { align-self: flex-start; }
-
-  .msg-bubble {
-    padding: 10px 14px;
-    border-radius: 6px;
-    border-left: 3px solid transparent;
-    line-height: 1.5;
-    font-size: 0.9rem;
-    word-break: break-word;
+  .config-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .config-grid .full{grid-column:1/-1;}
+  .config-row{display:flex;flex-direction:column;gap:4px;}
+  .config-row label{
+    font-family:'Share Tech Mono',monospace;font-size:.62rem;
+    color:var(--text-dim);letter-spacing:.06em;
   }
-
-  .msg.mine .msg-bubble {
-    background: var(--mine-bg);
-    border-left-color: var(--mine-border);
-    color: #d0f5e8;
+  .config-row input{
+    background:var(--surface2);border:1px solid var(--border);border-radius:3px;
+    color:var(--text);font-family:'Share Tech Mono',monospace;
+    font-size:.72rem;padding:7px 10px;outline:none;
   }
-
-  .msg.other .msg-bubble {
-    background: var(--other-bg);
-    border-left-color: var(--other-border);
-    color: #cde0f5;
+  .config-row input:focus{border-color:var(--accent);}
+  .config-actions{display:flex;gap:10px;margin-top:20px;}
+  .btn-sm{
+    flex:1;padding:9px;border-radius:4px;border:none;
+    font-family:'Share Tech Mono',monospace;font-size:.75rem;
+    cursor:pointer;letter-spacing:.06em;
   }
+  .btn-sm.primary  {background:var(--accent);color:#000;}
+  .btn-sm.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
 
-  .msg-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
+  /* TOAST */
+  #toast{
+    position:fixed;bottom:80px;left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--surface);border:1px solid var(--border);border-radius:4px;
+    padding:8px 16px;font-family:'Share Tech Mono',monospace;font-size:.72rem;
+    color:var(--text);opacity:0;transition:all .2s;
+    pointer-events:none;z-index:50;white-space:nowrap;
   }
+  #toast.show  {opacity:1;transform:translateX(-50%) translateY(0);}
+  #toast.error  {border-color:var(--warn);color:var(--warn);}
+  #toast.success{border-color:var(--accent);color:var(--accent);}
 
-  .msg.mine .msg-meta { flex-direction: row-reverse; }
-
-  .msg-user { color: var(--accent); }
-  .msg.other .msg-user { color: var(--accent2); }
-  .msg-time { color: var(--text-dim); }
-  .msg-dist {
-    color: var(--text-dim);
-    font-size: 0.6rem;
-    padding: 1px 5px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
+  @media(max-width:560px){
+    #users-sidebar{width:180px;min-width:180px;}
+    #users-sidebar.collapsed{width:32px;min-width:32px;}
+    .radar-canvas-wrap{width:110px;height:110px;}
+    #radar-canvas{width:110px!important;height:110px!important;}
   }
-
-  .empty-state {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    color: var(--text-dim);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem;
-    letter-spacing: 0.05em;
-    opacity: 0.5;
-  }
-
-  .empty-icon {
-    width: 60px; height: 60px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem;
-    position: relative;
-  }
-
-  .empty-icon::before, .empty-icon::after {
-    content: '';
-    position: absolute;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    animation: radarRing 3s ease-out infinite;
-  }
-
-  .empty-icon::before { inset: -12px; animation-delay: 0s; }
-  .empty-icon::after { inset: -24px; animation-delay: 0.8s; }
-
-  @keyframes radarRing {
-    0% { opacity: 0.6; transform: scale(1); }
-    100% { opacity: 0; transform: scale(1.3); }
-  }
-
-  /* ─── INPUT AREA ─── */
-  .input-area {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 14px 18px;
-    flex-shrink: 0;
-  }
-
-  .input-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-  }
-
-  #msg-input {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text);
-    font-family: 'Barlow', sans-serif;
-    font-size: 0.92rem;
-    padding: 10px 14px;
-    outline: none;
-    resize: none;
-    min-height: 42px;
-    max-height: 120px;
-    transition: border-color 0.2s;
-    line-height: 1.4;
-  }
-
-  #msg-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(0,229,160,0.08);
-  }
-
-  #msg-input::placeholder { color: var(--text-dim); }
-
-  #send-btn {
-    background: var(--accent);
-    border: none;
-    border-radius: 4px;
-    color: #000;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    padding: 10px 18px;
-    cursor: pointer;
-    letter-spacing: 0.06em;
-    transition: opacity 0.15s, transform 0.1s;
-    align-self: stretch;
-    display: flex; align-items: center; gap: 6px;
-    white-space: nowrap;
-  }
-
-  #send-btn:hover { opacity: 0.88; }
-  #send-btn:active { transform: scale(0.97); }
-  #send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-  .sending-spinner {
-    width: 10px; height: 10px;
-    border: 2px solid rgba(0,0,0,0.3);
-    border-top-color: #000;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .input-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 8px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.63rem;
-    color: var(--text-dim);
-  }
-
-  .scan-indicator {
-    display: flex; align-items: center; gap: 5px;
-  }
-
-  .scan-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--accent2);
-    animation: scanPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes scanPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  /* ─── TOAST ─── */
-  #toast {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text);
-    opacity: 0;
-    transition: all 0.2s;
-    pointer-events: none;
-    z-index: 50;
-    white-space: nowrap;
-  }
-
-  #toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  #toast.error { border-color: var(--warn); color: var(--warn); }
-  #toast.success { border-color: var(--accent); color: var(--accent); }
-
-  /* ─── CONFIG MODAL ─── */
-  #config-modal {
-    position: fixed; inset: 0; z-index: 80;
-    background: rgba(10,12,15,0.9);
-    display: none; align-items: center; justify-content: center;
-    backdrop-filter: blur(4px);
-  }
-
-  #config-modal.open { display: flex; }
-
-  .config-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 28px 32px;
-    width: min(460px, 92vw);
-    max-height: 85vh;
-    overflow-y: auto;
-  }
-
-  .config-card h3 {
-    font-family: 'Share Tech Mono', monospace;
-    color: var(--accent);
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    margin-bottom: 20px;
-  }
-
-  .config-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .config-grid .full { grid-column: 1/-1; }
-
-  .config-row { display: flex; flex-direction: column; gap: 4px; }
-
-  .config-row label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--text-dim);
-    letter-spacing: 0.06em;
-  }
-
-  .config-row input {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    padding: 7px 10px;
-    outline: none;
-  }
-
-  .config-row input:focus { border-color: var(--accent); }
-
-  .config-actions {
-    display: flex; gap: 10px; margin-top: 20px;
-  }
-
-  .btn-sm {
-    flex: 1; padding: 9px;
-    border-radius: 4px; border: none;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    cursor: pointer; letter-spacing: 0.06em;
-  }
-
-  .btn-sm.primary { background: var(--accent); color: #000; }
-  .btn-sm.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-
-  /* ─── SETTINGS ICON ─── */
-  .icon-btn {
-    background: none; border: none;
-    color: var(--text-dim); cursor: pointer;
-    padding: 4px; font-size: 1rem;
-    transition: color 0.15s;
-  }
-
-  .icon-btn:hover { color: var(--text); }
 </style>
 </head>
 <body>
 
-<!-- SETUP OVERLAY -->
+<!-- SETUP -->
 <div id="setup-overlay">
   <div class="setup-card">
     <h2>▸ PROXIMICHAT</h2>
-    <p>Location-aware field communications. Messages visible within your 20m proximity radius.</p>
-
+    <p>Location-aware field comms. Messages &amp; users visible within your 20 m proximity radius.</p>
     <div class="field-label">CALL SIGN / USERNAME</div>
-    <input type="text" class="field-input" id="setup-username" placeholder="Enter your call sign..." maxlength="30" />
-
-    <button class="btn-primary" id="setup-btn" onclick="startSession()">
-      ACQUIRE SIGNAL &amp; ENTER
-    </button>
-    <div class="geo-status" id="geo-status">Waiting for location permission...</div>
+    <input type="text" class="field-input" id="setup-username" placeholder="Enter your call sign..." maxlength="30"/>
+    <button class="btn-primary" id="setup-btn" onclick="startSession()">ACQUIRE SIGNAL &amp; ENTER</button>
+    <div class="geo-status" id="geo-status">Enter a call sign to get started</div>
   </div>
 </div>
 
 <!-- HEADER -->
 <header>
-  <div class="logo">
-    <div class="logo-pulse"></div>
-    PROXIMICHAT
-  </div>
+  <div class="logo"><div class="logo-pulse"></div>PROXIMICHAT</div>
   <div class="header-right">
-    <div class="status-badge" id="hdr-user">
+    <div class="status-badge">
       <div class="dot" id="geo-dot"></div>
       <span id="hdr-user-label">---</span>
+    </div>
+    <div class="status-badge" title="Users within 20m">
+      <div class="dot" id="nearby-dot"></div>
+      <span id="nearby-count-label">0 NEAR</span>
     </div>
     <div class="status-badge">
       <div class="dot ok" id="net-dot"></div>
       <span id="msg-count-label">0 MSG</span>
     </div>
-    <button class="icon-btn" onclick="toggleConfig()" title="Configure Form Fields">⚙</button>
+    <button class="icon-btn" onclick="toggleConfig()" title="Configure">⚙</button>
   </div>
 </header>
 
 <!-- MAIN -->
 <div class="main">
-  <!-- STATUS BAR -->
   <div class="status-bar">
-    <div class="sb-item">LAT <span class="sb-val" id="sb-lat">--</span></div>
-    <div class="sb-item">LNG <span class="sb-val" id="sb-lng">--</span></div>
-    <div class="sb-item">ACC <span class="sb-val" id="sb-acc">-- m</span></div>
+    <div class="sb-item">LAT   <span class="sb-val" id="sb-lat">--</span></div>
+    <div class="sb-item">LNG   <span class="sb-val" id="sb-lng">--</span></div>
+    <div class="sb-item">ACC   <span class="sb-val" id="sb-acc">-- m</span></div>
     <div class="sb-item">RADIUS <span class="sb-val">20 m</span></div>
-    <div class="sb-item">SCAN <span class="sb-val" id="sb-scan">--</span></div>
-    <div class="sb-item">VISIBLE <span class="sb-val" id="sb-visible">0</span></div>
+    <div class="sb-item">SCAN  <span class="sb-val" id="sb-scan">--</span></div>
+    <div class="sb-item">MSGS  <span class="sb-val" id="sb-visible">0</span></div>
   </div>
 
-  <!-- MESSAGES -->
-  <div id="messages">
-    <div class="empty-state" id="empty-state">
-      <div class="empty-icon">📡</div>
-      <div>SCANNING FOR NEARBY SIGNALS...</div>
+  <div class="content-area">
+
+    <!-- MESSAGES -->
+    <div id="messages">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">📡</div>
+        <div>SCANNING FOR NEARBY SIGNALS...</div>
+      </div>
     </div>
-  </div>
 
-  <!-- INPUT AREA -->
+    <!-- NEARBY USERS SIDEBAR -->
+    <div id="users-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">NEARBY · 20m</span>
+        <button class="sidebar-toggle" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle panel">◀</button>
+      </div>
+
+      <div class="radar-wrap">
+        <div>
+          <div class="radar-canvas-wrap">
+            <canvas id="radar-canvas" width="140" height="140"></canvas>
+            <div class="radar-center-dot"></div>
+          </div>
+          <div class="radar-label" id="radar-label">NO SIGNAL</div>
+        </div>
+      </div>
+
+      <div class="users-list-wrap">
+        <div id="users-list">
+          <div class="users-list-empty">AWAITING SESSION...</div>
+        </div>
+      </div>
+
+      <div class="sidebar-mini-users" id="mini-users"></div>
+    </div>
+
+  </div><!-- content-area -->
+
+  <!-- INPUT -->
   <div class="input-area">
     <div class="input-row">
       <textarea id="msg-input" placeholder="Transmit message..." rows="1"
@@ -598,528 +490,557 @@
         <div class="scan-dot"></div>
         <span id="last-scan-label">LAST SCAN: --</span>
       </div>
-      <span>Enter ↵ to send · Shift+Enter for newline</span>
+      <span>Enter ↵ send · Shift+Enter newline</span>
     </div>
   </div>
 </div>
 
-<!-- CONFIG MODAL -->
+<!-- CONFIG -->
 <div id="config-modal">
   <div class="config-card">
     <h3>⚙ FORM FIELD CONFIGURATION</h3>
-    <p style="font-size:0.72rem;color:var(--text-dim);margin-bottom:16px;font-family:'Share Tech Mono',monospace;">
-      Map Google Form entry IDs to data fields. Find these in your form URL or source.
+    <p style="font-size:.72rem;color:var(--text-dim);margin-bottom:16px;font-family:'Share Tech Mono',monospace;">
+      Map Google Form entry IDs. Find them by inspecting the form source.
     </p>
     <div class="config-grid">
-      <div class="config-row full">
-        <label>FORM ACTION URL</label>
-        <input id="cfg-form-url" type="text" placeholder="https://docs.google.com/forms/d/e/.../formResponse" />
-      </div>
-      <div class="config-row full">
-        <label>SHEET CSV URL</label>
-        <input id="cfg-sheet-url" type="text" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv" />
-      </div>
-      <div class="config-row">
-        <label>ENTRY: MESSAGE</label>
-        <input id="cfg-entry-msg" type="text" placeholder="entry.XXXXXXXX" />
-      </div>
-      <div class="config-row">
-        <label>ENTRY: USERNAME</label>
-        <input id="cfg-entry-user" type="text" placeholder="entry.XXXXXXXX" />
-      </div>
-      <div class="config-row">
-        <label>ENTRY: LATITUDE</label>
-        <input id="cfg-entry-lat" type="text" placeholder="entry.XXXXXXXX" />
-      </div>
-      <div class="config-row">
-        <label>ENTRY: LONGITUDE</label>
-        <input id="cfg-entry-lng" type="text" placeholder="entry.XXXXXXXX" />
-      </div>
-      <div class="config-row">
-        <label>SHEET COL: TIMESTAMP</label>
-        <input id="cfg-col-ts" type="text" placeholder="0" />
-      </div>
-      <div class="config-row">
-        <label>SHEET COL: MESSAGE</label>
-        <input id="cfg-col-msg" type="text" placeholder="1" />
-      </div>
-      <div class="config-row">
-        <label>SHEET COL: USERNAME</label>
-        <input id="cfg-col-user" type="text" placeholder="2" />
-      </div>
-      <div class="config-row">
-        <label>SHEET COL: LATITUDE</label>
-        <input id="cfg-col-lat" type="text" placeholder="3" />
-      </div>
-      <div class="config-row full">
-        <label>SHEET COL: LONGITUDE</label>
-        <input id="cfg-col-lng" type="text" placeholder="4" />
-      </div>
-      <div class="config-row full">
-        <label>POLL INTERVAL (seconds)</label>
-        <input id="cfg-poll" type="number" placeholder="5" min="3" max="60" />
-      </div>
+      <div class="config-row full"><label>FORM ACTION URL</label><input id="cfg-form-url" type="text" placeholder="https://docs.google.com/forms/d/e/.../formResponse"/></div>
+      <div class="config-row full"><label>SHEET CSV URL</label><input id="cfg-sheet-url" type="text" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv"/></div>
+      <div class="config-row"><label>ENTRY: MESSAGE</label>  <input id="cfg-entry-msg"  type="text" placeholder="entry.XXXXXXXX"/></div>
+      <div class="config-row"><label>ENTRY: USERNAME</label> <input id="cfg-entry-user" type="text" placeholder="entry.XXXXXXXX"/></div>
+      <div class="config-row"><label>ENTRY: LATITUDE</label> <input id="cfg-entry-lat"  type="text" placeholder="entry.XXXXXXXX"/></div>
+      <div class="config-row"><label>ENTRY: LONGITUDE</label><input id="cfg-entry-lng"  type="text" placeholder="entry.XXXXXXXX"/></div>
+      <div class="config-row"><label>COL: TIMESTAMP</label><input id="cfg-col-ts"   type="text" placeholder="0"/></div>
+      <div class="config-row"><label>COL: MESSAGE</label>  <input id="cfg-col-msg"  type="text" placeholder="1"/></div>
+      <div class="config-row"><label>COL: USERNAME</label> <input id="cfg-col-user" type="text" placeholder="2"/></div>
+      <div class="config-row"><label>COL: LATITUDE</label> <input id="cfg-col-lat"  type="text" placeholder="3"/></div>
+      <div class="config-row full"><label>COL: LONGITUDE</label><input id="cfg-col-lng" type="text" placeholder="4"/></div>
+      <div class="config-row full"><label>POLL INTERVAL (seconds)</label><input id="cfg-poll" type="number" placeholder="5" min="3" max="60"/></div>
     </div>
     <div class="config-actions">
       <button class="btn-sm secondary" onclick="toggleConfig()">CANCEL</button>
-      <button class="btn-sm primary" onclick="saveConfig()">SAVE CONFIG ▸</button>
+      <button class="btn-sm primary"   onclick="saveConfig()">SAVE CONFIG ▸</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  DEFAULT CONFIGURATION
-//  Edit these to match your Google Form entry IDs
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  DEFAULTS
+// ═══════════════════════════════════════════════
 const DEFAULTS = {
-  formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse',
-  sheetCsvUrl: 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/export?format=csv&gid=0',
-  entries: {
-    message:   'entry.47638508',   // ← known from your URL
-    username:  'entry.UNKNOWN_1',  // ← open form in browser → right-click → Inspect → find entry IDs
-    latitude:  'entry.UNKNOWN_2',  // ← OR pre-fill form URL to discover
-    longitude: 'entry.UNKNOWN_3',  // ← set these via ⚙ button above
+  formUrl:'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse',
+  sheetCsvUrl:'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/export?format=csv&gid=0',
+  entries:{
+    message:'entry.47638508',
+    username:'entry.UNKNOWN_1',
+    latitude:'entry.UNKNOWN_2',
+    longitude:'entry.UNKNOWN_3',
   },
-  cols: {
-    timestamp: 0,
-    message:   1,
-    username:  2,
-    latitude:  3,
-    longitude: 4,
-  },
-  pollInterval: 5 // seconds
+  cols:{timestamp:0,message:1,username:2,latitude:3,longitude:4},
+  pollInterval:5
 };
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 let cfg = loadConfig();
 let state = {
-  username: '',
-  lat: null,
-  lng: null,
-  accuracy: null,
-  messages: [],        // all fetched rows
-  visibleIds: new Set(),
-  pollTimer: null,
-  sending: false,
+  username:'', lat:null, lng:null, accuracy:null,
+  messages:[], pollTimer:null, sending:false, sidebarCollapsed:false,
+  userColors:{}, colorIdx:0,
 };
 
-// ═══════════════════════════════════════════════════════
-//  CONFIG PERSISTENCE
-// ═══════════════════════════════════════════════════════
+const PALETTES = [
+  ['#00e5a0','#032218'],['#0090ff','#001428'],['#c97fff','#1a0032'],
+  ['#ff6b35','#2a0a00'],['#ffcc00','#2a1e00'],['#00d4ff','#002a32'],
+  ['#ff4da6','#2a0016'],['#a0ff50','#142200'],
+];
+
+function getUserPalette(username) {
+  if (!state.userColors[username]) {
+    state.userColors[username] = PALETTES[state.colorIdx % PALETTES.length];
+    state.colorIdx++;
+  }
+  return state.userColors[username];
+}
+
+// ═══════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════
 function loadConfig() {
   try {
-    const saved = JSON.parse(localStorage.getItem('proximichat_cfg') || '{}');
-    return deepMerge(JSON.parse(JSON.stringify(DEFAULTS)), saved);
-  } catch(e) { return JSON.parse(JSON.stringify(DEFAULTS)); }
+    const s = JSON.parse(localStorage.getItem('proximichat_cfg')||'{}');
+    return deepMerge(JSON.parse(JSON.stringify(DEFAULTS)),s);
+  } catch(e){return JSON.parse(JSON.stringify(DEFAULTS));}
 }
-
-function deepMerge(target, source) {
-  for (const key of Object.keys(source)) {
-    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-      if (!target[key]) target[key] = {};
-      deepMerge(target[key], source[key]);
-    } else {
-      target[key] = source[key];
-    }
+function deepMerge(t,s){
+  for(const k of Object.keys(s)){
+    if(s[k]&&typeof s[k]==='object'&&!Array.isArray(s[k])){
+      if(!t[k])t[k]={};deepMerge(t[k],s[k]);
+    }else t[k]=s[k];
   }
-  return target;
+  return t;
 }
-
-function saveConfig() {
-  cfg.formUrl           = document.getElementById('cfg-form-url').value.trim();
-  cfg.sheetCsvUrl       = document.getElementById('cfg-sheet-url').value.trim();
-  cfg.entries.message   = document.getElementById('cfg-entry-msg').value.trim();
-  cfg.entries.username  = document.getElementById('cfg-entry-user').value.trim();
-  cfg.entries.latitude  = document.getElementById('cfg-entry-lat').value.trim();
-  cfg.entries.longitude = document.getElementById('cfg-entry-lng').value.trim();
-  cfg.cols.timestamp    = parseInt(document.getElementById('cfg-col-ts').value) || 0;
-  cfg.cols.message      = parseInt(document.getElementById('cfg-col-msg').value) || 1;
-  cfg.cols.username     = parseInt(document.getElementById('cfg-col-user').value) || 2;
-  cfg.cols.latitude     = parseInt(document.getElementById('cfg-col-lat').value) || 3;
-  cfg.cols.longitude    = parseInt(document.getElementById('cfg-col-lng').value) || 4;
-  cfg.pollInterval      = parseInt(document.getElementById('cfg-poll').value) || 5;
-
-  try { localStorage.setItem('proximichat_cfg', JSON.stringify(cfg)); } catch(e) {}
-  toggleConfig();
-  showToast('Configuration saved', 'success');
-  restartPoll();
+function saveConfig(){
+  cfg.formUrl          =document.getElementById('cfg-form-url').value.trim();
+  cfg.sheetCsvUrl      =document.getElementById('cfg-sheet-url').value.trim();
+  cfg.entries.message  =document.getElementById('cfg-entry-msg').value.trim();
+  cfg.entries.username =document.getElementById('cfg-entry-user').value.trim();
+  cfg.entries.latitude =document.getElementById('cfg-entry-lat').value.trim();
+  cfg.entries.longitude=document.getElementById('cfg-entry-lng').value.trim();
+  cfg.cols.timestamp   =parseInt(document.getElementById('cfg-col-ts').value)||0;
+  cfg.cols.message     =parseInt(document.getElementById('cfg-col-msg').value)||1;
+  cfg.cols.username    =parseInt(document.getElementById('cfg-col-user').value)||2;
+  cfg.cols.latitude    =parseInt(document.getElementById('cfg-col-lat').value)||3;
+  cfg.cols.longitude   =parseInt(document.getElementById('cfg-col-lng').value)||4;
+  cfg.pollInterval     =parseInt(document.getElementById('cfg-poll').value)||5;
+  try{localStorage.setItem('proximichat_cfg',JSON.stringify(cfg));}catch(e){}
+  toggleConfig(); showToast('Configuration saved','success'); restartPoll();
 }
-
-function toggleConfig() {
-  const modal = document.getElementById('config-modal');
-  modal.classList.toggle('open');
-  if (modal.classList.contains('open')) {
-    // Populate fields
-    document.getElementById('cfg-form-url').value   = cfg.formUrl;
-    document.getElementById('cfg-sheet-url').value  = cfg.sheetCsvUrl;
-    document.getElementById('cfg-entry-msg').value  = cfg.entries.message;
-    document.getElementById('cfg-entry-user').value = cfg.entries.username;
-    document.getElementById('cfg-entry-lat').value  = cfg.entries.latitude;
-    document.getElementById('cfg-entry-lng').value  = cfg.entries.longitude;
-    document.getElementById('cfg-col-ts').value     = cfg.cols.timestamp;
-    document.getElementById('cfg-col-msg').value    = cfg.cols.message;
-    document.getElementById('cfg-col-user').value   = cfg.cols.username;
-    document.getElementById('cfg-col-lat').value    = cfg.cols.latitude;
-    document.getElementById('cfg-col-lng').value    = cfg.cols.longitude;
-    document.getElementById('cfg-poll').value       = cfg.pollInterval;
+function toggleConfig(){
+  const m=document.getElementById('config-modal');
+  m.classList.toggle('open');
+  if(m.classList.contains('open')){
+    document.getElementById('cfg-form-url').value  =cfg.formUrl;
+    document.getElementById('cfg-sheet-url').value =cfg.sheetCsvUrl;
+    document.getElementById('cfg-entry-msg').value =cfg.entries.message;
+    document.getElementById('cfg-entry-user').value=cfg.entries.username;
+    document.getElementById('cfg-entry-lat').value =cfg.entries.latitude;
+    document.getElementById('cfg-entry-lng').value =cfg.entries.longitude;
+    document.getElementById('cfg-col-ts').value    =cfg.cols.timestamp;
+    document.getElementById('cfg-col-msg').value   =cfg.cols.message;
+    document.getElementById('cfg-col-user').value  =cfg.cols.username;
+    document.getElementById('cfg-col-lat').value   =cfg.cols.latitude;
+    document.getElementById('cfg-col-lng').value   =cfg.cols.longitude;
+    document.getElementById('cfg-poll').value      =cfg.pollInterval;
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  SESSION SETUP
-// ═══════════════════════════════════════════════════════
-function startSession() {
-  const username = document.getElementById('setup-username').value.trim();
-  if (!username) { showToast('Enter a call sign', 'error'); return; }
-
-  const btn = document.getElementById('setup-btn');
-  btn.disabled = true;
-  btn.textContent = 'ACQUIRING POSITION...';
-  document.getElementById('geo-status').textContent = 'Requesting GPS lock...';
+// ═══════════════════════════════════════════════
+//  SESSION
+// ═══════════════════════════════════════════════
+function startSession(){
+  const username=document.getElementById('setup-username').value.trim();
+  if(!username){showToast('Enter a call sign','error');return;}
+  const btn=document.getElementById('setup-btn');
+  btn.disabled=true; btn.textContent='ACQUIRING POSITION...';
+  document.getElementById('geo-status').textContent='Requesting GPS lock...';
 
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      state.username = username;
-      state.lat      = pos.coords.latitude;
-      state.lng      = pos.coords.longitude;
-      state.accuracy = pos.coords.accuracy;
-
-      document.getElementById('setup-overlay').style.display = 'none';
-      document.getElementById('hdr-user-label').textContent = username.toUpperCase();
-      updateStatusBar();
-      startWatchPosition();
-      startPoll();
-      showToast(`Signal acquired — ${username}`, 'success');
+    pos=>{
+      state.username=username;
+      state.lat=pos.coords.latitude; state.lng=pos.coords.longitude;
+      state.accuracy=pos.coords.accuracy;
+      document.getElementById('setup-overlay').style.display='none';
+      document.getElementById('hdr-user-label').textContent=username.toUpperCase();
+      document.getElementById('geo-dot').className='dot ok';
+      updateStatusBar(); startWatchPosition(); startPoll();
+      showToast(`Signal acquired — ${username}`,'success');
     },
-    (err) => {
-      btn.disabled = false;
-      btn.textContent = 'ACQUIRE SIGNAL & ENTER';
-      const msgs = {
-        1: 'Location access denied. Enable in browser settings.',
-        2: 'Location unavailable. Try again.',
-        3: 'Location timed out. Try again.',
-      };
-      document.getElementById('geo-status').textContent = msgs[err.code] || 'Location error.';
-      showToast('GPS error: ' + (msgs[err.code] || err.message), 'error');
+    err=>{
+      btn.disabled=false; btn.textContent='ACQUIRE SIGNAL & ENTER';
+      const msgs={1:'Location access denied.',2:'Location unavailable.',3:'Timed out.'};
+      document.getElementById('geo-status').textContent=msgs[err.code]||'Location error.';
+      showToast('GPS error: '+(msgs[err.code]||err.message),'error');
     },
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0}
   );
 }
 
-// ═══════════════════════════════════════════════════════
-//  GEOLOCATION WATCH
-// ═══════════════════════════════════════════════════════
-function startWatchPosition() {
+function startWatchPosition(){
   navigator.geolocation.watchPosition(
-    (pos) => {
-      state.lat      = pos.coords.latitude;
-      state.lng      = pos.coords.longitude;
-      state.accuracy = pos.coords.accuracy;
-      updateStatusBar();
-      renderMessages(); // re-filter on position change
-
-      const dot = document.getElementById('geo-dot');
-      dot.className = 'dot ok';
+    pos=>{
+      state.lat=pos.coords.latitude; state.lng=pos.coords.longitude;
+      state.accuracy=pos.coords.accuracy;
+      updateStatusBar(); renderMessages(); renderNearbyUsers();
+      document.getElementById('geo-dot').className='dot ok';
     },
-    (err) => {
-      console.warn('Watch position error:', err);
-      document.getElementById('geo-dot').className = 'dot warn';
-    },
-    { enableHighAccuracy: true, maximumAge: 5000 }
+    ()=>{document.getElementById('geo-dot').className='dot warn';},
+    {enableHighAccuracy:true,maximumAge:5000}
   );
 }
-
-function updateStatusBar() {
-  const fmt = (n, d) => n !== null ? n.toFixed(d) : '--';
-  document.getElementById('sb-lat').textContent = fmt(state.lat, 6);
-  document.getElementById('sb-lng').textContent = fmt(state.lng, 6);
-  document.getElementById('sb-acc').textContent = state.accuracy ? Math.round(state.accuracy) + ' m' : '-- m';
+function updateStatusBar(){
+  const f=(n,d)=>n!==null?n.toFixed(d):'--';
+  document.getElementById('sb-lat').textContent=f(state.lat,6);
+  document.getElementById('sb-lng').textContent=f(state.lng,6);
+  document.getElementById('sb-acc').textContent=state.accuracy?Math.round(state.accuracy)+' m':'-- m';
 }
 
-// ═══════════════════════════════════════════════════════
-//  HAVERSINE DISTANCE (meters)
-// ═══════════════════════════════════════════════════════
-function haversine(lat1, lng1, lat2, lng2) {
-  const R = 6371000;
-  const toRad = d => d * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat/2)**2 +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+// ═══════════════════════════════════════════════
+//  HAVERSINE & BEARING
+// ═══════════════════════════════════════════════
+function haversine(la1,ln1,la2,ln2){
+  const R=6371000,tr=d=>d*Math.PI/180;
+  const dla=tr(la2-la1),dln=tr(ln2-ln1);
+  const a=Math.sin(dla/2)**2+Math.cos(tr(la1))*Math.cos(tr(la2))*Math.sin(dln/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function bearing(la1,ln1,la2,ln2){
+  const tr=d=>d*Math.PI/180;
+  const dLn=tr(ln2-ln1);
+  const y=Math.sin(dLn)*Math.cos(tr(la2));
+  const x=Math.cos(tr(la1))*Math.sin(tr(la2))-Math.sin(tr(la1))*Math.cos(tr(la2))*Math.cos(dLn);
+  return(Math.atan2(y,x)*180/Math.PI+360)%360;
 }
 
-// ═══════════════════════════════════════════════════════
-//  CSV PARSING (handles quoted fields)
-// ═══════════════════════════════════════════════════════
-function parseCSV(text) {
-  const rows = [];
-  const lines = text.split('\n');
-  for (const line of lines) {
-    if (!line.trim()) continue;
-    const cells = [];
-    let cur = '';
-    let inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (c === '"') {
-        if (inQ && line[i+1] === '"') { cur += '"'; i++; }
-        else inQ = !inQ;
-      } else if (c === ',' && !inQ) {
-        cells.push(cur); cur = '';
-      } else cur += c;
+// ═══════════════════════════════════════════════
+//  CSV PARSE
+// ═══════════════════════════════════════════════
+function parseCSV(text){
+  const rows=[],lines=text.split('\n');
+  for(const line of lines){
+    if(!line.trim())continue;
+    const cells=[];let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+      else if(c===','&&!inQ){cells.push(cur);cur='';}
+      else cur+=c;
     }
-    cells.push(cur);
-    rows.push(cells);
+    cells.push(cur);rows.push(cells);
   }
   return rows;
 }
 
-// ═══════════════════════════════════════════════════════
-//  POLL GOOGLE SHEETS
-// ═══════════════════════════════════════════════════════
-async function fetchMessages() {
-  try {
-    const url = cfg.sheetCsvUrl + '&cachebust=' + Date.now();
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    const rows = parseCSV(text);
-
-    // Skip header row
-    const dataRows = rows.slice(1);
-    const c = cfg.cols;
-
-    state.messages = dataRows.map((row, i) => ({
-      id:        i + '_' + (row[c.timestamp] || i),
-      timestamp: row[c.timestamp] || '',
-      message:   row[c.message]   || '',
-      username:  row[c.username]  || '',
-      lat:       parseFloat(row[c.latitude]) || null,
-      lng:       parseFloat(row[c.longitude]) || null,
-    })).filter(m => m.message.trim());
-
-    document.getElementById('sb-scan').textContent = new Date().toLocaleTimeString();
-    document.getElementById('last-scan-label').textContent =
-      'LAST SCAN: ' + new Date().toLocaleTimeString();
-
-    document.getElementById('net-dot').className = 'dot ok';
-    renderMessages();
-  } catch(e) {
-    console.error('Fetch error:', e);
-    document.getElementById('net-dot').className = 'dot warn';
-    document.getElementById('sb-scan').textContent = 'ERR';
+// ═══════════════════════════════════════════════
+//  FETCH / POLL
+// ═══════════════════════════════════════════════
+async function fetchMessages(){
+  try{
+    const res=await fetch(cfg.sheetCsvUrl+'&cachebust='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const rows=parseCSV(await res.text()).slice(1);
+    const c=cfg.cols;
+    state.messages=rows.map((row,i)=>({
+      id:i+'_'+(row[c.timestamp]||i),
+      timestamp:row[c.timestamp]||'',
+      message:row[c.message]||'',
+      username:row[c.username]||'',
+      lat:parseFloat(row[c.latitude])||null,
+      lng:parseFloat(row[c.longitude])||null,
+    })).filter(m=>m.message.trim());
+    const now=new Date().toLocaleTimeString();
+    document.getElementById('sb-scan').textContent=now;
+    document.getElementById('last-scan-label').textContent='LAST SCAN: '+now;
+    document.getElementById('net-dot').className='dot ok';
+    renderMessages(); renderNearbyUsers();
+  }catch(e){
+    console.error(e);
+    document.getElementById('net-dot').className='dot warn';
+    document.getElementById('sb-scan').textContent='ERR';
   }
 }
+function startPoll(){fetchMessages();state.pollTimer=setInterval(fetchMessages,cfg.pollInterval*1000);}
+function restartPoll(){if(state.pollTimer)clearInterval(state.pollTimer);if(state.username)startPoll();}
 
-function startPoll() {
-  fetchMessages();
-  state.pollTimer = setInterval(fetchMessages, cfg.pollInterval * 1000);
-}
-
-function restartPoll() {
-  if (state.pollTimer) clearInterval(state.pollTimer);
-  if (state.username) startPoll();
-}
-
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  RENDER MESSAGES
-// ═══════════════════════════════════════════════════════
-function renderMessages() {
-  const container = document.getElementById('messages');
-  const emptyState = document.getElementById('empty-state');
-
-  const visible = state.messages.filter(m => isVisible(m));
-  document.getElementById('sb-visible').textContent = visible.length;
-  document.getElementById('msg-count-label').textContent = visible.length + ' MSG';
-
-  if (visible.length === 0) {
-    emptyState.style.display = 'flex';
-    // Remove only message elements
-    const msgs = container.querySelectorAll('.msg');
-    msgs.forEach(m => m.remove());
-    return;
-  }
-
-  emptyState.style.display = 'none';
-
-  const existingIds = new Set(
-    [...container.querySelectorAll('.msg')].map(el => el.dataset.id)
-  );
-
-  // Add new messages
-  let addedAny = false;
-  for (const msg of visible) {
-    const id = String(msg.id);
-    if (!existingIds.has(id)) {
-      const el = createMsgEl(msg);
-      container.appendChild(el);
-      addedAny = true;
-    }
-  }
-
-  // Remove messages no longer visible
-  const visibleIds = new Set(visible.map(m => String(m.id)));
-  for (const el of container.querySelectorAll('.msg')) {
-    if (!visibleIds.has(el.dataset.id)) el.remove();
-  }
-
-  if (addedAny) {
-    container.scrollTop = container.scrollHeight;
-  }
-}
-
-function isVisible(msg) {
-  const isMe = msg.username.toLowerCase().trim() === state.username.toLowerCase().trim();
-  if (isMe) return true;
-
-  if (state.lat !== null && state.lng !== null && msg.lat && msg.lng) {
-    const dist = haversine(state.lat, state.lng, msg.lat, msg.lng);
-    if (dist <= 20) return true;
-  }
-
+// ═══════════════════════════════════════════════
+function isVisible(msg){
+  const isMe=msg.username.toLowerCase().trim()===state.username.toLowerCase().trim();
+  if(isMe)return true;
+  if(state.lat!==null&&state.lng!==null&&msg.lat&&msg.lng)
+    return haversine(state.lat,state.lng,msg.lat,msg.lng)<=20;
   return false;
 }
-
-function getDistance(msg) {
-  if (state.lat !== null && state.lng !== null && msg.lat && msg.lng) {
-    return haversine(state.lat, state.lng, msg.lat, msg.lng);
-  }
+function getDist(msg){
+  if(state.lat!==null&&state.lng!==null&&msg.lat&&msg.lng)
+    return haversine(state.lat,state.lng,msg.lat,msg.lng);
   return null;
 }
-
-function createMsgEl(msg) {
-  const isMe = msg.username.toLowerCase().trim() === state.username.toLowerCase().trim();
-  const dist = getDistance(msg);
-
-  const el = document.createElement('div');
-  el.className = 'msg ' + (isMe ? 'mine' : 'other');
-  el.dataset.id = String(msg.id);
-
-  const time = formatTime(msg.timestamp);
-  const distStr = dist !== null ? Math.round(dist) + 'm' : '';
-
-  el.innerHTML = `
+function renderMessages(){
+  const cont=document.getElementById('messages');
+  const empty=document.getElementById('empty-state');
+  const visible=state.messages.filter(m=>isVisible(m));
+  document.getElementById('sb-visible').textContent=visible.length;
+  document.getElementById('msg-count-label').textContent=visible.length+' MSG';
+  if(visible.length===0){
+    empty.style.display='flex';
+    cont.querySelectorAll('.msg').forEach(m=>m.remove());
+    return;
+  }
+  empty.style.display='none';
+  const existing=new Set([...cont.querySelectorAll('.msg')].map(el=>el.dataset.id));
+  let added=false;
+  for(const msg of visible){
+    if(!existing.has(String(msg.id))){cont.appendChild(createMsgEl(msg));added=true;}
+  }
+  const visIds=new Set(visible.map(m=>String(m.id)));
+  for(const el of cont.querySelectorAll('.msg')){if(!visIds.has(el.dataset.id))el.remove();}
+  if(added)cont.scrollTop=cont.scrollHeight;
+}
+function createMsgEl(msg){
+  const isMe=msg.username.toLowerCase().trim()===state.username.toLowerCase().trim();
+  const dist=getDist(msg);
+  const el=document.createElement('div');
+  el.className='msg '+(isMe?'mine':'other');
+  el.dataset.id=String(msg.id);
+  const distStr=dist!==null?Math.round(dist)+'m':'';
+  el.innerHTML=`
     <div class="msg-meta">
-      <span class="msg-user">${escHtml(msg.username || 'UNKNOWN')}</span>
-      <span class="msg-time">${time}</span>
-      ${distStr ? `<span class="msg-dist">${distStr}</span>` : ''}
-      ${isMe ? '<span class="msg-dist" style="border-color:var(--accent);color:var(--accent)">YOU</span>' : ''}
+      <span class="msg-user">${esc(msg.username||'UNKNOWN')}</span>
+      <span class="msg-time">${fmtTime(msg.timestamp)}</span>
+      ${distStr?`<span class="msg-dist">${distStr}</span>`:''}
+      ${isMe?'<span class="msg-dist" style="border-color:var(--accent);color:var(--accent)">YOU</span>':''}
     </div>
-    <div class="msg-bubble">${escHtml(msg.message)}</div>
-  `;
+    <div class="msg-bubble">${esc(msg.message)}</div>`;
   return el;
 }
 
-function formatTime(ts) {
-  if (!ts) return '--:--';
-  try {
-    const d = new Date(ts);
-    if (isNaN(d)) return ts.slice(0, 16);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  } catch(e) { return ts.slice(0, 16); }
+// ═══════════════════════════════════════════════
+//  NEARBY USERS
+// ═══════════════════════════════════════════════
+function getNearbyUsers(){
+  const map={};
+  const myName=state.username.toLowerCase().trim();
+  for(const msg of state.messages){
+    const uname=msg.username.trim();
+    if(!uname||uname.toLowerCase()===myName)continue;
+    if(!msg.lat||!msg.lng)continue;
+    if(state.lat===null||state.lng===null)continue;
+    const dist=haversine(state.lat,state.lng,msg.lat,msg.lng);
+    if(dist>20)continue;
+    if(!map[uname])map[uname]={dist,lat:msg.lat,lng:msg.lng,lastMsgTime:null,msgCount:0};
+    map[uname].msgCount++;
+    map[uname].dist=Math.min(map[uname].dist,dist);
+    if(msg.timestamp){
+      const t=new Date(msg.timestamp).getTime();
+      if(!isNaN(t)&&(map[uname].lastMsgTime===null||t>map[uname].lastMsgTime)){
+        map[uname].lastMsgTime=t;
+        map[uname].lat=msg.lat;map[uname].lng=msg.lng;
+      }
+    }
+  }
+  return Object.entries(map)
+    .map(([username,d])=>({username,...d}))
+    .sort((a,b)=>a.dist-b.dist);
 }
 
-function escHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/\n/g, '<br>');
+function activityLevel(lastMsgTime){
+  if(!lastMsgTime)return'cold';
+  const age=(Date.now()-lastMsgTime)/60000;
+  return age<5?'hot':age<30?'warm':'cold';
+}
+function activityLabel(level){return level==='hot'?'LIVE':level==='warm'?'RECENT':'IDLE';}
+function lastSeenStr(t){
+  if(!t)return'unknown';
+  const s=(Date.now()-t)/1000;
+  if(s<60)return Math.round(s)+'s ago';
+  if(s<3600)return Math.round(s/60)+'m ago';
+  return Math.round(s/3600)+'h ago';
 }
 
-// ═══════════════════════════════════════════════════════
-//  SEND MESSAGE
-// ═══════════════════════════════════════════════════════
-async function sendMessage() {
-  const input = document.getElementById('msg-input');
-  const text = input.value.trim();
-  if (!text || state.sending) return;
-  if (!state.lat || !state.lng) {
-    showToast('GPS not ready. Wait for location lock.', 'error');
-    return;
+function renderNearbyUsers(){
+  const users=getNearbyUsers();
+  const count=users.length;
+
+  document.getElementById('nearby-count-label').textContent=count+' NEAR';
+  document.getElementById('nearby-dot').className=count>0?'dot blue':'dot';
+  document.getElementById('radar-label').textContent=
+    count===0?'NO SIGNAL':count+' USER'+(count>1?'S':'')+' IN RANGE';
+
+  // USER LIST
+  const list=document.getElementById('users-list');
+  list.innerHTML='';
+  if(count===0){
+    list.innerHTML='<div class="users-list-empty">NO USERS<br>WITHIN 20m<br><br>▸ scanning...</div>';
+  } else {
+    for(const u of users){
+      const [fg,bg]=getUserPalette(u.username);
+      const initial=u.username[0].toUpperCase();
+      const level=activityLevel(u.lastMsgTime);
+      const card=document.createElement('div');
+      card.className='user-card';
+      card.innerHTML=`
+        <div class="user-avatar${level==='hot'?' hot-ring':''}"
+             style="background:${bg};border-color:${fg};color:${fg}">
+          ${initial}
+        </div>
+        <div class="user-info">
+          <div class="user-name">${esc(u.username)}</div>
+          <div class="user-meta">
+            <span class="user-dist">${Math.round(u.dist)}m away</span>
+            <span class="user-lastseen">${lastSeenStr(u.lastMsgTime)}</span>
+          </div>
+        </div>
+        <div class="activity-pill ${level}">${activityLabel(level)}</div>`;
+      list.appendChild(card);
+    }
   }
 
-  state.sending = true;
-  const btn = document.getElementById('send-btn');
-  btn.disabled = true;
-  document.getElementById('send-label').innerHTML = '<span class="sending-spinner"></span> SENDING';
+  // MINI AVATARS (collapsed)
+  const mini=document.getElementById('mini-users');
+  mini.innerHTML='';
+  for(const u of users.slice(0,7)){
+    const [fg,bg]=getUserPalette(u.username);
+    const d=document.createElement('div');
+    d.className='mini-avatar';
+    d.style.background=bg; d.style.borderColor=fg; d.style.color=fg;
+    d.title=u.username+' · '+Math.round(u.dist)+'m';
+    d.textContent=u.username[0].toUpperCase();
+    mini.appendChild(d);
+  }
+}
 
-  const params = new URLSearchParams();
-  params.append(cfg.entries.message,   text);
-  params.append(cfg.entries.username,  state.username);
-  params.append(cfg.entries.latitude,  state.lat.toFixed(8));
-  params.append(cfg.entries.longitude, state.lng.toFixed(8));
+// ═══════════════════════════════════════════════
+//  RADAR CANVAS
+// ═══════════════════════════════════════════════
+(function initRadar(){
+  const canvas=document.getElementById('radar-canvas');
+  const ctx=canvas.getContext('2d');
+  let ang=0;
+  function frame(){
+    ang=(ang+1.8)%360;
+    const users=getNearbyUsers();
+    const W=canvas.width,H=canvas.height;
+    const cx=W/2,cy=H/2,R=W/2-2;
+    ctx.clearRect(0,0,W,H);
 
-  try {
-    await fetch(cfg.formUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
+    // BG
+    ctx.fillStyle='#060d09';
+    ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();
+
+    // Rings
+    for(let i=1;i<=4;i++){
+      ctx.strokeStyle=`rgba(0,229,160,${i===4?.15:.07})`;
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(cx,cy,R*(i/4),0,Math.PI*2);ctx.stroke();
+    }
+    // Ring labels
+    ctx.fillStyle='rgba(0,229,160,.25)';
+    ctx.font='6px Share Tech Mono,monospace';
+    ctx.textAlign='left';ctx.textBaseline='middle';
+    ['5m','10m','15m','20m'].forEach((lbl,i)=>{
+      ctx.fillText(lbl,cx+R*((i+1)/4)+2,cy);
     });
 
-    input.value = '';
-    input.style.height = '';
-    showToast('Transmitted', 'success');
+    // Crosshairs
+    ctx.strokeStyle='rgba(0,229,160,.06)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(cx-R,cy);ctx.lineTo(cx+R,cy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,cy-R);ctx.lineTo(cx,cy+R);ctx.stroke();
 
-    // Poll immediately for fast feedback
-    setTimeout(fetchMessages, 1500);
-    setTimeout(fetchMessages, 4000);
-  } catch(e) {
-    showToast('Send failed: ' + e.message, 'error');
-  } finally {
-    state.sending = false;
-    btn.disabled = false;
-    document.getElementById('send-label').textContent = 'SEND ▸';
+    // Sweep
+    const sweepRad=ang*Math.PI/180;
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(sweepRad);
+    const g=ctx.createLinearGradient(0,0,R,0);
+    g.addColorStop(0,'rgba(0,229,160,0)');
+    g.addColorStop(1,'rgba(0,229,160,.2)');
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,-Math.PI*.45,0);ctx.closePath();
+    ctx.fillStyle=g;ctx.fill();
+    ctx.restore();
+
+    // Sweep line
+    ctx.strokeStyle='rgba(0,229,160,.8)';ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+R*Math.cos(sweepRad),cy+R*Math.sin(sweepRad));
+    ctx.stroke();
+
+    // User blips
+    for(const u of users){
+      if(state.lat===null||state.lng===null||!u.lat||!u.lng)continue;
+      const dist=u.dist;
+      const norm=Math.min(dist/20,.97);
+      const brg=bearing(state.lat,state.lng,u.lat,u.lng)*Math.PI/180;
+      const bx=cx+norm*(R-10)*Math.sin(brg);
+      const by=cy-norm*(R-10)*Math.cos(brg);
+      const [fg]=getUserPalette(u.username);
+      const level=activityLevel(u.lastMsgTime);
+
+      // Glow
+      const gr=ctx.createRadialGradient(bx,by,0,bx,by,level==='hot'?10:6);
+      gr.addColorStop(0,fg+'bb');gr.addColorStop(1,fg+'00');
+      ctx.fillStyle=gr;
+      ctx.beginPath();ctx.arc(bx,by,level==='hot'?10:6,0,Math.PI*2);ctx.fill();
+
+      // Core dot
+      ctx.fillStyle=fg;
+      ctx.beginPath();ctx.arc(bx,by,level==='hot'?3.5:2.5,0,Math.PI*2);ctx.fill();
+
+      // Initial label
+      ctx.fillStyle=fg;
+      ctx.font=`bold ${level==='hot'?9:8}px Share Tech Mono,monospace`;
+      ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText(u.username[0].toUpperCase(),bx,by-5);
+    }
+
+    // Border
+    ctx.strokeStyle='rgba(0,229,160,.3)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.stroke();
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+// ═══════════════════════════════════════════════
+//  SIDEBAR TOGGLE
+// ═══════════════════════════════════════════════
+function toggleSidebar(){
+  const sb=document.getElementById('users-sidebar');
+  const btn=document.getElementById('sidebar-toggle-btn');
+  state.sidebarCollapsed=!state.sidebarCollapsed;
+  sb.classList.toggle('collapsed',state.sidebarCollapsed);
+  btn.textContent=state.sidebarCollapsed?'▶':'◀';
+}
+
+// ═══════════════════════════════════════════════
+//  SEND
+// ═══════════════════════════════════════════════
+async function sendMessage(){
+  const input=document.getElementById('msg-input');
+  const text=input.value.trim();
+  if(!text||state.sending)return;
+  if(!state.lat||!state.lng){showToast('GPS not ready','error');return;}
+  state.sending=true;
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;
+  document.getElementById('send-label').innerHTML='<span class="sending-spinner"></span> SENDING';
+  const params=new URLSearchParams();
+  params.append(cfg.entries.message,  text);
+  params.append(cfg.entries.username, state.username);
+  params.append(cfg.entries.latitude, state.lat.toFixed(8));
+  params.append(cfg.entries.longitude,state.lng.toFixed(8));
+  try{
+    await fetch(cfg.formUrl,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:params.toString()
+    });
+    input.value='';input.style.height='';
+    showToast('Transmitted','success');
+    setTimeout(fetchMessages,1500);setTimeout(fetchMessages,4000);
+  }catch(e){showToast('Send failed: '+e.message,'error');}
+  finally{
+    state.sending=false;btn.disabled=false;
+    document.getElementById('send-label').textContent='SEND ▸';
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 //  UTILS
-// ═══════════════════════════════════════════════════════
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+// ═══════════════════════════════════════════════
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function autoResize(el){el.style.height='';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+function fmtTime(ts){
+  if(!ts)return'--:--';
+  try{const d=new Date(ts);return isNaN(d)?ts.slice(0,16):d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+  catch(e){return ts.slice(0,16);}
 }
-
-function autoResize(el) {
-  el.style.height = '';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/\n/g,'<br>');
 }
-
 let toastTimer;
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show' + (type ? ' ' + type : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = ''; }, 3000);
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show'+(type?' '+type:'');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.className='';},3000);
 }
-
-// Kick off geo status polling
-setInterval(() => {
-  const dot = document.getElementById('geo-dot');
-  if (state.lat !== null) dot.className = 'dot ok';
-}, 2000);
-
-// Hint in setup box
-document.getElementById('setup-username').addEventListener('keydown', e => {
-  if (e.key === 'Enter') startSession();
-});
-
-window.addEventListener('load', () => {
-  document.getElementById('geo-status').textContent = 'Enter a call sign and click Enter to get started';
+document.getElementById('setup-username').addEventListener('keydown',e=>{
+  if(e.key==='Enter')startSession();
 });
 </script>
 </body>
