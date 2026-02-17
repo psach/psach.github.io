@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nearby Mesh Chat</title>
+
+<style>
+body { font-family: sans-serif; text-align: center; }
+#chat { height: 250px; border: 1px solid #aaa; overflow-y: auto; margin: 10px; padding: 5px;}
+textarea { width: 95%; height: 70px; }
+input { width: 70%; padding: 8px; }
+button { padding: 8px; margin: 3px; }
+</style>
+</head>
+<body>
+
+<h2>📡 Nearby Mesh Chat</h2>
+
+<button onclick="createOffer()">Create Link</button>
+<button onclick="acceptOffer()">Join</button>
+
+<textarea id="signal" placeholder="Paste connection data here"></textarea>
+
+<div id="chat"></div>
+
+<input id="msg" placeholder="Message">
+<button onclick="sendMsg()">Send</button>
+
+<script>
+let pc = new RTCPeerConnection();
+let channel;
+
+pc.ondatachannel = e => {
+  channel = e.channel;
+  setupChannel();
+};
+
+function setupChannel(){
+  channel.onmessage = e => addChat("Peer: " + e.data);
+  channel.onopen = () => addChat("Connected!");
+}
+
+async function createOffer(){
+  channel = pc.createDataChannel("chat");
+  setupChannel();
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  document.getElementById("signal").value =
+    JSON.stringify(pc.localDescription);
+}
+
+async function acceptOffer(){
+  const data = JSON.parse(signal.value);
+  await pc.setRemoteDescription(data);
+
+  if(data.type === "offer"){
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+
+    signal.value = JSON.stringify(pc.localDescription);
+  }
+}
+
+function sendMsg(){
+  channel.send(msg.value);
+  addChat("Me: " + msg.value);
+}
+
+function addChat(t){
+  chat.innerHTML += t + "<br>";
+  chat.scrollTop = chat.scrollHeight;
+}
+</script>
+
+</body>
+</html>
