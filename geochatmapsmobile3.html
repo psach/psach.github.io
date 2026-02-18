@@ -233,7 +233,7 @@ function updateNearby(fresh){
       nearbyUsers[u]={...info,marker:mk};
     }else{
       nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
-      nearbyUsers[u].marker.setPopupContent('<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>');
+      nearbyUsers[u].marker.setPopupContent('<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose(${u});return false" style="color:#4f8ef7">💬 Send message</a>');
       Object.assign(nearbyUsers[u],info);
     }
   });
