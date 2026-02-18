@@ -91,6 +91,59 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 }
 </style>
 
+
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div class="login-card">
+    <div style="font-size:2.5rem;margin-bottom:12px">📡</div>
+    <h2>NearbyChat</h2>
+    <p>Connect with people within 20 metres of you</p>
+    <div class="input-group">
+      <input type="text" id="usernameInput" placeholder="Choose a username" maxlength="30" autocomplete="off"/>
+    </div>
+    <button class="btn" id="joinBtn" disabled>Acquiring GPS…</button>
+    <div id="gpsStatus">Waiting for location permission…</div>
+  </div>
+</div>
+
+<header>
+  <span class="logo">NearbyChat</span>
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Offline</span>
+  <span id="userBadge" style="display:none"></span>
+  <span id="nearbyCount" style="display:none">0</span>
+</header>
+<div id="pollBar"><div id="pollProgress"></div></div>
+
+<div id="mapContainer">
+  <div id="map"></div>
+</div>
+
+<div id="msgPanel" class="collapsed">
+  <div class="panel-header" onclick="toggleMsgPanel()">
+    Messages <span class="msg-badge" id="msgCount">0</span>
+    <span class="toggle-icon">▼</span>
+  </div>
+  <div id="msgList"><div style="padding:12px;font-size:.78rem;color:var(--muted);text-align:center">No messages yet</div></div>
+</div>
+
+<div id="composeBox">
+  <h3>Send Message</h3>
+  <div class="target" id="composeTarget">To: —</div>
+  <textarea id="composeMsg" placeholder="Type your message…" maxlength="200"></textarea>
+  <div class="compose-actions">
+    <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
+    <button class="btn-send" id="sendBtn" onclick="sendMessage()">Send ✉️</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+
+</body>
+
+
 <script>
 const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
 const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
@@ -317,7 +370,7 @@ function startBar(){
 }
 
 // Join
-document.getElementById('joinBtn').addEventListener('click',async()=>{
+document.getElementById('joinBtn').addEventListener('click', async()=>{
   const u=document.getElementById('usernameInput').value.trim();
   if(!u){toast('⚠️ Enter a username');return;}
   if(!myLat){toast('⚠️ GPS not ready');return;}
@@ -338,54 +391,4 @@ startGPS();
 </script>
 
 
-</head>
-<body>
-
-<div id="loginOverlay">
-  <div class="login-card">
-    <div style="font-size:2.5rem;margin-bottom:12px">📡</div>
-    <h2>NearbyChat</h2>
-    <p>Connect with people within 20 metres of you</p>
-    <div class="input-group">
-      <input type="text" id="usernameInput" placeholder="Choose a username" maxlength="30" autocomplete="off"/>
-    </div>
-    <button class="btn" id="joinBtn" disabled>Acquiring GPS…</button>
-    <div id="gpsStatus">Waiting for location permission…</div>
-  </div>
-</div>
-
-<header>
-  <span class="logo">NearbyChat</span>
-  <div class="status-dot" id="statusDot"></div>
-  <span id="statusText">Offline</span>
-  <span id="userBadge" style="display:none"></span>
-  <span id="nearbyCount" style="display:none">0</span>
-</header>
-<div id="pollBar"><div id="pollProgress"></div></div>
-
-<div id="mapContainer">
-  <div id="map"></div>
-</div>
-
-<div id="msgPanel" class="collapsed">
-  <div class="panel-header" onclick="toggleMsgPanel()">
-    Messages <span class="msg-badge" id="msgCount">0</span>
-    <span class="toggle-icon">▼</span>
-  </div>
-  <div id="msgList"><div style="padding:12px;font-size:.78rem;color:var(--muted);text-align:center">No messages yet</div></div>
-</div>
-
-<div id="composeBox">
-  <h3>Send Message</h3>
-  <div class="target" id="composeTarget">To: —</div>
-  <textarea id="composeMsg" placeholder="Type your message…" maxlength="200"></textarea>
-  <div class="compose-actions">
-    <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
-    <button class="btn-send" id="sendBtn" onclick="sendMessage()">Send ✉️</button>
-  </div>
-</div>
-<div id="toast"></div>
-
-
-</body>
 </html>
