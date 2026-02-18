@@ -93,14 +93,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </head>
 <body>
 
-<!-- Audio element for notification sound -->
-<audio id="notificationSound" preload="auto">
-  <!-- Replace with your horn.wav file path -->
-  <source src="horn.wav" type="audio/wav">
-  <!-- Fallback to a notification beep sound from freesound.org -->
-  <source src="https://cdn.freesound.org/previews/320/320655_5260872-lq.mp3" type="audio/mpeg">
-</audio>
-
 <div id="loginOverlay">
   <div class="login-card">
     <div style="font-size:2.5rem;margin-bottom:12px">📡</div>
@@ -150,46 +142,10 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
 const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
 const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
-const RADIUS_M=20, TIME_WINDOW=30000, POLL_MS=8000; // 30 seconds for EVERYTHING
-const SOUND_DURATION=2000; // Play sound for 2 seconds
+const RADIUS_M=20, MSG_WINDOW=30000, POLL_MS=8000, USER_WINDOW=30000; // 30 seconds for new users
 
 let myUsername='',myLat=null,myLng=null,map,myMarker,radiusCircle;
 let nearbyUsers={},seenKeys=new Set(),composeTarget=null,registered=false,msgPanelOpen=false;
-let notificationAudio=null;
-
-// Load and prepare audio on page load
-window.addEventListener('DOMContentLoaded', ()=>{
-  notificationAudio=document.getElementById('notificationSound');
-  if(notificationAudio){
-    notificationAudio.volume=0.7; // Set volume (0.0 to 1.0)
-    // Preload the audio
-    notificationAudio.load();
-  }
-});
-
-// Play notification sound for 2 seconds
-function playNotificationSound(){
-  if(!notificationAudio)return;
-  try{
-    // Reset to start and play
-    notificationAudio.currentTime=0;
-    const playPromise=notificationAudio.play();
-    
-    if(playPromise!==undefined){
-      playPromise.then(()=>{
-        // Stop after 2 seconds
-        setTimeout(()=>{
-          notificationAudio.pause();
-          notificationAudio.currentTime=0;
-        },SOUND_DURATION);
-      }).catch(err=>{
-        console.warn('Audio play failed:',err);
-      });
-    }
-  }catch(e){
-    console.warn('Audio error:',e);
-  }
-}
 
 // GPS
 function startGPS(){
@@ -220,6 +176,8 @@ function initMap(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:21}).addTo(map);
   radiusCircle=L.circle([myLat,myLng],{radius:RADIUS_M,color:'#4f8ef7',fillColor:'#4f8ef720',fillOpacity:.25,weight:1.5,dashArray:'6,4'}).addTo(map);
   myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup(`<b>You (${myUsername})</b>`);
+  
+  // Resize map on panel toggle
   setTimeout(()=>map.invalidateSize(),100);
 }
 
@@ -236,24 +194,33 @@ async function submitForm(u,m,lat,lng){
 }
 async function registerPresence(){await submitForm(myUsername,'',myLat,myLng);registered=true;}
 
-// CSV parser
+function parseDDMMYYYY(dateStr) {
+  const [datePart, timePart] = dateStr.split(" ");
+  const [day, month, year] = datePart.split("/").map(Number);
+  const [hour, minute, second] = timePart.split(":").map(Number);
 
-function parseCSV(t){
-  const rows=[];let q=false,cell='',row=[];
-  for(let i=0;i<t.length;i++){const c=t[i];
-    if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++;}else q=!q;}
-    else if(c===','&&!q){row.push(cell);cell='';}
-    else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>x))rows.push(row);row=[];}
-    else cell+=c;
-  }
-	 console.log(rows);
-  const cutoff = Date.now() - 30000;
- 
-  if(row.length||cell){row.push(cell);if(row.some(x=>x))rows.push(row);}
-  return rows.filter(r => new Date(r[0]).getTime() >= cutoff);;
+  return new Date(year, month - 1, day, hour, minute, second).getTime();
 }
 
-// Poll & process - FILTER CSV ROWS AT LOAD TIME (within 30 seconds)
+function filterLast30Seconds(rows, colIndex = 0) {
+  const cutoff = Date.now() - 30000;
+
+  return rows.filter(row => {
+    const ts = parseDDMMYYYY(row[colIndex]);
+    return ts >= cutoff;
+  });
+}
+
+
+function parseCSV(t) {
+  return filterLast30Seconds(csv
+    .trim()
+    .split("\n")
+    .map(row => row.split(",")));
+}
+
+
+// Poll & process - changed to 30 second window for nearby users
 async function poll(){
   startBar();
   try{
@@ -265,13 +232,9 @@ async function poll(){
 }
 
 function processSheet(csv){
-  const allRows=parseCSV(csv);
-  if(allRows.length<2)return;
-  
-  const header=allRows[0];
-  const h=header.map(x=>(x||'').toLowerCase());
-  
-  // Detect column indices
+  const rows=parseCSV(csv);
+  if(rows.length<2)return;
+  const h=rows[0].map(x=>(x||'').toLowerCase());
   let cU=1,cM=2,cL=3;
   h.forEach((x,i)=>{
     if(x.includes('47638508')||x.includes('username'))cU=i;
@@ -279,64 +242,27 @@ function processSheet(csv){
     if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
   });
 
-  // FILTER: Keep only rows from the last 30 seconds
-  const now=Date.now();
-  const recentRows=[];
-  
-  for(let i=1;i<allRows.length;i++){
-    const row=allRows[i];
-    if(!row||row.length<2)continue;
-    
-    const tsRaw=(row[0]||'').trim();
-    const ts=parseDate(tsRaw);
-    const age=now-ts;
-	
-	console.log("tsRaw: "+tsRaw +"ts: "+ ts + "age: "+age);
-    
-    // Only keep rows within 30 second window
-    if(age<=TIME_WINDOW){
-      recentRows.push(row);
-    }
-  }
-  console.log(recentRows);
-  // Now process only the filtered recent rows
-  const fresh={};
-  
-  for(let r=0;r<recentRows.length;r++){
-    const row=recentRows[r];
-    
+  const now=Date.now(),fresh={};
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r];if(!row||row.length<2)continue;
+    const ts=parseDate((row[0]||'').trim());
     const user=(row[cU]||'').trim();
     const msg=(row[cM]||'').trim();
     const loc=parseLoc((row[cL]||'').trim());
-    
     if(!user||!loc)continue;
-    
-    // Skip my own entries
-    if(user===myUsername)continue;
-    
-    const dist=haversine(myLat,myLng,loc.lat,loc.lng);
-    
-    // Skip if outside 20m radius
-    if(dist>RADIUS_M)continue;
-    
-    const ts=parseDate((row[0]||'').trim());
+    const age=now-ts, dist=haversine(myLat,myLng,loc.lat,loc.lng);
 
-    // Use case 4: incoming messages (within 30s and 20m)
-    if(msg){
+    // Use case 4: incoming messages (30s window)
+    if(msg && user!==myUsername && age<MSG_WINDOW+5000 && dist<=RADIUS_M){
       const key=`${row[0]}|${user}|${msg}`;
-      if(!seenKeys.has(key)){
-        seenKeys.add(key);
-        showMsg(user,msg,ts,false);
-      }
+      if(!seenKeys.has(key)){seenKeys.add(key);showMsg(user,msg,ts,false);}
     }
     
-    // Use case 2: nearby users (within 30s and 20m)
-    // Keep most recent entry per user
-    if(!fresh[user]||ts>fresh[user].ts){
-      fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist)};
+    // Use case 2: nearby users (30s window only)
+    if(age<USER_WINDOW && user!==myUsername && dist<=RADIUS_M){
+      if(!fresh[user]||ts>fresh[user].ts) fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist)};
     }
   }
-  
   updateNearby(fresh);
 }
 
@@ -388,9 +314,6 @@ function showMsg(from,text,ts,mine){
   document.getElementById('msgCount').textContent=count;
   
   if(!mine){
-    // PLAY NOTIFICATION SOUND for incoming messages
-    playNotificationSound();
-    
     toast(`💬 ${from}: ${text.substring(0,40)}`);
     // Auto-expand panel for new messages
     if(!msgPanelOpen){
