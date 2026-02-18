@@ -156,7 +156,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
 const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
 const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
-const RADIUS_M=20, MSG_WINDOW=60000, POLL_MS=3000, USER_WINDOW=60000; // 30 seconds for new users
+const RADIUS_M=50, MSG_WINDOW=60000, POLL_MS=3000, USER_WINDOW=60000; // 30 seconds for new users
 
 let myUsername='',myLat=null,myLng=null,map,myMarker,radiusCircle;
 let nearbyUsers={},seenKeys=new Set(),composeTarget=null,registered=false,msgPanelOpen=false;
