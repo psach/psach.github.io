@@ -198,7 +198,7 @@ function parseDDMMYYYY(dateStr) {
   const [datePart, timePart] = dateStr.split(" ");
   const [day, month, year] = datePart.split("/").map(Number);
   const [hour, minute, second] = timePart.split(":").map(Number);
-
+	console.log(new Date(year, month - 1, day, hour, minute, second).getTime());
   return new Date(year, month - 1, day, hour, minute, second).getTime();
 }
 
