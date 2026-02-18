@@ -266,7 +266,7 @@ console.log(rows);
     
     // Use case 2: nearby users (30s window only)
     if(user!==myUsername && dist<=RADIUS_M){
-      if(!fresh[user]||ts>fresh[user].ts) fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist)};
+      if(!fresh[user]) fresh[user]={lat:loc.lat,lng:loc.lng,dist:Math.round(dist)};
     }
   }
   updateNearby(fresh);
