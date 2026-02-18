@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NearbyChat — Proximity Messenger</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--card:#21253a;--border:#2e3350;--accent:#4f8ef7;--accent2:#7c5bf7;--green:#22c55e;--text:#e8eaf0;--muted:#6b7280;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Header */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:1000}
+.logo{font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.status-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
+.status-dot.online{background:var(--green);box-shadow:0 0 6px var(--green)}
+#statusText{font-size:.8rem;color:var(--muted);flex:1}
+#userBadge{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.8rem;color:var(--accent);font-weight:600}
+#nearbyCount{background:var(--accent);color:#fff;border-radius:12px;padding:3px 10px;font-size:.75rem;font-weight:700;margin-left:auto}
+
+/* Login */
+#loginOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:min(340px,90vw);text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.login-card h2{font-size:1.5rem;margin-bottom:6px}
+.login-card p{color:var(--muted);font-size:.85rem;margin-bottom:24px}
+.input-group input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;color:var(--text);font-size:1rem;outline:none;transition:border .2s;margin-bottom:16px}
+.input-group input:focus{border-color:var(--accent)}
+.btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);padding:13px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+#gpsStatus{font-size:.78rem;color:var(--muted);margin-top:10px}
+
+/* Map container */
+#mapContainer{flex:1;position:relative;overflow:hidden}
+#map{width:100%;height:100%}
+
+/* Message panel - bottom overlay */
+#msgPanel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:900;transition:transform .3s;max-height:40vh;display:flex;flex-direction:column}
+#msgPanel.collapsed{transform:translateY(calc(100% - 44px))}
+.panel-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.msg-badge{background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;font-size:.7rem;font-weight:700}
+#msgList{flex:1;overflow-y:auto;padding:8px;min-height:120px}
+.msg-bubble{background:var(--card);border-radius:10px;padding:8px 12px;margin-bottom:6px;border-left:3px solid var(--accent);animation:fadeIn .3s ease}
+.msg-bubble.mine{border-left-color:var(--green)}
+.msg-from{font-size:.7rem;color:var(--accent);font-weight:700;margin-bottom:2px}
+.msg-bubble.mine .msg-from{color:var(--green)}
+.msg-text{font-size:.82rem;word-wrap:break-word}
+.msg-time{font-size:.65rem;color:var(--muted);margin-top:2px}
+.toggle-icon{transition:transform .3s}
+.toggle-icon.open{transform:rotate(180deg)}
+
+/* Compose box */
+#composeBox{display:none;position:fixed;bottom:80px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:min(340px,calc(100vw - 32px));z-index:5000;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+#composeBox h3{font-size:.95rem;margin-bottom:12px}
+.target{font-size:.8rem;color:var(--accent);margin-bottom:10px;font-weight:600}
+#composeBox textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:.85rem;resize:none;height:80px;outline:none}
+#composeBox textarea:focus{border-color:var(--accent)}
+.compose-actions{display:flex;gap:8px;margin-top:10px}
+.btn-send{flex:1;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;padding:9px;color:#fff;font-weight:600;cursor:pointer;font-size:.85rem}
+.btn-cancel{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;color:var(--text);cursor:pointer;font-size:.85rem;border:none}
+
+/* Toast */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);border-radius:30px;padding:9px 20px;font-size:.82rem;opacity:0;transition:all .3s;pointer-events:none;z-index:9000;white-space:nowrap;max-width:calc(100vw - 32px)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Poll bar */
+#pollBar{height:2px;background:var(--border);flex-shrink:0;overflow:hidden}
+#pollProgress{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width linear}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* Responsive */
+@media (max-width: 640px) {
+  header{padding:8px 12px}
+  .logo{font-size:1rem}
+  #statusText{display:none}
+  #userBadge{font-size:.7rem;padding:3px 8px}
+  #nearbyCount{font-size:.7rem;padding:2px 8px}
+  #composeBox{bottom:60px;right:12px;left:12px;width:auto}
+  #msgPanel{max-height:50vh}
+  .msg-bubble{font-size:.8rem}
+}
+
+@media (max-height: 600px) {
+  #msgPanel{max-height:35vh}
+}
+</style>
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div class="login-card">
+    <div style="font-size:2.5rem;margin-bottom:12px">📡</div>
+    <h2>NearbyChat</h2>
+    <p>Connect with people within 20 metres of you</p>
+    <div class="input-group">
+      <input type="text" id="usernameInput" placeholder="Choose a username" maxlength="30" autocomplete="off"/>
+    </div>
+    <button class="btn" id="joinBtn" disabled>Acquiring GPS…</button>
+    <div id="gpsStatus">Waiting for location permission…</div>
+  </div>
+</div>
+
+<header>
+  <span class="logo">NearbyChat</span>
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Offline</span>
+  <span id="userBadge" style="display:none"></span>
+  <span id="nearbyCount" style="display:none">0</span>
+</header>
+<div id="pollBar"><div id="pollProgress"></div></div>
+
+<div id="mapContainer">
+  <div id="map"></div>
+</div>
+
+<div id="msgPanel" class="collapsed">
+  <div class="panel-header" onclick="toggleMsgPanel()">
+    Messages <span class="msg-badge" id="msgCount">0</span>
+    <span class="toggle-icon">▼</span>
+  </div>
+  <div id="msgList"><div style="padding:12px;font-size:.78rem;color:var(--muted);text-align:center">No messages yet</div></div>
+</div>
+
+<div id="composeBox">
+  <h3>Send Message</h3>
+  <div class="target" id="composeTarget">To: —</div>
+  <textarea id="composeMsg" placeholder="Type your message…" maxlength="200"></textarea>
+  <div class="compose-actions">
+    <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
+    <button class="btn-send" id="sendBtn" onclick="sendMessage()">Send ✉️</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
+const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
+const RADIUS_M=20, TIME_WINDOW=30000, POLL_MS=8000; // 30 seconds for EVERYTHING
+
+let myUsername='',myLat=null,myLng=null,map,myMarker,radiusCircle;
+let nearbyUsers={},seenKeys=new Set(),composeTarget=null,registered=false,msgPanelOpen=false;
+
+// GPS
+function startGPS(){
+  if(!navigator.geolocation){setGPS('❌ Not supported');return;}
+  navigator.geolocation.watchPosition(onGPS,e=>setGPS('❌ '+e.message),{enableHighAccuracy:true,maximumAge:5000});
+}
+function setGPS(t){document.getElementById('gpsStatus').textContent=t;}
+function onGPS(p){
+  myLat=p.coords.latitude; myLng=p.coords.longitude;
+  setGPS(`📍 GPS ready — ±${Math.round(p.coords.accuracy)}m`);
+  const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join NearbyChat';
+  if(map){myMarker.setLatLng([myLat,myLng]);radiusCircle.setLatLng([myLat,myLng]);}
+  if(registered) registerPresence();
+}
+
+// Utils
+function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function fmtLoc(lat,lng){return `${lng.toFixed(7)}, ${lat.toFixed(7)}`;}
+function parseLoc(s){if(!s)return null;const p=s.split(',').map(x=>x.trim());const lng=parseFloat(p[0]),lat=parseFloat(p[1]);return(isNaN(lat)||isNaN(lng))?null:{lat,lng};}
+function parseDate(s){if(!s)return 0;const m=s.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):(\d+)/);if(m)return new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]).getTime();return new Date(s).getTime()||0;}
+function ini(n){return(n||'?')[0].toUpperCase();}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,ms=3500){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),ms);}
+
+// Map
+function initMap(){
+  map=L.map('map',{zoomControl:true,attributionControl:false}).setView([myLat,myLng],19);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:21}).addTo(map);
+  radiusCircle=L.circle([myLat,myLng],{radius:RADIUS_M,color:'#4f8ef7',fillColor:'#4f8ef720',fillOpacity:.25,weight:1.5,dashArray:'6,4'}).addTo(map);
+  myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup(`<b>You (${myUsername})</b>`);
+  setTimeout(()=>map.invalidateSize(),100);
+}
+
+function makeIcon(n,me=false){
+  const g=me?'#22c55e,#16a34a':'#4f8ef7,#7c5bf7';
+  return L.divIcon({className:'',html:`<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,${g});border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px #0008"><span style="transform:rotate(45deg);font-weight:700;font-size:12px;color:#fff">${ini(n)}</span></div>`,iconSize:[32,32],iconAnchor:[16,32],popupAnchor:[0,-36]});
+}
+
+// Form submit
+async function submitForm(u,m,lat,lng){
+  const body=new URLSearchParams({[F.username]:u,[F.message]:m||'',[F.location]:fmtLoc(lat,lng)});
+  try{await fetch(FORM_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});return true;}
+  catch(e){return false;}
+}
+async function registerPresence(){await submitForm(myUsername,'',myLat,myLng);registered=true;}
+
+// CSV parser
+function parseCSV(t){
+  const rows=[];let q=false,cell='',row=[];
+  for(let i=0;i<t.length;i++){const c=t[i];
+    if(c==='"'){if(q&&t[i+1]==='"'){cell+='"';i++;}else q=!q;}
+    else if(c===','&&!q){row.push(cell);cell='';}
+    else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>x))rows.push(row);row=[];}
+    else cell+=c;
+  }
+  if(row.length||cell){row.push(cell);if(row.some(x=>x))rows.push(row);}
+  return rows;
+}
+
+// Poll & process - STRICT 30 SECOND WINDOW for both users and messages
+async function poll(){
+  startBar();
+  try{
+    const r=await fetch(`${SHEET_CSV}&_=${Date.now()}`);
+    if(!r.ok)throw 0;
+    processSheet(await r.text());
+    setStat('online');
+  }catch(e){setStat('err');}
+}
+
+function processSheet(csv){
+  const rows=parseCSV(csv);
+  if(rows.length<2)return;
+  const h=rows[0].map(x=>(x||'').toLowerCase());
+  let cU=1,cM=2,cL=3;
+  h.forEach((x,i)=>{
+    if(x.includes('47638508')||x.includes('username'))cU=i;
+    if(x.includes('1476899599')||x.includes('message'))cM=i;
+    if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
+  });
+
+  const now=Date.now(),fresh={};
+  
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r];if(!row||row.length<2)continue;
+    const ts=parseDate((row[0]||'').trim());
+    const user=(row[cU]||'').trim();
+    const msg=(row[cM]||'').trim();
+    const loc=parseLoc((row[cL]||'').trim());
+    if(!user||!loc)continue;
+    
+    const age=now-ts;
+    
+    // STRICT 30 SECOND FILTER - skip anything older than 30 seconds
+    if(age>TIME_WINDOW)continue;
+    
+    const dist=haversine(myLat,myLng,loc.lat,loc.lng);
+    
+    // Skip if outside 20m radius
+    if(dist>RADIUS_M)continue;
+    
+    // Skip my own entries
+    if(user===myUsername)continue;
+
+    // Use case 4: incoming messages (within 30s and 20m)
+    if(msg){
+      const key=`${row[0]}|${user}|${msg}`;
+      if(!seenKeys.has(key)){
+        seenKeys.add(key);
+        showMsg(user,msg,ts,false);
+      }
+    }
+    
+    // Use case 2: nearby users (within 30s and 20m)
+    // Keep most recent entry per user
+    if(!fresh[user]||ts>fresh[user].ts){
+      fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist)};
+    }
+  }
+  
+  updateNearby(fresh);
+}
+
+function updateNearby(fresh){
+  // Remove stale users
+  Object.keys(nearbyUsers).forEach(u=>{
+    if(!fresh[u]){if(nearbyUsers[u].marker)map.removeLayer(nearbyUsers[u].marker);delete nearbyUsers[u];}
+  });
+  
+  // Add/update users
+  Object.entries(fresh).forEach(([u,info])=>{
+    if(!nearbyUsers[u]){
+      const mk=L.marker([info.lat,info.lng],{icon:makeIcon(u)}).addTo(map)
+        .bindPopup(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
+      nearbyUsers[u]={...info,marker:mk};
+    }else{
+      nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
+      nearbyUsers[u].marker.setPopupContent(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
+      Object.assign(nearbyUsers[u],info);
+    }
+  });
+  
+  // Update nearby count
+  const count=Object.keys(nearbyUsers).length;
+  const badge=document.getElementById('nearbyCount');
+  badge.textContent=count;
+  badge.style.display=count>0?'block':'none';
+}
+
+// Messages panel
+function toggleMsgPanel(){
+  const panel=document.getElementById('msgPanel');
+  msgPanelOpen=!msgPanelOpen;
+  panel.classList.toggle('collapsed');
+  document.querySelector('.toggle-icon').classList.toggle('open');
+  setTimeout(()=>map&&map.invalidateSize(),320);
+}
+
+function showMsg(from,text,ts,mine){
+  const list=document.getElementById('msgList');
+  const ph=list.querySelector('div[style]');if(ph)ph.remove();
+  const time=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
+  const d=document.createElement('div');d.className='msg-bubble'+(mine?' mine':'');
+  d.innerHTML=`<div class="msg-from">${esc(from)}</div><div class="msg-text">${esc(text)}</div><div class="msg-time">${time}</div>`;
+  list.appendChild(d);list.scrollTop=list.scrollHeight;
+  
+  // Update message count
+  const count=list.querySelectorAll('.msg-bubble').length;
+  document.getElementById('msgCount').textContent=count;
+  
+  if(!mine){
+    toast(`💬 ${from}: ${text.substring(0,40)}`);
+    // Auto-expand panel for new messages
+    if(!msgPanelOpen){
+      setTimeout(()=>{
+        document.getElementById('msgPanel').classList.remove('collapsed');
+        document.querySelector('.toggle-icon').classList.add('open');
+        msgPanelOpen=true;
+      },500);
+    }
+  }
+}
+
+// Compose — Use case 3
+function openCompose(u){
+  composeTarget=u;
+  document.getElementById('composeTarget').textContent='To: '+u;
+  document.getElementById('composeMsg').value='';
+  document.getElementById('composeBox').style.display='block';
+  document.getElementById('composeMsg').focus();
+}
+
+function closeCompose(){
+  document.getElementById('composeBox').style.display='none';
+  composeTarget=null;
+}
+
+async function sendMessage(){
+  const msg=document.getElementById('composeMsg').value.trim();
+  if(!msg){toast('⚠️ Empty message');return;}
+  const btn=document.getElementById('sendBtn');btn.disabled=true;btn.textContent='Sending…';
+  const ok=await submitForm(myUsername,msg,myLat,myLng);
+  if(ok){showMsg(`You → ${composeTarget}`,msg,Date.now(),true);toast(`✅ Message sent`);closeCompose();}
+  else toast('❌ Send failed');
+  btn.disabled=false;btn.textContent='Send ✉️';
+}
+
+// Status & bar
+function setStat(s){
+  const d=document.getElementById('statusDot'),t=document.getElementById('statusText');
+  if(s==='online'){d.className='status-dot online';t.textContent='Live';}
+  else{d.className='status-dot';t.textContent='Reconnecting…';}
+}
+
+function startBar(){
+  const b=document.getElementById('pollProgress');
+  b.style.transition='none';b.style.width='0%';
+  requestAnimationFrame(()=>{b.style.transition=`width ${POLL_MS/1000}s linear`;b.style.width='100%';});
+}
+
+// Join
+document.getElementById('joinBtn').addEventListener('click',async()=>{
+  const u=document.getElementById('usernameInput').value.trim();
+  if(!u){toast('⚠️ Enter a username');return;}
+  if(!myLat){toast('⚠️ GPS not ready');return;}
+  myUsername=u;
+  const btn=document.getElementById('joinBtn');btn.disabled=true;btn.textContent='Joining…';
+  await registerPresence();
+  document.getElementById('loginOverlay').style.display='none';
+  const b=document.getElementById('userBadge');b.textContent=u;b.style.display='block';
+  initMap();setStat('online');toast(`🎉 Joined as ${u}`);
+  poll();setInterval(poll,POLL_MS);
+  setInterval(registerPresence,45000);
+});
+
+document.getElementById('usernameInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('joinBtn').click();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCompose();});
+
+startGPS();
+</script>
+</body>
+</html>
