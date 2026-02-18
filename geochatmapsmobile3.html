@@ -237,6 +237,7 @@ async function submitForm(u,m,lat,lng){
 async function registerPresence(){await submitForm(myUsername,'',myLat,myLng);registered=true;}
 
 // CSV parser
+
 function parseCSV(t){
   const rows=[];let q=false,cell='',row=[];
   for(let i=0;i<t.length;i++){const c=t[i];
@@ -245,6 +246,8 @@ function parseCSV(t){
     else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>x))rows.push(row);row=[];}
     else cell+=c;
   }
+  const cutoff = Date.now() - 30000;
+  rows= rows.filter(r => new Date(r[colIndex]).getTime() >= cutoff);
   if(row.length||cell){row.push(cell);if(row.some(x=>x))rows.push(row);}
   return rows;
 }
@@ -276,41 +279,24 @@ function processSheet(csv){
   });
 
   // FILTER: Keep only rows from the last 30 seconds
-const now = Date.now();
-const recentRows = [];
-
-console.log("Current time:", new Date(now).toLocaleString(), "(" + now + ")");
-
-for(let i = 1; i < allRows.length; i++){
-  const row = allRows[i];
-  if(!row || row.length < 2) continue;
+  const now=Date.now();
+  const recentRows=[];
   
-  const tsRaw = (row[0] || '').trim();
-  if(!tsRaw) {
-    console.log("Row", i, "- Empty timestamp, skipping");
-    continue;
+  for(let i=1;i<allRows.length;i++){
+    const row=allRows[i];
+    if(!row||row.length<2)continue;
+    
+    const tsRaw=(row[0]||'').trim();
+    const ts=parseDate(tsRaw);
+    const age=now-ts;
+	
+	console.log("tsRaw: "+tsRaw +"ts: "+ ts + "age: "+age);
+    
+    // Only keep rows within 30 second window
+    if(age<=TIME_WINDOW){
+      recentRows.push(row);
+    }
   }
-  
-  const ts = parseDate(tsRaw);
-  
-  if(!ts || ts === 0) {
-    console.log("Row", i, "- Failed to parse timestamp:", tsRaw);
-    continue;
-  }
-  
-  const age = now - ts;
-  const ageSeconds = Math.floor(age / 1000);
-  
-  console.log("Row", i, "- Timestamp:", tsRaw, "→", new Date(ts).toLocaleString(), 
-              "| Age:", ageSeconds + "s", "| Keep:", age <= TIME_WINDOW);
-  
-  // Only keep rows within 30 second window
-  if(age <= TIME_WINDOW && age >= 0){  // Also check age is not negative (future timestamps)
-    recentRows.push(row);
-  }
-}
-
-console.log("Total rows:", allRows.length - 1, "| Recent rows (≤30s):", recentRows.length);
   console.log(recentRows);
   // Now process only the filtered recent rows
   const fresh={};
