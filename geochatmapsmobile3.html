@@ -181,7 +181,7 @@ function initMap(){
   map=L.map('map',{zoomControl:true,attributionControl:false}).setView([myLat,myLng],19);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:21}).addTo(map);
   radiusCircle=L.circle([myLat,myLng],{radius:RADIUS_M,color:'#4f8ef7',fillColor:'#4f8ef720',fillOpacity:.25,weight:1.5,dashArray:'6,4'}).addTo(map);
-  myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup('<b>You (${myUsername})</b>');
+  myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup('<b>You ('${myUsername})'</b>');
   
   // Resize map on panel toggle
   setTimeout(()=>map.invalidateSize(),100);
@@ -204,10 +204,10 @@ function parseDDMMYYYY(dateStr) {
   const [datePart, timePart] = dateStr.replaceAll('"', '').split(" ");
   const [day, month, year] = datePart.split("/").map(Number);
   const [hour, minute, second] = timePart.split(":").map(Number);
-	console.log(new Date(year, month - 1, day, hour, minute, second).getTime());
+
   return new Date(year, month - 1, day, hour, minute, second).getTime();
 }
-'18/02/2026 09:49:33'
+
 function filterLast30Seconds(rows, colIndex = 0) {
   const cutoff = Date.now() - 30000;
 
