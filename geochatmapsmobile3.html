@@ -201,13 +201,13 @@ async function submitForm(u,m,lat,lng){
 async function registerPresence(){await submitForm(myUsername,'',myLat,myLng);registered=true;}
 
 function parseDDMMYYYY(dateStr) {
-  const [datePart, timePart] = dateStr.split(" ");
+  const [datePart, timePart] = dateStr.replaceAll('"', '').split(" ");
   const [day, month, year] = datePart.split("/").map(Number);
   const [hour, minute, second] = timePart.split(":").map(Number);
 	console.log(new Date(year, month - 1, day, hour, minute, second).getTime());
   return new Date(year, month - 1, day, hour, minute, second).getTime();
 }
-
+'18/02/2026 09:49:33'
 function filterLast30Seconds(rows, colIndex = 0) {
   const cutoff = Date.now() - 30000;
 
