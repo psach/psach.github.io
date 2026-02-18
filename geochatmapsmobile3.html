@@ -273,7 +273,7 @@ function processSheet(csv){
     if(msg && user!==myUsername && dist<=RADIUS_M){
      const key=`${row[0]}|${user}|${msg}`;
       if(!seenKeys.has(key)){seenKeys.add(key);showMsg(user,msg,ts,false);}
-	  if(msg==="horn")playNotificationSound();
+	  if(msg==="horn"){playNotificationSound();row[cM]="hornok";}
     }
     
     // Use case 2: nearby users (30s window only)
@@ -295,7 +295,7 @@ function updateNearby(fresh){
     if(!nearbyUsers[u]){
       const mk=L.marker([info.lat,info.lng],{icon:makeIcon(u)}).addTo(map)
         //.bindPopup(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
-      .bindPopup(`<a href="#" onclick="sendHorn('${u}');return false" style="color:#4f8ef7">💬 Send Horn</a><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
+      .bindPopup(`<b>${esc(u)}</b><a href="#" onclick="sendHorn('${u}');return false" style="color:#4f8ef7">💬 Send Horn</a><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
 	  nearbyUsers[u]={...info,marker:mk};
     }else{
       nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
