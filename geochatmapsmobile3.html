@@ -95,6 +95,14 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </head>
 <body>
 
+<!-- Audio element for notification sound -->
+<audio id="notificationSound" preload="auto">
+  <!-- Replace with your horn.wav file path -->
+  <source src="horn.wav" type="audio/wav">
+  <!-- Fallback to a notification beep sound from freesound.org -->
+  <source src="https://cdn.freesound.org/previews/320/320655_5260872-lq.mp3" type="audio/mpeg">
+</audio>
+
 <div id="loginOverlay">
   <div class="login-card">
     <div style="font-size:2.5rem;margin-bottom:12px">📡</div>
@@ -148,7 +156,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
 const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
 const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
-const RADIUS_M=20, MSG_WINDOW=60000, POLL_MS=8000, USER_WINDOW=60000; // 30 seconds for new users
+const RADIUS_M=20, MSG_WINDOW=60000, POLL_MS=3000, USER_WINDOW=60000; // 30 seconds for new users
 
 let myUsername='',myLat=null,myLng=null,map,myMarker,radiusCircle;
 let nearbyUsers={},seenKeys=new Set(),composeTarget=null,registered=false,msgPanelOpen=false;
@@ -301,6 +309,41 @@ function updateNearby(fresh){
   badge.style.display=count>0?'block':'none';
 }
 
+// Load and prepare audio on page load
+window.addEventListener('DOMContentLoaded', ()=>{
+  notificationAudio=document.getElementById('notificationSound');
+  if(notificationAudio){
+    notificationAudio.volume=0.7; // Set volume (0.0 to 1.0)
+    // Preload the audio
+    notificationAudio.load();
+  }
+});
+
+// Play notification sound for 2 seconds
+function playNotificationSound(){
+  if(!notificationAudio)return;
+  try{
+    // Reset to start and play
+    notificationAudio.currentTime=0;
+    const playPromise=notificationAudio.play();
+    
+    if(playPromise!==undefined){
+      playPromise.then(()=>{
+        // Stop after 2 seconds
+        setTimeout(()=>{
+          notificationAudio.pause();
+          notificationAudio.currentTime=0;
+        },SOUND_DURATION);
+      }).catch(err=>{
+        console.warn('Audio play failed:',err);
+      });
+    }
+  }catch(e){
+    console.warn('Audio error:',e);
+  }
+}
+
+
 // Messages panel
 function toggleMsgPanel(){
   const panel=document.getElementById('msgPanel');
@@ -323,6 +366,7 @@ function showMsg(from,text,ts,mine){
   document.getElementById('msgCount').textContent=count;
   
   if(!mine){
+    playNotificationSound();
     toast(`💬 ${from}: ${text.substring(0,40)}`);
     // Auto-expand panel for new messages
     if(!msgPanelOpen){
