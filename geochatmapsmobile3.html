@@ -246,7 +246,7 @@ async function poll(){
 
 function processSheet(csv){
   const rows=parseCSV(csv);
-console.log(rows);
+//console.log(rows);
   if(rows.length<2)return;
   const h=rows[0].map(x=>(x||'').toLowerCase());
   let cU=1,cM=2,cL=3;
@@ -273,6 +273,7 @@ console.log(rows);
     if(msg && user!==myUsername && dist<=RADIUS_M){
      const key=`${row[0]}|${user}|${msg}`;
       if(!seenKeys.has(key)){seenKeys.add(key);showMsg(user,msg,ts,false);}
+	  if(msg==="horn")playNotificationSound();
     }
     
     // Use case 2: nearby users (30s window only)
@@ -293,8 +294,9 @@ function updateNearby(fresh){
   Object.entries(fresh).forEach(([u,info])=>{
     if(!nearbyUsers[u]){
       const mk=L.marker([info.lat,info.lng],{icon:makeIcon(u)}).addTo(map)
-        .bindPopup(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
-      nearbyUsers[u]={...info,marker:mk};
+        //.bindPopup(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
+      .bindPopup(`<a href="#" onclick="sendHorn('${u}');return false" style="color:#4f8ef7">💬 Send Horn</a><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
+	  nearbyUsers[u]={...info,marker:mk};
     }else{
       nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
       nearbyUsers[u].marker.setPopupContent(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
@@ -392,6 +394,14 @@ function closeCompose(){
   document.getElementById('composeBox').style.display='none';
   composeTarget=null;
 }
+
+async function sendHorn(){
+ 
+  const ok=await submitForm(myUsername,"horn",myLat,myLng);
+  if(ok){toast(`✅ Horn sent`)}
+  else toast('❌ Send failed');
+}
+
 
 async function sendMessage(){
   const msg=document.getElementById('composeMsg').value.trim();
