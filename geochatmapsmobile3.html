@@ -241,7 +241,7 @@ function processSheet(csv){
 console.log(rows);
   if(rows.length<2)return;
   const h=rows[0].map(x=>(x||'').toLowerCase());
-  let cU=1,cM=2,cL=3;
+  let cU=1,cM=2,cL=4;
   h.forEach((x,i)=>{
     if(x.includes('47638508')||x.includes('username'))cU=i;
     if(x.includes('1476899599')||x.includes('message'))cM=i;
