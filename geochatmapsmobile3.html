@@ -161,7 +161,7 @@ function startGPS(){
 function setGPS(t){document.getElementById('gpsStatus').textContent=t;}
 function onGPS(p){
   myLat=p.coords.latitude; myLng=p.coords.longitude;
-  setGPS('📍 GPS ready — ±${Math.round(p.coords.accuracy)}m');
+  setGPS(`📍 GPS ready — ±${Math.round(p.coords.accuracy)}m`);
   const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join NearbyChat';
   if(map){myMarker.setLatLng([myLat,myLng]);radiusCircle.setLatLng([myLat,myLng]);}
   if(registered) registerPresence();
@@ -260,7 +260,7 @@ console.log(rows);
 
     // Use case 4: incoming messages (30s window)
     if(msg && user!==myUsername && dist<=RADIUS_M){
-      const key='${row[0]}|${user}|${msg}';
+     const key=`${row[0]}|${user}|${msg}`;
       if(!seenKeys.has(key)){seenKeys.add(key);showMsg(user,msg,ts,false);}
     }
     
@@ -286,7 +286,7 @@ function updateNearby(fresh){
       nearbyUsers[u]={...info,marker:mk};
     }else{
       nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
-      nearbyUsers[u].marker.setPopupContent('<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose(${u});return false" style="color:#4f8ef7">💬 Send message</a>');
+    nearbyUsers[u].marker.setPopupContent(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
       Object.assign(nearbyUsers[u],info);
     }
   });
@@ -312,7 +312,7 @@ function showMsg(from,text,ts,mine){
   const ph=list.querySelector('div[style]');if(ph)ph.remove();
   const time=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
   const d=document.createElement('div');d.className='msg-bubble'+(mine?' mine':'');
-  d.innerHTML='<div class="msg-from">${esc(from)}</div><div class="msg-text">${esc(text)}</div><div class="msg-time">${time}</div>';
+  d.innerHTML=`<div class="msg-from">${esc(from)}</div><div class="msg-text">${esc(text)}</div><div class="msg-time">${time}</div>`;
   list.appendChild(d);list.scrollTop=list.scrollHeight;
   
   // Update message count
@@ -320,7 +320,7 @@ function showMsg(from,text,ts,mine){
   document.getElementById('msgCount').textContent=count;
   
   if(!mine){
-    toast('💬 ${from}: ${text.substring(0,40)}');
+    toast(`💬 ${from}: ${text.substring(0,40)}`);
     // Auto-expand panel for new messages
     if(!msgPanelOpen){
       setTimeout(()=>{
@@ -351,7 +351,7 @@ async function sendMessage(){
   if(!msg){toast('⚠️ Empty message');return;}
   const btn=document.getElementById('sendBtn');btn.disabled=true;btn.textContent='Sending…';
   const ok=await submitForm(myUsername,msg,myLat,myLng);
-  if(ok){showMsg('You → ${composeTarget}',msg,Date.now(),true);toast('✅ Message sent');closeCompose();}
+  if(ok){showMsg(`You → ${composeTarget}`,msg,Date.now(),true);toast(`✅ Message sent`);closeCompose();}
   else toast('❌ Send failed');
   btn.disabled=false;btn.textContent='Send ✉️';
 }
@@ -366,7 +366,7 @@ function setStat(s){
 function startBar(){
   const b=document.getElementById('pollProgress');
   b.style.transition='none';b.style.width='0%';
-  requestAnimationFrame(()=>{b.style.transition='width ${POLL_MS/1000}s linear';b.style.width='100%';});
+  requestAnimationFrame(()=>{b.style.transition=`width ${POLL_MS/1000}s linear`;b.style.width='100%';});
 }
 
 // Join
@@ -379,7 +379,7 @@ document.getElementById('joinBtn').addEventListener('click', async()=>{
   await registerPresence();
   document.getElementById('loginOverlay').style.display='none';
   const b=document.getElementById('userBadge');b.textContent=u;b.style.display='block';
-  initMap();setStat('online');toast('🎉 Joined as ${u}');
+  initMap();setStat('online');toast(`🎉 Joined as ${u}`);
   poll();setInterval(poll,POLL_MS);
   setInterval(registerPresence,45000);
 });
