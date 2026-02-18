@@ -246,6 +246,7 @@ function parseCSV(t){
     else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>x))rows.push(row);row=[];}
     else cell+=c;
   }
+	 console.log(rows);
   const cutoff = Date.now() - 30000;
  
   if(row.length||cell){row.push(cell);if(row.some(x=>x))rows.push(row);}
