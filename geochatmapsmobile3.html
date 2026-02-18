@@ -90,6 +90,254 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
   #msgPanel{max-height:35vh}
 }
 </style>
+
+<script>
+const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
+const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
+const RADIUS_M=20, MSG_WINDOW=30000, POLL_MS=8000, USER_WINDOW=30000; // 30 seconds for new users
+
+let myUsername='',myLat=null,myLng=null,map,myMarker,radiusCircle;
+let nearbyUsers={},seenKeys=new Set(),composeTarget=null,registered=false,msgPanelOpen=false;
+
+// GPS
+function startGPS(){
+  if(!navigator.geolocation){setGPS('❌ Not supported');return;}
+  navigator.geolocation.watchPosition(onGPS,e=>setGPS('❌ '+e.message),{enableHighAccuracy:true,maximumAge:5000});
+}
+function setGPS(t){document.getElementById('gpsStatus').textContent=t;}
+function onGPS(p){
+  myLat=p.coords.latitude; myLng=p.coords.longitude;
+  setGPS('📍 GPS ready — ±${Math.round(p.coords.accuracy)}m');
+  const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join NearbyChat';
+  if(map){myMarker.setLatLng([myLat,myLng]);radiusCircle.setLatLng([myLat,myLng]);}
+  if(registered) registerPresence();
+}
+
+// Utils
+function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function fmtLoc(lat,lng){return '${lng.toFixed(7)}, ${lat.toFixed(7)}';}
+function parseLoc(s){if(!s)return null;const p=s.split(',').map(x=>x.trim());const lng=parseFloat(p[0]),lat=parseFloat(p[1]);return(isNaN(lat)||isNaN(lng))?null:{lat,lng};}
+function parseDate(s){if(!s)return 0;const m=s.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):(\d+)/);if(m)return new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]).getTime();return new Date(s).getTime()||0;}
+function ini(n){return(n||'?')[0].toUpperCase();}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,ms=3500){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),ms);}
+
+// Map
+function initMap(){
+  map=L.map('map',{zoomControl:true,attributionControl:false}).setView([myLat,myLng],19);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:21}).addTo(map);
+  radiusCircle=L.circle([myLat,myLng],{radius:RADIUS_M,color:'#4f8ef7',fillColor:'#4f8ef720',fillOpacity:.25,weight:1.5,dashArray:'6,4'}).addTo(map);
+  myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup('<b>You (${myUsername})</b>');
+  
+  // Resize map on panel toggle
+  setTimeout(()=>map.invalidateSize(),100);
+}
+
+function makeIcon(n,me=false){
+  const g=me?'#22c55e,#16a34a':'#4f8ef7,#7c5bf7';
+  return L.divIcon({className:'',html:'<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,${g});border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px #0008"><span style="transform:rotate(45deg);font-weight:700;font-size:12px;color:#fff">${ini(n)}</span></div>',iconSize:[32,32],iconAnchor:[16,32],popupAnchor:[0,-36]});
+}
+
+// Form submit
+async function submitForm(u,m,lat,lng){
+  const body=new URLSearchParams({[F.username]:u,[F.message]:m||'',[F.location]:fmtLoc(lat,lng)});
+  try{await fetch(FORM_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});return true;}
+  catch(e){return false;}
+}
+async function registerPresence(){await submitForm(myUsername,'',myLat,myLng);registered=true;}
+
+function parseDDMMYYYY(dateStr) {
+  const [datePart, timePart] = dateStr.split(" ");
+  const [day, month, year] = datePart.split("/").map(Number);
+  const [hour, minute, second] = timePart.split(":").map(Number);
+	console.log(new Date(year, month - 1, day, hour, minute, second).getTime());
+  return new Date(year, month - 1, day, hour, minute, second).getTime();
+}
+
+function filterLast30Seconds(rows, colIndex = 0) {
+  const cutoff = Date.now() - 30000;
+
+  return rows.filter(row => {
+    const ts = parseDDMMYYYY(row[colIndex]);
+    return ts >= cutoff;
+  });
+}
+
+
+function parseCSV(t) {
+  return filterLast30Seconds(t
+    .trim()
+    .split("\n")
+    .map(row => row.split(",")));
+}
+
+
+// Poll & process - changed to 30 second window for nearby users
+async function poll(){
+  startBar();
+  try{
+    const r=await fetch('${SHEET_CSV}&_=${Date.now()}');
+    if(!r.ok)throw 0;
+    processSheet(await r.text());
+    setStat('online');
+  }catch(e){setStat('err');}
+}
+
+function processSheet(csv){
+  const rows=parseCSV(csv);
+  if(rows.length<2)return;
+  const h=rows[0].map(x=>(x||'').toLowerCase());
+  let cU=1,cM=2,cL=3;
+  h.forEach((x,i)=>{
+    if(x.includes('47638508')||x.includes('username'))cU=i;
+    if(x.includes('1476899599')||x.includes('message'))cM=i;
+    if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
+  });
+
+  const now=Date.now(),fresh={};
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r];if(!row||row.length<2)continue;
+    const ts=parseDate((row[0]||'').trim());
+    const user=(row[cU]||'').trim();
+    const msg=(row[cM]||'').trim();
+    const loc=parseLoc((row[cL]||'').trim());
+    if(!user||!loc)continue;
+    const age=now-ts, dist=haversine(myLat,myLng,loc.lat,loc.lng);
+
+    // Use case 4: incoming messages (30s window)
+    if(msg && user!==myUsername && age<MSG_WINDOW+5000 && dist<=RADIUS_M){
+      const key='${row[0]}|${user}|${msg}';
+      if(!seenKeys.has(key)){seenKeys.add(key);showMsg(user,msg,ts,false);}
+    }
+    
+    // Use case 2: nearby users (30s window only)
+    if(age<USER_WINDOW && user!==myUsername && dist<=RADIUS_M){
+      if(!fresh[user]||ts>fresh[user].ts) fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist)};
+    }
+  }
+  updateNearby(fresh);
+}
+
+function updateNearby(fresh){
+  // Remove stale users
+  Object.keys(nearbyUsers).forEach(u=>{
+    if(!fresh[u]){if(nearbyUsers[u].marker)map.removeLayer(nearbyUsers[u].marker);delete nearbyUsers[u];}
+  });
+  
+  // Add/update users
+  Object.entries(fresh).forEach(([u,info])=>{
+    if(!nearbyUsers[u]){
+      const mk=L.marker([info.lat,info.lng],{icon:makeIcon(u)}).addTo(map)
+        .bindPopup('<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>');
+      nearbyUsers[u]={...info,marker:mk};
+    }else{
+      nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
+      nearbyUsers[u].marker.setPopupContent('<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>');
+      Object.assign(nearbyUsers[u],info);
+    }
+  });
+  
+  // Update nearby count
+  const count=Object.keys(nearbyUsers).length;
+  const badge=document.getElementById('nearbyCount');
+  badge.textContent=count;
+  badge.style.display=count>0?'block':'none';
+}
+
+// Messages panel
+function toggleMsgPanel(){
+  const panel=document.getElementById('msgPanel');
+  msgPanelOpen=!msgPanelOpen;
+  panel.classList.toggle('collapsed');
+  document.querySelector('.toggle-icon').classList.toggle('open');
+  setTimeout(()=>map&&map.invalidateSize(),320);
+}
+
+function showMsg(from,text,ts,mine){
+  const list=document.getElementById('msgList');
+  const ph=list.querySelector('div[style]');if(ph)ph.remove();
+  const time=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
+  const d=document.createElement('div');d.className='msg-bubble'+(mine?' mine':'');
+  d.innerHTML='<div class="msg-from">${esc(from)}</div><div class="msg-text">${esc(text)}</div><div class="msg-time">${time}</div>';
+  list.appendChild(d);list.scrollTop=list.scrollHeight;
+  
+  // Update message count
+  const count=list.querySelectorAll('.msg-bubble').length;
+  document.getElementById('msgCount').textContent=count;
+  
+  if(!mine){
+    toast('💬 ${from}: ${text.substring(0,40)}');
+    // Auto-expand panel for new messages
+    if(!msgPanelOpen){
+      setTimeout(()=>{
+        document.getElementById('msgPanel').classList.remove('collapsed');
+        document.querySelector('.toggle-icon').classList.add('open');
+        msgPanelOpen=true;
+      },500);
+    }
+  }
+}
+
+// Compose — Use case 3
+function openCompose(u){
+  composeTarget=u;
+  document.getElementById('composeTarget').textContent='To: '+u;
+  document.getElementById('composeMsg').value='';
+  document.getElementById('composeBox').style.display='block';
+  document.getElementById('composeMsg').focus();
+}
+
+function closeCompose(){
+  document.getElementById('composeBox').style.display='none';
+  composeTarget=null;
+}
+
+async function sendMessage(){
+  const msg=document.getElementById('composeMsg').value.trim();
+  if(!msg){toast('⚠️ Empty message');return;}
+  const btn=document.getElementById('sendBtn');btn.disabled=true;btn.textContent='Sending…';
+  const ok=await submitForm(myUsername,msg,myLat,myLng);
+  if(ok){showMsg('You → ${composeTarget}',msg,Date.now(),true);toast('✅ Message sent');closeCompose();}
+  else toast('❌ Send failed');
+  btn.disabled=false;btn.textContent='Send ✉️';
+}
+
+// Status & bar
+function setStat(s){
+  const d=document.getElementById('statusDot'),t=document.getElementById('statusText');
+  if(s==='online'){d.className='status-dot online';t.textContent='Live';}
+  else{d.className='status-dot';t.textContent='Reconnecting…';}
+}
+
+function startBar(){
+  const b=document.getElementById('pollProgress');
+  b.style.transition='none';b.style.width='0%';
+  requestAnimationFrame(()=>{b.style.transition='width ${POLL_MS/1000}s linear';b.style.width='100%';});
+}
+
+// Join
+document.getElementById('joinBtn').addEventListener('click',async()=>{
+  const u=document.getElementById('usernameInput').value.trim();
+  if(!u){toast('⚠️ Enter a username');return;}
+  if(!myLat){toast('⚠️ GPS not ready');return;}
+  myUsername=u;
+  const btn=document.getElementById('joinBtn');btn.disabled=true;btn.textContent='Joining…';
+  await registerPresence();
+  document.getElementById('loginOverlay').style.display='none';
+  const b=document.getElementById('userBadge');b.textContent=u;b.style.display='block';
+  initMap();setStat('online');toast('🎉 Joined as ${u}');
+  poll();setInterval(poll,POLL_MS);
+  setInterval(registerPresence,45000);
+});
+
+document.getElementById('usernameInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('joinBtn').click();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCompose();});
+
+startGPS();
+</script>
+
+
 </head>
 <body>
 
@@ -138,250 +386,6 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 </div>
 <div id="toast"></div>
 
-<script>
-const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
-const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
-const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
-const RADIUS_M=20, MSG_WINDOW=30000, POLL_MS=8000, USER_WINDOW=30000; // 30 seconds for new users
 
-let myUsername='',myLat=null,myLng=null,map,myMarker,radiusCircle;
-let nearbyUsers={},seenKeys=new Set(),composeTarget=null,registered=false,msgPanelOpen=false;
-
-// GPS
-function startGPS(){
-  if(!navigator.geolocation){setGPS('❌ Not supported');return;}
-  navigator.geolocation.watchPosition(onGPS,e=>setGPS('❌ '+e.message),{enableHighAccuracy:true,maximumAge:5000});
-}
-function setGPS(t){document.getElementById('gpsStatus').textContent=t;}
-function onGPS(p){
-  myLat=p.coords.latitude; myLng=p.coords.longitude;
-  setGPS(`📍 GPS ready — ±${Math.round(p.coords.accuracy)}m`);
-  const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join NearbyChat';
-  if(map){myMarker.setLatLng([myLat,myLng]);radiusCircle.setLatLng([myLat,myLng]);}
-  if(registered) registerPresence();
-}
-
-// Utils
-function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-function fmtLoc(lat,lng){return `${lng.toFixed(7)}, ${lat.toFixed(7)}`;}
-function parseLoc(s){if(!s)return null;const p=s.split(',').map(x=>x.trim());const lng=parseFloat(p[0]),lat=parseFloat(p[1]);return(isNaN(lat)||isNaN(lng))?null:{lat,lng};}
-function parseDate(s){if(!s)return 0;const m=s.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):(\d+)/);if(m)return new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]).getTime();return new Date(s).getTime()||0;}
-function ini(n){return(n||'?')[0].toUpperCase();}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function toast(msg,ms=3500){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),ms);}
-
-// Map
-function initMap(){
-  map=L.map('map',{zoomControl:true,attributionControl:false}).setView([myLat,myLng],19);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:21}).addTo(map);
-  radiusCircle=L.circle([myLat,myLng],{radius:RADIUS_M,color:'#4f8ef7',fillColor:'#4f8ef720',fillOpacity:.25,weight:1.5,dashArray:'6,4'}).addTo(map);
-  myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup(`<b>You (${myUsername})</b>`);
-  
-  // Resize map on panel toggle
-  setTimeout(()=>map.invalidateSize(),100);
-}
-
-function makeIcon(n,me=false){
-  const g=me?'#22c55e,#16a34a':'#4f8ef7,#7c5bf7';
-  return L.divIcon({className:'',html:`<div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,${g});border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px #0008"><span style="transform:rotate(45deg);font-weight:700;font-size:12px;color:#fff">${ini(n)}</span></div>`,iconSize:[32,32],iconAnchor:[16,32],popupAnchor:[0,-36]});
-}
-
-// Form submit
-async function submitForm(u,m,lat,lng){
-  const body=new URLSearchParams({[F.username]:u,[F.message]:m||'',[F.location]:fmtLoc(lat,lng)});
-  try{await fetch(FORM_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});return true;}
-  catch(e){return false;}
-}
-async function registerPresence(){await submitForm(myUsername,'',myLat,myLng);registered=true;}
-
-function parseDDMMYYYY(dateStr) {
-  const [datePart, timePart] = dateStr.split(" ");
-  const [day, month, year] = datePart.split("/").map(Number);
-  const [hour, minute, second] = timePart.split(":").map(Number);
-	console.log(new Date(year, month - 1, day, hour, minute, second).getTime());
-  return new Date(year, month - 1, day, hour, minute, second).getTime();
-}
-
-function filterLast30Seconds(rows, colIndex = 0) {
-  const cutoff = Date.now() - 30000;
-
-  return rows.filter(row => {
-    const ts = parseDDMMYYYY(row[colIndex]);
-    return ts >= cutoff;
-  });
-}
-
-
-function parseCSV(t) {
-  return filterLast30Seconds(t
-    .trim()
-    .split("\n")
-    .map(row => row.split(",")));
-}
-
-
-// Poll & process - changed to 30 second window for nearby users
-async function poll(){
-  startBar();
-  try{
-    const r=await fetch(`${SHEET_CSV}&_=${Date.now()}`);
-    if(!r.ok)throw 0;
-    processSheet(await r.text());
-    setStat('online');
-  }catch(e){setStat('err');}
-}
-
-function processSheet(csv){
-  const rows=parseCSV(csv);
-  if(rows.length<2)return;
-  const h=rows[0].map(x=>(x||'').toLowerCase());
-  let cU=1,cM=2,cL=3;
-  h.forEach((x,i)=>{
-    if(x.includes('47638508')||x.includes('username'))cU=i;
-    if(x.includes('1476899599')||x.includes('message'))cM=i;
-    if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
-  });
-
-  const now=Date.now(),fresh={};
-  for(let r=1;r<rows.length;r++){
-    const row=rows[r];if(!row||row.length<2)continue;
-    const ts=parseDate((row[0]||'').trim());
-    const user=(row[cU]||'').trim();
-    const msg=(row[cM]||'').trim();
-    const loc=parseLoc((row[cL]||'').trim());
-    if(!user||!loc)continue;
-    const age=now-ts, dist=haversine(myLat,myLng,loc.lat,loc.lng);
-
-    // Use case 4: incoming messages (30s window)
-    if(msg && user!==myUsername && age<MSG_WINDOW+5000 && dist<=RADIUS_M){
-      const key=`${row[0]}|${user}|${msg}`;
-      if(!seenKeys.has(key)){seenKeys.add(key);showMsg(user,msg,ts,false);}
-    }
-    
-    // Use case 2: nearby users (30s window only)
-    if(age<USER_WINDOW && user!==myUsername && dist<=RADIUS_M){
-      if(!fresh[user]||ts>fresh[user].ts) fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist)};
-    }
-  }
-  updateNearby(fresh);
-}
-
-function updateNearby(fresh){
-  // Remove stale users
-  Object.keys(nearbyUsers).forEach(u=>{
-    if(!fresh[u]){if(nearbyUsers[u].marker)map.removeLayer(nearbyUsers[u].marker);delete nearbyUsers[u];}
-  });
-  
-  // Add/update users
-  Object.entries(fresh).forEach(([u,info])=>{
-    if(!nearbyUsers[u]){
-      const mk=L.marker([info.lat,info.lng],{icon:makeIcon(u)}).addTo(map)
-        .bindPopup(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
-      nearbyUsers[u]={...info,marker:mk};
-    }else{
-      nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
-      nearbyUsers[u].marker.setPopupContent(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose('${u}');return false" style="color:#4f8ef7">💬 Send message</a>`);
-      Object.assign(nearbyUsers[u],info);
-    }
-  });
-  
-  // Update nearby count
-  const count=Object.keys(nearbyUsers).length;
-  const badge=document.getElementById('nearbyCount');
-  badge.textContent=count;
-  badge.style.display=count>0?'block':'none';
-}
-
-// Messages panel
-function toggleMsgPanel(){
-  const panel=document.getElementById('msgPanel');
-  msgPanelOpen=!msgPanelOpen;
-  panel.classList.toggle('collapsed');
-  document.querySelector('.toggle-icon').classList.toggle('open');
-  setTimeout(()=>map&&map.invalidateSize(),320);
-}
-
-function showMsg(from,text,ts,mine){
-  const list=document.getElementById('msgList');
-  const ph=list.querySelector('div[style]');if(ph)ph.remove();
-  const time=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
-  const d=document.createElement('div');d.className='msg-bubble'+(mine?' mine':'');
-  d.innerHTML=`<div class="msg-from">${esc(from)}</div><div class="msg-text">${esc(text)}</div><div class="msg-time">${time}</div>`;
-  list.appendChild(d);list.scrollTop=list.scrollHeight;
-  
-  // Update message count
-  const count=list.querySelectorAll('.msg-bubble').length;
-  document.getElementById('msgCount').textContent=count;
-  
-  if(!mine){
-    toast(`💬 ${from}: ${text.substring(0,40)}`);
-    // Auto-expand panel for new messages
-    if(!msgPanelOpen){
-      setTimeout(()=>{
-        document.getElementById('msgPanel').classList.remove('collapsed');
-        document.querySelector('.toggle-icon').classList.add('open');
-        msgPanelOpen=true;
-      },500);
-    }
-  }
-}
-
-// Compose — Use case 3
-function openCompose(u){
-  composeTarget=u;
-  document.getElementById('composeTarget').textContent='To: '+u;
-  document.getElementById('composeMsg').value='';
-  document.getElementById('composeBox').style.display='block';
-  document.getElementById('composeMsg').focus();
-}
-
-function closeCompose(){
-  document.getElementById('composeBox').style.display='none';
-  composeTarget=null;
-}
-
-async function sendMessage(){
-  const msg=document.getElementById('composeMsg').value.trim();
-  if(!msg){toast('⚠️ Empty message');return;}
-  const btn=document.getElementById('sendBtn');btn.disabled=true;btn.textContent='Sending…';
-  const ok=await submitForm(myUsername,msg,myLat,myLng);
-  if(ok){showMsg(`You → ${composeTarget}`,msg,Date.now(),true);toast(`✅ Message sent`);closeCompose();}
-  else toast('❌ Send failed');
-  btn.disabled=false;btn.textContent='Send ✉️';
-}
-
-// Status & bar
-function setStat(s){
-  const d=document.getElementById('statusDot'),t=document.getElementById('statusText');
-  if(s==='online'){d.className='status-dot online';t.textContent='Live';}
-  else{d.className='status-dot';t.textContent='Reconnecting…';}
-}
-
-function startBar(){
-  const b=document.getElementById('pollProgress');
-  b.style.transition='none';b.style.width='0%';
-  requestAnimationFrame(()=>{b.style.transition=`width ${POLL_MS/1000}s linear`;b.style.width='100%';});
-}
-
-// Join
-document.getElementById('joinBtn').addEventListener('click',async()=>{
-  const u=document.getElementById('usernameInput').value.trim();
-  if(!u){toast('⚠️ Enter a username');return;}
-  if(!myLat){toast('⚠️ GPS not ready');return;}
-  myUsername=u;
-  const btn=document.getElementById('joinBtn');btn.disabled=true;btn.textContent='Joining…';
-  await registerPresence();
-  document.getElementById('loginOverlay').style.display='none';
-  const b=document.getElementById('userBadge');b.textContent=u;b.style.display='block';
-  initMap();setStat('online');toast(`🎉 Joined as ${u}`);
-  poll();setInterval(poll,POLL_MS);
-  setInterval(registerPresence,45000);
-});
-
-document.getElementById('usernameInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('joinBtn').click();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCompose();});
-
-startGPS();
-</script>
 </body>
 </html>
