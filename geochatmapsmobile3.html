@@ -241,7 +241,7 @@ function processSheet(csv){
 console.log(rows);
   if(rows.length<2)return;
   const h=rows[0].map(x=>(x||'').toLowerCase());
-  let cU=1,cM=2,cL=4;
+  let cU=1,cM=2,cL=3;
   h.forEach((x,i)=>{
     if(x.includes('47638508')||x.includes('username'))cU=i;
     if(x.includes('1476899599')||x.includes('message'))cM=i;
@@ -254,7 +254,7 @@ console.log(rows);
     const ts=parseDate((row[0]||'').trim());
     const user=(row[cU]||'').trim();
     const msg=(row[cM]||'').trim();
-    const loc=parseLoc((row[cL]||'').trim());
+    const loc=parseLoc((row[cL]||'').trim().replaceAll('"',''));
     if(!user||!loc)continue;
     const age=now-ts, dist=haversine(myLat,myLng,loc.lat,loc.lng);
 
