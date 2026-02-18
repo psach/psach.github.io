@@ -169,8 +169,8 @@ function onGPS(p){
 
 // Utils
 function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-function fmtLoc(lat,lng){return `${lng.toFixed(7)}, ${lat.toFixed(7)}`;}
-function parseLoc(s){if(!s)return null;const p=s.split(',').map(x=>x.trim());const lng=parseFloat(p[0]),lat=parseFloat(p[1]);return(isNaN(lat)||isNaN(lng))?null:{lat,lng};}
+function fmtLoc(lat,lng){return `${lng.toFixed(7)}| ${lat.toFixed(7)}`;}
+function parseLoc(s){if(!s)return null;const p=s.split('|').map(x=>x.trim());const lng=parseFloat(p[0]),lat=parseFloat(p[1]);return(isNaN(lat)||isNaN(lng))?null:{lat,lng};}
 function parseDate(s){if(!s)return 0;const m=s.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):(\d+)/);if(m)return new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]).getTime();return new Date(s).getTime()||0;}
 function ini(n){return(n||'?')[0].toUpperCase();}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
