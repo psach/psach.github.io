@@ -209,7 +209,7 @@ function parseDDMMYYYY(dateStr) {
 }
 
 function filterLast30Seconds(rows, colIndex = 0) {
-  const cutoff = Date.now() - 30000;
+  const cutoff = Date.now() - USER_WINDOW;
 
   return rows.filter(row => {
     const ts = parseDDMMYYYY(row[colIndex]);
