@@ -247,9 +247,9 @@ function parseCSV(t){
     else cell+=c;
   }
   const cutoff = Date.now() - 30000;
-  rows= rows.filter(r => new Date(r[0]).getTime() >= cutoff);
+ 
   if(row.length||cell){row.push(cell);if(row.some(x=>x))rows.push(row);}
-  return rows;
+  return rows.filter(r => new Date(r[0]).getTime() >= cutoff);;
 }
 
 // Poll & process - FILTER CSV ROWS AT LOAD TIME (within 30 seconds)
