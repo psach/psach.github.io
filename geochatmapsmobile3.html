@@ -219,10 +219,11 @@ function filterLast30Seconds(rows, colIndex = 0) {
 
 
 function parseCSV(t) {
-  return filterLast30Seconds(t
-    .trim()
-    .split("\n")
-    .map(row => row.split(",")));
+   t.trim()
+    .split("\n").slice(1)
+    .map(row => row.split(","));
+	
+	return filterLast30Seconds(t);
 }
 
 
