@@ -286,6 +286,8 @@ function processSheet(csv){
     const tsRaw=(row[0]||'').trim();
     const ts=parseDate(tsRaw);
     const age=now-ts;
+	
+	console.log("tsRaw: "+tsRaw +"ts: "+ ts + "age: "+age);
     
     // Only keep rows within 30 second window
     if(age<=TIME_WINDOW){
