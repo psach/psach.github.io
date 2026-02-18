@@ -230,7 +230,7 @@ function parseCSV(t) {
 async function poll(){
   startBar();
   try{
-    const r=await fetch(${SHEET_CSV}&_=${Date.now()});
+    const r=await fetch(${SHEET_CSV});
     if(!r.ok)throw 0;
     processSheet(await r.text());
     setStat('online');
