@@ -181,7 +181,7 @@ function initMap(){
   map=L.map('map',{zoomControl:true,attributionControl:false}).setView([myLat,myLng],19);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:21}).addTo(map);
   radiusCircle=L.circle([myLat,myLng],{radius:RADIUS_M,color:'#4f8ef7',fillColor:'#4f8ef720',fillOpacity:.25,weight:1.5,dashArray:'6,4'}).addTo(map);
-  myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup('<b>You ('${myUsername})'</b>');
+  myMarker=L.marker([myLat,myLng],{icon:makeIcon(myUsername,true),zIndexOffset:1000}).addTo(map).bindPopup(`<b>You (${myUsername})</b>`);
   
   // Resize map on panel toggle
   setTimeout(()=>map.invalidateSize(),100);
@@ -281,7 +281,7 @@ function updateNearby(fresh){
   Object.entries(fresh).forEach(([u,info])=>{
     if(!nearbyUsers[u]){
       const mk=L.marker([info.lat,info.lng],{icon:makeIcon(u)}).addTo(map)
-        .bindPopup('<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose(${u});return false" style="color:#4f8ef7">💬 Send message</a>');
+        .bindPopup(`<b>${esc(u)}</b><br>${info.dist}m away<br><a href="#" onclick="openCompose(${u});return false" style="color:#4f8ef7">💬 Send message</a>`);
       nearbyUsers[u]={...info,marker:mk};
     }else{
       nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
