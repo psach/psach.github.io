@@ -259,13 +259,13 @@ console.log(rows);
     const age=now-ts, dist=haversine(myLat,myLng,loc.lat,loc.lng);
 
     // Use case 4: incoming messages (30s window)
-    if(msg && user!==myUsername && age<MSG_WINDOW+5000 && dist<=RADIUS_M){
+    if(msg && user!==myUsername && dist<=RADIUS_M){
       const key='${row[0]}|${user}|${msg}';
       if(!seenKeys.has(key)){seenKeys.add(key);showMsg(user,msg,ts,false);}
     }
     
     // Use case 2: nearby users (30s window only)
-    if(age<USER_WINDOW && user!==myUsername && dist<=RADIUS_M){
+    if(user!==myUsername && dist<=RADIUS_M){
       if(!fresh[user]||ts>fresh[user].ts) fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist)};
     }
   }
