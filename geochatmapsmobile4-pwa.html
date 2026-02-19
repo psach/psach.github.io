@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NearbyChat">
+<meta name="description" content="Connect & honk with people within 50 metres of you">
+<!-- Apple touch icon (inline SVG → data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f1117'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle'%3E📡%3C/text%3E%3C/svg%3E">
+<title>NearbyChat — Proximity Messenger</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--card:#21253a;--border:#2e3350;--accent:#4f8ef7;--accent2:#7c5bf7;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--text:#e8eaf0;--muted:#6b7280;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Header */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:1000}
+.logo{font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.status-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
+.status-dot.online{background:var(--green);box-shadow:0 0 6px var(--green)}
+#statusText{font-size:.8rem;color:var(--muted);flex:1}
+#userBadge{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.8rem;color:var(--accent);font-weight:600}
+#nearbyCount{background:var(--accent);color:#fff;border-radius:12px;padding:3px 10px;font-size:.75rem;font-weight:700;margin-left:auto}
+
+/* Login */
+#loginOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;overflow-y:auto;padding:16px 0}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px 28px;width:min(380px,92vw);text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.login-card h2{font-size:1.5rem;margin-bottom:6px}
+.login-card p{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+.input-group input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;color:var(--text);font-size:1rem;outline:none;transition:border .2s;margin-bottom:16px}
+.input-group input:focus{border-color:var(--accent)}
+.btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);padding:13px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+#gpsStatus{font-size:.78rem;color:var(--muted);margin-top:10px}
+
+/* Vehicle selector */
+.vehicle-label{font-size:.8rem;color:var(--muted);text-align:left;margin-bottom:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.vehicle-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.vehicle-option{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:8px 4px;cursor:pointer;transition:all .2s;text-align:center;user-select:none}
+.vehicle-option:hover{border-color:var(--accent);background:rgba(79,142,247,.1)}
+.vehicle-option.selected{border-color:var(--accent);background:rgba(79,142,247,.18);box-shadow:0 0 12px rgba(79,142,247,.3)}
+.vehicle-option .v-emoji{font-size:1.6rem;display:block;line-height:1.2}
+.vehicle-option .v-name{font-size:.58rem;color:var(--muted);margin-top:3px;line-height:1.2}
+.vehicle-option.selected .v-name{color:var(--accent)}
+
+/* Map container */
+#mapContainer{flex:1;position:relative;overflow:hidden}
+#map{width:100%;height:100%}
+
+/* Horn button */
+#hornBtn{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:800;background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:10px 14px;cursor:pointer;text-align:center;font-size:1.6rem;line-height:1;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,.4);display:none}
+#hornBtn:hover:not(:disabled){border-color:var(--yellow);background:rgba(245,158,11,.1);transform:translateY(-50%) scale(1.05)}
+#hornBtn:disabled{opacity:.4;cursor:not-allowed}
+#hornBtn .horn-count{font-size:.6rem;color:var(--yellow);font-weight:700;display:block;margin-top:2px}
+#hornBtn.honked{animation:honkPulse .4s ease}
+
+/* Horn incoming flash */
+.horn-flash{position:fixed;inset:0;background:rgba(245,158,11,.12);pointer-events:none;z-index:8999;opacity:0;transition:opacity .1s}
+.horn-flash.active{opacity:1}
+
+@keyframes honkPulse{0%{transform:translateY(-50%) scale(1)}30%{transform:translateY(-50%) scale(1.25) rotate(-8deg)}60%{transform:translateY(-50%) scale(1.1) rotate(5deg)}100%{transform:translateY(-50%) scale(1)}}
+
+/* Message panel */
+#msgPanel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:900;transition:transform .3s;max-height:40vh;display:flex;flex-direction:column}
+#msgPanel.collapsed{transform:translateY(calc(100% - 44px))}
+.panel-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.msg-badge{background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;font-size:.7rem;font-weight:700}
+#msgList{flex:1;overflow-y:auto;padding:8px;min-height:120px}
+.msg-bubble{background:var(--card);border-radius:10px;padding:8px 12px;margin-bottom:6px;border-left:3px solid var(--accent);animation:fadeIn .3s ease}
+.msg-bubble.mine{border-left-color:var(--green)}
+.msg-bubble.horn-msg{border-left-color:var(--yellow);background:rgba(245,158,11,.07)}
+.msg-from{font-size:.7rem;color:var(--accent);font-weight:700;margin-bottom:2px}
+.msg-bubble.mine .msg-from{color:var(--green)}
+.msg-bubble.horn-msg .msg-from{color:var(--yellow)}
+.msg-text{font-size:.82rem;word-wrap:break-word}
+.msg-time{font-size:.65rem;color:var(--muted);margin-top:2px}
+.toggle-icon{transition:transform .3s}
+.toggle-icon.open{transform:rotate(180deg)}
+
+/* Compose */
+#composeBox{display:none;position:fixed;bottom:80px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:min(340px,calc(100vw - 32px));z-index:5000;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+#composeBox h3{font-size:.95rem;margin-bottom:12px}
+.target{font-size:.8rem;color:var(--accent);margin-bottom:10px;font-weight:600}
+#composeBox textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:.85rem;resize:none;height:80px;outline:none}
+#composeBox textarea:focus{border-color:var(--accent)}
+.compose-actions{display:flex;gap:8px;margin-top:10px}
+.btn-send{flex:1;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;padding:9px;color:#fff;font-weight:600;cursor:pointer;font-size:.85rem}
+.btn-cancel{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;color:var(--text);cursor:pointer;font-size:.85rem;border:none}
+
+/* Toast */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);border-radius:30px;padding:9px 20px;font-size:.82rem;opacity:0;transition:all .3s;pointer-events:none;z-index:9000;white-space:nowrap;max-width:calc(100vw - 32px)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.horn-toast{border-color:var(--yellow);color:var(--yellow)}
+
+/* Poll bar */
+#pollBar{height:2px;background:var(--border);flex-shrink:0;overflow:hidden}
+#pollProgress{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width linear}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* Google Maps-style popup */
+.leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 4px 20px rgba(0,0,0,.22)!important;border:none!important;padding:0!important}
+.leaflet-popup-content{margin:14px 16px!important}
+.leaflet-popup-tip{background:#fff!important}
+.leaflet-popup-close-button{color:#5f6368!important;font-size:16px!important;top:8px!important;right:10px!important}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+@media (max-width:640px){
+  header{padding:8px 12px}
+  .logo{font-size:1rem}
+  #statusText{display:none}
+  #userBadge{font-size:.7rem;padding:3px 8px}
+  #nearbyCount{font-size:.7rem;padding:2px 8px}
+  #composeBox{bottom:60px;right:12px;left:12px;width:auto}
+  #msgPanel{max-height:50vh}
+  #hornBtn{right:10px}
+  .vehicle-grid{grid-template-columns:repeat(4,1fr);gap:6px}
+}
+@media (max-height:600px){#msgPanel{max-height:35vh}}
+
+/* ── Install button ── */
+#installBtn{display:none;background:linear-gradient(135deg,var(--green),#16a34a);border:none;border-radius:20px;padding:5px 13px;color:#fff;font-size:.75rem;font-weight:700;cursor:pointer;gap:5px;align-items:center;white-space:nowrap;box-shadow:0 2px 10px rgba(34,197,94,.35);transition:opacity .2s,transform .2s}
+#installBtn:hover{opacity:.9;transform:scale(1.04)}
+#installBtn.visible{display:flex}
+
+/* ── iOS "Add to Home Screen" banner ── */
+#iosBanner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 18px;z-index:9998;flex-direction:column;gap:8px;box-shadow:0 -8px 32px rgba(0,0,0,.5)}
+#iosBanner.show{display:flex}
+.ios-banner-row{display:flex;align-items:center;gap:12px}
+.ios-banner-icon{font-size:2rem;flex-shrink:0}
+.ios-banner-text{flex:1;font-size:.82rem;line-height:1.5}
+.ios-banner-text strong{color:var(--text)}
+.ios-banner-text span{color:var(--muted)}
+.ios-banner-close{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:4px 10px;font-size:.78rem;cursor:pointer}
+.ios-step{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.ios-step b{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- Horn flash overlay -->
+<div class="horn-flash" id="hornFlash"></div>
+
+<!-- Audio for notifications/horn -->
+<audio id="notificationSound" preload="auto">
+  <source src="horn.wav" type="audio/wav">
+  <source src="https://cdn.freesound.org/previews/320/320655_5260872-lq.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Login -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div style="font-size:2.5rem;margin-bottom:12px">📡</div>
+    <h2>NearbyChat</h2>
+    <p>Connect with people within 50 metres of you</p>
+    <div class="input-group">
+      <input type="text" id="usernameInput" placeholder="Choose a username" maxlength="30" autocomplete="off"/>
+    </div>
+    <div class="vehicle-label">Your vehicle</div>
+    <div class="vehicle-grid" id="vehicleGrid">
+      <!-- populated by JS -->
+    </div>
+    <button class="btn" id="joinBtn" disabled>Acquiring GPS…</button>
+    <div id="gpsStatus">Waiting for location permission…</div>
+  </div>
+</div>
+
+<header>
+  <span class="logo">NearbyChat</span>
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Offline</span>
+  <span id="userBadge" style="display:none"></span>
+  <button id="installBtn" onclick="triggerInstall()" title="Install app">⬇ Install</button>
+  <span id="nearbyCount" style="display:none">0</span>
+</header>
+<div id="pollBar"><div id="pollProgress"></div></div>
+
+<div id="mapContainer"><div id="map"></div></div>
+
+<!-- Horn button -->
+<button id="hornBtn" onclick="sendHorn()" title="Honk to nearby users">
+  📯
+  <span class="horn-count" id="hornCountLabel">3 left</span>
+</button>
+
+<div id="msgPanel" class="collapsed">
+  <div class="panel-header" onclick="toggleMsgPanel()">
+    Messages <span class="msg-badge" id="msgCount">0</span>
+    <span class="toggle-icon">▼</span>
+  </div>
+  <div id="msgList"><div style="padding:12px;font-size:.78rem;color:var(--muted);text-align:center">No messages yet</div></div>
+</div>
+
+<div id="composeBox">
+  <h3>Send Message</h3>
+  <div class="target" id="composeTarget">To: —</div>
+  <textarea id="composeMsg" placeholder="Type your message…" maxlength="200"></textarea>
+  <div class="compose-actions">
+    <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
+    <button class="btn-send" id="sendBtn" onclick="sendMessage()">Send ✉️</button>
+  </div>
+</div>
+<div id="iosBanner">
+  <div class="ios-banner-row">
+    <span class="ios-banner-icon">📡</span>
+    <div class="ios-banner-text">
+      <strong>Install NearbyChat</strong><br>
+      <span>Add to Home Screen for the best experience</span>
+    </div>
+    <button class="ios-banner-close" onclick="dismissIosBanner()">✕</button>
+  </div>
+  <div class="ios-step">1️⃣ <b>Tap</b> the Share button <b>⎙</b> at the bottom of Safari</div>
+  <div class="ios-step">2️⃣ Scroll down and tap <b>"Add to Home Screen"</b></div>
+  <div class="ios-step">3️⃣ Tap <b>Add</b> — done! 🎉</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
+const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
+const RADIUS_M=50, MSG_WINDOW=60000, POLL_MS=3000, USER_WINDOW=60000;
+const HORN_SEND_LIMIT = 3;
+const HORN_RECV_LIMIT = 3;          // max horns received from same sender
+const HORN_MSG = '__HORN__';
+const HORN_1TO1_PREFIX = '__HORN1TO1__|'; // directed horn: "__HORN1TO1__|targetUsername"
+const SOUND_DURATION = 2000;
+
+// ─── INDIAN VEHICLES ───────────────────────────────────────────────────────
+const VEHICLES = [
+  { emoji:'🚗', name:'Car' },
+  { emoji:'🚙', name:'SUV/MUV' },
+  { emoji:'🏍️', name:'Bike' },
+  { emoji:'🛵', name:'Scooter' },
+  { emoji:'🛺', name:'Auto\nRickshaw' },
+  { emoji:'🚕', name:'Taxi/Cab' },
+  { emoji:'🚌', name:'Bus' },
+  { emoji:'🚐', name:'Tempo\nTraveller' },
+  { emoji:'🚚', name:'Mini\nTruck' },
+  { emoji:'🚛', name:'Lorry' },
+  { emoji:'🚲', name:'Cycle' },
+  { emoji:'🛻', name:'Pickup' },
+];
+
+let myVehicle = VEHICLES[0].emoji; // default: Car
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let myUsername='', myLat=null, myLng=null, map, myMarker, radiusCircle;
+let nearbyUsers={}, seenKeys=new Set(), composeTarget=null, registered=false, msgPanelOpen=false;
+let notificationAudio=null;
+let hornsSent = 0;
+let hornRecvCount = {};   // {username: count} — how many horns received from each sender
+
+// ─── BUILD VEHICLE GRID ────────────────────────────────────────────────────
+(function buildVehicleGrid(){
+  const grid = document.getElementById('vehicleGrid');
+  VEHICLES.forEach((v,i) => {
+    const div = document.createElement('div');
+    div.className = 'vehicle-option' + (i===0?' selected':'');
+    div.dataset.emoji = v.emoji;
+    div.innerHTML = `<span class="v-emoji">${v.emoji}</span><span class="v-name">${v.name.replace('\n','<br>')}</span>`;
+    div.addEventListener('click', ()=>{
+      document.querySelectorAll('.vehicle-option').forEach(el=>el.classList.remove('selected'));
+      div.classList.add('selected');
+      myVehicle = v.emoji;
+    });
+    grid.appendChild(div);
+  });
+})();
+
+// ─── GPS ────────────────────────────────────────────────────────────────────
+function startGPS(){
+  if(!navigator.geolocation){setGPS('❌ Not supported');return;}
+  navigator.geolocation.watchPosition(onGPS,e=>setGPS('❌ '+e.message),{enableHighAccuracy:true,maximumAge:5000});
+}
+function setGPS(t){document.getElementById('gpsStatus').textContent=t;}
+function onGPS(p){
+  myLat=p.coords.latitude; myLng=p.coords.longitude;
+  setGPS(`📍 GPS ready — ±${Math.round(p.coords.accuracy)}m`);
+  const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join NearbyChat';
+  if(map){myMarker.setLatLng([myLat,myLng]); radiusCircle.setLatLng([myLat,myLng]); enforceBounds();}
+  if(registered) registerPresence();
+}
+
+// ─── UTILS ──────────────────────────────────────────────────────────────────
+function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function fmtLoc(lat,lng){return `${lng.toFixed(7)}| ${lat.toFixed(7)}`;}
+function parseLoc(s){if(!s)return null;const p=s.split('|').map(x=>x.trim());const lng=parseFloat(p[0]),lat=parseFloat(p[1]);return(isNaN(lat)||isNaN(lng))?null:{lat,lng};}
+function parseDate(s){if(!s)return 0;const m=s.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):(\d+)/);if(m)return new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]).getTime();return new Date(s).getTime()||0;}
+function ini(n){return(n||'?')[0].toUpperCase();}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,ms=3500,cls=''){
+  const e=document.getElementById('toast');
+  e.textContent=msg; e.className=cls?`show ${cls}`:'show';
+  clearTimeout(e._t); e._t=setTimeout(()=>{e.className='';},ms);
+}
+
+// Parse "name|🚗" → {name, vehicle}
+function parseUsername(raw){
+  const parts = raw.split('|');
+  return { name: parts[0].trim(), vehicle: parts[1] ? parts[1].trim() : '🚗' };
+}
+
+// ─── MAP ────────────────────────────────────────────────────────────────────
+function initMap(){
+  // minZoom 18 = ~150m view; zoom 19 = ~75m; keeps user within 50m radius context
+  map = L.map('map', {
+    zoomControl: true,
+    attributionControl: false,
+    minZoom: 18,
+    maxZoom: 21,
+  }).setView([myLat, myLng], 19);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:21,attribution:'© OpenStreetMap © CARTO'}).addTo(map);
+  radiusCircle = L.circle([myLat,myLng],{radius:RADIUS_M,color:'#1a73e8',fillColor:'#1a73e820',fillOpacity:.3,weight:2,dashArray:'6,4'}).addTo(map);
+  myMarker = L.marker([myLat,myLng],{icon:makeVehicleIcon(myVehicle,true),zIndexOffset:1000}).addTo(map)
+    .bindPopup(`<b>${esc(myUsername)}</b> (You)<br>${myVehicle}`);
+
+  enforceBounds();
+  setTimeout(()=>map.invalidateSize(),100);
+}
+
+function enforceBounds(){
+  if(!map||!myLat) return;
+  // Restrict panning to ~150m around user's position (generous but keeps map local)
+  const center = L.latLng(myLat, myLng);
+  const bounds = center.toBounds(300); // 300m diameter = 150m radius
+  map.setMaxBounds(bounds);
+}
+
+function makeVehicleIcon(vehicleEmoji, me=false){
+  const ringColor = me ? '#1e8e3e' : '#1a73e8';
+  const bg = me ? 'rgba(30,142,62,.12)' : 'rgba(26,115,232,.12)';
+  const shadow = me ? '0 2px 10px rgba(30,142,62,.55),0 0 0 3px rgba(30,142,62,.15)' : '0 2px 10px rgba(26,115,232,.5),0 0 0 3px rgba(26,115,232,.12)';
+  return L.divIcon({
+    className:'',
+    html:`<div style="
+      position:relative;
+      width:46px;height:46px;
+      border-radius:50%;
+      background:${bg};
+      border:2.5px solid ${ringColor};
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:${shadow};
+      font-size:23px;line-height:1;
+      backdrop-filter:blur(2px);
+    ">${vehicleEmoji}${me?`<div style="position:absolute;bottom:-2px;right:-2px;width:13px;height:13px;border-radius:50%;background:#1e8e3e;border:2px solid #fff;box-shadow:0 1px 4px #0003"></div>`:''}</div>`,
+    iconSize:[46,46],
+    iconAnchor:[23,23],
+    popupAnchor:[0,-28]
+  });
+}
+
+// ─── HORN FEATURE ──────────────────────────────────────────────────────────
+function updateHornBtn(){
+  const btn = document.getElementById('hornBtn');
+  const label = document.getElementById('hornCountLabel');
+  const left = HORN_SEND_LIMIT - hornsSent;
+  label.textContent = left > 0 ? `${left} left` : 'Used up';
+  btn.disabled = left <= 0;
+}
+
+async function sendHorn(){
+  if(hornsSent >= HORN_SEND_LIMIT){ toast('📯 Horn limit reached (3 max)'); return; }
+  hornsSent++;
+  updateHornBtn();
+  const btn = document.getElementById('hornBtn');
+  btn.classList.add('honked');
+  setTimeout(()=>btn.classList.remove('honked'), 500);
+  playNotificationSound();
+  const ok = await submitForm(myUsername + '|' + myVehicle, HORN_MSG, myLat, myLng);
+  if(ok){
+    showMsg('You 📯 Honked!', '📯 Honk sent to all nearby!', Date.now(), true, true);
+    toast('📯 Honk sent!', 2500);
+  } else {
+    hornsSent--;
+    updateHornBtn();
+    toast('❌ Horn failed, try again');
+  }
+}
+
+async function sendDirectHorn(targetUser){
+  if(hornsSent >= HORN_SEND_LIMIT){ toast('📯 Horn limit reached (3 max)'); return; }
+  hornsSent++;
+  updateHornBtn();
+  playNotificationSound();
+  const payload = HORN_1TO1_PREFIX + targetUser;
+  const ok = await submitForm(myUsername + '|' + myVehicle, payload, myLat, myLng);
+  if(ok){
+    showMsg(`You 📯 → ${targetUser}`, `📯 Direct honk sent to ${targetUser}!`, Date.now(), true, true);
+    toast(`📯 Honked at ${targetUser}!`, 2500);
+    // animate the target's marker if visible
+    const u = nearbyUsers[targetUser];
+    if(u && u.marker){
+      const el = u.marker.getElement();
+      if(el){ el.style.transition='transform .1s'; el.style.transform='scale(1.5)'; setTimeout(()=>el.style.transform='',400); }
+    }
+  } else {
+    hornsSent--;
+    updateHornBtn();
+    toast('❌ Direct horn failed, try again');
+  }
+}
+
+function receiveHorn(sender, vehicle, ts, isDirect=false){
+  const count = hornRecvCount[sender] || 0;
+  if(count >= HORN_RECV_LIMIT) return;
+  hornRecvCount[sender] = count + 1;
+
+  const flash = document.getElementById('hornFlash');
+  flash.style.background = isDirect ? 'rgba(239,68,68,.22)' : 'rgba(245,158,11,.12)';
+  flash.classList.add('active');
+  setTimeout(()=>flash.classList.remove('active'), isDirect ? 600 : 300);
+
+  playNotificationSound();
+  if(isDirect){
+    showMsg(`${vehicle} ${sender} 📯 → YOU`, '🔴 DIRECT HONK — they mean you!', ts, false, true);
+    toast(`🔴 ${vehicle} ${sender} honked at YOU!`, 4500, 'horn-toast');
+  } else {
+    showMsg(`${vehicle} ${sender} 📯`, '📯 HONK HONK!', ts, false, true);
+    toast(`📯 ${vehicle} ${sender} is honking!`, 3500, 'horn-toast');
+  }
+}
+
+// ─── FORM SUBMIT ────────────────────────────────────────────────────────────
+async function submitForm(u,m,lat,lng){
+  const body=new URLSearchParams({[F.username]:u,[F.message]:m||'',[F.location]:fmtLoc(lat,lng)});
+  try{await fetch(FORM_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});return true;}
+  catch(e){return false;}
+}
+async function registerPresence(){
+  await submitForm(myUsername + '|' + myVehicle, '', myLat, myLng);
+  registered=true;
+}
+
+// ─── CSV PARSING ────────────────────────────────────────────────────────────
+function parseDDMMYYYY(dateStr){
+  const [datePart,timePart]=dateStr.replaceAll('"','').split(' ');
+  const [day,month,year]=datePart.split('/').map(Number);
+  const [hour,minute,second]=timePart.split(':').map(Number);
+  return new Date(year,month-1,day,hour,minute,second).getTime();
+}
+function filterRecent(rows,colIndex=0){
+  const cutoff=Date.now()-USER_WINDOW;
+  return rows.filter(row=>{try{return parseDDMMYYYY(row[colIndex])>=cutoff;}catch{return false;}});
+}
+function parseCSV(t){return filterRecent(t.trim().split('\n').slice(1).map(row=>row.split(',')));}
+
+// ─── POLL ───────────────────────────────────────────────────────────────────
+async function poll(){
+  startBar();
+  try{const r=await fetch(SHEET_CSV);if(!r.ok)throw 0;processSheet(await r.text());setStat('online');}
+  catch(e){setStat('err');}
+}
+
+function processSheet(csv){
+  const rows=parseCSV(csv);
+  if(rows.length<2)return;
+  const h=rows[0].map(x=>(x||'').toLowerCase());
+  let cU=1,cM=2,cL=3;
+  h.forEach((x,i)=>{
+    if(x.includes('47638508')||x.includes('username'))cU=i;
+    if(x.includes('1476899599')||x.includes('message'))cM=i;
+    if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
+  });
+
+  const now=Date.now(),fresh={};
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r]; if(!row||row.length<2)continue;
+    const rawUser=(row[cU]||'').trim().replaceAll('"','');
+    const {name:user, vehicle} = parseUsername(rawUser);
+    const msg=(row[cM]||'').trim().replaceAll('"','');
+    const loc=parseLoc((row[cL]||'').trim().replaceAll('"',''));
+    const ts=parseDate((row[0]||'').trim());
+    if(!user||!loc)continue;
+    const dist=haversine(myLat,myLng,loc.lat,loc.lng);
+
+    // Broadcast horn
+    if(msg===HORN_MSG && user!==myUsername && dist<=RADIUS_M){
+      const key=`horn|${row[0]}|${user}`;
+      if(!seenKeys.has(key)){seenKeys.add(key); receiveHorn(user, vehicle, ts, false);}
+    }
+    // Directed horn — only process if we are the target
+    else if(msg.startsWith(HORN_1TO1_PREFIX) && user!==myUsername && dist<=RADIUS_M){
+      const target = msg.slice(HORN_1TO1_PREFIX.length).trim();
+      if(target === myUsername){
+        const key=`horn1to1|${row[0]}|${user}`;
+        if(!seenKeys.has(key)){seenKeys.add(key); receiveHorn(user, vehicle, ts, true);}
+      }
+    }
+    // Incoming chat messages
+    else if(msg && msg!==HORN_MSG && !msg.startsWith(HORN_1TO1_PREFIX) && user!==myUsername && dist<=RADIUS_M){
+      const key=`${row[0]}|${user}|${msg}`;
+      if(!seenKeys.has(key)){seenKeys.add(key); showMsg(`${vehicle} ${user}`,msg,ts,false,false);}
+    }
+
+    // Nearby users
+    if(user!==myUsername && dist<=RADIUS_M){
+      if(!fresh[user]) fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist),vehicle};
+    }
+  }
+  updateNearby(fresh);
+}
+
+// ─── NEARBY USERS ───────────────────────────────────────────────────────────
+function updateNearby(fresh){
+  Object.keys(nearbyUsers).forEach(u=>{
+    if(!fresh[u]){if(nearbyUsers[u].marker)map.removeLayer(nearbyUsers[u].marker);delete nearbyUsers[u];}
+  });
+  Object.entries(fresh).forEach(([u,info])=>{
+    const vehicle = info.vehicle || '🚗';
+    if(!nearbyUsers[u]){
+      const mk=L.marker([info.lat,info.lng],{icon:makeVehicleIcon(vehicle,false)}).addTo(map)
+        .bindPopup(makePopup(u,vehicle,info.dist));
+      nearbyUsers[u]={...info,marker:mk};
+    }else{
+      nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
+      nearbyUsers[u].marker.setIcon(makeVehicleIcon(vehicle,false));
+      nearbyUsers[u].marker.setPopupContent(makePopup(u,vehicle,info.dist));
+      Object.assign(nearbyUsers[u],info);
+    }
+  });
+  const count=Object.keys(nearbyUsers).length;
+  const badge=document.getElementById('nearbyCount');
+  badge.textContent=count; badge.style.display=count>0?'block':'none';
+}
+
+function makePopup(u, vehicle, dist){
+  return `<div style="font-family:'Google Sans',system-ui,sans-serif;min-width:155px;padding:4px 2px">
+    <div style="font-size:1.5rem;text-align:center;margin-bottom:4px">${vehicle}</div>
+    <b style="display:block;text-align:center;font-size:.95rem;color:#202124;margin-bottom:2px">${esc(u)}</b>
+    <div style="font-size:.72rem;color:#5f6368;text-align:center;margin-bottom:10px">📍 ${dist}m away</div>
+    <div style="display:flex;gap:6px">
+      <a href="#" onclick="openCompose('${esc(u)}');return false" style="flex:1;display:block;text-align:center;background:#1a73e8;color:#fff;border-radius:20px;padding:6px 4px;text-decoration:none;font-size:.78rem;font-weight:600">💬 Chat</a>
+      <a href="#" onclick="sendDirectHorn('${esc(u)}');return false" style="flex:1;display:block;text-align:center;background:#e8710a;color:#fff;border-radius:20px;padding:6px 4px;text-decoration:none;font-size:.78rem;font-weight:600">📯 Honk</a>
+    </div>
+  </div>`;
+}
+
+// ─── MESSAGES ───────────────────────────────────────────────────────────────
+function showMsg(from,text,ts,mine,isHorn=false){
+  const list=document.getElementById('msgList');
+  const ph=list.querySelector('div[style]'); if(ph)ph.remove();
+  const time=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
+  const d=document.createElement('div');
+  d.className='msg-bubble'+(mine?' mine':'')+(isHorn?' horn-msg':'');
+  d.innerHTML=`<div class="msg-from">${esc(from)}</div><div class="msg-text">${esc(text)}</div><div class="msg-time">${time}</div>`;
+  list.appendChild(d); list.scrollTop=list.scrollHeight;
+  const count=list.querySelectorAll('.msg-bubble').length;
+  document.getElementById('msgCount').textContent=count;
+  if(!mine){
+    if(!isHorn) playNotificationSound();
+    if(!isHorn) toast(`💬 ${from}: ${text.substring(0,40)}`);
+    if(!msgPanelOpen){
+      setTimeout(()=>{
+        document.getElementById('msgPanel').classList.remove('collapsed');
+        document.querySelector('.toggle-icon').classList.add('open');
+        msgPanelOpen=true;
+      },500);
+    }
+  }
+}
+
+function toggleMsgPanel(){
+  const panel=document.getElementById('msgPanel');
+  msgPanelOpen=!msgPanelOpen;
+  panel.classList.toggle('collapsed');
+  document.querySelector('.toggle-icon').classList.toggle('open');
+  setTimeout(()=>map&&map.invalidateSize(),320);
+}
+
+// ─── COMPOSE ────────────────────────────────────────────────────────────────
+function openCompose(u){
+  composeTarget=u;
+  document.getElementById('composeTarget').textContent='To: '+u;
+  document.getElementById('composeMsg').value='';
+  document.getElementById('composeBox').style.display='block';
+  document.getElementById('composeMsg').focus();
+}
+function closeCompose(){document.getElementById('composeBox').style.display='none';composeTarget=null;}
+async function sendMessage(){
+  const msg=document.getElementById('composeMsg').value.trim();
+  if(!msg){toast('⚠️ Empty message');return;}
+  const btn=document.getElementById('sendBtn'); btn.disabled=true; btn.textContent='Sending…';
+  const ok=await submitForm(myUsername+'|'+myVehicle, msg, myLat, myLng);
+  if(ok){showMsg(`You → ${composeTarget}`,msg,Date.now(),true);toast(`✅ Message sent`);closeCompose();}
+  else toast('❌ Send failed');
+  btn.disabled=false; btn.textContent='Send ✉️';
+}
+
+// ─── STATUS & POLL BAR ──────────────────────────────────────────────────────
+function setStat(s){
+  const d=document.getElementById('statusDot'),t=document.getElementById('statusText');
+  if(s==='online'){d.className='status-dot online';t.textContent='Live';}
+  else{d.className='status-dot';t.textContent='Reconnecting…';}
+}
+function startBar(){
+  const b=document.getElementById('pollProgress');
+  b.style.transition='none'; b.style.width='0%';
+  requestAnimationFrame(()=>{b.style.transition=`width ${POLL_MS/1000}s linear`;b.style.width='100%';});
+}
+
+// ─── AUDIO ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  notificationAudio=document.getElementById('notificationSound');
+  if(notificationAudio){notificationAudio.volume=0.7;notificationAudio.load();}
+});
+function playNotificationSound(){
+  if(!notificationAudio)return;
+  try{
+    notificationAudio.currentTime=0;
+    const p=notificationAudio.play();
+    if(p!==undefined) p.then(()=>{
+      setTimeout(()=>{notificationAudio.pause();notificationAudio.currentTime=0;},SOUND_DURATION);
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+// ─── JOIN ───────────────────────────────────────────────────────────────────
+document.getElementById('joinBtn').addEventListener('click',async()=>{
+  const u=document.getElementById('usernameInput').value.trim();
+  if(!u){toast('⚠️ Enter a username');return;}
+  if(!myLat){toast('⚠️ GPS not ready');return;}
+  myUsername=u;
+  const btn=document.getElementById('joinBtn'); btn.disabled=true; btn.textContent='Joining…';
+  await registerPresence();
+  document.getElementById('loginOverlay').style.display='none';
+  const b=document.getElementById('userBadge'); b.textContent=myVehicle+' '+u; b.style.display='block';
+  document.getElementById('hornBtn').style.display='block';
+  updateHornBtn();
+  initMap(); setStat('online'); toast(`🎉 Joined as ${myVehicle} ${u}`);
+  poll(); setInterval(poll,POLL_MS);
+  setInterval(registerPresence,45000);
+});
+
+document.getElementById('usernameInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('joinBtn').click();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCompose();});
+
+// ─── PWA SETUP ──────────────────────────────────────────────────────────────
+
+// 1) Inject Web App Manifest as a dynamic <link> with a blob URL
+(function injectManifest(){
+  const manifest = {
+    name: 'NearbyChat — Proximity Messenger',
+    short_name: 'NearbyChat',
+    description: 'Connect & honk with people within 50 metres of you',
+    start_url: location.href,
+    display: 'standalone',
+    orientation: 'portrait-primary',
+    background_color: '#0f1117',
+    theme_color: '#0f1117',
+    categories: ['social', 'navigation'],
+    icons: [
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f1117'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle'%3E📡%3C/text%3E%3C/svg%3E", sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230f1117'/%3E%3Ctext x='256' y='360' font-size='300' text-anchor='middle'%3E📡%3C/text%3E%3C/svg%3E", sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel   = 'manifest';
+  link.href  = url;
+  document.head.appendChild(link);
+})();
+
+// 2) Register Service Worker (inline blob — caches app shell for offline use)
+(function registerSW(){
+  if(!('serviceWorker' in navigator)) return;
+  const swCode = `
+const CACHE = 'nearbychat-v1';
+const SHELL = [
+  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
+  'https://a.basemaps.cartocdn.com/dark_all/19/0/0.png'
+];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(()=>{})));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
+});
+self.addEventListener('fetch', e => {
+  // Cache-first for tile and CDN assets, network-first for sheets/forms
+  const url = e.request.url;
+  if(url.includes('google.com') || url.includes('gviz')) return; // never cache live data
+  e.respondWith(
+    caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+      if(res && res.status === 200 && e.request.method === 'GET'){
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
+      return res;
+    }).catch(() => cached))
+  );
+});
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl, {scope: './'})
+    .then(reg => console.log('SW registered', reg.scope))
+    .catch(err => console.warn('SW registration failed:', err));
+})();
+
+// 3) Install prompt (Android / Chrome / Edge)
+let _installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  document.getElementById('installBtn').classList.add('visible');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBtn').classList.remove('visible');
+  _installPrompt = null;
+  toast('✅ NearbyChat installed!', 3000);
+});
+
+function triggerInstall(){
+  if(!_installPrompt){ toast('ℹ️ Already installed or use browser menu'); return; }
+  _installPrompt.prompt();
+  _installPrompt.userChoice.then(r => {
+    if(r.outcome === 'accepted') toast('✅ Installing NearbyChat…');
+    _installPrompt = null;
+    document.getElementById('installBtn').classList.remove('visible');
+  });
+}
+
+// 4) iOS Safari — show manual "Add to Home Screen" banner
+(function iosPrompt(){
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  const dismissed = sessionStorage.getItem('nc-ios-banner');
+  if(isIos && isSafari && !isStandalone && !dismissed){
+    // show after a short delay so page loads first
+    setTimeout(()=> document.getElementById('iosBanner').classList.add('show'), 2500);
+  }
+})();
+
+function dismissIosBanner(){
+  document.getElementById('iosBanner').classList.remove('show');
+  sessionStorage.setItem('nc-ios-banner','1');
+}
+
+startGPS();
+</script>
+</body>
+</html>
