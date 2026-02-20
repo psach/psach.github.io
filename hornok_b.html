@@ -1018,8 +1018,8 @@ self.addEventListener('notificationclick', e => {
       // Register Periodic Background Sync (Chrome 80+ Android, requires HTTPS + engagement)
       if('periodicSync' in reg){
         Promise.all([
-          reg.periodicSync.register('hornok-poll',     {minInterval: 5  * 60 * 1000}),
-          reg.periodicSync.register('hornok-presence', {minInterval: 10 * 60 * 1000})
+          reg.periodicSync.register('hornok-poll',     {minInterval: 10 * 1000}),
+          reg.periodicSync.register('hornok-presence', {minInterval: 5 * 1000})
         ]).catch(()=>{}); // silently fails in browser if permissions not granted
       }
     })
