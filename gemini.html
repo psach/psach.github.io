@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardianPulse | Emergency Alert System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+        .animate-pulse-red { animation: pulse-red 1.5s infinite; }
+        #map { height: 100%; width: 100%; z-index: 1; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen overflow-hidden flex flex-col">
+
+    <!-- Login / Join Screen -->
+    <div id="auth-screen" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl w-full max-w-md shadow-2xl">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-red-900/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <h1 class="text-2xl font-bold">GuardianPulse</h1>
+                <p class="text-slate-400 text-sm">Emergency Coordination System</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Display Name</label>
+                    <input type="text" id="username-input" placeholder="e.g. Responder Alpha" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Group Code</label>
+                    <input type="text" id="group-input" placeholder="Enter or Create Code" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all uppercase font-mono tracking-widest text-center">
+                </div>
+                <button id="join-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg shadow-red-900/40">
+                    Connect to System
+                </button>
+                <p id="auth-status" class="text-center text-xs text-slate-500 mt-2">Connecting to secure network...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application UI -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-red-600 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <div>
+                <h2 id="group-display" class="font-bold text-sm leading-none">GROUP: ----</h2>
+                <p id="user-display" class="text-xs text-slate-400">Loading profile...</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <button id="toggle-view-btn" class="bg-slate-800 hover:bg-slate-700 p-2 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-2">
+                <span id="view-icon">📋</span>
+                <span id="view-text">List View</span>
+            </button>
+            <button id="panic-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-tighter shadow-lg shadow-red-900/30 animate-pulse-red">
+                PANIC
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow relative flex overflow-hidden">
+        
+        <!-- Map Overlay (Active View) -->
+        <div id="map-container" class="absolute inset-0">
+            <div id="map"></div>
+        </div>
+
+        <!-- List Overlay (Toggleable) -->
+        <div id="list-view" class="hidden absolute inset-0 z-40 bg-slate-950 p-4 overflow-y-auto">
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Active Responders</h3>
+            <div id="responder-list" class="space-y-3">
+                <!-- Responders dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Alert Notification -->
+        <div id="alert-banner" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-lg bg-red-600 text-white p-4 rounded-xl shadow-2xl flex items-center justify-between border-2 border-red-400">
+            <div class="flex items-center gap-3">
+                <div class="animate-bounce">🚨</div>
+                <div>
+                    <p class="font-bold text-lg">EMERGENCY ALERT</p>
+                    <p id="alert-origin" class="text-xs opacity-90 uppercase font-mono">Triggered by Responder</p>
+                </div>
+            </div>
+            <button id="cancel-alert-btn" class="bg-white text-red-600 px-3 py-1 rounded-md text-xs font-bold uppercase">Mute & Clear</button>
+        </div>
+
+        <!-- Floating Chat Sidebar (Desktop-like) or Bottom Drawer (Mobile) -->
+        <div id="chat-sidebar" class="absolute bottom-4 right-4 z-50 w-80 max-h-[60%] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
+            <div class="bg-slate-800 p-3 border-b border-slate-700 flex justify-between items-center cursor-pointer" id="chat-header">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Coordination Chat</span>
+                <span id="chat-toggle-icon">▼</span>
+            </div>
+            <div id="chat-body" class="flex flex-col h-full flex-grow overflow-hidden">
+                <div id="message-container" class="flex-grow p-4 space-y-3 overflow-y-auto custom-scrollbar text-sm">
+                    <!-- Messages here -->
+                </div>
+                <div class="p-3 border-t border-slate-800 bg-slate-900">
+                    <form id="chat-form" class="flex gap-2">
+                        <input type="text" id="msg-input" placeholder="Type message..." class="flex-grow bg-slate-800 border border-slate-700 text-sm rounded-lg px-3 py-2 focus:outline-none">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-2 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Stats -->
+    <footer class="bg-slate-900 border-t border-slate-800 p-2 flex justify-between text-[10px] text-slate-500 font-mono tracking-tighter">
+        <div id="system-status">POLLING: ACTIVE (5s)</div>
+        <div id="gps-status">GPS: SIGNAL ACQUIRING...</div>
+        <div id="user-count">MEMBERS: 0</div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getLeaflet } from "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+
+        // --- Configuration ---
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'emergency-alert-demo';
+
+        // --- Application State ---
+        let user = null;
+        let groupId = '';
+        let displayName = '';
+        let myLocation = { lat: 0, lng: 0 };
+        let map = null;
+        let markers = {};
+        let members = {};
+        let isViewMap = true;
+        let isAlertActive = false;
+        let chatCollapsed = false;
+        let sirenOscillator = null;
+        let audioCtx = null;
+
+        // --- Core Functions ---
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth failed:", err);
+                document.getElementById('auth-status').innerText = "Authentication Error.";
+            }
+        }
+
+        function setupMap() {
+            map = L.map('map', { zoomControl: false }).setView([0, 0], 2);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+            L.control.zoom({ position: 'topleft' }).addTo(map);
+        }
+
+        async function joinGroup() {
+            const nameInput = document.getElementById('username-input').value.trim();
+            const codeInput = document.getElementById('group-input').value.trim().toUpperCase();
+
+            if (!nameInput || !codeInput) {
+                alert("Please enter both a name and a group code.");
+                return;
+            }
+
+            displayName = nameInput;
+            groupId = codeInput;
+            
+            // Hide login
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('group-display').innerText = `GROUP: ${groupId}`;
+            document.getElementById('user-display').innerText = `Responder: ${displayName}`;
+
+            // Initialize Map if not done
+            if (!map) setupMap();
+
+            // Start GPS tracking
+            startLocationTracking();
+
+            // Initial Registration in Firestore
+            await updateMyPresence();
+
+            // Start the Polling Loop (Strict requirement)
+            startPolling();
+        }
+
+        function startLocationTracking() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition((pos) => {
+                    myLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    document.getElementById('gps-status').innerText = `GPS: LOCK (${myLocation.lat.toFixed(4)}, ${myLocation.lng.toFixed(4)})`;
+                    updateMyPresence();
+                }, (err) => {
+                    document.getElementById('gps-status').innerText = "GPS: SIGNAL ERROR";
+                }, { enableHighAccuracy: true });
+            }
+        }
+
+        async function updateMyPresence() {
+            if (!user || !groupId) return;
+            const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'members', user.uid);
+            await setDoc(userRef, {
+                name: displayName,
+                lat: myLocation.lat,
+                lng: myLocation.lng,
+                lastSeen: serverTimestamp()
+            }, { merge: true });
+        }
+
+        // --- Polling Engine ---
+        function startPolling() {
+            // Run once immediately
+            runPollCycle();
+            // Then every 5 seconds
+            setInterval(runPollCycle, 5000);
+        }
+
+        async function runPollCycle() {
+            if (!user || !groupId) return;
+            
+            const groupRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId);
+            const membersColl = collection(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'members');
+            const messagesColl = collection(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'messages');
+
+            try {
+                // 1. Get Group Global State (for alerts)
+                const groupSnap = await getDoc(groupRef);
+                if (groupSnap.exists()) {
+                    const data = groupSnap.data();
+                    handleAlertState(data.isAlertActive, data.alertBy);
+                }
+
+                // 2. Get Members
+                const membersSnap = await getDocs(membersColl);
+                updateResponderUI(membersSnap.docs);
+
+                // 3. Get Recent Messages (last 20)
+                const messagesSnap = await getDocs(messagesColl); // Simple query as per Rule 2
+                updateChatUI(messagesSnap.docs);
+
+            } catch (err) {
+                console.error("Poll cycle error:", err);
+            }
+        }
+
+        function handleAlertState(active, triggeredBy) {
+            const banner = document.getElementById('alert-banner');
+            const originText = document.getElementById('alert-origin');
+
+            if (active) {
+                if (!isAlertActive) {
+                    startSiren();
+                    isAlertActive = true;
+                }
+                banner.classList.remove('hidden');
+                originText.innerText = `Triggered by ${triggeredBy || 'Unknown'}`;
+                document.body.classList.add('ring-4', 'ring-red-600', 'ring-inset');
+            } else {
+                if (isAlertActive) {
+                    stopSiren();
+                    isAlertActive = false;
+                }
+                banner.classList.add('hidden');
+                document.body.classList.remove('ring-4', 'ring-red-600', 'ring-inset');
+            }
+        }
+
+        function updateResponderUI(memberDocs) {
+            const listEl = document.getElementById('responder-list');
+            const countEl = document.getElementById('user-count');
+            listEl.innerHTML = '';
+            countEl.innerText = `MEMBERS: ${memberDocs.length}`;
+
+            memberDocs.forEach(doc => {
+                const data = doc.data();
+                const uid = doc.id;
+                const isMe = uid === user.uid;
+
+                // Update List View
+                const item = document.createElement('div');
+                item.className = `flex items-center justify-between p-3 rounded-lg border ${isMe ? 'bg-indigo-900/20 border-indigo-700' : 'bg-slate-900 border-slate-800'}`;
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-xs">
+                            ${data.name.charAt(0)}
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold">${data.name} ${isMe ? '(You)' : ''}</p>
+                            <p class="text-[10px] text-slate-500 uppercase">${data.lat.toFixed(4)}, ${data.lng.toFixed(4)}</p>
+                        </div>
+                    </div>
+                    <div class="text-[10px] ${Date.now() - (data.lastSeen?.toMillis() || 0) < 15000 ? 'text-green-500' : 'text-slate-600'}">
+                        ● ${Date.now() - (data.lastSeen?.toMillis() || 0) < 15000 ? 'ONLINE' : 'AWAY'}
+                    </div>
+                `;
+                listEl.appendChild(item);
+
+                // Update Map Markers
+                if (data.lat && data.lng) {
+                    if (!markers[uid]) {
+                        const icon = L.divIcon({
+                            html: `<div class="w-4 h-4 rounded-full border-2 border-white shadow-lg ${isMe ? 'bg-indigo-500' : 'bg-red-500'}"></div>`,
+                            className: 'custom-div-icon',
+                            iconSize: [16, 16],
+                            iconAnchor: [8, 8]
+                        });
+                        markers[uid] = L.marker([data.lat, data.lng], { icon }).addTo(map)
+                            .bindTooltip(data.name, { permanent: false, direction: 'top' });
+                    } else {
+                        markers[uid].setLatLng([data.lat, data.lng]);
+                    }
+                }
+            });
+            
+            // Auto-center on me once if needed
+            if (isViewMap && myLocation.lat !== 0 && Object.keys(markers).length === 1) {
+                map.setView([myLocation.lat, myLocation.lng], 15);
+            }
+        }
+
+        function updateChatUI(msgDocs) {
+            const container = document.getElementById('message-container');
+            const currentMsgs = Array.from(container.children).map(c => c.dataset.id);
+            
+            // Sort in memory (Rule 2)
+            const sortedDocs = msgDocs.sort((a, b) => (a.data().time?.toMillis() || 0) - (b.data().time?.toMillis() || 0));
+
+            sortedDocs.forEach(doc => {
+                if (!currentMsgs.includes(doc.id)) {
+                    const data = doc.data();
+                    const msgDiv = document.createElement('div');
+                    msgDiv.dataset.id = doc.id;
+                    const isMe = data.senderId === user.uid;
+                    
+                    msgDiv.className = `max-w-[85%] ${isMe ? 'ml-auto text-right' : 'mr-auto text-left'}`;
+                    msgDiv.innerHTML = `
+                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-0.5">${data.senderName}</p>
+                        <div class="inline-block px-3 py-2 rounded-2xl ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none'}">
+                            ${data.text}
+                        </div>
+                    `;
+                    container.appendChild(msgDiv);
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
+        }
+
+        // --- Interaction Handlers ---
+
+        async function triggerPanic() {
+            if (!groupId) return;
+            const groupRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId);
+            await setDoc(groupRef, {
+                isAlertActive: true,
+                alertBy: displayName,
+                lastUpdate: serverTimestamp()
+            }, { merge: true });
+            
+            // Send alert message to chat
+            await sendChatMessage("⚠️ EMERGENCY PANIC TRIGGERED!");
+        }
+
+        async function cancelPanic() {
+            if (!groupId) return;
+            const groupRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId);
+            await setDoc(groupRef, {
+                isAlertActive: false,
+                lastUpdate: serverTimestamp()
+            }, { merge: true });
+        }
+
+        async function sendChatMessage(text) {
+            if (!text || !groupId) return;
+            const messagesColl = collection(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'messages');
+            await addDoc(messagesColl, {
+                text: text,
+                senderId: user.uid,
+                senderName: displayName,
+                time: serverTimestamp()
+            });
+        }
+
+        function startSiren() {
+            if (audioCtx) return; // Already running
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+            
+            // Siren wobble
+            oscillator.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.5);
+            oscillator.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 1.0);
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            
+            // Loop the frequency change
+            const interval = setInterval(() => {
+                if (!audioCtx) {
+                    clearInterval(interval);
+                    return;
+                }
+                oscillator.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.5);
+                oscillator.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 1.0);
+            }, 1000);
+
+            sirenOscillator = { oscillator, gainNode, interval };
+        }
+
+        function stopSiren() {
+            if (sirenOscillator) {
+                clearInterval(sirenOscillator.interval);
+                sirenOscillator.oscillator.stop();
+                audioCtx.close();
+                audioCtx = null;
+                sirenOscillator = null;
+            }
+        }
+
+        // --- UI Listeners ---
+
+        document.getElementById('join-btn').addEventListener('click', joinGroup);
+        
+        document.getElementById('panic-btn').addEventListener('click', triggerPanic);
+        
+        document.getElementById('cancel-alert-btn').addEventListener('click', cancelPanic);
+
+        document.getElementById('toggle-view-btn').addEventListener('click', () => {
+            isViewMap = !isViewMap;
+            const listView = document.getElementById('list-view');
+            const mapContainer = document.getElementById('map-container');
+            const viewText = document.getElementById('view-text');
+            const viewIcon = document.getElementById('view-icon');
+
+            if (isViewMap) {
+                listView.classList.add('hidden');
+                mapContainer.classList.remove('hidden');
+                viewText.innerText = 'List View';
+                viewIcon.innerText = '📋';
+                map.invalidateSize();
+            } else {
+                listView.classList.remove('hidden');
+                mapContainer.classList.add('hidden');
+                viewText.innerText = 'Map View';
+                viewIcon.innerText = '🗺️';
+            }
+        });
+
+        document.getElementById('chat-header').addEventListener('click', () => {
+            chatCollapsed = !chatCollapsed;
+            const sidebar = document.getElementById('chat-sidebar');
+            const body = document.getElementById('chat-body');
+            const icon = document.getElementById('chat-toggle-icon');
+            
+            if (chatCollapsed) {
+                sidebar.classList.remove('h-full');
+                sidebar.classList.add('h-10');
+                body.classList.add('hidden');
+                icon.innerText = '▲';
+            } else {
+                sidebar.classList.add('h-full');
+                sidebar.classList.remove('h-10');
+                body.classList.remove('hidden');
+                icon.innerText = '▼';
+            }
+        });
+
+        document.getElementById('chat-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (text) {
+                sendChatMessage(text);
+                input.value = '';
+            }
+        });
+
+        // --- Auth Observer ---
+        onAuthStateChanged(auth, (u) => {
+            user = u;
+            if (u) {
+                document.getElementById('auth-status').innerText = "System Ready.";
+            }
+        });
+
+        // Start Auth
+        initAuth();
+
+    </script>
+</body>
+</html>
