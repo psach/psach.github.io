@@ -3,522 +3,635 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GuardianPulse | Emergency Alert System</title>
-    <!-- Tailwind CSS -->
+    <title>Emergency Alerting System</title>
+    
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Leaflet CSS & JS for Mapping -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
-        @keyframes pulse-red {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        /* Ensure map takes up proper space */
+        #map { height: 100%; width: 100%; border-radius: 0.5rem; z-index: 10; }
+        .hidden-view { display: none !important; }
+        
+        /* Custom scrollbar for chat */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .pulse-red {
+            animation: pulse-red 2s infinite;
         }
-        .animate-pulse-red { animation: pulse-red 1.5s infinite; }
-        #map { height: 100%; width: 100%; z-index: 1; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 h-screen overflow-hidden flex flex-col">
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- Login / Join Screen -->
-    <div id="auth-screen" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl w-full max-w-md shadow-2xl">
-            <div class="flex flex-col items-center mb-8">
-                <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-red-900/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <!-- SETUP SCREEN -->
+    <div id="setup-screen" class="absolute inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-600 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 </div>
-                <h1 class="text-2xl font-bold">GuardianPulse</h1>
-                <p class="text-slate-400 text-sm">Emergency Coordination System</p>
+                <h1 class="text-2xl font-bold text-slate-900">Emergency System</h1>
+                <p class="text-sm text-slate-500 mt-2">Join a group to share location and alerts.</p>
             </div>
-            
+
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Display Name</label>
-                    <input type="text" id="username-input" placeholder="e.g. Responder Alpha" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                    <input type="text" id="input-username" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="E.g., John Doe" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Group Code</label>
-                    <input type="text" id="group-input" placeholder="Enter or Create Code" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all uppercase font-mono tracking-widest text-center">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Group Code</label>
+                    <input type="text" id="input-groupcode" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase" placeholder="E.g., ALPHA-99" required>
                 </div>
-                <button id="join-btn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg shadow-red-900/40">
-                    Connect to System
+                
+                <div id="setup-error" class="hidden text-red-500 text-sm text-center">Please fill in all fields.</div>
+                
+                <button onclick="joinGroup()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2">
+                    Join / Create Group
                 </button>
-                <p id="auth-status" class="text-center text-xs text-slate-500 mt-2">Connecting to secure network...</p>
             </div>
         </div>
     </div>
 
-    <!-- Main Application UI -->
-    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-red-600 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-            </div>
+    <!-- MAIN APP SCREEN -->
+    <div id="main-app" class="hidden h-full flex flex-col max-w-4xl mx-auto w-full bg-white shadow-xl relative">
+        
+        <!-- Header -->
+        <header class="bg-slate-900 text-white p-4 flex justify-between items-center z-20 shadow-md">
             <div>
-                <h2 id="group-display" class="font-bold text-sm leading-none">GROUP: ----</h2>
-                <p id="user-display" class="text-xs text-slate-400">Loading profile...</p>
+                <h2 class="font-bold text-lg leading-tight">Emergency Comms</h2>
+                <div class="text-xs text-slate-300 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                    Group: <span id="display-groupcode" class="font-mono font-bold text-yellow-300">---</span>
+                </div>
+            </div>
+            
+            <!-- View Toggles -->
+            <div class="flex bg-slate-800 rounded-lg p-1">
+                <button onclick="toggleView('list')" id="btn-list-view" class="px-4 py-1.5 rounded-md text-sm font-medium bg-slate-600 shadow-sm transition-all">List</button>
+                <button onclick="toggleView('map')" id="btn-map-view" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-white transition-all">Map</button>
+            </div>
+        </header>
+
+        <!-- Notification Banner -->
+        <div id="notification-banner" class="hidden bg-red-600 text-white text-center py-2 text-sm font-bold flex justify-center items-center gap-2 animate-pulse z-20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            NEW EMERGENCY ALERT
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 relative overflow-hidden bg-slate-50">
+            
+            <!-- List View -->
+            <div id="view-list" class="absolute inset-0 p-4 overflow-y-auto flex flex-col gap-3">
+                <div class="text-center text-xs text-slate-400 my-2">System Initialized. Awaiting messages...</div>
+                <!-- Messages will be injected here -->
+                <div id="message-container" class="flex flex-col gap-3 pb-20"></div>
+            </div>
+
+            <!-- Map View -->
+            <div id="view-map" class="absolute inset-0 hidden-view p-2 bg-slate-200">
+                <div id="map" class="shadow-inner border border-slate-300"></div>
+            </div>
+            
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-white border-t border-slate-200 p-4 z-20 pb-safe">
+            <div id="location-status" class="text-xs text-slate-500 mb-2 flex justify-between items-center">
+                <span>📍 Getting location...</span>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="input-message" class="flex-1 bg-slate-100 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type a message...">
+                
+                <button onclick="sendMessage('Chat')" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 font-medium transition-colors">
+                    Send
+                </button>
+                
+                <button onclick="sendMessage('Alert')" class="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 font-bold transition-colors pulse-red whitespace-nowrap flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    ALERT
+                </button>
             </div>
         </div>
         
-        <div class="flex items-center gap-2">
-            <button id="toggle-view-btn" class="bg-slate-800 hover:bg-slate-700 p-2 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-2">
-                <span id="view-icon">📋</span>
-                <span id="view-text">List View</span>
-            </button>
-            <button id="panic-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-tighter shadow-lg shadow-red-900/30 animate-pulse-red">
-                PANIC
-            </button>
-        </div>
-    </header>
+    </div>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow relative flex overflow-hidden">
+    <!-- Hidden iframe for silent Google Form submissions -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){ onFormSubmitted(); }"></iframe>
+
+    <script>
+        /* =========================================================================
+           CONFIGURATION (Google Forms & Sheets)
+           ========================================================================= */
         
-        <!-- Map Overlay (Active View) -->
-        <div id="map-container" class="absolute inset-0">
-            <div id="map"></div>
-        </div>
+        // SET THIS TO FALSE to use your actual Google Forms/Sheets.
+        // If TRUE, it will mock the database locally so you can test the UI instantly.
+        const MOCK_MODE = true; 
 
-        <!-- List Overlay (Toggleable) -->
-        <div id="list-view" class="hidden absolute inset-0 z-40 bg-slate-950 p-4 overflow-y-auto">
-            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Active Responders</h3>
-            <div id="responder-list" class="space-y-3">
-                <!-- Responders dynamically added here -->
-            </div>
-        </div>
-
-        <!-- Alert Notification -->
-        <div id="alert-banner" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-lg bg-red-600 text-white p-4 rounded-xl shadow-2xl flex items-center justify-between border-2 border-red-400">
-            <div class="flex items-center gap-3">
-                <div class="animate-bounce">🚨</div>
-                <div>
-                    <p class="font-bold text-lg">EMERGENCY ALERT</p>
-                    <p id="alert-origin" class="text-xs opacity-90 uppercase font-mono">Triggered by Responder</p>
-                </div>
-            </div>
-            <button id="cancel-alert-btn" class="bg-white text-red-600 px-3 py-1 rounded-md text-xs font-bold uppercase">Mute & Clear</button>
-        </div>
-
-        <!-- Floating Chat Sidebar (Desktop-like) or Bottom Drawer (Mobile) -->
-        <div id="chat-sidebar" class="absolute bottom-4 right-4 z-50 w-80 max-h-[60%] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
-            <div class="bg-slate-800 p-3 border-b border-slate-700 flex justify-between items-center cursor-pointer" id="chat-header">
-                <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Coordination Chat</span>
-                <span id="chat-toggle-icon">▼</span>
-            </div>
-            <div id="chat-body" class="flex flex-col h-full flex-grow overflow-hidden">
-                <div id="message-container" class="flex-grow p-4 space-y-3 overflow-y-auto custom-scrollbar text-sm">
-                    <!-- Messages here -->
-                </div>
-                <div class="p-3 border-t border-slate-800 bg-slate-900">
-                    <form id="chat-form" class="flex gap-2">
-                        <input type="text" id="msg-input" placeholder="Type message..." class="flex-grow bg-slate-800 border border-slate-700 text-sm rounded-lg px-3 py-2 focus:outline-none">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-2 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer Stats -->
-    <footer class="bg-slate-900 border-t border-slate-800 p-2 flex justify-between text-[10px] text-slate-500 font-mono tracking-tighter">
-        <div id="system-status">POLLING: ACTIVE (5s)</div>
-        <div id="gps-status">GPS: SIGNAL ACQUIRING...</div>
-        <div id="user-count">MEMBERS: 0</div>
-    </footer>
-
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getLeaflet } from "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-
-        // --- Configuration ---
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'emergency-alert-demo';
-
-        // --- Application State ---
-        let user = null;
-        let groupId = '';
-        let displayName = '';
-        let myLocation = { lat: 0, lng: 0 };
-        let map = null;
-        let markers = {};
-        let members = {};
-        let isViewMap = true;
-        let isAlertActive = false;
-        let chatCollapsed = false;
-        let sirenOscillator = null;
-        let audioCtx = null;
-
-        // --- Core Functions ---
-
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth failed:", err);
-                document.getElementById('auth-status').innerText = "Authentication Error.";
+        const GOOGLE_CONFIG = {
+            // Write: Google Form URL (Change to your form's formResponse URL)
+            FORM_URL: "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse",
+            
+            // Read: Google Sheet Published CSV URL (File -> Share -> Publish to Web -> CSV)
+            SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID/pub?output=csv",
+            
+            // Google Form Entry IDs (Inspect your form to find these numbers)
+            ENTRIES: {
+                TIMESTAMP: "entry.111111111",
+                GROUP_CODE: "entry.222222222",
+                USERNAME: "entry.333333333",
+                LAT: "entry.444444444",
+                LNG: "entry.555555555",
+                MESSAGE: "entry.666666666",
+                TYPE: "entry.777777777" // 'Chat' or 'Alert'
             }
-        }
+        };
 
-        function setupMap() {
-            map = L.map('map', { zoomControl: false }).setView([0, 0], 2);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
-            L.control.zoom({ position: 'topleft' }).addTo(map);
-        }
+        const POLL_INTERVAL_MS = 3000; // Poll every 3 seconds
 
-        async function joinGroup() {
-            const nameInput = document.getElementById('username-input').value.trim();
-            const codeInput = document.getElementById('group-input').value.trim().toUpperCase();
+        /* =========================================================================
+           STATE MANAGEMENT
+           ========================================================================= */
+        let state = {
+            username: '',
+            groupCode: '',
+            lat: null,
+            lng: null,
+            messages: [],
+            lastMessageCount: 0,
+            mapInitialized: false,
+            pollTimer: null
+        };
 
-            if (!nameInput || !codeInput) {
-                alert("Please enter both a name and a group code.");
+        let map = null;
+        let markers = {}; // Store marker instances by unique ID
+        let submitted = false; // Flag for iframe submission
+        let mockDatabase = []; // Used only if MOCK_MODE is true
+
+        /* =========================================================================
+           INITIALIZATION & AUTH
+           ========================================================================= */
+        function joinGroup() {
+            const user = document.getElementById('input-username').value.trim();
+            const group = document.getElementById('input-groupcode').value.trim().toUpperCase();
+            
+            if (!user || !group) {
+                document.getElementById('setup-error').classList.remove('hidden');
                 return;
             }
 
-            displayName = nameInput;
-            groupId = codeInput;
+            state.username = user;
+            state.groupCode = group;
             
-            // Hide login
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('group-display').innerText = `GROUP: ${groupId}`;
-            document.getElementById('user-display').innerText = `Responder: ${displayName}`;
+            // Update UI
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('display-groupcode').innerText = state.groupCode;
 
-            // Initialize Map if not done
-            if (!map) setupMap();
-
-            // Start GPS tracking
-            startLocationTracking();
-
-            // Initial Registration in Firestore
-            await updateMyPresence();
-
-            // Start the Polling Loop (Strict requirement)
+            // Start background processes
+            initGeolocation();
             startPolling();
         }
 
-        function startLocationTracking() {
+        /* =========================================================================
+           GEOLOCATION
+           ========================================================================= */
+        function initGeolocation() {
             if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition((pos) => {
-                    myLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                    document.getElementById('gps-status').innerText = `GPS: LOCK (${myLocation.lat.toFixed(4)}, ${myLocation.lng.toFixed(4)})`;
-                    updateMyPresence();
-                }, (err) => {
-                    document.getElementById('gps-status').innerText = "GPS: SIGNAL ERROR";
-                }, { enableHighAccuracy: true });
+                navigator.geolocation.watchPosition(
+                    (position) => {
+                        state.lat = position.coords.latitude;
+                        state.lng = position.coords.longitude;
+                        document.getElementById('location-status').innerHTML = `
+                            <span class="text-green-600 font-medium">📍 Location Active (${state.lat.toFixed(4)}, ${state.lng.toFixed(4)})</span>
+                        `;
+                        // Update map center if we are the only one on it currently
+                        if(map && Object.keys(markers).length === 0) {
+                            map.setView([state.lat, state.lng], 15);
+                        }
+                    },
+                    (error) => {
+                        console.error("Location error:", error);
+                        document.getElementById('location-status').innerHTML = `
+                            <span class="text-red-500 font-medium">⚠️ Location Access Denied. Cannot send coordinates.</span>
+                        `;
+                    },
+                    { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                );
+            } else {
+                document.getElementById('location-status').innerText = "Geolocation not supported by this browser.";
             }
         }
 
-        async function updateMyPresence() {
-            if (!user || !groupId) return;
-            const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'members', user.uid);
-            await setDoc(userRef, {
-                name: displayName,
-                lat: myLocation.lat,
-                lng: myLocation.lng,
-                lastSeen: serverTimestamp()
-            }, { merge: true });
+        /* =========================================================================
+           UI TOGGLES
+           ========================================================================= */
+        function toggleView(view) {
+            const listView = document.getElementById('view-list');
+            const mapView = document.getElementById('view-map');
+            const btnList = document.getElementById('btn-list-view');
+            const btnMap = document.getElementById('btn-map-view');
+
+            if (view === 'list') {
+                listView.classList.remove('hidden-view');
+                mapView.classList.add('hidden-view');
+                
+                btnList.classList.replace('bg-transparent', 'bg-slate-600');
+                btnList.classList.replace('text-slate-400', 'text-white');
+                btnMap.classList.replace('bg-slate-600', 'bg-transparent');
+                btnMap.classList.replace('text-white', 'text-slate-400');
+            } else {
+                listView.classList.add('hidden-view');
+                mapView.classList.remove('hidden-view');
+                
+                btnMap.classList.replace('bg-transparent', 'bg-slate-600');
+                btnMap.classList.replace('text-slate-400', 'text-white');
+                btnList.classList.replace('bg-slate-600', 'bg-transparent');
+                btnList.classList.replace('text-white', 'text-slate-400');
+
+                // Initialize Leaflet map only when view is first opened
+                if (!state.mapInitialized) {
+                    initMap();
+                } else {
+                    map.invalidateSize(); // Fix tile loading issues when unhiding
+                }
+            }
         }
 
-        // --- Polling Engine ---
-        function startPolling() {
-            // Run once immediately
-            runPollCycle();
-            // Then every 5 seconds
-            setInterval(runPollCycle, 5000);
-        }
+        /* =========================================================================
+           MAP INITIALIZATION (Leaflet.js)
+           ========================================================================= */
+        function initMap() {
+            // Default center (will be updated by geolocation or markers)
+            const startLat = state.lat || 0;
+            const startLng = state.lng || 0;
 
-        async function runPollCycle() {
-            if (!user || !groupId) return;
+            map = L.map('map').setView([startLat, startLng], 13);
             
-            const groupRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId);
-            const membersColl = collection(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'members');
-            const messagesColl = collection(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'messages');
+            // OpenStreetMap tiles (Open Source)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            state.mapInitialized = true;
+            renderMapMarkers(); // Render any existing messages onto the map
+        }
+
+        /* =========================================================================
+           DATA TRANSMISSION (WRITE)
+           ========================================================================= */
+        function sendMessage(type) {
+            const msgInput = document.getElementById('input-message');
+            const text = msgInput.value.trim();
+            
+            if (!text && type === 'Chat') return; // Chat requires text, Alert doesn't strictly need it
+
+            // Optimistic UI Update (Show immediately locally)
+            const timestamp = new Date().toISOString();
+            const tempMsg = {
+                timestamp: timestamp,
+                groupCode: state.groupCode,
+                username: state.username,
+                lat: state.lat || '',
+                lng: state.lng || '',
+                message: text || (type === 'Alert' ? 'TRIGGERED EMERGENCY ALERT!' : ''),
+                type: type
+            };
+            
+            msgInput.value = ''; // clear input
+
+            if (MOCK_MODE) {
+                // Simulate backend write
+                mockDatabase.push(tempMsg);
+                processIncomingData(mockDatabase);
+            } else {
+                // Actual Google Form Submission via hidden iframe
+                submitToGoogleForm(tempMsg);
+            }
+        }
+
+        function submitToGoogleForm(data) {
+            submitted = true; // Set flag so iframe onload triggers success
+            
+            // Create a temporary form and submit it to the hidden iframe
+            const form = document.createElement('form');
+            form.action = GOOGLE_CONFIG.FORM_URL;
+            form.method = 'POST';
+            form.target = 'hidden_iframe';
+
+            const mapData = {
+                [GOOGLE_CONFIG.ENTRIES.TIMESTAMP]: data.timestamp,
+                [GOOGLE_CONFIG.ENTRIES.GROUP_CODE]: data.groupCode,
+                [GOOGLE_CONFIG.ENTRIES.USERNAME]: data.username,
+                [GOOGLE_CONFIG.ENTRIES.LAT]: data.lat,
+                [GOOGLE_CONFIG.ENTRIES.LNG]: data.lng,
+                [GOOGLE_CONFIG.ENTRIES.MESSAGE]: data.message,
+                [GOOGLE_CONFIG.ENTRIES.TYPE]: data.type
+            };
+
+            for (let key in mapData) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = mapData[key];
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            // Optimistically update UI while waiting for poll to catch up
+            state.messages.push(data);
+            renderList();
+            if(state.mapInitialized) renderMapMarkers();
+        }
+
+        function onFormSubmitted() {
+            submitted = false;
+            // The polling mechanism will automatically grab the new data shortly.
+            // A small inline notification could go here if needed.
+        }
+
+        /* =========================================================================
+           DATA RETRIEVAL (READ / POLL)
+           ========================================================================= */
+        function startPolling() {
+            pollData(); // Initial poll
+            state.pollTimer = setInterval(pollData, POLL_INTERVAL_MS);
+        }
+
+        async function pollData() {
+            if (MOCK_MODE) {
+                processIncomingData(mockDatabase);
+                return;
+            }
 
             try {
-                // 1. Get Group Global State (for alerts)
-                const groupSnap = await getDoc(groupRef);
-                if (groupSnap.exists()) {
-                    const data = groupSnap.data();
-                    handleAlertState(data.isAlertActive, data.alertBy);
-                }
-
-                // 2. Get Members
-                const membersSnap = await getDocs(membersColl);
-                updateResponderUI(membersSnap.docs);
-
-                // 3. Get Recent Messages (last 20)
-                const messagesSnap = await getDocs(messagesColl); // Simple query as per Rule 2
-                updateChatUI(messagesSnap.docs);
-
-            } catch (err) {
-                console.error("Poll cycle error:", err);
+                // Fetch the published CSV from Google Sheets
+                // We append a random string to bypass browser/CDN caching
+                const response = await fetch(`${GOOGLE_CONFIG.SHEET_CSV_URL}&t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error("Network response was not ok");
+                
+                const csvText = await response.text();
+                const parsedData = parseCSV(csvText);
+                processIncomingData(parsedData);
+                
+            } catch (error) {
+                console.error("Polling error:", error);
             }
         }
 
-        function handleAlertState(active, triggeredBy) {
-            const banner = document.getElementById('alert-banner');
-            const originText = document.getElementById('alert-origin');
+        // Simple CSV parser tailored for Google Sheets output
+        function parseCSV(str) {
+            const result = [];
+            // Regex to handle commas inside quotes
+            const lines = str.split('\n');
+            if(lines.length < 2) return result;
 
-            if (active) {
-                if (!isAlertActive) {
-                    startSiren();
-                    isAlertActive = true;
-                }
-                banner.classList.remove('hidden');
-                originText.innerText = `Triggered by ${triggeredBy || 'Unknown'}`;
-                document.body.classList.add('ring-4', 'ring-red-600', 'ring-inset');
-            } else {
-                if (isAlertActive) {
-                    stopSiren();
-                    isAlertActive = false;
-                }
-                banner.classList.add('hidden');
-                document.body.classList.remove('ring-4', 'ring-red-600', 'ring-inset');
-            }
-        }
-
-        function updateResponderUI(memberDocs) {
-            const listEl = document.getElementById('responder-list');
-            const countEl = document.getElementById('user-count');
-            listEl.innerHTML = '';
-            countEl.innerText = `MEMBERS: ${memberDocs.length}`;
-
-            memberDocs.forEach(doc => {
-                const data = doc.data();
-                const uid = doc.id;
-                const isMe = uid === user.uid;
-
-                // Update List View
-                const item = document.createElement('div');
-                item.className = `flex items-center justify-between p-3 rounded-lg border ${isMe ? 'bg-indigo-900/20 border-indigo-700' : 'bg-slate-900 border-slate-800'}`;
-                item.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-xs">
-                            ${data.name.charAt(0)}
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold">${data.name} ${isMe ? '(You)' : ''}</p>
-                            <p class="text-[10px] text-slate-500 uppercase">${data.lat.toFixed(4)}, ${data.lng.toFixed(4)}</p>
-                        </div>
-                    </div>
-                    <div class="text-[10px] ${Date.now() - (data.lastSeen?.toMillis() || 0) < 15000 ? 'text-green-500' : 'text-slate-600'}">
-                        ● ${Date.now() - (data.lastSeen?.toMillis() || 0) < 15000 ? 'ONLINE' : 'AWAY'}
-                    </div>
-                `;
-                listEl.appendChild(item);
-
-                // Update Map Markers
-                if (data.lat && data.lng) {
-                    if (!markers[uid]) {
-                        const icon = L.divIcon({
-                            html: `<div class="w-4 h-4 rounded-full border-2 border-white shadow-lg ${isMe ? 'bg-indigo-500' : 'bg-red-500'}"></div>`,
-                            className: 'custom-div-icon',
-                            iconSize: [16, 16],
-                            iconAnchor: [8, 8]
-                        });
-                        markers[uid] = L.marker([data.lat, data.lng], { icon }).addTo(map)
-                            .bindTooltip(data.name, { permanent: false, direction: 'top' });
-                    } else {
-                        markers[uid].setLatLng([data.lat, data.lng]);
-                    }
-                }
-            });
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
             
-            // Auto-center on me once if needed
-            if (isViewMap && myLocation.lat !== 0 && Object.keys(markers).length === 1) {
-                map.setView([myLocation.lat, myLocation.lng], 15);
+            for(let i=1; i<lines.length; i++) {
+                if(!lines[i].trim()) continue;
+                
+                // Split by comma, respecting quotes
+                const currentline = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                const obj = {};
+                
+                // Map to our expected keys based on order.
+                // Assuming Google sheet columns: Timestamp, GroupCode, Username, Lat, Lng, Message, Type
+                // Note: Actual header names from sheet might vary, mapping by index is safer if structure is fixed.
+                obj.timestamp = cleanCSVField(currentline[0]);
+                obj.groupCode = cleanCSVField(currentline[1]);
+                obj.username = cleanCSVField(currentline[2]);
+                obj.lat = cleanCSVField(currentline[3]);
+                obj.lng = cleanCSVField(currentline[4]);
+                obj.message = cleanCSVField(currentline[5]);
+                obj.type = cleanCSVField(currentline[6]);
+
+                result.push(obj);
+            }
+            return result;
+        }
+
+        function cleanCSVField(field) {
+            if(!field) return '';
+            return field.trim().replace(/^"|"$/g, '');
+        }
+
+        function processIncomingData(allData) {
+            // 1. Filter data by Group Code
+            const groupData = allData.filter(row => 
+                row.groupCode && row.groupCode.toUpperCase() === state.groupCode
+            );
+
+            // 2. Check for new messages
+            if (groupData.length > state.lastMessageCount) {
+                
+                // Find new alerts specifically to trigger sound
+                const newItems = groupData.slice(state.lastMessageCount);
+                const hasNewAlert = newItems.some(item => 
+                    item.type === 'Alert' && item.username !== state.username
+                );
+
+                if (hasNewAlert) {
+                    triggerEmergencyAlertUI();
+                }
+
+                state.messages = groupData;
+                state.lastMessageCount = groupData.length;
+                
+                // 3. Update Views
+                renderList();
+                if (state.mapInitialized) {
+                    renderMapMarkers();
+                }
             }
         }
 
-        function updateChatUI(msgDocs) {
+        /* =========================================================================
+           VIEW RENDERING
+           ========================================================================= */
+        function renderList() {
             const container = document.getElementById('message-container');
-            const currentMsgs = Array.from(container.children).map(c => c.dataset.id);
-            
-            // Sort in memory (Rule 2)
-            const sortedDocs = msgDocs.sort((a, b) => (a.data().time?.toMillis() || 0) - (b.data().time?.toMillis() || 0));
+            container.innerHTML = ''; // Clear current
 
-            sortedDocs.forEach(doc => {
-                if (!currentMsgs.includes(doc.id)) {
-                    const data = doc.data();
-                    const msgDiv = document.createElement('div');
-                    msgDiv.dataset.id = doc.id;
-                    const isMe = data.senderId === user.uid;
-                    
-                    msgDiv.className = `max-w-[85%] ${isMe ? 'ml-auto text-right' : 'mr-auto text-left'}`;
-                    msgDiv.innerHTML = `
-                        <p class="text-[10px] text-slate-500 font-bold uppercase mb-0.5">${data.senderName}</p>
-                        <div class="inline-block px-3 py-2 rounded-2xl ${isMe ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none'}">
-                            ${data.text}
+            if(state.messages.length === 0) {
+                container.innerHTML = '<div class="text-center text-sm text-slate-400">No messages yet.</div>';
+                return;
+            }
+
+            // Reverse to show newest at bottom, or normal loop to show chronologically
+            state.messages.forEach(msg => {
+                const isMe = msg.username === state.username;
+                const isAlert = msg.type === 'Alert';
+                
+                const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+
+                const div = document.createElement('div');
+                div.className = `flex flex-col max-w-[85%] rounded-xl p-3 shadow-sm ${
+                    isAlert 
+                        ? 'bg-red-100 border border-red-300 self-center w-full text-center' 
+                        : (isMe ? 'bg-blue-600 text-white self-end' : 'bg-white border border-slate-200 self-start text-slate-800')
+                }`;
+
+                let content = '';
+                
+                if (isAlert) {
+                    content = `
+                        <div class="text-red-700 font-bold uppercase tracking-wide flex items-center justify-center gap-2">
+                            ⚠️ Emergency Alert from ${msg.username} ⚠️
+                        </div>
+                        ${msg.message ? `<div class="text-red-800 mt-1 font-medium">${msg.message}</div>` : ''}
+                        <div class="text-xs text-red-500 mt-2">${timeStr} ${msg.lat ? `| Loc: ${parseFloat(msg.lat).toFixed(4)}, ${parseFloat(msg.lng).toFixed(4)}` : ''}</div>
+                    `;
+                } else {
+                    content = `
+                        ${!isMe ? `<div class="text-xs font-bold mb-1 text-slate-500">${msg.username}</div>` : ''}
+                        <div class="text-sm">${msg.message}</div>
+                        <div class="text-[10px] mt-1 text-right opacity-70 flex justify-between">
+                            ${msg.lat ? `<span title="Location attached">📍</span>` : '<span></span>'}
+                            <span>${timeStr}</span>
                         </div>
                     `;
-                    container.appendChild(msgDiv);
-                    container.scrollTop = container.scrollHeight;
+                }
+
+                div.innerHTML = content;
+                container.appendChild(div);
+            });
+
+            // Auto-scroll to bottom
+            const viewList = document.getElementById('view-list');
+            viewList.scrollTop = viewList.scrollHeight;
+        }
+
+        function renderMapMarkers() {
+            if (!map) return;
+
+            // Group messages by user to show latest location per user
+            const latestLocations = {};
+            
+            state.messages.forEach(msg => {
+                if (msg.lat && msg.lng && msg.lat !== 'undefined' && msg.lng !== 'undefined') {
+                    latestLocations[msg.username] = msg; // Overwrites older msgs from same user
                 }
             });
-        }
 
-        // --- Interaction Handlers ---
+            // Add/Update markers
+            Object.values(latestLocations).forEach(msg => {
+                const lat = parseFloat(msg.lat);
+                const lng = parseFloat(msg.lng);
+                
+                if (isNaN(lat) || isNaN(lng)) return;
 
-        async function triggerPanic() {
-            if (!groupId) return;
-            const groupRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId);
-            await setDoc(groupRef, {
-                isAlertActive: true,
-                alertBy: displayName,
-                lastUpdate: serverTimestamp()
-            }, { merge: true });
-            
-            // Send alert message to chat
-            await sendChatMessage("⚠️ EMERGENCY PANIC TRIGGERED!");
-        }
+                const isAlert = msg.type === 'Alert';
+                const markerId = msg.username;
 
-        async function cancelPanic() {
-            if (!groupId) return;
-            const groupRef = doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId);
-            await setDoc(groupRef, {
-                isAlertActive: false,
-                lastUpdate: serverTimestamp()
-            }, { merge: true });
-        }
+                // Create custom icon based on type
+                const markerColor = isAlert ? '#ef4444' : '#3b82f6'; // Red vs Blue
+                const svgIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color:${markerColor}; width:16px; height:16px; border-radius:50%; border:2px solid white; box-shadow:0 0 4px rgba(0,0,0,0.5);"></div>`,
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
+                });
 
-        async function sendChatMessage(text) {
-            if (!text || !groupId) return;
-            const messagesColl = collection(db, 'artifacts', appId, 'public', 'data', 'groups', groupId, 'messages');
-            await addDoc(messagesColl, {
-                text: text,
-                senderId: user.uid,
-                senderName: displayName,
-                time: serverTimestamp()
-            });
-        }
-
-        function startSiren() {
-            if (audioCtx) return; // Already running
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-
-            oscillator.type = 'square';
-            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
-            
-            // Siren wobble
-            oscillator.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.5);
-            oscillator.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 1.0);
-            
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            oscillator.start();
-            
-            // Loop the frequency change
-            const interval = setInterval(() => {
-                if (!audioCtx) {
-                    clearInterval(interval);
-                    return;
+                if (markers[markerId]) {
+                    // Update existing marker
+                    markers[markerId].setLatLng([lat, lng]);
+                    markers[markerId].setIcon(svgIcon);
+                    markers[markerId].setPopupContent(`
+                        <div class="font-bold">${msg.username}</div>
+                        <div class="text-xs">${isAlert ? '<span class="text-red-600 font-bold">EMERGENCY</span>' : 'Latest location'}</div>
+                        <div class="text-xs text-gray-500">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+                    `);
+                } else {
+                    // Create new marker
+                    const marker = L.marker([lat, lng], {icon: svgIcon}).addTo(map);
+                    marker.bindPopup(`
+                        <div class="font-bold">${msg.username}</div>
+                        <div class="text-xs">${isAlert ? '<span class="text-red-600 font-bold">EMERGENCY</span>' : 'Latest location'}</div>
+                        <div class="text-xs text-gray-500">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+                    `);
+                    markers[markerId] = marker;
                 }
-                oscillator.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.5);
-                oscillator.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 1.0);
-            }, 1000);
-
-            sirenOscillator = { oscillator, gainNode, interval };
-        }
-
-        function stopSiren() {
-            if (sirenOscillator) {
-                clearInterval(sirenOscillator.interval);
-                sirenOscillator.oscillator.stop();
-                audioCtx.close();
-                audioCtx = null;
-                sirenOscillator = null;
-            }
-        }
-
-        // --- UI Listeners ---
-
-        document.getElementById('join-btn').addEventListener('click', joinGroup);
-        
-        document.getElementById('panic-btn').addEventListener('click', triggerPanic);
-        
-        document.getElementById('cancel-alert-btn').addEventListener('click', cancelPanic);
-
-        document.getElementById('toggle-view-btn').addEventListener('click', () => {
-            isViewMap = !isViewMap;
-            const listView = document.getElementById('list-view');
-            const mapContainer = document.getElementById('map-container');
-            const viewText = document.getElementById('view-text');
-            const viewIcon = document.getElementById('view-icon');
-
-            if (isViewMap) {
-                listView.classList.add('hidden');
-                mapContainer.classList.remove('hidden');
-                viewText.innerText = 'List View';
-                viewIcon.innerText = '📋';
-                map.invalidateSize();
-            } else {
-                listView.classList.remove('hidden');
-                mapContainer.classList.add('hidden');
-                viewText.innerText = 'Map View';
-                viewIcon.innerText = '🗺️';
-            }
-        });
-
-        document.getElementById('chat-header').addEventListener('click', () => {
-            chatCollapsed = !chatCollapsed;
-            const sidebar = document.getElementById('chat-sidebar');
-            const body = document.getElementById('chat-body');
-            const icon = document.getElementById('chat-toggle-icon');
+            });
             
-            if (chatCollapsed) {
-                sidebar.classList.remove('h-full');
-                sidebar.classList.add('h-10');
-                body.classList.add('hidden');
-                icon.innerText = '▲';
-            } else {
-                sidebar.classList.add('h-full');
-                sidebar.classList.remove('h-10');
-                body.classList.remove('hidden');
-                icon.innerText = '▼';
+            // Adjust bounds to fit all markers if there are any
+            const markerGroup = L.featureGroup(Object.values(markers));
+            if (Object.keys(markers).length > 0) {
+                map.fitBounds(markerGroup.getBounds().pad(0.2));
             }
-        });
+        }
 
-        document.getElementById('chat-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const input = document.getElementById('msg-input');
-            const text = input.value.trim();
-            if (text) {
-                sendChatMessage(text);
-                input.value = '';
+        /* =========================================================================
+           EMERGENCY AUDIO & UI ALERTS
+           ========================================================================= */
+        function triggerEmergencyAlertUI() {
+            // Play Sound
+            playSiren();
+
+            // Show Banner
+            const banner = document.getElementById('notification-banner');
+            banner.classList.remove('hidden');
+            
+            // Auto hide banner after 10 seconds
+            setTimeout(() => {
+                banner.classList.add('hidden');
+            }, 10000);
+        }
+
+        // Self-contained synthesizer siren using Web Audio API (No external files needed)
+        function playSiren() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                osc.type = 'square'; // Harsh sound good for alarms
+
+                // Siren modulation: High to low sweeping
+                const now = ctx.currentTime;
+                
+                // Volume envelope
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.3, now + 0.1); // Max volume 30%
+                gainNode.gain.setValueAtTime(0.3, now + 2.5);
+                gainNode.gain.linearRampToValueAtTime(0, now + 3.0);
+
+                // Frequency modulation loop (European style siren)
+                for(let i=0; i<3; i++) {
+                    let offset = i * 1.0;
+                    osc.frequency.setValueAtTime(800, now + offset);
+                    osc.frequency.setValueAtTime(800, now + offset + 0.45);
+                    osc.frequency.setValueAtTime(600, now + offset + 0.5);
+                    osc.frequency.setValueAtTime(600, now + offset + 0.95);
+                }
+
+                osc.start(now);
+                osc.stop(now + 3.0);
+            } catch(e) {
+                console.warn("Audio Context blocked or unsupported. User interaction might be required first.");
             }
-        });
-
-        // --- Auth Observer ---
-        onAuthStateChanged(auth, (u) => {
-            user = u;
-            if (u) {
-                document.getElementById('auth-status').innerText = "System Ready.";
-            }
-        });
-
-        // Start Auth
-        initAuth();
+        }
 
     </script>
 </body>
