@@ -366,7 +366,8 @@ function onGPS(p){
   myLat=p.coords.latitude; myLng=p.coords.longitude;
   setGPS(`📍 GPS ready — ±${Math.round(p.coords.accuracy)}m`);
   const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join EmergAlert';
-  if(map){myMarker.setLatLng([myLat,myLng]); radiusCircle.setLatLng([myLat,myLng]); enforceBounds();}
+  if(map){myMarker.setLatLng([myLat,myLng]); radiusCircle.setLatLng([myLat,myLng]); //enforceBounds();
+  }
   if(registered) registerPresence();
 }
 
