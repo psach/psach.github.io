@@ -399,16 +399,14 @@ function initMap(){
   map = L.map('map', {
     zoomControl: true,
     attributionControl: false,
-    minZoom: 18,
-    maxZoom: 21,
-  }).setView([myLat, myLng], 19);
+   }).setView([myLat, myLng], 19);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:21,attribution:'© OpenStreetMap © CARTO'}).addTo(map);
   radiusCircle = L.circle([myLat,myLng],{radius:RADIUS_M,color:'#e53935',fillColor:'#e5393520',fillOpacity:.3,weight:2,dashArray:'6,4'}).addTo(map);
   myMarker = L.marker([myLat,myLng],{icon:makeVehicleIcon(myVehicle,true,myColor),zIndexOffset:1000}).addTo(map)
     .bindPopup(`<b>${esc(myUsername)}</b> (You)<br>${myVehicle}`);
 
-  enforceBounds();
+  //enforceBounds();
   setTimeout(()=>map.invalidateSize(),100);
 }
 
