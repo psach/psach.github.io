@@ -130,7 +130,7 @@
     </div>
 
     <!-- Hidden iframe for silent Google Form submissions -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){ onFormSubmitted(); }"></iframe>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
     <script>
         /* =========================================================================
@@ -177,9 +177,16 @@
         };
 
         let map = null;
-        let markers = {}; // Store marker instances by unique ID
-        let submitted = false; // Flag for iframe submission
-        let mockDatabase = []; // Used only if MOCK_MODE is true
+        let markers = {}; 
+        let submitted = false; 
+        let mockDatabase = []; 
+
+        /* Attach iframe onload listener here to avoid the ReferenceError */
+        document.getElementById('hidden_iframe').onload = function() {
+            if (submitted) {
+                onFormSubmitted();
+            }
+        };
 
         /* =========================================================================
            INITIALIZATION & AUTH
@@ -364,7 +371,7 @@
         function onFormSubmitted() {
             submitted = false;
             // The polling mechanism will automatically grab the new data shortly.
-            // A small inline notification could go here if needed.
+            console.log("Form successfully submitted silently.");
         }
 
         /* =========================================================================
@@ -414,7 +421,6 @@
                 
                 // Map to our expected keys based on order.
                 // Assuming Google sheet columns: Timestamp, GroupCode, Username, Lat, Lng, Message, Type
-                // Note: Actual header names from sheet might vary, mapping by index is safer if structure is fixed.
                 obj.timestamp = cleanCSVField(currentline[0]);
                 obj.groupCode = cleanCSVField(currentline[1]);
                 obj.username = cleanCSVField(currentline[2]);
@@ -475,7 +481,6 @@
                 return;
             }
 
-            // Reverse to show newest at bottom, or normal loop to show chronologically
             state.messages.forEach(msg => {
                 const isMe = msg.username === state.username;
                 const isAlert = msg.type === 'Alert';
