@@ -23,6 +23,11 @@
     </style>
 </head>
 <body>
+
+	// 3. Use anywhere
+const { installState, isIos, triggerInstall } = usePWAInstall();
+<InstallButton installState={installState} isIos={isIos} triggerInstall={triggerInstall} />
+	
     <h1 style="text-align: center;">Play Chess with Stockfish
 	<br/>
 	<a  href="https://stockfishchess.org/">Credits</a>
