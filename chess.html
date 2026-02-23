@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d0d14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Noir Chess">
+<title>Noir Chess</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<style>
+:root {
+  --bg: #0c0c12;
+  --panel: #111119;
+  --panel-border: #1c1c2c;
+  --light-sq: #eedcb4;
+  --dark-sq: #b07240;
+  --sel-overlay: rgba(22,100,35,0.62);
+  --valid-dot: rgba(22,100,35,0.52);
+  --last-move: rgba(180,220,30,0.32);
+  --check-glow: rgba(220,40,40,0.65);
+  --accent: #c9a227;
+  --accent-dim: #6b560f;
+  --accent-bg: rgba(201,162,39,0.08);
+  --text: #cec9c0;
+  --text-muted: #58534e;
+  --text-bright: #ede8e0;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body {
+  height:100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'EB Garamond', Georgia, serif;
+  background-image:
+    radial-gradient(ellipse 70% 60% at 15% 55%, rgba(201,162,39,0.05) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 50% at 85% 20%, rgba(80,60,200,0.04) 0%, transparent 100%);
+}
+body {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.app {
+  display:flex;
+  gap:20px;
+  align-items:flex-start;
+  width:100%;
+  max-width:860px;
+}
+
+/* ── Board ── */
+.board-wrap { flex-shrink:0; display:flex; flex-direction:column; gap:2px; }
+.file-labels { display:flex; padding-left:18px; }
+.file-label { flex:1; text-align:center; font-size:11px; color:var(--text-muted); font-style:italic; }
+.board-row { display:flex; gap:2px; }
+.rank-label { width:18px; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--text-muted); font-style:italic; flex-shrink:0; }
+.board {
+  display:grid;
+  grid-template-columns: repeat(8,1fr);
+  grid-template-rows: repeat(8,1fr);
+  width: min(460px, calc(100vw - 32px));
+  height: min(460px, calc(100vw - 32px));
+  border: 2px solid var(--accent-dim);
+  box-shadow: 0 24px 72px rgba(0,0,0,.85), 0 0 0 1px rgba(201,162,39,.12), inset 0 0 0 1px rgba(255,255,255,.03);
+  border-radius:2px;
+  overflow:hidden;
+}
+.sq {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.sq.light { background:var(--light-sq); }
+.sq.dark  { background:var(--dark-sq); }
+.sq::after { content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit; transition:background .1s; }
+.sq.last-move::after  { background:var(--last-move); }
+.sq.selected::after   { background:var(--sel-overlay); }
+.sq.in-check .piece   { filter: drop-shadow(0 0 10px rgba(255,60,60,1)) drop-shadow(0 0 4px rgba(255,0,0,1)); }
+.sq.valid-move::before {
+  content:''; position:absolute; width:30%; height:30%; border-radius:50%;
+  background:var(--valid-dot); z-index:2; pointer-events:none;
+}
+.sq.valid-cap::before {
+  content:''; position:absolute; inset:0;
+  background: transparent;
+  box-shadow: inset 0 0 0 5px rgba(22,100,35,0.48);
+  z-index:2; pointer-events:none;
+}
+
+/* Piece */
+.piece {
+  font-size: clamp(26px, 5.5vw, 46px);
+  line-height:1;
+  position:relative;
+  z-index:3;
+  user-select:none;
+  pointer-events:none;
+  transition: transform .08s;
+}
+.wp { color:#fff;    filter: drop-shadow(0 1px 0 #333) drop-shadow(0 0 4px rgba(0,0,0,.8)); }
+.bp { color:#110e08; filter: drop-shadow(0 1px 0 rgba(255,255,255,.25)) drop-shadow(0 0 2px rgba(0,0,0,.6)); }
+.sq.dragging-src .piece { opacity:.25; }
+
+/* Drag ghost */
+.ghost {
+  position:fixed;
+  pointer-events:none;
+  z-index:9999;
+  transform: translate(-50%,-50%) scale(1.3);
+  font-size:clamp(32px,6vw,52px);
+  line-height:1;
+}
+
+/* ── Panel ── */
+.panel {
+  flex:1;
+  min-width:190px;
+  max-width:250px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.card {
+  background:var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:8px;
+  padding:14px 16px;
+}
+h1 {
+  font-family:'Playfair Display',serif;
+  font-size:20px;
+  font-weight:700;
+  color:var(--accent);
+  letter-spacing:.04em;
+}
+.subtitle { font-size:12px; color:var(--text-muted); font-style:italic; margin-top:1px; }
+
+/* Status */
+.status { font-family:'Playfair Display',serif; font-size:14px; color:var(--text-bright); margin-top:10px; min-height:20px; }
+.thinking { display:none; align-items:center; gap:6px; font-size:12px; color:var(--accent); font-style:italic; margin-top:4px; }
+.dots span { animation:blink 1.2s infinite; }
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+
+/* Labels */
+.lbl {
+  font-size:11px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-bottom:8px;
+}
+/* Color toggle */
+.color-btns { display:flex; gap:6px; }
+.cbtn {
+  flex:1; padding:7px 6px;
+  border:1px solid var(--panel-border);
+  border-radius:5px;
+  background:transparent;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-family:'EB Garamond',serif;
+  font-size:14px;
+  transition:all .18s;
+}
+.cbtn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-bg); }
+.cbtn:hover:not(.active){ border-color:var(--text-muted); color:var(--text); }
+
+/* Difficulty */
+.diff-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; }
+.diff-name { font-family:'Playfair Display',serif; font-size:14px; color:var(--text-bright); }
+.diff-val  { font-size:12px; color:var(--accent); }
+input[type=range] {
+  width:100%; height:3px; background:var(--panel-border);
+  border-radius:2px; outline:none; cursor:pointer;
+  -webkit-appearance:none; appearance:none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:13px; height:13px; border-radius:50%;
+  background:var(--accent); cursor:pointer;
+}
+
+/* Buttons */
+.btn {
+  width:100%; padding:9px 14px;
+  background:transparent;
+  border:1px solid var(--accent-dim);
+  border-radius:6px;
+  color:var(--accent);
+  font-family:'Playfair Display',serif;
+  font-size:13px;
+  cursor:pointer;
+  letter-spacing:.04em;
+  transition:all .18s;
+}
+.btn:hover { background:var(--accent-bg); border-color:var(--accent); }
+.btn-sm {
+  border-color:var(--panel-border);
+  color:var(--text-muted);
+  font-family:'EB Garamond',serif;
+  font-size:12px;
+  padding:7px 12px;
+  margin-top:6px;
+}
+.btn-sm:hover { color:var(--text); border-color:var(--text-muted); }
+
+/* Captured */
+.cap-row { display:flex; flex-wrap:wrap; gap:1px; min-height:22px; font-size:18px; line-height:1.1; margin-bottom:4px; }
+.cap-white { color:#fff;    filter:drop-shadow(0 1px 1px #000); }
+.cap-black { color:#110e08; filter:drop-shadow(0 1px 1px rgba(255,255,255,.2)); }
+
+/* History */
+.hist-scroll { max-height:180px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--panel-border) transparent; }
+.hist-table { width:100%; border-collapse:collapse; font-size:13px; }
+.hist-table td { padding:2px 3px; }
+.mv-num { color:var(--text-muted); font-style:italic; width:26px; }
+.mv-w, .mv-b {
+  font-family:'EB Garamond',serif;
+  cursor:pointer; border-radius:3px;
+  padding:1px 4px; transition:background .12s;
+}
+.mv-w:hover,.mv-b:hover { background:var(--panel-border); }
+.mv-w.cur,.mv-b.cur { background:rgba(201,162,39,.14); color:var(--accent); }
+
+/* Promotion modal */
+.promo-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.75); z-index:1000;
+  align-items:center; justify-content:center;
+}
+.promo-overlay.open { display:flex; }
+.promo-box {
+  background:var(--panel);
+  border:1px solid var(--accent-dim);
+  border-radius:10px;
+  padding:20px;
+  display:flex; gap:12px;
+}
+.promo-piece {
+  font-size:52px; cursor:pointer; line-height:1;
+  padding:8px; border-radius:6px;
+  transition:background .15s;
+}
+.promo-piece:hover { background:var(--accent-bg); }
+
+/* Responsive */
+@media(max-width:660px){
+  .app { flex-direction:column; align-items:center; }
+  .panel { max-width:min(460px,calc(100vw - 32px)); width:100%; flex-direction:row; flex-wrap:wrap; }
+  .card { flex:1; min-width:140px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="board-section">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="panel">
+    <div class="card">
+      <h1>♟ Noir Chess</h1>
+      <div class="subtitle">Powered by Stockfish</div>
+      <div class="status" id="status">White to move</div>
+      <div class="thinking" id="thinking">
+        Thinking<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Play as</div>
+      <div class="color-btns">
+        <button class="cbtn active" id="btn-w" onclick="setColor('w')">♔ White</button>
+        <button class="cbtn"        id="btn-b" onclick="setColor('b')">♚ Black</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Difficulty</div>
+      <div class="diff-row">
+        <span class="diff-name" id="diff-name">Intermediate</span>
+        <span class="diff-val"  id="diff-val">10 / 20</span>
+      </div>
+      <input type="range" min="0" max="20" value="10" id="diff-slider" oninput="setDifficulty(+this.value)">
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column">
+      <button class="btn" onclick="newGame()">New Game</button>
+      <button class="btn btn-sm" onclick="flipBoard()">⇅ Flip Board</button>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Captured</div>
+      <div class="cap-row cap-black" id="cap-by-white"></div>
+      <div class="cap-row cap-white" id="cap-by-black"></div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Move History</div>
+      <div class="hist-scroll">
+        <table class="hist-table"><tbody id="hist-body"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Promotion dialog -->
+<div class="promo-overlay" id="promo-overlay">
+  <div class="promo-box" id="promo-box"></div>
+</div>
+
+<script>
+// ── Pieces ──────────────────────────────────────────────────────────────────
+const GLYPHS = {
+  wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',
+  bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'
+};
+const FILES = ['a','b','c','d','e','f','g','h'];
+const RANKS = [8,7,6,5,4,3,2,1];
+const DIFF_NAMES = [
+  'Beginner','Beginner','Novice','Novice','Amateur',
+  'Amateur','Club Player','Club Player','Advanced','Advanced',
+  'Intermediate','Strong','Expert','Expert',
+  'Master','Master','Grandmaster','Grandmaster','Elite','Elite','Maximum'
+];
+
+// ── State ────────────────────────────────────────────────────────────────────
+let chess        = new Chess();
+let playerColor  = 'w';
+let flipped      = false;
+let selected     = null;
+let legalDests   = [];
+let lastMove     = null;
+let thinking     = false;
+let skillLevel   = 10;
+let stockfish    = null;
+let sfReady      = false;
+let pendingMove  = null; // for promotion
+let dragSrc      = null;
+let ghost        = null;
+
+// ── Stockfish ────────────────────────────────────────────────────────────────
+function initSF() {
+  const sfURL = 'https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js';
+  try {
+    const blob = new Blob([`importScripts(${JSON.stringify(sfURL)})`], {type:'text/javascript'});
+    stockfish = new Worker(URL.createObjectURL(blob));
+  } catch(e) {
+    try { stockfish = new Worker(sfURL); }
+    catch(e2) { console.warn('Stockfish unavailable'); return; }
+  }
+  stockfish.onmessage = e => {
+    const msg = e.data;
+    if (!sfReady && msg.startsWith('uciok')) { sfReady = true; }
+    if (msg.startsWith('bestmove')) {
+      const mv = msg.split(' ')[1];
+      if (mv && mv !== '(none)') {
+        applyEngineMove(mv.slice(0,2), mv.slice(2,4), mv[4] || null);
+      } else {
+        setThinking(false);
+        render();
+        updateSidebar();
+      }
+    }
+  };
+  stockfish.postMessage('uci');
+  stockfish.postMessage('isready');
+}
+
+function sfSend(cmd) { if (stockfish) stockfish.postMessage(cmd); }
+
+function askEngine() {
+  if (!stockfish || chess.game_over()) return;
+  setThinking(true);
+  sfSend(`setoption name Skill Level value ${skillLevel}`);
+  sfSend(`position fen ${chess.fen()}`);
+  const mt = skillLevel < 5 ? 250 : skillLevel < 10 ? 600 : skillLevel < 16 ? 1200 : 2000;
+  sfSend(`go movetime ${mt}`);
+}
+
+function applyEngineMove(from, to, promo) {
+  const mv = chess.move({ from, to, promotion: promo || 'q' });
+  if (mv) {
+    lastMove = { from: mv.from, to: mv.to };
+  }
+  setThinking(false);
+  selected   = null;
+  legalDests = [];
+  render();
+  updateSidebar();
+}
+
+// ── Board Render ─────────────────────────────────────────────────────────────
+function squareName(ri, fi) {
+  const df = flipped ? FILES.slice().reverse() : FILES;
+  const dr = flipped ? RANKS.slice().reverse() : RANKS;
+  return df[fi] + dr[ri];
+}
+
+function render() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  for (let ri = 0; ri < 8; ri++) {
+    for (let fi = 0; fi < 8; fi++) {
+      const sq = squareName(ri, fi);
+      const fileIdx = FILES.indexOf(sq[0]);
+      const rankNum  = parseInt(sq[1]);
+      const isLight  = (fileIdx + rankNum) % 2 === 1;
+
+      const div = document.createElement('div');
+      div.className = `sq ${isLight ? 'light' : 'dark'}`;
+      div.dataset.sq = sq;
+
+      if (selected === sq)                                div.classList.add('selected');
+      if (lastMove && (lastMove.from===sq||lastMove.to===sq)) div.classList.add('last-move');
+      if (chess.in_check() && findKing(chess.turn()) === sq) div.classList.add('in-check');
+      if (legalDests.includes(sq)) {
+        div.classList.add(chess.get(sq) ? 'valid-cap' : 'valid-move');
+      }
+      if (dragSrc === sq) div.classList.add('dragging-src');
+
+      const piece = chess.get(sq);
+      if (piece) {
+        const span = document.createElement('span');
+        span.className = `piece ${piece.color==='w' ? 'wp' : 'bp'}`;
+        span.textContent = GLYPHS[piece.color + piece.type.toUpperCase()];
+        div.appendChild(span);
+      }
+
+      div.addEventListener('click',      () => handleClick(sq));
+      div.addEventListener('mousedown',  e  => startDrag(e, sq));
+      div.addEventListener('touchstart', e  => startTouch(e, sq), {passive:false});
+
+      board.appendChild(div);
+    }
+  }
+}
+
+function findKing(color) {
+  const b = chess.board();
+  for (let r=0;r<8;r++) for (let f=0;f<8;f++) {
+    const p = b[r][f];
+    if (p && p.type==='k' && p.color===color) return FILES[f]+(8-r);
+  }
+  return null;
+}
+
+// ── Click handler ─────────────────────────────────────────────────────────────
+function handleClick(sq) {
+  if (thinking || chess.game_over()) return;
+  if (chess.turn() !== playerColor) return;
+
+  const piece = chess.get(sq);
+
+  if (selected) {
+    if (legalDests.includes(sq)) {
+      tryMove(selected, sq);
+    } else if (piece && piece.color === playerColor) {
+      selected   = sq;
+      legalDests = getLegalDests(sq);
+      render();
+    } else {
+      selected   = null;
+      legalDests = [];
+      render();
+    }
+  } else {
+    if (piece && piece.color === playerColor) {
+      selected   = sq;
+      legalDests = getLegalDests(sq);
+      render();
+    }
+  }
+}
+
+function getLegalDests(sq) {
+  return chess.moves({square:sq, verbose:true}).map(m => m.to);
+}
+
+// ── Move execution ────────────────────────────────────────────────────────────
+function tryMove(from, to) {
+  const piece = chess.get(from);
+  if (piece && piece.type==='p') {
+    const toRank = to[1];
+    if ((piece.color==='w' && toRank==='8') || (piece.color==='b' && toRank==='1')) {
+      // Promotion
+      pendingMove = {from, to};
+      showPromo(piece.color);
+      return;
+    }
+  }
+  commitMove(from, to, 'q');
+}
+
+function commitMove(from, to, promo) {
+  const mv = chess.move({from, to, promotion: promo});
+  if (!mv) return;
+  lastMove   = {from:mv.from, to:mv.to};
+  selected   = null;
+  legalDests = [];
+  render();
+  updateSidebar();
+  if (!chess.game_over()) setTimeout(askEngine, 150);
+}
+
+// ── Promotion UI ──────────────────────────────────────────────────────────────
+function showPromo(color) {
+  const box = document.getElementById('promo-box');
+  box.innerHTML = '';
+  ['q','r','b','n'].forEach(t => {
+    const span = document.createElement('span');
+    span.className = `promo-piece ${color==='w'?'wp':'bp'}`;
+    span.textContent = GLYPHS[color + t.toUpperCase()];
+    span.onclick = () => {
+      document.getElementById('promo-overlay').classList.remove('open');
+      commitMove(pendingMove.from, pendingMove.to, t);
+      pendingMove = null;
+    };
+    box.appendChild(span);
+  });
+  document.getElementById('promo-overlay').classList.add('open');
+}
+
+// ── Drag & Drop (mouse) ───────────────────────────────────────────────────────
+function startDrag(e, sq) {
+  if (e.button !== 0) return;
+  if (thinking || chess.game_over() || chess.turn()!==playerColor) return;
+  const piece = chess.get(sq);
+  if (!piece || piece.color!==playerColor) return;
+
+  e.preventDefault();
+  dragSrc    = sq;
+  selected   = sq;
+  legalDests = getLegalDests(sq);
+
+  ghost = document.createElement('div');
+  ghost.className = `ghost ${piece.color==='w'?'wp':'bp'}`;
+  ghost.textContent = GLYPHS[piece.color+piece.type.toUpperCase()];
+  positionGhost(ghost, e.clientX, e.clientY);
+  document.body.appendChild(ghost);
+
+  render();
+
+  const onMove = e2 => positionGhost(ghost, e2.clientX, e2.clientY);
+  const onUp   = e2 => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup',   onUp);
+    ghost.remove(); ghost = null;
+
+    const el = document.elementFromPoint(e2.clientX, e2.clientY);
+    const target = el?.closest('[data-sq]')?.dataset.sq;
+    if (target && legalDests.includes(target)) {
+      tryMove(dragSrc, target);
+    } else {
+      selected=null; legalDests=[];
+    }
+    dragSrc = null;
+    render();
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',   onUp);
+}
+
+// ── Drag & Drop (touch) ───────────────────────────────────────────────────────
+let touchGhost = null;
+let touchSrc   = null;
+
+function startTouch(e, sq) {
+  if (thinking || chess.game_over() || chess.turn()!==playerColor) return;
+  const piece = chess.get(sq);
+
+  // If already selected, handle as click
+  if (selected && legalDests.includes(sq)) {
+    e.preventDefault();
+    tryMove(selected, sq);
+    return;
+  }
+  if (!piece || piece.color!==playerColor) return;
+  e.preventDefault();
+
+  touchSrc   = sq;
+  selected   = sq;
+  legalDests = getLegalDests(sq);
+
+  const t = e.touches[0];
+  touchGhost = document.createElement('div');
+  touchGhost.className = `ghost ${piece.color==='w'?'wp':'bp'}`;
+  touchGhost.textContent = GLYPHS[piece.color+piece.type.toUpperCase()];
+  positionGhost(touchGhost, t.clientX, t.clientY);
+  document.body.appendChild(touchGhost);
+
+  render();
+
+  const onMove = e2 => { e2.preventDefault(); const t2=e2.touches[0]; positionGhost(touchGhost,t2.clientX,t2.clientY); };
+  const onEnd  = e2 => {
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend',  onEnd);
+    touchGhost.remove(); touchGhost=null;
+
+    const t3 = e2.changedTouches[0];
+    const el = document.elementFromPoint(t3.clientX, t3.clientY);
+    const target = el?.closest('[data-sq]')?.dataset.sq;
+    if (target && legalDests.includes(target)) {
+      tryMove(touchSrc, target);
+    } else {
+      selected=null; legalDests=[];
+    }
+    touchSrc=null;
+    render();
+  };
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('touchend',  onEnd);
+}
+
+function positionGhost(g, x, y) {
+  g.style.left = x+'px';
+  g.style.top  = y+'px';
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function updateSidebar() {
+  // Status
+  const el = document.getElementById('status');
+  if (chess.in_checkmate()) {
+    const winner = chess.turn()==='w' ? 'Black' : 'White';
+    el.textContent = `✦ Checkmate — ${winner} wins`;
+  } else if (chess.in_stalemate()) {
+    el.textContent = '✦ Stalemate — Draw';
+  } else if (chess.insufficient_material()) {
+    el.textContent = '✦ Insufficient material — Draw';
+  } else if (chess.in_threefold_repetition()) {
+    el.textContent = '✦ Threefold repetition — Draw';
+  } else if (chess.in_draw()) {
+    el.textContent = '✦ Draw by 50-move rule';
+  } else if (chess.in_check()) {
+    const who = chess.turn()==='w' ? 'White' : 'Black';
+    el.textContent = `${who} in check!`;
+  } else {
+    const who = chess.turn()==='w' ? 'White' : 'Black';
+    el.textContent = `${who} to move`;
+  }
+
+  // History
+  const hist = chess.history({verbose:true});
+  const tbody = document.getElementById('hist-body');
+  tbody.innerHTML = '';
+  for (let i=0;i<hist.length;i+=2) {
+    const w = hist[i], b = hist[i+1];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="mv-num">${i/2+1}.</td>
+      <td class="mv-w ${i===hist.length-1?'cur':''}">${w.san}</td>
+      <td class="mv-b ${b&&i+1===hist.length-1?'cur':''}">${b?b.san:''}</td>`;
+    tbody.appendChild(tr);
+  }
+  document.querySelector('.hist-scroll').scrollTop = 9999;
+
+  // Captured
+  const captByW = [], captByB = [];
+  for (const mv of hist) {
+    if (mv.captured) {
+      const c = mv.color==='w'?'b':'w';
+      const sym = GLYPHS[c+mv.captured.toUpperCase()];
+      if (mv.color==='w') captByW.push(sym);
+      else captByB.push(sym);
+    }
+  }
+  document.getElementById('cap-by-white').textContent = captByW.join('');
+  document.getElementById('cap-by-black').textContent = captByB.join('');
+}
+
+// ── Controls ─────────────────────────────────────────────────────────────────
+function setThinking(v) {
+  thinking = v;
+  document.getElementById('thinking').style.display = v ? 'flex' : 'none';
+}
+
+function setDifficulty(v) {
+  skillLevel = v;
+  document.getElementById('diff-val').textContent  = v+' / 20';
+  document.getElementById('diff-name').textContent = DIFF_NAMES[v];
+  sfSend(`setoption name Skill Level value ${v}`);
+}
+
+function setColor(c) {
+  playerColor = c;
+  document.getElementById('btn-w').classList.toggle('active', c==='w');
+  document.getElementById('btn-b').classList.toggle('active', c==='b');
+  newGame();
+}
+
+function flipBoard() { flipped = !flipped; render(); }
+
+function newGame() {
+  chess      = new Chess();
+  selected   = null;
+  legalDests = [];
+  lastMove   = null;
+  setThinking(false);
+  render();
+  updateSidebar();
+  if (playerColor === 'b') setTimeout(askEngine, 400);
+}
+
+// ── PWA ───────────────────────────────────────────────────────────────────────
+(function pwa() {
+  const manifest = {
+    name:'Noir Chess', short_name:'Chess',
+    start_url:'.', display:'standalone',
+    theme_color:'#0c0c12', background_color:'#0c0c12',
+    description:'Play chess against Stockfish engine',
+    icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">♟</text></svg>',sizes:'any',type:'image/svg+xml'}]
+  };
+  const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  const mLink = document.createElement('link');
+  mLink.rel = 'manifest'; mLink.href = URL.createObjectURL(mBlob);
+  document.head.appendChild(mLink);
+
+  if ('serviceWorker' in navigator) {
+    const sw = `
+      const CACHE='noir-chess-v1';
+      self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['${location.href}'])))});
+      self.addEventListener('activate',e=>{clients.claim()});
+      self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});
+    `;
+    const swBlob = new Blob([sw],{type:'text/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+  }
+})();
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+initSF();
+render();
+updateSidebar();
+</script>
+</body>
+</html>
