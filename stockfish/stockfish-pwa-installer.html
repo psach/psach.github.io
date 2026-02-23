@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stockfish — Install</title>
+<link rel="manifest" id="manifest-link">
+<meta name="theme-color" content="#0a0a0a">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --fg: #f0ede6;
+    --accent: #e8c84a;
+    --muted: #3a3a3a;
+    --board-light: #f0d9b5;
+    --board-dark: #b58863;
+    --gutter: clamp(1.5rem, 5vw, 4rem);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+  }
+
+  /* Chessboard background */
+  .board-bg {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .board-bg span:nth-child(even of .light) { background: var(--board-light); }
+  .board-bg span { display: block; }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 50% 50%, rgba(232,200,74,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 100% 100% at 0% 100%, rgba(181,136,99,0.08) 0%, transparent 50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--gutter);
+    gap: 2rem;
+  }
+
+  /* Knight SVG mark */
+  .knight-mark {
+    width: 72px;
+    height: 72px;
+    filter: drop-shadow(0 0 24px rgba(232,200,74,0.4));
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 12vw, 9rem);
+    letter-spacing: 0.04em;
+    line-height: 0.9;
+    text-align: center;
+    background: linear-gradient(160deg, #fff 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-align: center;
+    opacity: 0.85;
+  }
+
+  .divider {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, transparent, var(--muted), transparent);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--muted);
+    border: 1px solid var(--muted);
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .info-cell {
+    background: #111;
+    padding: 1.1rem 1rem;
+    text-align: center;
+  }
+
+  .info-cell .val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .info-cell .key {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #666;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #666;
+    transition: background 0.4s, box-shadow 0.4s;
+  }
+  .status-dot.ready { background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.6); }
+  .status-dot.installed { background: var(--accent); box-shadow: 0 0 8px rgba(232,200,74,0.5); }
+  .status-dot.pulse { animation: pulse-dot 1.2s ease-in-out infinite; }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  #status-text { transition: opacity 0.3s; }
+
+  /* Buttons */
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 1rem 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.05);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn:hover::after { opacity: 1; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0a;
+    font-weight: 500;
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(232,200,74,0.25);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 48px rgba(232,200,74,0.45);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--muted);
+  }
+  .btn-ghost:hover { border-color: #666; }
+
+  /* Progress bar */
+  .progress-wrap {
+    width: 100%;
+    max-width: 320px;
+    height: 2px;
+    background: var(--muted);
+    overflow: hidden;
+    display: none;
+  }
+  .progress-wrap.active { display: block; }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #fff, var(--accent));
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    width: 0%;
+    transition: width 0.3s;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Instructions panel */
+  .instructions {
+    display: none;
+    max-width: 400px;
+    width: 100%;
+    border: 1px solid var(--muted);
+    background: #0f0f0f;
+    padding: 1.5rem;
+  }
+  .instructions.visible { display: block; animation: slide-in 0.3s ease; }
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .instructions h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .step {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.68rem;
+    line-height: 1.6;
+    letter-spacing: 0.05em;
+    color: #aaa;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    background: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: var(--fg);
+  }
+
+  /* Already installed */
+  .installed-msg {
+    display: none;
+    text-align: center;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .installed-msg.visible { display: block; animation: slide-in 0.3s ease; }
+
+  .footer-note {
+    font-size: 0.6rem;
+    color: #444;
+    text-align: center;
+    letter-spacing: 0.1em;
+    max-width: 320px;
+  }
+
+  /* Board tiles background */
+  .tile {
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Chess pattern background -->
+<div class="board-bg" id="board-bg"></div>
+
+<div class="container">
+
+  <!-- Knight icon -->
+  <svg class="knight-mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 52 C20 52 18 48 18 42 C18 36 22 30 22 30 C22 30 14 28 12 24 C10 20 14 16 14 16 C14 16 18 20 22 18 C26 16 28 10 32 10 C36 10 40 14 38 20 C36 26 32 28 32 28 L38 36 C40 40 42 44 42 50 L42 52 Z" fill="var(--fg)" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
+    <ellipse cx="26" cy="20" rx="2" ry="2" fill="var(--bg)"/>
+    <line x1="16" y1="52" x2="46" y2="52" stroke="var(--accent)" stroke-width="2"/>
+  </svg>
+
+  <div>
+    <div class="title">STOCKFISH</div>
+    <div class="subtitle">World's Strongest Chess Engine · PWA Installer</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="info-grid">
+    <div class="info-cell">
+      <div class="val">SF17</div>
+      <div class="key">Version</div>
+    </div>
+    <div class="info-cell">
+      <div class="val">WASM</div>
+      <div class="key">Runtime</div>
+    </div>
+    <div class="info-cell">
+      <div class="val" id="elo-val">3642</div>
+      <div class="key">Elo Rating</div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-dot pulse" id="status-dot"></div>
+    <span id="status-text">Checking environment…</span>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+
+  <!-- Installed message -->
+  <div class="installed-msg" id="installed-msg">
+    ♟ App installed — open from your home screen
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-group" id="btn-group">
+    <button class="btn btn-primary" id="install-btn" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v14M6 10l6 6 6-6"/><path d="M4 20h16"/></svg>
+      Install App
+    </button>
+    <a href="https://psach.github.io/stockfish/stockfish.html" target="_blank" class="btn btn-ghost" id="open-btn">
+      Open in Browser
+    </a>
+  </div>
+
+  <!-- Manual instructions fallback -->
+  <div class="instructions" id="instructions">
+    <h3>Manual Install</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>Open <strong style="color:var(--fg)">https://psach.github.io/stockfish/stockfish.html</strong> in Chrome, Edge, or Safari</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div><strong style="color:var(--fg)">Chrome / Edge:</strong> Click the install icon (⊕) in the address bar, then "Install"</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div><strong style="color:var(--fg)">Safari iOS:</strong> Tap the Share button → "Add to Home Screen"</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div>Stockfish will now appear as a standalone app on your device</div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Installs Stockfish Chess as a Progressive Web App · Works offline · No app store required
+  </div>
+
+</div>
+
+<script>
+// ── Build chessboard background ──────────────────────────────────────────────
+const boardBg = document.getElementById('board-bg');
+for (let r = 0; r < 8; r++) {
+  for (let c = 0; c < 8; c++) {
+    const s = document.createElement('span');
+    if ((r + c) % 2 === 0) {
+      s.style.background = '#f0d9b5';
+    } else {
+      s.style.background = '#b58863';
+    }
+    boardBg.appendChild(s);
+  }
+}
+
+// ── DOM refs ─────────────────────────────────────────────────────────────────
+const dot        = document.getElementById('status-dot');
+const statusText = document.getElementById('status-text');
+const installBtn = document.getElementById('install-btn');
+const btnGroup   = document.getElementById('btn-group');
+const progressWrap = document.getElementById('progress-wrap');
+const progressBar  = document.getElementById('progress-bar');
+const instructions = document.getElementById('instructions');
+const installedMsg = document.getElementById('installed-msg');
+
+let deferredPrompt = null;
+
+function setStatus(text, state = 'idle') {
+  statusText.textContent = text;
+  dot.className = 'status-dot';
+  if (state === 'ready')     { dot.classList.add('ready'); }
+  if (state === 'installed') { dot.classList.add('installed'); }
+  if (state === 'loading')   { dot.classList.add('pulse'); }
+}
+
+function animateProgress(to, duration = 600) {
+  progressWrap.classList.add('active');
+  progressBar.style.transition = `width ${duration}ms ease`;
+  progressBar.style.width = to + '%';
+}
+
+// ── Check if already running as PWA ──────────────────────────────────────────
+const isStandalone =
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true;
+
+if (isStandalone) {
+  // We're already installed — redirect straight to the app
+  setStatus('Launching Stockfish…', 'installed');
+  setTimeout(() => {
+    window.location.href = 'https://psach.github.io/stockfish/stockfish.html';
+  }, 800);
+}
+
+// ── Inject a minimal manifest for this installer page ────────────────────────
+function injectManifest() {
+  const manifest = {
+    name: "Stockfish Chess",
+    short_name: "Stockfish",
+    description: "The world's strongest chess engine, in your browser.",
+    start_url: "https://psach.github.io/stockfish/stockfish.html",
+    display: "standalone",
+    background_color: "#0a0a0a",
+    theme_color: "#0a0a0a",
+    icons: [
+      {
+        src: "https://psach.github.io/stockfish/favicon.png",
+        sizes: "any",
+        type: "image/png",
+        purpose: "any maskable"
+      }
+    ]
+  };
+
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const link = document.getElementById('manifest-link');
+  link.href = url;
+}
+
+injectManifest();
+
+// ── Intercept beforeinstallprompt ─────────────────────────────────────────────
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setStatus('Ready to install', 'ready');
+  installBtn.disabled = false;
+  instructions.classList.remove('visible');
+});
+
+// ── Install button handler ────────────────────────────────────────────────────
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+
+  setStatus('Waiting for confirmation…', 'loading');
+  animateProgress(50);
+  installBtn.disabled = true;
+
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+
+  if (outcome === 'accepted') {
+    animateProgress(100);
+    setStatus('Installing…', 'loading');
+    setTimeout(() => {
+      progressWrap.classList.remove('active');
+      btnGroup.style.display = 'none';
+      installedMsg.classList.add('visible');
+      setStatus('Installation complete', 'installed');
+    }, 900);
+  } else {
+    progressWrap.classList.remove('active');
+    installBtn.disabled = false;
+    setStatus('Install dismissed — try again', 'ready');
+  }
+});
+
+// ── appinstalled event ────────────────────────────────────────────────────────
+window.addEventListener('appinstalled', () => {
+  btns.style.display = 'none';
+  installedMsg.classList.add('visible');
+  setStatus('Installed successfully', 'installed');
+});
+
+// ── Initial check: is the browser PWA-capable? ───────────────────────────────
+function init() {
+  const isHttps = location.protocol === 'https:' || location.hostname === 'localhost';
+  const supportsServiceWorker = 'serviceWorker' in navigator;
+
+  if (!isHttps || !supportsServiceWorker) {
+    setStatus('Browser not PWA-capable', 'idle');
+    installBtn.style.display = 'none';
+    instructions.classList.add('visible');
+    return;
+  }
+
+  setStatus('Awaiting install prompt…', 'loading');
+
+  // Fallback: if after 4s no beforeinstallprompt, show manual instructions
+  setTimeout(() => {
+    if (!deferredPrompt && !isStandalone) {
+      const alreadyInstalled =
+        window.matchMedia('(display-mode: standalone)').matches;
+      if (alreadyInstalled) {
+        setStatus('Already installed', 'installed');
+        btnGroup.style.display = 'none';
+        installedMsg.classList.add('visible');
+      } else {
+        setStatus('Use browser menu to install', 'idle');
+        installBtn.disabled = true;
+        instructions.classList.add('visible');
+      }
+    }
+  }, 4000);
+}
+
+init();
+</script>
+</body>
+</html>
