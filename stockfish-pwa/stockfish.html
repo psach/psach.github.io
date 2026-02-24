@@ -216,10 +216,7 @@
             });
         }
 
-        // Show/hide PWA banner based on availability
-        const banner = document.getElementById('pwa-banner');
-        const dismissButton = document.getElementById('dismiss-button');
-
+       
         // Check if install prompt is available
         let installPromptShown = false;
         window.addEventListener('beforeinstallprompt', () => {
@@ -227,12 +224,7 @@
             banner.classList.add('visible');
         });
 
-        // Hide banner on dismiss
-        dismissButton.addEventListener('click', () => {
-            banner.classList.remove('visible');
-            localStorage.setItem('pwa_dismissed', Date.now());
-        });
-
+      
         // Initialize chess.js and chessboard.js
         const game = new Chess();
         const board = Chessboard('board', {
