@@ -2,12 +2,11 @@
 const VERSION = 'v1.0.0';
 const CORE = [
   '/',
-  '/index.html',
+  '/stockfish-pwa/stockfish.html',
   '/styles.css',
-  '/app.js',
   '/manifest.webmanifest',
-  '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png'
+  '/img/chesspieces/wikipedia/bK.png',
+  '/img/chesspieces/wikipedia/bK.png'
 ];
 
 self.addEventListener('install', (e) => {
