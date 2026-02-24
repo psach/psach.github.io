@@ -790,7 +790,7 @@ function processSheet(csv){
     if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
   });
 
-  
+   const now=Date.now(),fresh={};
   for(let r = 1; r < rows.length; r++){
     const row = rows[r];
     if(!row || row.length < 2) continue;
