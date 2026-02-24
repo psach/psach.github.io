@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Horn OK">
+<meta name="description" content="Horn OK Please — honk at people within 50 metres of you">
+<!-- Apple touch icon — 📯 on dark -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f1117'/%3E%3Ctext x='96' y='132' font-size='110' text-anchor='middle'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E">
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f1117'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E">
+<title>Horn OK — Proximity Honker</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--card:#21253a;--border:#2e3350;--accent:#4f8ef7;--accent2:#7c5bf7;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--text:#e8eaf0;--muted:#6b7280;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Header */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:1000}
+.logo{font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.status-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
+.status-dot.online{background:var(--green);box-shadow:0 0 6px var(--green)}
+#statusText{font-size:.8rem;color:var(--muted);flex:1}
+#userBadge{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.8rem;color:var(--accent);font-weight:600}
+#nearbyCount{background:var(--accent);color:#fff;border-radius:12px;padding:3px 10px;font-size:.75rem;font-weight:700;margin-left:auto}
+
+/* Login */
+#loginOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;overflow-y:auto;padding:16px 0}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px 28px;width:min(380px,92vw);text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.login-card h2{font-size:1.5rem;margin-bottom:6px}
+.login-card p{color:var(--muted);font-size:.85rem;margin-bottom:20px}
+.input-group input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;color:var(--text);font-size:1rem;outline:none;transition:border .2s;margin-bottom:16px}
+.input-group input:focus{border-color:var(--accent)}
+.btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);padding:13px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+#gpsStatus{font-size:.78rem;color:var(--muted);margin-top:10px}
+
+/* Vehicle selector */
+.vehicle-label{font-size:.8rem;color:var(--muted);text-align:left;margin-bottom:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.vehicle-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.vehicle-option{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:8px 4px 8px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;text-align:center;user-select:none;overflow:hidden}
+.vehicle-option:hover{border-color:var(--accent);background:rgba(79,142,247,.08)}
+.vehicle-option.selected{border-color:var(--accent);background:rgba(79,142,247,.14);box-shadow:0 0 0 1px var(--accent) inset}
+.v-emoji{font-size:1.6rem;display:block;line-height:1.2}
+.v-name{font-size:.58rem;color:var(--muted);margin-top:2px;line-height:1.2;display:block}
+.vehicle-option.selected .v-name{color:var(--accent)}
+
+/* Inline colour strip inside selected vehicle card */
+.v-colors{display:none;flex-wrap:wrap;justify-content:center;gap:4px;padding:7px 4px 2px;border-top:1px solid rgba(79,142,247,.2);margin-top:6px}
+.vehicle-option.selected .v-colors{display:flex}
+.v-swatch{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s,box-shadow .15s;position:relative;flex-shrink:0}
+.v-swatch:hover{transform:scale(1.25)}
+.v-swatch.selected{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.45),0 1px 6px rgba(0,0,0,.55)}
+.v-swatch.selected::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.45rem;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+
+/* Map container */
+#mapContainer{flex:1;position:relative;overflow:hidden}
+#map{width:100%;height:100%}
+
+/* Horn button */
+#hornBtn{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:800;background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:10px 14px;cursor:pointer;text-align:center;font-size:1.6rem;line-height:1;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,.4);display:none}
+#hornBtn:hover:not(:disabled){border-color:var(--yellow);background:rgba(245,158,11,.1);transform:translateY(-50%) scale(1.05)}
+#hornBtn:disabled{opacity:.4;cursor:not-allowed}
+#hornBtn .horn-count{font-size:.6rem;color:var(--yellow);font-weight:700;display:block;margin-top:2px}
+#hornBtn.honked{animation:honkPulse .4s ease}
+
+/* Horn incoming flash */
+.horn-flash{position:fixed;inset:0;background:rgba(245,158,11,.12);pointer-events:none;z-index:8999;opacity:0;transition:opacity .1s}
+.horn-flash.active{opacity:1}
+
+@keyframes honkPulse{0%{transform:translateY(-50%) scale(1)}30%{transform:translateY(-50%) scale(1.25) rotate(-8deg)}60%{transform:translateY(-50%) scale(1.1) rotate(5deg)}100%{transform:translateY(-50%) scale(1)}}
+
+/* ── Map speech bubbles ── */
+.map-bubble{position:absolute;z-index:700;pointer-events:none;transform:translate(-50%,-100%);animation:bubblePop .25s cubic-bezier(.34,1.56,.64,1) forwards}
+.map-bubble.dying{animation:bubbleFade .35s ease forwards}
+.bubble-body{background:#fff;color:#111;border-radius:14px;padding:7px 11px;font-size:.78rem;font-weight:600;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 18px rgba(0,0,0,.28);line-height:1.35;position:relative}
+.bubble-body.horn-bubble{color:#fff}
+.bubble-body.direct-bubble{color:#fff}
+.bubble-tail{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #fff;margin:0 auto;filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+.bubble-tail.horn-tail,.bubble-tail.direct-tail{border-top-color:inherit}
+@keyframes bubblePop{from{opacity:0;transform:translate(-50%,-90%) scale(.7)}to{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+@keyframes bubbleFade{from{opacity:1;transform:translate(-50%,-100%) scale(1)}to{opacity:0;transform:translate(-50%,-115%) scale(.85)}}
+
+/* Message panel */
+#msgPanel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:900;transition:transform .3s;max-height:40vh;display:flex;flex-direction:column}
+#msgPanel.collapsed{transform:translateY(calc(100% - 44px))}
+.panel-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.msg-badge{background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;font-size:.7rem;font-weight:700}
+#msgList{flex:1;overflow-y:auto;padding:8px;min-height:120px}
+.msg-bubble{background:var(--card);border-radius:10px;padding:8px 12px;margin-bottom:6px;border-left:3px solid var(--accent);animation:fadeIn .3s ease}
+.msg-bubble.mine{border-left-color:var(--green)}
+.msg-bubble.horn-msg{border-left-color:var(--yellow);background:rgba(245,158,11,.07)}
+.msg-from{font-size:.7rem;color:var(--accent);font-weight:700;margin-bottom:2px}
+.msg-bubble.mine .msg-from{color:var(--green)}
+.msg-bubble.horn-msg .msg-from{color:var(--yellow)}
+.msg-text{font-size:.82rem;word-wrap:break-word}
+.msg-time{font-size:.65rem;color:var(--muted);margin-top:2px}
+.toggle-icon{transition:transform .3s}
+.toggle-icon.open{transform:rotate(180deg)}
+
+/* Compose */
+#composeBox{display:none;position:fixed;bottom:80px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:min(340px,calc(100vw - 32px));z-index:5000;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+#composeBox h3{font-size:.95rem;margin-bottom:12px}
+.target{font-size:.8rem;color:var(--accent);margin-bottom:10px;font-weight:600}
+#composeBox textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:.85rem;resize:none;height:80px;outline:none}
+#composeBox textarea:focus{border-color:var(--accent)}
+.compose-actions{display:flex;gap:8px;margin-top:10px}
+.btn-send{flex:1;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;padding:9px;color:#fff;font-weight:600;cursor:pointer;font-size:.85rem}
+.btn-cancel{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;color:var(--text);cursor:pointer;font-size:.85rem;border:none}
+
+/* Toast */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border);border-radius:30px;padding:9px 20px;font-size:.82rem;opacity:0;transition:all .3s;pointer-events:none;z-index:9000;white-space:nowrap;max-width:calc(100vw - 32px)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.horn-toast{border-color:var(--yellow);color:var(--yellow)}
+
+/* Poll bar */
+#pollBar{height:2px;background:var(--border);flex-shrink:0;overflow:hidden}
+#pollProgress{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width linear}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* Google Maps-style popup */
+.leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 4px 20px rgba(0,0,0,.22)!important;border:none!important;padding:0!important}
+.leaflet-popup-content{margin:14px 16px!important}
+.leaflet-popup-tip{background:#fff!important}
+.leaflet-popup-close-button{color:#5f6368!important;font-size:16px!important;top:8px!important;right:10px!important}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+@media (max-width:640px){
+  header{padding:8px 12px}
+  .logo{font-size:1rem}
+  #statusText{display:none}
+  #userBadge{font-size:.7rem;padding:3px 8px}
+  #nearbyCount{font-size:.7rem;padding:2px 8px}
+  #composeBox{bottom:60px;right:12px;left:12px;width:auto}
+  #msgPanel{max-height:50vh}
+  #hornBtn{right:10px}
+  .vehicle-grid{grid-template-columns:repeat(4,1fr);gap:6px}
+}
+@media (max-height:600px){#msgPanel{max-height:35vh}}
+
+/* ── Bell button ── */
+#bellBtn{position:relative;background:none;border:1.5px solid var(--border);border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+#bellBtn.bell-show{display:flex}
+#bellBtn:hover{border-color:var(--accent);background:rgba(79,142,247,.1)}
+#bellBtn.notif-on{border-color:var(--green)}
+#bellBtn.notif-off{border-color:var(--red)}
+#bellBtn.notif-ask{border-color:var(--yellow);animation:bellPulse 2s ease-in-out infinite}
+#bellDot{position:absolute;top:0px;right:0px;width:9px;height:9px;border-radius:50%;border:2px solid var(--surface);display:none}
+#bellBtn.notif-on  #bellDot{display:block;background:var(--green)}
+#bellBtn.notif-off #bellDot{display:block;background:var(--red)}
+#bellBtn.notif-ask #bellDot{display:block;background:var(--yellow)}
+@keyframes bellPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12) rotate(10deg)}}
+
+/* ── Notif panel rows ── */
+.notif-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.notif-row:last-child{border-bottom:none}
+.notif-icon{font-size:1.8rem;flex-shrink:0;width:40px;text-align:center}
+.notif-info{flex:1}
+.notif-info strong{display:block;font-size:.88rem;margin-bottom:2px}
+.notif-info span{font-size:.75rem;color:var(--muted)}
+.notif-toggle{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;color:var(--text);font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
+.notif-toggle.on{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.notif-toggle.warn{background:rgba(245,158,11,.12);border-color:var(--yellow);color:var(--yellow)}
+.notif-toggle.err{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.notif-step-box{background:var(--card);border-radius:12px;padding:14px;margin-top:12px}
+.notif-step-box p{font-size:.78rem;color:var(--muted);margin-bottom:8px}
+.notif-step{font-size:.78rem;color:var(--text);margin-bottom:6px;display:flex;gap:8px}
+.notif-close-btn{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;color:var(--text);font-size:.85rem;font-weight:600;cursor:pointer;margin-top:16px;transition:background .2s}
+.notif-close-btn:hover{background:var(--border)}
+#installBtn{display:none;background:linear-gradient(135deg,var(--green),#16a34a);border:none;border-radius:20px;padding:5px 13px;color:#fff;font-size:.75rem;font-weight:700;cursor:pointer;gap:5px;align-items:center;white-space:nowrap;box-shadow:0 2px 10px rgba(34,197,94,.35);transition:opacity .2s,transform .2s}
+#installBtn:hover{opacity:.9;transform:scale(1.04)}
+#installBtn.visible{display:flex}
+
+/* ── iOS "Add to Home Screen" banner ── */
+#iosBanner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 18px;z-index:9998;flex-direction:column;gap:8px;box-shadow:0 -8px 32px rgba(0,0,0,.5)}
+#iosBanner.show{display:flex}
+.ios-banner-row{display:flex;align-items:center;gap:12px}
+.ios-banner-icon{font-size:2rem;flex-shrink:0}
+.ios-banner-text{flex:1;font-size:.82rem;line-height:1.5}
+.ios-banner-text strong{color:var(--text)}
+.ios-banner-text span{color:var(--muted)}
+.ios-banner-close{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:4px 10px;font-size:.78rem;cursor:pointer}
+.ios-step{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.ios-step b{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- Horn flash overlay -->
+<div class="horn-flash" id="hornFlash"></div>
+
+<!-- Audio for notifications/horn -->
+<audio id="notificationSound" preload="auto">
+  <source src="horn.wav" type="audio/wav">
+  <source src="https://cdn.freesound.org/previews/320/320655_5260872-lq.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Login -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div style="font-size:2.8rem;margin-bottom:10px;filter:drop-shadow(0 0 12px rgba(245,158,11,.5))">📯</div>
+    <h2>Horn OK</h2>
+    <p>Horn OK Please — honk at people within 50 metres</p>
+    <div class="input-group">
+      <input type="text" id="usernameInput" placeholder="Choose a username" maxlength="30" autocomplete="off"/>
+    </div>
+    <div class="vehicle-label">Your vehicle</div>
+    <div class="vehicle-grid" id="vehicleGrid">
+      <!-- populated by JS -->
+    </div>
+    <button class="btn" id="joinBtn" disabled>Acquiring GPS…</button>
+    <div id="gpsStatus">Waiting for location permission…</div>
+  </div>
+</div>
+
+<header>
+  <span class="logo">📯 Horn OK</span>
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Offline</span>
+  <span id="userBadge" style="display:none"></span>
+  <button id="bellBtn" onclick="openNotifPanel()" title="Notification settings" style="display:none">🔔<span id="bellDot"></span></button>
+  <button id="installBtn" onclick="triggerInstall()" title="Install app">⬇ Install</button>
+  <span id="nearbyCount" style="display:none">0</span>
+</header>
+<div id="pollBar"><div id="pollProgress"></div></div>
+
+<div id="mapContainer"><div id="map"></div></div>
+
+<!-- Horn button -->
+<button id="hornBtn" onclick="sendHorn()" title="Honk to nearby users">
+  📯
+  <span class="horn-count" id="hornCountLabel">3 left</span>
+</button>
+
+<div id="msgPanel" class="collapsed">
+  <div class="panel-header" onclick="toggleMsgPanel()">
+    Messages <span class="msg-badge" id="msgCount">0</span>
+    <span class="toggle-icon">▼</span>
+  </div>
+  <div id="msgList"><div style="padding:12px;font-size:.78rem;color:var(--muted);text-align:center">No messages yet</div></div>
+</div>
+
+<div id="composeBox">
+  <h3>Send Message</h3>
+  <div class="target" id="composeTarget">To: —</div>
+  <textarea id="composeMsg" placeholder="Type your message…" maxlength="200"></textarea>
+  <div class="compose-actions">
+    <button class="btn-cancel" onclick="closeCompose()">Cancel</button>
+    <button class="btn-send" id="sendBtn" onclick="sendMessage()">Send ✉️</button>
+  </div>
+</div>
+<div id="iosBanner">
+  <div class="ios-banner-row">
+    <span class="ios-banner-icon">📯</span>
+    <div class="ios-banner-text">
+      <strong>Install Horn OK</strong><br>
+      <span>Add to Home Screen for the best experience</span>
+    </div>
+    <button class="ios-banner-close" onclick="dismissIosBanner()">✕</button>
+  </div>
+  <div class="ios-step">1️⃣ <b>Tap</b> the Share button <b>⎙</b> at the bottom of Safari</div>
+  <div class="ios-step">2️⃣ Scroll down and tap <b>"Add to Home Screen"</b></div>
+  <div class="ios-step">3️⃣ Tap <b>Add</b> — done! 🎉</div>
+</div>
+
+<!-- Notification permission panel -->
+<div id="notifPanel" style="display:none;position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center">
+  <div id="notifCard" style="background:var(--surface);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:460px;box-shadow:0 -16px 60px rgba(0,0,0,.6)">
+    <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 24px"></div>
+    <div id="notifPanelContent"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────
+const FORM_URL  = 'https://docs.google.com/forms/d/e/1FAIpQLSfZReeVsl_qDpTWxBQtvIpkaFTXj9xkfiHU_TmBqghw3unoPg/formResponse';
+const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1RpumeyOegHo7VDN3fhqVp3USbbb2mGcpmg94OXu6ko0/gviz/tq?tqx=out:csv';
+const F = { username:'entry.47638508', message:'entry.1476899599', location:'entry.1017486679' };
+const RADIUS_M=50, MSG_WINDOW=60000, POLL_MS=3000, USER_WINDOW=60000;
+const HORN_SEND_LIMIT = 10;
+const HORN_RECV_LIMIT = 3;
+const HORN_MSG = '__HORN__';
+const HORN_1TO1_PREFIX = '__HORN1TO1__|';
+const SOUND_DURATION = 1000;
+const STATIONARY_MS = 30000;   // must be still for 30s before honking
+const MOVE_THRESHOLD_M = 3;    // GPS jitter below this = "not moved"
+
+// ─── INDIAN VEHICLES ───────────────────────────────────────────────────────
+const VEHICLES = [
+  { emoji:'🚗', name:'Car' },
+  { emoji:'🚙', name:'SUV/MUV' },
+  { emoji:'🏍️', name:'Bike' },
+  { emoji:'🛵', name:'Scooter' },
+  { emoji:'🛺', name:'Auto\nRickshaw' },
+  { emoji:'🚕', name:'Taxi/Cab' },
+  { emoji:'🚌', name:'Bus' },
+  { emoji:'🚐', name:'Tempo\nTraveller' },
+  { emoji:'🚚', name:'Mini\nTruck' },
+  { emoji:'🚛', name:'Lorry' },
+  { emoji:'🚲', name:'Cycle' },
+  { emoji:'🛻', name:'Pickup' },
+];
+
+let myVehicle = VEHICLES[0].emoji; // default: Car
+let myColor = '#e53935';           // default: Red
+
+// ─── 12 DISTINCT VEHICLE COLOURS ────────────────────────────────────────────
+const COLORS = [
+  { hex:'#e53935', name:'Red' },
+  { hex:'#f57c00', name:'Orange' },
+  { hex:'#fdd835', name:'Yellow' },
+  { hex:'#43a047', name:'Green' },
+  { hex:'#00acc1', name:'Teal' },
+  { hex:'#1e88e5', name:'Blue' },
+  { hex:'#5e35b1', name:'Purple' },
+  { hex:'#e91e8c', name:'Pink' },
+  { hex:'#ffffff', name:'White' },
+  { hex:'#b0bec5', name:'Silver' },
+  { hex:'#5d4037', name:'Brown' },
+  { hex:'#212121', name:'Black' },
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let myUsername='', myLat=null, myLng=null, map, myMarker, radiusCircle;
+let nearbyUsers={}, seenKeys=new Set(), composeTarget=null, registered=false, msgPanelOpen=false;
+let notificationAudio=null;
+let hornsSent = 0;
+let hornRecvCount = {};
+let wakeLock = null;
+let swRegistration = null;
+
+// ─── STATIONARITY TRACKING ──────────────────────────────────────────────────
+let lastMovedAt  = null;   // timestamp of last time I moved > MOVE_THRESHOLD_M
+let prevLat      = null;
+let prevLng      = null;
+
+// ─── BROADCAST CHANNEL — receive events from SW background poll ────────────
+const bgChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('hornok-bg') : null;
+if(bgChannel){
+  bgChannel.addEventListener('message', e => {
+    const {type, data} = e.data || {};
+    if(!registered) return; // not joined yet
+    if(type === 'BG_HORN' && data){
+      const key = (data.isDirect ? 'horn1to1' : 'horn') + '|bg|' + data.sender + '|' + data.ts;
+      if(!seenKeys.has(key)){ seenKeys.add(key); receiveHorn(data.sender, data.vehicle, data.ts, data.isDirect); }
+    }
+    if(type === 'BG_MSG' && data){
+      const key = 'bgmsg|' + data.sender + '|' + data.ts;
+      if(!seenKeys.has(key)){ seenKeys.add(key); showMsg(data.from, data.text, data.ts, false, false); }
+    }
+    if(type === 'BG_SEENKEYS' && data){
+      (data.keys||[]).forEach(k => seenKeys.add(k));
+    }
+  });
+}
+
+// ─── BUILD VEHICLE GRID (with inline colour strip per card) ─────────────────
+(function buildVehicleGrid(){
+  const grid = document.getElementById('vehicleGrid');
+
+  function makeSwatchStrip(cardEl){
+    const strip = document.createElement('div');
+    strip.className = 'v-colors';
+    COLORS.forEach((c, ci) => {
+      const s = document.createElement('div');
+      s.className = 'v-swatch' + (ci === 0 ? ' selected' : '');
+      s.style.background = c.hex;
+      if(['#ffffff','#fdd835','#b0bec5'].includes(c.hex))
+        s.style.outline = '1px solid rgba(255,255,255,.2)';
+      s.title = c.name;
+      s.addEventListener('click', e => {
+        e.stopPropagation(); // don't re-trigger card click
+        cardEl.querySelectorAll('.v-swatch').forEach(x => x.classList.remove('selected'));
+        s.classList.add('selected');
+        myColor = c.hex;
+        // Update card border accent to chosen colour
+        cardEl.style.borderColor = c.hex;
+        cardEl.style.boxShadow   = `0 0 0 1px ${c.hex} inset, 0 0 12px ${hexToRgba(c.hex,.3)}`;
+      });
+      strip.appendChild(s);
+    });
+    return strip;
+  }
+
+  VEHICLES.forEach((v, i) => {
+    const div = document.createElement('div');
+    div.className = 'vehicle-option' + (i === 0 ? ' selected' : '');
+    div.dataset.emoji = v.emoji;
+    div.innerHTML = `<span class="v-emoji">${v.emoji}</span><span class="v-name">${v.name.replace('\n','<br>')}</span>`;
+
+    const strip = makeSwatchStrip(div);
+    div.appendChild(strip);
+
+    div.addEventListener('click', () => {
+      // Deselect all cards and reset their custom border
+      document.querySelectorAll('.vehicle-option').forEach(el => {
+        el.classList.remove('selected');
+        el.style.borderColor = '';
+        el.style.boxShadow   = '';
+      });
+      div.classList.add('selected');
+      myVehicle = v.emoji;
+      // Re-apply the current colour accent to this newly-selected card
+      div.style.borderColor = myColor;
+      div.style.boxShadow   = `0 0 0 1px ${myColor} inset, 0 0 12px ${hexToRgba(myColor,.3)}`;
+      // Sync selected swatch inside this card to global myColor
+      div.querySelectorAll('.v-swatch').forEach(s => {
+        s.classList.toggle('selected', s.style.backgroundColor === hexToRgb(myColor) || s.title === COLORS.find(c=>c.hex===myColor)?.name);
+      });
+    });
+
+    // First card: seed with default Red selected & styled
+    if(i === 0){
+      div.style.borderColor = myColor;
+      div.style.boxShadow   = `0 0 0 1px ${myColor} inset, 0 0 12px ${hexToRgba(myColor,.3)}`;
+    }
+
+    grid.appendChild(div);
+  });
+})();
+
+// ─── GPS ────────────────────────────────────────────────────────────────────
+function startGPS(){
+  if(!navigator.geolocation){setGPS('❌ Not supported');return;}
+  navigator.geolocation.watchPosition(onGPS,e=>setGPS('❌ '+e.message),{enableHighAccuracy:true,maximumAge:5000});
+}
+function setGPS(t){document.getElementById('gpsStatus').textContent=t;}
+function onGPS(p){
+  const newLat=p.coords.latitude, newLng=p.coords.longitude;
+
+  // Stationarity: reset clock if moved more than MOVE_THRESHOLD_M
+  if(prevLat !== null){
+    const moved = haversine(prevLat, prevLng, newLat, newLng);
+    if(moved > MOVE_THRESHOLD_M){
+      lastMovedAt = Date.now();
+      if(registered) updateHornBtn(); // reflect moving state immediately
+    }
+  } else {
+    lastMovedAt = Date.now(); // first fix — start the 30s clock from here
+  }
+  prevLat = newLat; prevLng = newLng;
+
+  myLat=newLat; myLng=newLng;
+  setGPS(`📍 GPS ready — ±${Math.round(p.coords.accuracy)}m`);
+  const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join NearbyChat';
+  if(map){myMarker.setLatLng([myLat,myLng]); radiusCircle.setLatLng([myLat,myLng]); enforceBounds();}
+  if(registered) registerPresence();
+}
+
+function amIStationary(){
+  if(!lastMovedAt) return false;
+  return (Date.now() - lastMovedAt) >= STATIONARY_MS;
+}
+function stationarySecsLeft(){
+  if(!lastMovedAt) return STATIONARY_MS / 1000;
+  return Math.max(0, Math.ceil((STATIONARY_MS - (Date.now() - lastMovedAt)) / 1000));
+}
+
+// ─── UTILS ──────────────────────────────────────────────────────────────────
+function haversine(a,b,c,d){const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function fmtLoc(lat,lng){return `${lng.toFixed(7)}| ${lat.toFixed(7)}`;}
+function parseLoc(s){if(!s)return null;const p=s.split('|').map(x=>x.trim());const lng=parseFloat(p[0]),lat=parseFloat(p[1]);return(isNaN(lat)||isNaN(lng))?null:{lat,lng};}
+function parseDate(s){if(!s)return 0;const m=s.match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+):(\d+)/);if(m)return new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]).getTime();return new Date(s).getTime()||0;}
+function ini(n){return(n||'?')[0].toUpperCase();}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg,ms=3500,cls=''){
+  const e=document.getElementById('toast');
+  e.textContent=msg; e.className=cls?`show ${cls}`:'show';
+  clearTimeout(e._t); e._t=setTimeout(()=>{e.className='';},ms);
+}
+
+// Parse "name|🚗|#e53935" → {name, vehicle, color}
+function parseUsername(raw){
+  const parts = raw.split('|');
+  return {
+    name:    parts[0].trim(),
+    vehicle: parts[1] ? parts[1].trim() : '🚗',
+    color:   parts[2] ? parts[2].trim() : '#1e88e5'
+  };
+}
+
+// ─── MAP ────────────────────────────────────────────────────────────────────
+function initMap(){
+  // minZoom 18 = ~150m view; zoom 19 = ~75m; keeps user within 50m radius context
+  map = L.map('map', {
+    zoomControl: true,
+    attributionControl: false,
+    minZoom: 18,
+    maxZoom: 21,
+  }).setView([myLat, myLng], 19);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:21,attribution:'© OpenStreetMap © CARTO'}).addTo(map);
+  radiusCircle = L.circle([myLat,myLng],{radius:RADIUS_M,color:'#1a73e8',fillColor:'#1a73e820',fillOpacity:.3,weight:2,dashArray:'6,4'}).addTo(map);
+  myMarker = L.marker([myLat,myLng],{icon:makeVehicleIcon(myVehicle,true,myColor),zIndexOffset:1000}).addTo(map)
+    .bindPopup(`<b>${esc(myUsername)}</b> (You)<br>${myVehicle}`);
+
+  enforceBounds();
+  setTimeout(()=>map.invalidateSize(),100);
+}
+
+function enforceBounds(){
+  if(!map||!myLat) return;
+  // Restrict panning to ~150m around user's position (generous but keeps map local)
+  const center = L.latLng(myLat, myLng);
+  const bounds = center.toBounds(300); // 300m diameter = 150m radius
+  map.setMaxBounds(bounds);
+}
+
+function makeVehicleIcon(vehicleEmoji, me=false, color='#1e88e5'){
+  const pinColor = me ? '#1e8e3e' : color;
+  const glow     = me ? 'rgba(30,142,62,.65)' : hexToRgba(color, 0.65);
+  const shadow   = `0 4px 14px ${glow}, 0 2px 5px rgba(0,0,0,.45)`;
+  const isLight  = ['#ffffff','#fdd835','#b0bec5'].includes((color||'').toLowerCase());
+  const rimColor = isLight ? 'rgba(0,0,0,.25)' : 'rgba(255,255,255,.3)';
+  const emojiShadow = isLight ? '0 1px 3px rgba(0,0,0,.7)' : '0 1px 3px rgba(0,0,0,.4)';
+  const dot = me ? `<div style="position:absolute;bottom:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid #fff;box-shadow:0 1px 4px #0006;z-index:2"></div>` : '';
+  return L.divIcon({
+    className:'',
+    html:`<div style="position:relative;width:44px;height:52px">
+      <div style="position:absolute;inset:0 0 8px 0;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${pinColor};box-shadow:${shadow};border:2px solid ${rimColor}"></div>
+      <div style="position:absolute;inset:0 0 8px 0;display:flex;align-items:center;justify-content:center;font-size:20px;filter:drop-shadow(${emojiShadow})">${vehicleEmoji}</div>
+      ${dot}
+    </div>`,
+    iconSize:[44,52], iconAnchor:[22,52], popupAnchor:[0,-56]
+  });
+}
+
+// Convert "#rrggbb" → "rgba(r,g,b,a)"
+function hexToRgba(hex, alpha){
+  const h = hex.replace('#','');
+  if(h.length < 6) return `rgba(100,150,255,${alpha})`;
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+// Convert "#rrggbb" → "rgb(r, g, b)" (matches browser computed style)
+function hexToRgb(hex){
+  const h = hex.replace('#','');
+  if(h.length < 6) return 'rgb(100, 150, 255)';
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+// ─── MAP SPEECH BUBBLES ─────────────────────────────────────────────────────
+const activeBubbles = {}; // {username: domElement}
+
+function showMapBubble(username, text, type='msg', pinColor='#1e88e5'){
+  if(!map) return;
+  const userData = nearbyUsers[username];
+  if(!userData || !userData.marker) return;
+
+  // Remove any existing bubble for this user
+  if(activeBubbles[username]){
+    activeBubbles[username].remove();
+    delete activeBubbles[username];
+  }
+
+  // Convert marker lat/lng → pixel point relative to map container
+  const latlng  = userData.marker.getLatLng();
+  const pt      = map.latLngToContainerPoint(latlng);
+  const mapEl   = document.getElementById('map');
+
+  // Style per type
+  let bg, label;
+  if(type === 'direct'){
+    bg = '#ef4444'; label = '🔴 HONK at YOU!';
+  } else if(type === 'horn'){
+    bg = '#f59e0b'; label = '📯 ' + text;
+  } else {
+    bg = pinColor; label = text;
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = 'map-bubble';
+  bubble.style.left = pt.x + 'px';
+  bubble.style.top  = (pt.y - 54) + 'px'; // 54px = pin height, sit above pin tip
+
+  const isHorn = type === 'horn' || type === 'direct';
+  const tailClass = type === 'direct' ? 'direct-tail' : (type === 'horn' ? 'horn-tail' : '');
+  const bodyClass = type === 'direct' ? 'direct-bubble' : (type === 'horn' ? 'horn-bubble' : '');
+
+  // Truncate long messages
+  const display = label.length > 36 ? label.slice(0, 34) + '…' : label;
+
+  bubble.innerHTML = `
+    <div class="bubble-body ${bodyClass}" style="${isHorn ? 'background:'+bg+';box-shadow:0 4px 18px '+hexToRgba(bg,.45) : 'background:#fff;border-left:3px solid '+bg}">
+      ${display}
+    </div>
+    <div class="bubble-tail ${tailClass}" style="${isHorn ? 'border-top-color:'+bg : 'border-top-color:#fff'}"></div>
+  `;
+
+  mapEl.appendChild(bubble);
+  activeBubbles[username] = bubble;
+
+  // Reposition bubble if map pans/zooms
+  const reposition = () => {
+    if(!activeBubbles[username]) return;
+    const p = map.latLngToContainerPoint(userData.marker.getLatLng());
+    bubble.style.left = p.x + 'px';
+    bubble.style.top  = (p.y - 54) + 'px';
+  };
+  map.on('move zoom', reposition);
+
+  // Auto-dismiss
+  const lifetime = type === 'msg' ? 5000 : 4000;
+  setTimeout(() => {
+    if(!activeBubbles[username]) return;
+    bubble.classList.add('dying');
+    map.off('move zoom', reposition);
+    setTimeout(() => { bubble.remove(); delete activeBubbles[username]; }, 350);
+  }, lifetime);
+}
+
+// ─── HORN FEATURE ──────────────────────────────────────────────────────────
+function updateHornBtn(){
+  const btn   = document.getElementById('hornBtn');
+  const label = document.getElementById('hornCountLabel');
+  const left  = HORN_SEND_LIMIT - hornsSent;
+
+  if(left <= 0){
+    label.textContent = 'Used up';
+    btn.disabled = true;
+    btn.title = 'Horn limit reached';
+    return;
+  }
+  if(!amIStationary()){
+    const secs = stationarySecsLeft();
+    label.textContent = `⏳ ${secs}s`;
+    btn.disabled = true;
+    btn.title = `Be still for ${secs}s more to honk`;
+    return;
+  }
+  label.textContent = `${left} left`;
+  btn.disabled = false;
+  btn.title = 'Honk to nearby users';
+}
+
+async function sendHorn(){
+  if(!amIStationary()){
+    toast(`⏳ Stay still for ${stationarySecsLeft()}s more to honk`, 3000);
+    return;
+  }
+  if(hornsSent >= HORN_SEND_LIMIT){ toast('📯 Horn limit reached'); return; }
+  hornsSent++;
+  updateHornBtn();
+  const btn = document.getElementById('hornBtn');
+  btn.classList.add('honked');
+  setTimeout(()=>btn.classList.remove('honked'), 500);
+  playNotificationSound();
+  const ok = await submitForm(myUsername + '|' + myVehicle + '|' + myColor, HORN_MSG, myLat, myLng);
+  if(ok){
+    showMsg('You 📯 Honked!', '📯 Honk sent to all nearby!', Date.now(), true, true);
+    toast('📯 Honk sent!', 2500);
+  } else {
+    hornsSent--;
+    updateHornBtn();
+    toast('❌ Horn failed, try again');
+  }
+}
+
+async function sendDirectHorn(targetUser){
+  if(!amIStationary()){
+    toast(`⏳ Stay still for ${stationarySecsLeft()}s more to honk`, 3000);
+    return;
+  }
+  if(!isSenderStationary(targetUser)){
+    toast(`⏳ ${targetUser} is still moving — wait for them to stop`, 3500);
+    return;
+  }
+  if(hornsSent >= HORN_SEND_LIMIT){ toast('📯 Horn limit reached'); return; }
+  hornsSent++;
+  updateHornBtn();
+  playNotificationSound();
+  const payload = HORN_1TO1_PREFIX + targetUser;
+  const ok = await submitForm(myUsername + '|' + myVehicle + '|' + myColor, payload, myLat, myLng);
+  if(ok){
+    showMsg(`You 📯 → ${targetUser}`, `📯 Direct honk sent to ${targetUser}!`, Date.now(), true, true);
+    toast(`📯 Honked at ${targetUser}!`, 2500);
+    // animate the target's marker if visible
+    const u = nearbyUsers[targetUser];
+    if(u && u.marker){
+      const el = u.marker.getElement();
+      if(el){ el.style.transition='transform .1s'; el.style.transform='scale(1.5)'; setTimeout(()=>el.style.transform='',400); }
+    }
+  } else {
+    hornsSent--;
+    updateHornBtn();
+    toast('❌ Direct horn failed, try again');
+  }
+}
+
+function receiveHorn(sender, vehicle, ts, isDirect=false, color='#f59e0b'){
+  // Ignore horn if sender was not stationary (they submitted while moving)
+  if(!isSenderStationary(sender)){
+    console.log(`[Horn OK] Ignored horn from ${sender} — sender not stationary`);
+    return;
+  }
+  const count = hornRecvCount[sender] || 0;
+  if(count >= HORN_RECV_LIMIT) return;
+  hornRecvCount[sender] = count + 1;
+
+  const flash = document.getElementById('hornFlash');
+  flash.style.background = isDirect ? 'rgba(239,68,68,.22)' : 'rgba(245,158,11,.12)';
+  flash.classList.add('active');
+  setTimeout(()=>flash.classList.remove('active'), isDirect ? 600 : 300);
+
+  playNotificationSound();
+  if(isDirect){
+    showMsg(`${vehicle} ${sender} 📯 → YOU`, '🔴 DIRECT HONK — they mean you!', ts, false, true);
+    toast(`🔴 ${vehicle} ${sender} honked at YOU!`, 4500, 'horn-toast');
+    fireNotification(`🔴 ${vehicle} ${sender} → DIRECT HONK!`, 'They mean YOU — tap to open', 'hornok-horn-direct', [300,100,300,100,300]);
+    setTimeout(()=>showMapBubble(sender, '🔴 HONK at YOU!', 'direct', '#ef4444'), 80);
+  } else {
+    showMsg(`${vehicle} ${sender} 📯`, '📯 HONK HONK!', ts, false, true);
+    toast(`📯 ${vehicle} ${sender} is honking!`, 3500, 'horn-toast');
+    fireNotification(`📯 ${vehicle} ${sender} is honking!`, 'Broadcast honk to everyone nearby', 'hornok-horn', [200,100,200]);
+    setTimeout(()=>showMapBubble(sender, 'HONK HONK!', 'horn', '#f59e0b'), 80);
+  }
+}
+
+// ─── FORM SUBMIT ────────────────────────────────────────────────────────────
+async function submitForm(u,m,lat,lng){
+  const body=new URLSearchParams({[F.username]:u,[F.message]:m||'',[F.location]:fmtLoc(lat,lng)});
+  try{
+    await fetch(FORM_URL,{
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body: body.toString(),
+      keepalive: true  // survives page unload / backgrounding
+    });
+    return true;
+  } catch(e){
+    // Queue for Background Sync so SW retries when connection restores
+    await queueForBgSync({u,m,lat,lng});
+    if(swRegistration && 'sync' in swRegistration){
+      swRegistration.sync.register('hornok-send').catch(()=>{});
+    }
+    return false;
+  }
+}
+
+async function queueForBgSync(item){
+  try {
+    const cache = await caches.open('hornok-v2');
+    let queue = [];
+    const existing = await cache.match('__send_queue__');
+    if(existing) queue = await existing.json();
+    queue.push(item);
+    await cache.put('__send_queue__', new Response(JSON.stringify(queue)));
+  } catch(e){}
+}
+
+async function registerPresence(){
+  const body=new URLSearchParams({[F.username]:myUsername+'|'+myVehicle+'|'+myColor,[F.message]:'',[F.location]:fmtLoc(myLat,myLng)});
+  try{
+    await fetch(FORM_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString(),keepalive:true});
+  } catch(e){
+    if(swRegistration && 'sync' in swRegistration){
+      swRegistration.sync.register('hornok-presence').catch(()=>{});
+    }
+  }
+  registered=true;
+  syncConfig();
+}
+
+// Push current state to SW so it can background-poll on our behalf
+function syncConfig(){
+  if(!swRegistration || !myUsername || !myLat) return;
+  const ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
+  if(!ctrl) return;
+  ctrl.postMessage({
+    type: 'CONFIG',
+    config: {
+      sheetUrl: SHEET_CSV, formUrl: FORM_URL, formFields: F,
+      username: myUsername, vehicle: myVehicle, color: myColor,
+      lat: myLat, lng: myLng, radiusM: RADIUS_M,
+      seenKeys: [...seenKeys].slice(-300),
+      hornRecvCount
+    }
+  });
+}
+
+// ─── CSV PARSING ────────────────────────────────────────────────────────────
+function parseDDMMYYYY(dateStr){
+  const [datePart,timePart]=dateStr.replaceAll('"','').split(' ');
+  const [day,month,year]=datePart.split('/').map(Number);
+  const [hour,minute,second]=timePart.split(':').map(Number);
+  return new Date(year,month-1,day,hour,minute,second).getTime();
+}
+function filterRecent(rows,colIndex=0){
+  const cutoff=Date.now()-USER_WINDOW;
+  return rows.filter(row=>{try{return parseDDMMYYYY(row[colIndex])>=cutoff;}catch{return false;}});
+}
+function parseCSV(t){return filterRecent(t.trim().split('\n').slice(1).map(row=>row.split(',')));}
+
+// ─── POLL ───────────────────────────────────────────────────────────────────
+async function poll(){
+  startBar();
+  try{const r=await fetch(SHEET_CSV);if(!r.ok)throw 0;processSheet(await r.text());setStat('online');}
+  catch(e){setStat('err');}
+}
+
+function processSheet(csv){
+  const rows=parseCSV(csv);
+  if(rows.length<2)return;
+  const h=rows[0].map(x=>(x||'').toLowerCase());
+  let cU=1,cM=2,cL=3;
+  h.forEach((x,i)=>{
+    if(x.includes('47638508')||x.includes('username'))cU=i;
+    if(x.includes('1476899599')||x.includes('message'))cM=i;
+    if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
+  });
+
+  const now=Date.now(),fresh={};
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r]; if(!row||row.length<2)continue;
+    const rawUser=(row[cU]||'').trim().replaceAll('"','');
+    const {name:user, vehicle, color} = parseUsername(rawUser);
+    const msg=(row[cM]||'').trim().replaceAll('"','');
+    const loc=parseLoc((row[cL]||'').trim().replaceAll('"',''));
+    const ts=parseDate((row[0]||'').trim());
+    if(!user||!loc)continue;
+    const dist=haversine(myLat,myLng,loc.lat,loc.lng);
+
+    // Broadcast horn
+    if(msg===HORN_MSG && user!==myUsername && dist<=RADIUS_M){
+      const key=`horn|${row[0]}|${user}`;
+      if(!seenKeys.has(key)){seenKeys.add(key); receiveHorn(user, vehicle, ts, false, color);}
+    }
+    // Directed horn — only process if we are the target
+    else if(msg.startsWith(HORN_1TO1_PREFIX) && user!==myUsername && dist<=RADIUS_M){
+      const target = msg.slice(HORN_1TO1_PREFIX.length).trim();
+      if(target === myUsername){
+        const key=`horn1to1|${row[0]}|${user}`;
+        if(!seenKeys.has(key)){seenKeys.add(key); receiveHorn(user, vehicle, ts, true, color);}
+      }
+    }
+    // Incoming chat messages
+    else if(msg && msg!==HORN_MSG && !msg.startsWith(HORN_1TO1_PREFIX) && user!==myUsername && dist<=RADIUS_M){
+      const key=`${row[0]}|${user}|${msg}`;
+      if(!seenKeys.has(key)){
+        seenKeys.add(key);
+        showMsg(`${vehicle} ${user}`,msg,ts,false,false);
+        // Bubble appears after updateNearby has run (use tiny delay so marker exists)
+        setTimeout(()=>showMapBubble(user, msg, 'msg', color||'#1e88e5'), 80);
+      }
+    }
+
+    // Nearby users
+    if(user!==myUsername && dist<=RADIUS_M){
+      if(!fresh[user]) fresh[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist),vehicle,color};
+    }
+  }
+  updateNearby(fresh);
+}
+
+// ─── NEARBY USERS ───────────────────────────────────────────────────────────
+function isSenderStationary(username){
+  const u = nearbyUsers[username];
+  if(!u || !u.stableAt) return false;
+  return (Date.now() - u.stableAt) >= STATIONARY_MS;
+}
+
+function updateNearby(fresh){
+  Object.keys(nearbyUsers).forEach(u=>{
+    if(!fresh[u]){if(nearbyUsers[u].marker)map.removeLayer(nearbyUsers[u].marker);delete nearbyUsers[u];}
+  });
+  Object.entries(fresh).forEach(([u,info])=>{
+    const vehicle = info.vehicle || '🚗';
+    const color   = info.color   || '#1e88e5';
+    if(!nearbyUsers[u]){
+      // First time seeing this user — start their stability clock from now
+      const mk=L.marker([info.lat,info.lng],{icon:makeVehicleIcon(vehicle,false,color)}).addTo(map)
+        .bindPopup(makePopup(u,vehicle,info.dist));
+      nearbyUsers[u]={...info, marker:mk, stableAt: Date.now()};
+    }else{
+      // Check if they moved significantly since last poll
+      const moved = haversine(nearbyUsers[u].lat, nearbyUsers[u].lng, info.lat, info.lng);
+      if(moved > MOVE_THRESHOLD_M){
+        nearbyUsers[u].stableAt = null; // reset — they're moving
+      } else if(!nearbyUsers[u].stableAt){
+        nearbyUsers[u].stableAt = Date.now(); // just stopped — start clock
+      }
+      nearbyUsers[u].marker.setLatLng([info.lat,info.lng]);
+      nearbyUsers[u].marker.setIcon(makeVehicleIcon(vehicle,false,color));
+      nearbyUsers[u].marker.setPopupContent(makePopup(u,vehicle,info.dist));
+      Object.assign(nearbyUsers[u], {...info, stableAt: nearbyUsers[u].stableAt});
+    }
+  });
+  const count=Object.keys(nearbyUsers).length;
+  const badge=document.getElementById('nearbyCount');
+  badge.textContent=count; badge.style.display=count>0?'block':'none';
+}
+
+function makePopup(u, vehicle, dist){
+  const theyReady = isSenderStationary(u);
+  const iReady    = amIStationary();
+  const bothReady = theyReady && iReady;
+  const honkStyle = bothReady
+    ? 'background:#e8710a;color:#fff'
+    : 'background:#6b7280;color:#ccc;cursor:not-allowed';
+  const honkTitle = bothReady ? '' : (!iReady ? `⏳ You: ${stationarySecsLeft()}s` : `⏳ They're moving`);
+  return `<div style="font-family:'Google Sans',system-ui,sans-serif;min-width:155px;padding:4px 2px">
+    <div style="font-size:1.5rem;text-align:center;margin-bottom:4px">${vehicle}</div>
+    <b style="display:block;text-align:center;font-size:.95rem;color:#202124;margin-bottom:2px">${esc(u)}</b>
+    <div style="font-size:.72rem;color:#5f6368;text-align:center;margin-bottom:6px">📍 ${dist}m away</div>
+    ${!bothReady ? `<div style="font-size:.68rem;color:#e8710a;text-align:center;margin-bottom:8px">⏳ ${honkTitle} to honk</div>` : ''}
+    <div style="display:flex;gap:6px">
+      <a href="#" onclick="openCompose('${esc(u)}');return false" style="flex:1;display:block;text-align:center;background:#1a73e8;color:#fff;border-radius:20px;padding:6px 4px;text-decoration:none;font-size:.78rem;font-weight:600">💬 Chat</a>
+      <a href="#" onclick="sendDirectHorn('${esc(u)}');return false" style="flex:1;display:block;text-align:center;${honkStyle};border-radius:20px;padding:6px 4px;text-decoration:none;font-size:.78rem;font-weight:600">📯 Honk</a>
+    </div>
+  </div>`;
+}
+
+// ─── MESSAGES ───────────────────────────────────────────────────────────────
+function showMsg(from,text,ts,mine,isHorn=false){
+  const list=document.getElementById('msgList');
+  const ph=list.querySelector('div[style]'); if(ph)ph.remove();
+  const time=ts?new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
+  const d=document.createElement('div');
+  d.className='msg-bubble'+(mine?' mine':'')+(isHorn?' horn-msg':'');
+  d.innerHTML=`<div class="msg-from">${esc(from)}</div><div class="msg-text">${esc(text)}</div><div class="msg-time">${time}</div>`;
+  list.appendChild(d); list.scrollTop=list.scrollHeight;
+  const count=list.querySelectorAll('.msg-bubble').length;
+  document.getElementById('msgCount').textContent=count;
+  if(!mine){
+    if(!isHorn) playNotificationSound();
+    if(!isHorn) toast(`💬 ${from}: ${text.substring(0,40)}`);
+    if(!isHorn) fireNotification(`💬 ${from}`, text.substring(0,80), 'hornok-msg', [200]);
+    if(!msgPanelOpen){
+      setTimeout(()=>{
+        document.getElementById('msgPanel').classList.remove('collapsed');
+        document.querySelector('.toggle-icon').classList.add('open');
+        msgPanelOpen=true;
+      },500);
+    }
+  }
+}
+
+function toggleMsgPanel(){
+  const panel=document.getElementById('msgPanel');
+  msgPanelOpen=!msgPanelOpen;
+  panel.classList.toggle('collapsed');
+  document.querySelector('.toggle-icon').classList.toggle('open');
+  setTimeout(()=>map&&map.invalidateSize(),320);
+}
+
+// ─── COMPOSE ────────────────────────────────────────────────────────────────
+function openCompose(u){
+  composeTarget=u;
+  document.getElementById('composeTarget').textContent='To: '+u;
+  document.getElementById('composeMsg').value='';
+  document.getElementById('composeBox').style.display='block';
+  document.getElementById('composeMsg').focus();
+}
+function closeCompose(){document.getElementById('composeBox').style.display='none';composeTarget=null;}
+async function sendMessage(){
+  const msg=document.getElementById('composeMsg').value.trim();
+  if(!msg){toast('⚠️ Empty message');return;}
+  const btn=document.getElementById('sendBtn'); btn.disabled=true; btn.textContent='Sending…';
+  const ok=await submitForm(myUsername+'|'+myVehicle+'|'+myColor, msg, myLat, myLng);
+  if(ok){showMsg(`You → ${composeTarget}`,msg,Date.now(),true);toast(`✅ Message sent`);closeCompose();}
+  else toast('❌ Send failed');
+  btn.disabled=false; btn.textContent='Send ✉️';
+}
+
+// ─── STATUS & POLL BAR ──────────────────────────────────────────────────────
+function setStat(s){
+  const d=document.getElementById('statusDot'),t=document.getElementById('statusText');
+  if(s==='online'){d.className='status-dot online';t.textContent='Live';}
+  else{d.className='status-dot';t.textContent='Reconnecting…';}
+}
+function startBar(){
+  const b=document.getElementById('pollProgress');
+  b.style.transition='none'; b.style.width='0%';
+  requestAnimationFrame(()=>{b.style.transition=`width ${POLL_MS/1000}s linear`;b.style.width='100%';});
+}
+
+// ─── NATIVE NOTIFICATIONS ───────────────────────────────────────────────────
+const NOTIF_ICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f1117'/%3E%3Ctext x='96' y='132' font-size='110' text-anchor='middle'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E";
+const notifSupported = 'Notification' in window;
+
+// Update bell icon to reflect current permission state
+function updateBellState(){
+  const btn = document.getElementById('bellBtn');
+  if(!notifSupported){ btn.style.display='none'; return; }
+  btn.classList.add('bell-show');
+  const p = Notification.permission;
+  btn.className = btn.className.replace(/notif-\w+/g,'').trim();
+  if(p === 'granted'){ btn.classList.add('notif-on');  btn.title='Notifications ON'; btn.textContent='🔔'; }
+  else if(p === 'denied'){  btn.classList.add('notif-off'); btn.title='Notifications BLOCKED'; btn.textContent='🔕'; }
+  else {                    btn.classList.add('notif-ask'); btn.title='Enable notifications'; btn.textContent='🔔'; }
+  // Re-append the dot span (textContent wiped it)
+  const dot = document.createElement('span'); dot.id='bellDot'; btn.appendChild(dot);
+}
+
+// Open the notification settings bottom sheet
+function openNotifPanel(){
+  const panel = document.getElementById('notifPanel');
+  const content = document.getElementById('notifPanelContent');
+  const p = Notification.permission;
+  const periodicOk = swRegistration && 'periodicSync' in (swRegistration||{});
+
+  let html = `<h3 style="font-size:1.05rem;margin-bottom:18px;text-align:center">🔔 Notification Settings</h3>`;
+
+  // ── Row 1: Permission state ──
+  if(!notifSupported){
+    html += notifRow('🚫','Not supported','This browser does not support notifications','',false);
+  } else if(p === 'granted'){
+    html += notifRow('🔔','Notifications','You will be alerted for horns & messages even when app is in background','Enabled','on');
+  } else if(p === 'denied'){
+    html += notifRow('🔕','Notifications blocked','You blocked notifications. Re-enable in browser settings.','Blocked','err');
+    html += `<div class="notif-step-box">
+      <p>To re-enable notifications:</p>
+      <div class="notif-step">1️⃣ <span>Tap the <b>🔒 lock icon</b> or <b>⋮ menu</b> in your browser address bar</span></div>
+      <div class="notif-step">2️⃣ <span>Tap <b>Site settings</b> → <b>Notifications</b></span></div>
+      <div class="notif-step">3️⃣ <span>Change to <b>Allow</b>, then reload the page</span></div>
+    </div>`;
+  } else {
+    html += notifRow('🔔','Enable notifications','Get alerted for honks & messages when app is in background',
+      '<button class="notif-toggle warn" onclick="grantNotifications()">Enable</button>',false,true);
+  }
+
+  html += `<div style="height:1px;background:var(--border);margin:4px 0"></div>`;
+
+  // ── Row 2: What you'll get ──
+  html += `<div style="margin:14px 0 6px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">You'll be notified for</div>`;
+  html += notifRow('📯','Broadcast honk','When anyone nearby honks at everyone','','');
+  html += notifRow('🔴','Direct honk','When someone honks specifically at YOU','','');
+  html += notifRow('💬','Chat messages','When someone sends you a message','','');
+
+  html += `<div style="height:1px;background:var(--border);margin:4px 0"></div>`;
+
+  // ── Row 3: Background sync status ──
+  const bgLabel = periodicOk ? 'Active — polls every ~5 min when closed' : 'Limited — requires HTTPS + Chrome Android';
+  const bgState = periodicOk ? 'on' : 'warn';
+  html += notifRow('🔄','Background sync', bgLabel,'',bgState);
+
+  html += `<button class="notif-close-btn" onclick="closeNotifPanel()">Close</button>`;
+  content.innerHTML = html;
+  panel.style.display = 'flex';
+}
+
+function notifRow(icon, title, sub, action, state, rawAction=false){
+  const stateClass = state ? ` class="notif-toggle ${state}"` : '';
+  const actionHtml = rawAction ? action : (action ? `<span${stateClass}>${action}</span>` : '');
+  return `<div class="notif-row">
+    <div class="notif-icon">${icon}</div>
+    <div class="notif-info"><strong>${title}</strong><span>${sub}</span></div>
+    ${actionHtml ? '<div>'+actionHtml+'</div>' : ''}
+  </div>`;
+}
+
+function closeNotifPanel(){
+  document.getElementById('notifPanel').style.display='none';
+}
+document.getElementById('notifPanel').addEventListener('click', e=>{
+  if(e.target===document.getElementById('notifPanel')) closeNotifPanel();
+});
+
+async function grantNotifications(){
+  if(!notifSupported) return;
+  const perm = await Notification.requestPermission();
+  closeNotifPanel();
+  updateBellState();
+  if(perm === 'granted'){
+    toast('🔔 Notifications enabled!', 3500);
+    // Fire a test notification after 2s so user sees it work
+    setTimeout(()=>{
+      fireNotification('📯 Horn OK', 'Notifications are working! You\'ll be alerted for honks & messages.', 'hornok-test', [200,100,200]);
+    }, 2000);
+  } else {
+    toast('ℹ️ Tap the 🔕 bell to see how to enable later', 4000);
+  }
+}
+
+async function requestNotificationPermission(){
+  if(!notifSupported) return;
+  updateBellState();
+  if(Notification.permission === 'default'){
+    // Don't auto-prompt — show bell nudge instead so it's not intrusive
+    setTimeout(()=>{
+      const btn = document.getElementById('bellBtn');
+      if(btn && Notification.permission === 'default'){
+        btn.style.animation='bellPulse .6s ease 3'; // draw attention
+        toast('🔔 Tap the bell to enable background alerts', 4500);
+      }
+    }, 3000);
+  }
+}
+
+function fireNotification(title, body, tag='hornok', vibrate=[200,100,200], actions=[]){
+  if(!notifSupported || Notification.permission !== 'granted') return;
+  if(!document.hidden) return; // only fire when app is in background
+  try {
+    const opts = {
+      body, tag, renotify: true, icon: NOTIF_ICON, badge: NOTIF_ICON,
+      vibrate, silent: false, timestamp: Date.now(),
+      data: { url: location.href, tag }
+    };
+    if(actions.length && 'actions' in Notification.prototype) opts.actions = actions;
+    const n = new Notification(title, opts);
+    n.onclick = ()=>{ window.focus(); n.close(); };
+  } catch(e){}
+}
+
+// ─── WAKE LOCK — keep screen/GPS alive while app is visible ─────────────────
+async function acquireWakeLock(){
+  if(!('wakeLock' in navigator)) return;
+  try {
+    if(wakeLock) return; // already held
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', ()=>{ wakeLock = null; });
+  } catch(e){}
+}
+function releaseWakeLock(){
+  if(wakeLock){ wakeLock.release().catch(()=>{}); wakeLock=null; }
+}
+
+// ─── PAGE VISIBILITY ─────────────────────────────────────────────────────────
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible'){
+    acquireWakeLock();
+    updateBellState();
+    if(registered){ poll(); }
+    syncConfig();
+  } else {
+    releaseWakeLock();
+    syncConfig(); // save latest state to SW before going to background
+  }
+});
+
+// ─── AUDIO ──────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  notificationAudio=document.getElementById('notificationSound');
+  if(notificationAudio){notificationAudio.volume=0.7;notificationAudio.load();}
+});
+function playNotificationSound(){
+  if(!notificationAudio)return;
+  try{
+    notificationAudio.currentTime=0;
+    const p=notificationAudio.play();
+    if(p!==undefined) p.then(()=>{
+      setTimeout(()=>{notificationAudio.pause();notificationAudio.currentTime=0;},SOUND_DURATION);
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+// ─── JOIN ───────────────────────────────────────────────────────────────────
+document.getElementById('joinBtn').addEventListener('click',async()=>{
+  const u=document.getElementById('usernameInput').value.trim();
+  if(!u){toast('⚠️ Enter a username');return;}
+  if(!myLat){toast('⚠️ GPS not ready');return;}
+  myUsername=u;
+  const btn=document.getElementById('joinBtn'); btn.disabled=true; btn.textContent='Joining…';
+  await registerPresence();
+  document.getElementById('loginOverlay').style.display='none';
+  const b=document.getElementById('userBadge');
+  b.innerHTML = `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${myColor};margin-right:5px;border:1.5px solid rgba(255,255,255,.4);vertical-align:middle"></span>${myVehicle} ${u}`;
+  b.style.display='block';
+  document.getElementById('hornBtn').style.display='block';
+  updateHornBtn();
+  updateBellState();
+  initMap(); setStat('online'); toast(`📯 Horn OK — joined as ${myVehicle} ${u}`);
+  // Background features
+  await acquireWakeLock();
+  await requestNotificationPermission();
+  syncConfig();
+  poll(); setInterval(poll, POLL_MS);
+  setInterval(registerPresence, 45000);
+  setInterval(syncConfig, 30000);
+  // Live countdown on horn button while waiting to be stationary
+  setInterval(updateHornBtn, 1000);
+});
+
+document.getElementById('usernameInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('joinBtn').click();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCompose();});
+
+// ─── PWA SETUP ──────────────────────────────────────────────────────────────
+
+// 1) Inject Web App Manifest
+(function injectManifest(){
+  const manifest = {
+    name: 'Horn OK — Proximity Honker',
+    short_name: 'Horn OK',
+    description: 'Horn OK Please — honk at people within 50 metres of you',
+    start_url: location.href,
+    display: 'standalone',
+    orientation: 'portrait-primary',
+    background_color: '#0f1117',
+    theme_color: '#0f1117',
+    categories: ['social', 'navigation'],
+    icons: [
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f1117'/%3E%3Ctext x='96' y='132' font-size='110' text-anchor='middle'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E", sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+      { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%230f1117'/%3E%3Ctext x='256' y='360' font-size='300' text-anchor='middle'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E", sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const link = document.createElement('link');
+  link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+})();
+
+// 2) Register Service Worker — full background support
+(function registerSW(){
+  if(!('serviceWorker' in navigator)) return;
+
+  const swCode = `
+const CACHE = 'hornok-v2';
+const SHELL = [
+  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'
+];
+const NOTIF_ICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%230f1117'/%3E%3Ctext x='96' y='132' font-size='110' text-anchor='middle'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E";
+const ch = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('hornok-bg') : null;
+const HORN_MSG = '__HORN__';
+const HORN_PREFIX = '__HORN1TO1__|';
+
+// ── Install & Activate ──────────────────────────────────────────────────────
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(()=>{})));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+
+// ── Cache-first fetch (skip live Google data) ────────────────────────────────
+self.addEventListener('fetch', e => {
+  const url = e.request.url;
+  if(url.includes('google.com') || url.includes('gviz') || url.includes('docs.google')) return;
+  e.respondWith(
+    caches.match(e.request).then(cached => cached ||
+      fetch(e.request).then(res => {
+        if(res && res.status===200 && e.request.method==='GET'){
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => cached)
+    )
+  );
+});
+
+// ── Message from page: store config + handle queued sends ────────────────────
+self.addEventListener('message', e => {
+  if(!e.data) return;
+  if(e.data.type === 'CONFIG'){
+    caches.open(CACHE).then(c =>
+      c.put('__config__', new Response(JSON.stringify(e.data.config)))
+    );
+  }
+});
+
+// ── Background Sync — retry queued sends when back online ───────────────────
+self.addEventListener('sync', e => {
+  if(e.tag === 'hornok-send')     e.waitUntil(retrySendQueue());
+  if(e.tag === 'hornok-presence') e.waitUntil(retryPresence());
+});
+
+async function loadConfig(){
+  try {
+    const c = await caches.open(CACHE);
+    const r = await c.match('__config__');
+    return r ? await r.json() : null;
+  } catch(e){ return null; }
+}
+
+async function retryPresence(){
+  const cfg = await loadConfig();
+  if(!cfg || !cfg.username || !cfg.lat) return;
+  const body = new URLSearchParams({
+    [cfg.formFields.username]: cfg.username + '|' + cfg.vehicle,
+    [cfg.formFields.message]: '',
+    [cfg.formFields.location]: cfg.lng.toFixed(7) + '| ' + cfg.lat.toFixed(7)
+  });
+  await fetch(cfg.formUrl, {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()}).catch(()=>{});
+}
+
+async function retrySendQueue(){
+  const cfg = await loadConfig();
+  if(!cfg) return;
+  const c = await caches.open(CACHE);
+  const qr = await c.match('__send_queue__');
+  if(!qr) return;
+  let queue = await qr.json();
+  const remaining = [];
+  for(const item of queue){
+    try {
+      const body = new URLSearchParams({
+        [cfg.formFields.username]: item.u,
+        [cfg.formFields.message]: item.m || '',
+        [cfg.formFields.location]: item.lng.toFixed(7) + '| ' + item.lat.toFixed(7)
+      });
+      await fetch(cfg.formUrl, {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+    } catch(err){ remaining.push(item); }
+  }
+  if(remaining.length) await c.put('__send_queue__', new Response(JSON.stringify(remaining)));
+  else await c.delete('__send_queue__');
+}
+
+// ── Periodic Background Sync — poll sheet even when app is closed ────────────
+self.addEventListener('periodicsync', e => {
+  if(e.tag === 'hornok-poll')     e.waitUntil(backgroundPoll());
+  if(e.tag === 'hornok-presence') e.waitUntil(retryPresence());
+});
+
+// ── Helpers (duplicated from page for SW context) ───────────────────────────
+function haversine(a,b,c,d){
+  const R=6371000,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,
+  x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+function parseVehicle(raw){ const p=raw.split('|'); return {name:p[0].trim(), vehicle:p[1]?p[1].trim():'🚗'}; }
+function parseDT(s){
+  try {
+    const [dp,tp]=s.replaceAll('"','').split(' ');
+    const [d,mo,y]=dp.split('/').map(Number);
+    const [h,mi,sec]=tp.split(':').map(Number);
+    return new Date(y,mo-1,d,h,mi,sec).getTime();
+  } catch(e){ return 0; }
+}
+
+async function backgroundPoll(){
+  const cfg = await loadConfig();
+  if(!cfg || !cfg.username || !cfg.lat) return;
+
+  let csv;
+  try { csv = (await (await fetch(cfg.sheetUrl, {cache:'no-store'})).text()); }
+  catch(e){ return; }
+
+  const cutoff = Date.now() - 60000;
+  const seenKeys = new Set(cfg.seenKeys || []);
+  const newSeen = [];
+  const notifications = [];
+
+  const rows = csv.trim().split('\\n').slice(1).map(r => r.split(','));
+  for(const row of rows){
+    try {
+      const ts = parseDT(row[0]||'');
+      if(!ts || ts < cutoff) continue;
+      const {name:user, vehicle} = parseVehicle((row[1]||'').trim().replaceAll('"',''));
+      const msg = (row[2]||'').trim().replaceAll('"','');
+      const parts = (row[3]||'').trim().replaceAll('"','').split('|').map(x=>x.trim());
+      const lng=parseFloat(parts[0]), lat=parseFloat(parts[1]);
+      if(!user||isNaN(lat)||isNaN(lng)) continue;
+      if(user===cfg.username) continue;
+      if(haversine(cfg.lat,cfg.lng,lat,lng) > cfg.radiusM) continue;
+
+      if(msg===HORN_MSG){
+        const key='horn|'+row[0]+'|'+user;
+        if(!seenKeys.has(key)){
+          seenKeys.add(key); newSeen.push(key);
+          notifications.push({
+            title: '📯 ' + vehicle + ' ' + user + ' is honking!',
+            body: 'Broadcast honk to everyone nearby — tap to open',
+            tag: key, vib:[200,100,200],
+            actions:[{action:'open',title:'Open Horn OK'}]
+          });
+          if(ch) ch.postMessage({type:'BG_HORN', data:{sender:user,vehicle,ts,isDirect:false}});
+        }
+      } else if(msg.startsWith(HORN_PREFIX)){
+        const target=msg.slice(HORN_PREFIX.length).trim();
+        if(target===cfg.username){
+          const key='horn1to1|'+row[0]+'|'+user;
+          if(!seenKeys.has(key)){
+            seenKeys.add(key); newSeen.push(key);
+            notifications.push({
+              title: '🔴 ' + vehicle + ' ' + user + ' → DIRECT HONK!',
+              body: 'They honked directly at YOU — tap to respond',
+              tag: key, vib:[300,100,300,100,300],
+              actions:[{action:'open',title:'Open Horn OK'}]
+            });
+            if(ch) ch.postMessage({type:'BG_HORN', data:{sender:user,vehicle,ts,isDirect:true}});
+          }
+        }
+      } else if(msg && !msg.startsWith(HORN_PREFIX)){
+        const key=row[0]+'|'+user+'|'+msg;
+        if(!seenKeys.has(key)){
+          seenKeys.add(key); newSeen.push(key);
+          notifications.push({
+            title: '💬 ' + vehicle + ' ' + user,
+            body: msg,
+            tag: key, vib:[150],
+            actions:[{action:'open',title:'Reply'}]
+          });
+          if(ch) ch.postMessage({type:'BG_MSG', data:{from:vehicle+' '+user,text:msg,ts,sender:user}});
+        }
+      }
+    } catch(rowErr){}
+  }
+
+  // Update persisted seenKeys
+  if(newSeen.length){
+    cfg.seenKeys = [...seenKeys].slice(-300);
+    const c = await caches.open(CACHE);
+    await c.put('__config__', new Response(JSON.stringify(cfg)));
+    if(ch) ch.postMessage({type:'BG_SEENKEYS', data:{keys:newSeen}});
+  }
+
+  // Show native notifications only when no visible page
+  const allClients = await self.clients.matchAll({type:'window', includeUncontrolled:true});
+  const pageVisible = allClients.some(c => c.visibilityState==='visible');
+  if(!pageVisible){
+    for(const n of notifications){
+      try {
+        await self.registration.showNotification(n.title, {
+          body:n.body, icon:NOTIF_ICON, badge:NOTIF_ICON,
+          tag:n.tag, renotify:true, vibrate:n.vib, silent:false,
+          timestamp: Date.now(),
+          actions: n.actions || [],
+          data:{url:self.registration.scope, tag:n.tag}
+        });
+      } catch(ne){}
+    }
+  }
+}
+
+// ── Notification click — focus or open app ───────────────────────────────────
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({type:'window', includeUncontrolled:true}).then(clients => {
+      if(clients.length) return clients[0].focus();
+      return self.clients.openWindow(e.notification.data && e.notification.data.url || self.registration.scope);
+    })
+  );
+});
+`;
+
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl, {scope: './'})
+    .then(reg => {
+      swRegistration = reg;
+      console.log('🔔 Horn OK SW registered');
+      // Register Periodic Background Sync (Chrome 80+ Android, requires HTTPS + engagement)
+      if('periodicSync' in reg){
+        Promise.all([
+          reg.periodicSync.register('hornok-poll',     {minInterval: 5  * 60 * 1000}),
+          reg.periodicSync.register('hornok-presence', {minInterval: 10 * 60 * 1000})
+        ]).catch(()=>{}); // silently fails in browser if permissions not granted
+      }
+    })
+    .catch(err => console.warn('SW registration failed:', err));
+})();
+
+// 3) Install prompt (Android / Chrome / Edge)
+let _installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  document.getElementById('installBtn').classList.add('visible');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBtn').classList.remove('visible');
+  _installPrompt = null;
+  toast('✅ Horn OK installed!', 3000);
+});
+
+function triggerInstall(){
+  if(!_installPrompt){ toast('ℹ️ Already installed or use browser menu'); return; }
+  _installPrompt.prompt();
+  _installPrompt.userChoice.then(r => {
+    if(r.outcome === 'accepted') toast('✅ Installing Horn OK…');
+    _installPrompt = null;
+    document.getElementById('installBtn').classList.remove('visible');
+  });
+}
+
+// 4) iOS Safari — show manual "Add to Home Screen" banner
+(function iosPrompt(){
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  const dismissed = sessionStorage.getItem('nc-ios-banner');
+  if(isIos && isSafari && !isStandalone && !dismissed){
+    setTimeout(()=> document.getElementById('iosBanner').classList.add('show'), 2500);
+  }
+})();
+
+function dismissIosBanner(){
+  document.getElementById('iosBanner').classList.remove('show');
+  sessionStorage.setItem('nc-ios-banner','1');
+}
+
+startGPS();
+</script>
+</body>
+</html>
