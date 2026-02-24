@@ -1,0 +1,389 @@
+/*
+  pwa.css
+  ──────────────────────────────────────────────────────────────────────────
+  Styles for InstallBanner, InstallButton, and IOSGuide components.
+  Import once in your root (e.g. main.jsx or App.jsx):
+
+    import "./pwa.css";
+
+  Font: loaded via <link> in index.html — never from JS.
+  ──────────────────────────────────────────────────────────────────────────
+*/
+
+/* ── Reset ──────────────────────────────────────────────────────────── */
+.pwa-banner *,
+.pwa-modal *,
+.pwa-main-btn,
+.pwa-install-btn,
+.pwa-dismiss-btn,
+.pwa-close-btn {
+  box-sizing: border-box;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INSTALL BANNER
+   Fixed, bottom-center toast. Animates via `bottom` so that the
+   existing translateX(-50%) centering is never clobbered.
+═══════════════════════════════════════════════════════════════════════ */
+
+.pwa-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  /* Center without touching the animation property */
+  transform: translateX(-50%);
+  width: min(520px, calc(100% - 32px));
+
+  background: rgba(15, 20, 35, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+
+  /* Animate only `bottom` — leaves transform alone */
+  animation: pwa-banner-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pwa-banner-in {
+  from { bottom: -80px; opacity: 0; }
+  to   { bottom: 24px;  opacity: 1; }
+}
+
+.pwa-banner-glow {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.8),
+    transparent
+  );
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.pwa-app-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+}
+
+.pwa-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-banner-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwa-banner-sub {
+  font-size: 12px;
+  color: #8892a4;
+  margin-top: 2px;
+}
+
+.pwa-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pwa-install-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4);
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.pwa-install-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 6px 24px rgba(79, 70, 229, 0.55);
+}
+
+.pwa-dismiss-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #8892a4;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pwa-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #c7d0e4;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INSTALL BUTTON
+   Inline CTA with 4 visual variants.
+═══════════════════════════════════════════════════════════════════════ */
+
+.pwa-main-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, box-shadow 0.2s, transform 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.pwa-main-btn:not(:disabled):hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.pwa-main-btn:disabled {
+  cursor: default;
+}
+
+.pwa-btn--primary {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  box-shadow:
+    0 8px 32px rgba(79, 70, 229, 0.45),
+    0 0 0 1px rgba(79, 70, 229, 0.3);
+}
+
+.pwa-btn--loading {
+  background: rgba(79, 70, 229, 0.2);
+  color: #818cf8;
+  border: 1px solid rgba(79, 70, 229, 0.3);
+}
+
+.pwa-btn--success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  cursor: default;
+}
+
+.pwa-btn--ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: #4b5563;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: default;
+}
+
+/* Spinner inside the loading button */
+.pwa-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(129, 140, 248, 0.3);
+  border-top-color: #818cf8;
+  animation: pwa-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pwa-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   IOS GUIDE MODAL
+   Bottom-sheet overlay with step-by-step Safari instructions.
+═══════════════════════════════════════════════════════════════════════ */
+
+.pwa-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 16px 24px;
+}
+
+.pwa-modal {
+  width: min(480px, 100%);
+  background: #0d1422;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 28px;
+  position: relative;
+  /* Modal slides up from its own position — no translateX needed */
+  animation: pwa-modal-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pwa-modal-in {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.pwa-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #8892a4;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pwa-close-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #c7d0e4;
+}
+
+.pwa-modal-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6366f1;
+  margin: 0 0 8px;
+}
+
+.pwa-modal-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #f0f4ff;
+  margin: 0 0 4px;
+  font-family: "DM Serif Display", Georgia, serif;
+}
+
+.pwa-modal-sub {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 0 0 28px;
+}
+
+.pwa-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pwa-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.pwa-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.pwa-step-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(79, 70, 229, 0.12);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #818cf8;
+  flex-shrink: 0;
+}
+
+.pwa-step-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #c7d0e4;
+}
+
+.pwa-step-sub {
+  font-size: 12px;
+  color: #4b5563;
+  margin-top: 2px;
+}
+
+.pwa-ios-tip {
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #7dd3fc;
+  line-height: 1.6;
+}
+
+.pwa-ios-tip strong {
+  color: #22d3ee;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pwa-banner,
+  .pwa-modal,
+  .pwa-spinner {
+    animation: none;
+  }
+  .pwa-banner {
+    bottom: 24px;
+    opacity: 1;
+  }
+  .pwa-modal {
+    transform: none;
+    opacity: 1;
+  }
+}

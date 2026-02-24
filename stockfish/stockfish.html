@@ -4,37 +4,241 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Play Chess with Stockfish</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0a">
+    
     <!-- Include jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Correct browser-compatible versions -->
+    <!-- Chess libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.min.js"></script>
     <script src="chessboard.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
+    
+    <!-- PWA Install Script -->
+    <script src="pwa-install.js" defer></script>
+    
     <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            color: #f0ede6;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .pwa-banner {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(520px, calc(100% - 32px));
+            background: rgba(15, 20, 35, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: 1000;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: none;
+        }
+
+        .pwa-banner.visible {
+            display: flex;
+        }
+
+        .pwa-banner-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.8), transparent);
+        }
+
+        .pwa-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            width: 100%;
+        }
+
+        .pwa-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+            font-size: 22px;
+        }
+
+        .pwa-text {
+            flex: 1;
+        }
+
+        .pwa-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: #fff;
+        }
+
+        .pwa-subtitle {
+            font-size: 12px;
+            color: #8892a4;
+            margin-top: 2px;
+        }
+
+        .pwa-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .pwa-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 8px 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4);
+            transition: all 0.2s;
+        }
+
+        .pwa-btn:hover {
+            box-shadow: 0 4px 24px rgba(79, 70, 229, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .pwa-dismiss {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #8892a4;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pwa-dismiss:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(40px) translateX(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) translateX(-50%);
+                opacity: 1;
+            }
+        }
+
         #board {
             width: 400px;
             margin: 20px auto;
         }
+
         #status {
             text-align: center;
             margin-top: 20px;
             font-size: 18px;
         }
+
+        h1 {
+            text-align: center;
+            color: #e8c84a;
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .links {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .links a {
+            color: #4f46e5;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s;
+        }
+
+        .links a:hover {
+            color: #7c3aed;
+        }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Play Chess with Stockfish
-	<br/>
-	<a  href="https://stockfishchess.org/">Credits</a>
-	<a  href="https://chatgpt.com/share/6781f28b-12f8-8008-8fc6-6d1e409b65be">ChatGpt</a>
-	
-    
+    <!-- PWA Install Banner -->
+    <div class="pwa-banner" id="pwa-banner">
+        <div class="pwa-banner-glow"></div>
+        <div class="pwa-banner-content">
+            <div class="pwa-icon">⚡</div>
+            <div class="pwa-text">
+                <div class="pwa-title">Install App</div>
+                <div class="pwa-subtitle">Fast, offline-ready, no App Store</div>
+            </div>
+            <div class="pwa-actions">
+                <button class="pwa-btn" id="install-button">
+                    <span>⬇️</span>
+                    <span>Install</span>
+                </button>
+                <button class="pwa-btn pwa-dismiss" id="dismiss-button">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <h1>
+        Play Chess with Stockfish
+        <br/>
+        <span style="font-size: 14px; color: #666;">v17 WASM</span>
     </h1>
+    
+    <div class="links">
+        <a href="https://stockfishchess.org/">Credits</a>
+        <a href="https://chatgpt.com/share/6781f28b-12f8-8008-8fc6-6d1e409b65be">ChatGPT</a>
+    </div>
     
     <div id="board"></div>
     <div id="status">Your move!</div>
 
     <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('ServiceWorker registration failed:', err);
+            });
+        }
+
+        // Show/hide PWA banner based on availability
+        const banner = document.getElementById('pwa-banner');
+        const dismissButton = document.getElementById('dismiss-button');
+
+        // Check if install prompt is available
+        let installPromptShown = false;
+        window.addEventListener('beforeinstallprompt', () => {
+            installPromptShown = true;
+            banner.classList.add('visible');
+        });
+
+        // Hide banner on dismiss
+        dismissButton.addEventListener('click', () => {
+            banner.classList.remove('visible');
+            localStorage.setItem('pwa_dismissed', Date.now());
+        });
+
         // Initialize chess.js and chessboard.js
         const game = new Chess();
         const board = Chessboard('board', {
@@ -52,7 +256,7 @@
 
         // Update the board position after a piece is dropped
         function onDrop(source, target) {
-            const move = game.move({ from: source, to: target, promotion: 'q' }); // Always promote to a queen
+            const move = game.move({ from: source, to: target, promotion: 'q' });
 
             // Illegal move
             if (move === null) {
