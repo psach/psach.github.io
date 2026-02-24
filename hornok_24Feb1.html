@@ -437,7 +437,13 @@ function startGPS(){
   navigator.geolocation.watchPosition(onGPS,e=>setGPS('❌ '+e.message),{enableHighAccuracy:true,maximumAge:5000});
 }
 function setGPS(t){document.getElementById('gpsStatus').textContent=t;}
-
+function onGPS(p){
+  myLat=p.coords.latitude; myLng=p.coords.longitude;
+  setGPS(`📍 GPS ready — ±${Math.round(p.coords.accuracy)}m`);
+  const b=document.getElementById('joinBtn'); b.disabled=false; b.textContent='Join NearbyChat';
+  if(map){myMarker.setLatLng([myLat,myLng]); radiusCircle.setLatLng([myLat,myLng]); enforceBounds();}
+  if(registered) registerPresence();
+}
 
 function amIStationary(){
   if(!lastMovedAt) return false;
@@ -784,16 +790,38 @@ function processSheet(csv){
     if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
   });
 
-  const now=Date.now(),fresh={};
-  for(let r=1;r<rows.length;r++){
-    const row=rows[r]; if(!row||row.length<2)continue;
-    const rawUser=(row[cU]||'').trim().replaceAll('"','');
-    const {name:user, vehicle, color} = parseUsername(rawUser);
-    const msg=(row[cM]||'').trim().replaceAll('"','');
-    const loc=parseLoc((row[cL]||'').trim().replaceAll('"',''));
-    const ts=parseDate((row[0]||'').trim());
-    if(!user||!loc)continue;
-    const dist=haversine(myLat,myLng,loc.lat,loc.lng);
+
+// Build map of latest row per user (by timestamp)
+  const latest = {}; // user -> { row, ts, loc, msg, vehicle, color }
+  for(let r = 1; r < rows.length; r++){
+    const row = rows[r];
+    if(!row || row.length < 2) continue;
+
+    const rawUser = (row[cU] || '').trim().replaceAll('"','');
+    const { name: user, vehicle, color } = parseUsername(rawUser);
+    const msg = (row[cM] || '').trim().replaceAll('"','');
+    const loc = parseLoc((row[cL] || '').trim().replaceAll('"',''));
+    const ts = parseDate((row[0] || '').trim());
+
+    if(!user || !loc) continue;
+
+    // If we don't have an entry yet or this row is newer, keep it
+    if(!latest[user] || ts > latest[user].ts){
+      latest[user] = { row, ts, loc, msg, vehicle, color };
+    }
+  }
+  
+  
+ 
+const now = Date.now(), fresh = {};
+  for(const [user, entry] of Object.entries(latest)){
+    const { row, ts, loc, msg, vehicle, color } = entry;
+
+    // skip our own record processing for incoming logic (we still update prevLocations below)
+    const dist = (myLat && myLng && loc) ? haversine(myLat, myLng, loc.lat, loc.lng) : Infinity;
+
+
+
 
     // Broadcast horn — must be within HORN_DIST_M (tighter than RADIUS_M)
     if(msg===HORN_MSG && user!==myUsername && dist<=HORN_DIST_M){
