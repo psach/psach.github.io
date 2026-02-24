@@ -299,3 +299,82 @@ $('#p2iGo').addEventListener('click', async ()=>{
   const zipBlob = await zip.generateAsync({ type: 'blob' });
   downloadBlob(zipBlob, (file.name.replace(/\.pdf$/i,'')||'pdf')+'_images.zip');
 });
+
+
+     // Initialize chess.js and chessboard.js
+        const game = new Chess();
+        const board = Chessboard('board', {
+            draggable: true,
+            position: 'start',
+            onDrop: onDrop,
+            onSnapEnd: onSnapEnd
+        });
+
+        // Load Stockfish
+        const stockfish = new Worker('stockfish.js');
+
+        // UI elements
+        const statusElement = document.getElementById('status');
+
+        // Update the board position after a piece is dropped
+        function onDrop(source, target) {
+            const move = game.move({ from: source, to: target, promotion: 'q' });
+
+            // Illegal move
+            if (move === null) {
+                return 'snapback';
+            }
+
+            // Update status
+            updateStatus();
+
+            // Make the engine move
+            setTimeout(makeEngineMove, 250);
+        }
+
+        // Update board position to match game state
+        function onSnapEnd() {
+            board.position(game.fen());
+        }
+
+        // Make a move using Stockfish
+        function makeEngineMove() {
+            if (game.game_over()) {
+                updateStatus();
+                return;
+            }
+
+            stockfish.postMessage(`position fen ${game.fen()}`);
+            stockfish.postMessage('go depth 15');
+
+            stockfish.onmessage = function(event) {
+                const line = event.data;
+                if (line.startsWith('bestmove')) {
+                    const bestMove = line.split(' ')[1];
+                    game.move({ from: bestMove.slice(0, 2), to: bestMove.slice(2, 4), promotion: 'q' });
+                    board.position(game.fen());
+                    updateStatus();
+                }
+            };
+        }
+
+        // Update the status element
+        function updateStatus() {
+            let status = '';
+
+            if (game.in_checkmate()) {
+                status = 'Checkmate! Game over.';
+            } else if (game.in_draw()) {
+                status = 'Draw! Game over.';
+            } else {
+                status = `Your move! ${game.turn() === 'w' ? 'White' : 'Black'} to move.`;
+                if (game.in_check()) {
+                    status += ' Check!';
+                }
+            }
+
+            statusElement.textContent = status;
+        }
+
+        updateStatus();
+		
