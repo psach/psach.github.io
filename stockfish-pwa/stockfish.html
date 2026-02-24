@@ -14,10 +14,11 @@
     <script src="chessboard.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
     
-    <!-- PWA Install Script -->
-    <script src="pwa-install.js" defer></script>
+    
     
     <style>
+	
+	
         * { box-sizing: border-box; }
         body {
             margin: 0;
@@ -179,10 +180,17 @@
             color: #7c3aed;
         }
     </style>
+
+<script>
+    // Register service worker if supported
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+</script>
+  
 </head>
 <body>
-    <!-- PWA Install Banner -->
-    <div class="pwa-banner" id="pwa-banner">
+   
         <div class="pwa-banner-glow"></div>
         <div class="pwa-banner-content">
             <div class="pwa-icon">⚡</div>
