@@ -790,9 +790,7 @@ function processSheet(csv){
     if(x.includes('1017486679')||x.includes('location')||x.includes('longitude'))cL=i;
   });
 
-
-// Build map of latest row per user (by timestamp)
-  const latest = {}; // user -> { row, ts, loc, msg, vehicle, color }
+  
   for(let r = 1; r < rows.length; r++){
     const row = rows[r];
     if(!row || row.length < 2) continue;
@@ -804,23 +802,6 @@ function processSheet(csv){
     const ts = parseDate((row[0] || '').trim());
 
     if(!user || !loc) continue;
-
-    // If we don't have an entry yet or this row is newer, keep it
-    if(!latest[user] || ts > latest[user].ts){
-      latest[user] = { row, ts, loc, msg, vehicle, color };
-    }
-  }
-  
-  
- 
-const now = Date.now(), fresh = {};
-  for(const [user, entry] of Object.entries(latest)){
-    const { row, ts, loc, msg, vehicle, color } = entry;
-
-    // skip our own record processing for incoming logic (we still update prevLocations below)
-    const dist = (myLat && myLng && loc) ? haversine(myLat, myLng, loc.lat, loc.lng) : Infinity;
-
-
 
 
     // Broadcast horn — must be within HORN_DIST_M (tighter than RADIUS_M)
