@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitman Shorthand Translator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #150800;
+  --ink-light: #3D2010;
+  --parchment: #F6E8C3;
+  --parchment-mid: #EDD9A0;
+  --parchment-dark: #D4B96A;
+  --gold: #9A7220;
+  --gold-light: #C49A30;
+  --red: #7A1515;
+  --bg: #0E0A04;
+  --panel-bg: #1C1208;
+  --panel-border: #3A2810;
+  --line-color: #C9AE7A;
+  --muted: #6B5030;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  font-family: 'Crimson Pro', Georgia, serif;
+  color: var(--parchment);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 40px;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(154,114,32,0.08) 0%, transparent 70%);
+}
+
+/* ── Header ── */
+header {
+  width: 100%;
+  max-width: 1080px;
+  text-align: center;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.header-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent);
+  margin: 10px 0;
+}
+
+h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  color: var(--parchment);
+  letter-spacing: 3px;
+  line-height: 1.1;
+}
+
+h1 em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.subtitle {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* ── Layout ── */
+.main {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 18px;
+  width: 100%;
+  max-width: 1080px;
+}
+
+@media (max-width: 700px) {
+  .main { grid-template-columns: 1fr; }
+}
+
+/* ── Panel ── */
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 8px;
+}
+
+/* ── Speech Button ── */
+.mic-btn {
+  width: 100%;
+  height: 64px;
+  background: none;
+  border: 2px solid var(--gold);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem;
+  color: var(--parchment);
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.mic-btn:hover {
+  background: rgba(154,114,32,0.15);
+  border-color: var(--gold-light);
+}
+
+.mic-btn.listening {
+  border-color: var(--red);
+  background: rgba(122,21,21,0.15);
+  animation: pulse 1.5s infinite;
+}
+
+.mic-btn.listening .mic-icon { color: #E05050; }
+.mic-btn.listening .btn-label::after { content: '...'; }
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(122,21,21,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(122,21,21,0); }
+}
+
+.mic-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+/* ── Text Input ── */
+textarea {
+  width: 100%;
+  height: 100px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  color: var(--parchment);
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 10px 12px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+textarea:focus { border-color: var(--gold); }
+textarea::placeholder { color: var(--muted); font-style: italic; }
+
+/* ── Buttons row ── */
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 8px;
+  background: none;
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  color: var(--muted);
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.btn:hover { border-color: var(--gold); color: var(--parchment); }
+.btn.primary { border-color: var(--gold); color: var(--gold-light); }
+.btn.primary:hover { background: rgba(154,114,32,0.2); color: var(--parchment); }
+
+/* ── Status ── */
+.status {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  min-height: 1.2em;
+}
+
+.status.error { color: #C05050; }
+.status.ok { color: #7AAA70; }
+
+/* ── Reference Chart ── */
+.ref-chart {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.ref-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.ref-item svg { flex-shrink: 0; }
+.ref-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem;
+  color: var(--parchment-dark);
+  min-width: 20px;
+}
+
+/* ── Canvas Panel ── */
+.canvas-wrap {
+  background: var(--parchment);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.15), 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.canvas-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.canvas-header {
+  background: var(--parchment-mid);
+  border-bottom: 2px solid var(--parchment-dark);
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.canvas-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.canvas-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.canvas-btn {
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.canvas-btn:hover { border-color: var(--gold); color: var(--ink-light); }
+
+#shorthand-svg {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.placeholder-msg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--line-color);
+  font-style: italic;
+  font-size: 1.1rem;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.placeholder-msg small {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* ── Legend ── */
+.legend {
+  width: 100%;
+  max-width: 1080px;
+  margin-top: 16px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+
+.legend-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.legend-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+  flex-shrink: 0;
+}
+
+.legend-dot.hollow { background: none; border: 1.5px solid var(--ink); }
+.legend-dash { width: 14px; height: 2px; background: var(--ink); flex-shrink: 0; }
+.legend-dash.thin { height: 1px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-rule"></div>
+  <h1>Pitman <em>Shorthand</em> Translator</h1>
+  <p class="subtitle">Speech & Text → SVG Stenographic Notation · Isaac Pitman, 1837</p>
+  <div class="header-rule"></div>
+</header>
+
+<div class="main">
+  <!-- Controls -->
+  <div class="panel">
+    <div class="panel-title">Input</div>
+
+    <button class="mic-btn" id="mic-btn" title="Click to speak">
+      <span class="mic-icon">🎙</span>
+      <span class="btn-label" id="btn-label">Speak</span>
+    </button>
+
+    <textarea id="text-input" placeholder="…or type your text here" rows="4"></textarea>
+
+    <div class="btn-row">
+      <button class="btn primary" id="translate-btn">Translate</button>
+      <button class="btn" id="clear-btn">Clear</button>
+    </div>
+
+    <div class="status" id="status">Ready — speak or type above</div>
+
+    <div class="panel-title">Vowel Legend</div>
+    <div style="font-size:0.8rem; color:var(--muted); line-height:1.8">
+      <span style="color:var(--parchment)">●</span> Heavy dot = A, O<br>
+      <span style="color:var(--parchment)">·</span> Light dot = E, I, U<br>
+      <span style="color:var(--parchment)">—</span> Heavy dash = Ā, Ō<br>
+      <span style="color:var(--parchment); letter-spacing:2px">– </span> Light dash = Ē, Ū<br>
+      <span style="color:var(--muted); font-style:italic">Placed above / below stroke</span>
+    </div>
+
+    <div class="panel-title">Stroke Weight</div>
+    <div style="font-size:0.8rem; color:var(--muted); line-height:1.9">
+      <svg width="40" height="14" style="vertical-align:middle;margin-right:4px"><line x1="2" y1="8" x2="38" y2="8" stroke="#F6E8C3" stroke-width="1.2"/></svg>Thin = Unvoiced (P,T,K…)<br>
+      <svg width="40" height="14" style="vertical-align:middle;margin-right:4px"><line x1="2" y1="8" x2="38" y2="8" stroke="#F6E8C3" stroke-width="3.5"/></svg>Thick = Voiced (B,D,G…)
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-wrap" id="canvas-wrap">
+    <div class="canvas-header">
+      <span class="canvas-title">Shorthand Transcription</span>
+      <div class="canvas-actions">
+        <button class="canvas-btn" id="download-btn">↓ SVG</button>
+        <button class="canvas-btn" id="zoom-in">+</button>
+        <button class="canvas-btn" id="zoom-out">−</button>
+      </div>
+    </div>
+    <div id="placeholder" class="placeholder-msg">
+      Your shorthand will appear here
+      <small>Click "Speak" or type text, then "Translate"</small>
+    </div>
+    <svg id="shorthand-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+</div>
+
+<!-- Reference chart -->
+<div class="legend">
+  <div class="legend-title">Consonant Reference — Pitman System</div>
+  <div id="ref-grid" class="legend-grid"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  PITMAN GLYPH DEFINITIONS
+//  Each glyph has: d (SVG path), w (advance width),
+//  thick (bool), exitX/exitY (relative exit point),
+//  startX/startY (relative entry point = 0,0 usually)
+//  All defined in a 30-high coordinate space
+//  Baseline at y=20 (strokes go up from there, or hang below)
+// ═══════════════════════════════════════════════════════
+
+const GLYPHS = {
+  // ── Plosives: vertical strokes ──
+  'p':  { d:'M0,0 L0,28',          w:14, thick:false, ex:0,  ey:28, label:'P',  desc:'thin down' },
+  'b':  { d:'M0,0 L0,28',          w:14, thick:true,  ex:0,  ey:28, label:'B',  desc:'thick down' },
+
+  // ── Dentals: horizontal strokes ──
+  't':  { d:'M0,0 L24,0',          w:24, thick:false, ex:24, ey:0,  label:'T',  desc:'thin horiz' },
+  'd':  { d:'M0,0 L24,0',          w:24, thick:true,  ex:24, ey:0,  label:'D',  desc:'thick horiz' },
+
+  // ── Velars: curves opening right ──
+  'k':  { d:'M0,0 Q22,0 22,22',    w:26, thick:false, ex:22, ey:22, label:'K',  desc:'thin curve →' },
+  'g':  { d:'M0,0 Q22,0 22,22',    w:26, thick:true,  ex:22, ey:22, label:'G',  desc:'thick curve →' },
+
+  // ── Affricates: curves opening left ──
+  'ch': { d:'M22,0 Q0,0 0,22',     w:26, thick:false, ex:0,  ey:22, label:'CH', desc:'thin curve ←' },
+  'j':  { d:'M22,0 Q0,0 0,22',     w:26, thick:true,  ex:0,  ey:22, label:'J',  desc:'thick curve ←' },
+
+  // ── Labio-dentals: diagonal strokes ──
+  'f':  { d:'M0,0 L20,26',         w:22, thick:false, ex:20, ey:26, label:'F',  desc:'thin diag ↘' },
+  'v':  { d:'M0,0 L20,26',         w:22, thick:true,  ex:20, ey:26, label:'V',  desc:'thick diag ↘' },
+
+  // ── Interdentals: shallow curves ──
+  'th': { d:'M0,8 Q12,0 24,8',     w:24, thick:false, ex:24, ey:8,  label:'TH', desc:'thin shallow' },
+  'dh': { d:'M0,8 Q12,0 24,8',     w:24, thick:true,  ex:24, ey:8,  label:'Ð',  desc:'thick shallow' },
+
+  // ── Sibilants: hook/circle ──
+  's':  { d:'M14,0 A10,10 0 1,0 14,0.1', w:28, thick:false, ex:4,  ey:18, label:'S',  desc:'small circle', circle:true, cx:14, cy:12, r:10 },
+  'z':  { d:'M14,0 A10,10 0 1,0 14,0.1', w:28, thick:true,  ex:4,  ey:18, label:'Z',  desc:'thick circle', circle:true, cx:14, cy:12, r:10 },
+
+  // ── Palato-alveolars: long curves ──
+  'sh': { d:'M12,0 Q28,14 12,28',  w:28, thick:false, ex:12, ey:28, label:'SH', desc:'long forward curve' },
+  'zh': { d:'M12,0 Q28,14 12,28',  w:28, thick:true,  ex:12, ey:28, label:'ZH', desc:'long thick curve' },
+
+  // ── Nasals ──
+  'n':  { d:'M0,16 L22,0',         w:24, thick:false, ex:22, ey:0,  label:'N',  desc:'thin slant ↗' },
+  'm':  { d:'M0,16 L32,0',         w:34, thick:false, ex:32, ey:0,  label:'M',  desc:'thin long slant' },
+  'ng': { d:'M0,0 Q24,0 24,18 Q24,32 0,32', w:28, thick:false, ex:0, ey:32, label:'NG', desc:'large hook' },
+
+  // ── Laterals ──
+  'l':  { d:'M0,28 L0,0',          w:14, thick:false, ex:0,  ey:0,  label:'L',  desc:'thin upstroke' },
+
+  // ── Rhotics ──
+  'r':  { d:'M0,12 Q18,0 18,18',   w:22, thick:false, ex:18, ey:18, label:'R',  desc:'small hook' },
+
+  // ── Glides ──
+  'w':  { d:'M0,22 Q0,0 16,0',     w:20, thick:false, ex:16, ey:0,  label:'W',  desc:'upward initial hook' },
+  'y':  { d:'M0,0 Q0,22 16,22',    w:20, thick:false, ex:16, ey:22, label:'Y',  desc:'downward initial hook' },
+  'wh': { d:'M16,22 Q16,0 0,0',    w:20, thick:false, ex:0,  ey:0,  label:'WH', desc:'reverse hook' },
+
+  // ── Glottals ──
+  'h':  { d:'M8,24 L8,0',          w:16, thick:false, ex:8,  ey:0,  label:'H',  desc:'small tick up' },
+
+  // ── Misc ──
+  'ph': { d:'M0,0 L20,26',         w:22, thick:true,  ex:20, ey:26, label:'PH', desc:'thick diag (=F)' },
+  'qu': { d:'M0,0 Q22,0 22,22',    w:26, thick:true,  ex:22, ey:22, label:'QU', desc:'thick curve' },
+  'x':  { d:'M0,0 L20,26',         w:22, thick:false, ex:20, ey:26, label:'X',  desc:'diag (=KS)' },
+};
+
+// Vowel indicators
+const VOWELS = {
+  'a': { type:'dot',  r:4,  above:true,  heavy:true  },  // trap
+  'e': { type:'dash', len:10, above:true, heavy:false },  // dress
+  'i': { type:'dot',  r:2.5, above:true, heavy:false },  // kit
+  'o': { type:'dot',  r:4,  above:false, heavy:true  },  // lot
+  'u': { type:'dot',  r:2.5, above:false, heavy:false },  // foot
+};
+
+// ═══════════════════════════════════════════════════════
+//  TOKENIZER
+// ═══════════════════════════════════════════════════════
+
+function tokenizeWord(word) {
+  const tokens = [];
+  const s = word.toLowerCase().replace(/[^a-z]/g, '');
+  let i = 0;
+  while (i < s.length) {
+    // Check trigraphs
+    const three = s.slice(i, i+3);
+    // Check digraphs
+    const two = s.slice(i, i+2);
+    if (['th','sh','ch','ng','wh','ph','qu','zh'].includes(two)) {
+      // Check if TH is voiced (the, this, that, those, then, there, they...)
+      const isVoicedTH = (two === 'th' && ['the','this','that','those','them','then','there','they','though','their','these'].some(w => word.toLowerCase().startsWith(w)) );
+      const key = (two === 'th' && isVoicedTH) ? 'dh' : two;
+      tokens.push({ type:'consonant', key });
+      i += 2;
+    } else {
+      const c = s[i];
+      if ('aeiou'.includes(c)) {
+        // Group consecutive vowels
+        let v = '';
+        while (i < s.length && 'aeiou'.includes(s[i])) { v += s[i]; i++; }
+        // Take primary vowel (first)
+        tokens.push({ type:'vowel', key: v[0] });
+      } else if (c in GLYPHS) {
+        tokens.push({ type:'consonant', key: c });
+        i++;
+      } else {
+        i++; // skip unknown
+      }
+    }
+  }
+  return tokens;
+}
+
+// ═══════════════════════════════════════════════════════
+//  SVG RENDERER
+// ═══════════════════════════════════════════════════════
+
+const INK = '#150800';
+const SCALE = 1.0;
+const LINE_HEIGHT = 80;     // pixels between baselines
+const MARGIN_X = 30;
+const MARGIN_Y = 20;
+const GLYPH_SCALE = 1.15;  // scale glyphs up slightly
+const WORD_GAP = 28;
+const GLYPH_GAP = 3;
+const VOWEL_OFFSET = 18;   // vertical distance for vowel indicators
+
+let zoom = 1.0;
+
+function renderShorthand(text) {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return;
+
+  const svg = document.getElementById('shorthand-svg');
+  const ph = document.getElementById('placeholder');
+  ph.style.display = 'none';
+
+  // SVG dimensions
+  const canvasWidth = svg.parentElement.clientWidth || 700;
+  const maxWidth = canvasWidth - MARGIN_X * 2;
+
+  // First pass: calculate layout
+  const lines = [];
+  let currentLine = [];
+  let lineWidth = 0;
+
+  for (const word of words) {
+    const tokens = tokenizeWord(word);
+    const wordWidth = measureWord(tokens);
+    if (lineWidth > 0 && lineWidth + WORD_GAP + wordWidth > maxWidth) {
+      lines.push(currentLine);
+      currentLine = [];
+      lineWidth = 0;
+    }
+    currentLine.push({ tokens, wordWidth });
+    lineWidth += (lineWidth > 0 ? WORD_GAP : 0) + wordWidth;
+  }
+  if (currentLine.length) lines.push(currentLine);
+
+  // SVG height
+  const svgHeight = MARGIN_Y * 2 + lines.length * LINE_HEIGHT + 20;
+
+  svg.setAttribute('width', canvasWidth);
+  svg.setAttribute('height', svgHeight * zoom);
+  svg.setAttribute('viewBox', `0 0 ${canvasWidth} ${svgHeight}`);
+  svg.innerHTML = '';
+
+  // Background
+  const bg = makeSVG('rect', { width: canvasWidth, height: svgHeight, fill: '#F6E8C3' });
+  svg.appendChild(bg);
+
+  // Ruled lines
+  for (let li = 0; li < lines.length; li++) {
+    const baseY = MARGIN_Y + li * LINE_HEIGHT + 40;
+    const rule = makeSVG('line', {
+      x1: MARGIN_X, y1: baseY,
+      x2: canvasWidth - MARGIN_X, y2: baseY,
+      stroke: '#C9AE7A', 'stroke-width': 0.8, opacity: 0.7
+    });
+    svg.appendChild(rule);
+    // Secondary guide line (upper)
+    const guide = makeSVG('line', {
+      x1: MARGIN_X, y1: baseY - 30,
+      x2: canvasWidth - MARGIN_X, y2: baseY - 30,
+      stroke: '#D4B96A', 'stroke-width': 0.4, opacity: 0.4,
+      'stroke-dasharray': '4,4'
+    });
+    svg.appendChild(guide);
+  }
+
+  // Render words
+  for (let li = 0; li < lines.length; li++) {
+    const baseY = MARGIN_Y + li * LINE_HEIGHT + 40;
+    let cx = MARGIN_X;
+
+    for (const wordObj of lines[li]) {
+      cx = renderWord(svg, wordObj.tokens, cx, baseY);
+      cx += WORD_GAP;
+    }
+  }
+}
+
+function measureWord(tokens) {
+  let w = 0;
+  for (const tok of tokens) {
+    if (tok.type === 'consonant') {
+      const g = GLYPHS[tok.key];
+      if (g) w += (g.w + GLYPH_GAP) * GLYPH_SCALE;
+    }
+  }
+  return w;
+}
+
+function renderWord(svg, tokens, startX, baseY) {
+  let cx = startX;
+  let lastConsonantX = cx;
+  let lastConsonantMidY = baseY;
+  const pendingVowels = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (tok.type === 'consonant') {
+      // Flush pending vowels before this consonant
+      for (const v of pendingVowels) {
+        renderVowelMark(svg, v, lastConsonantX, lastConsonantMidY, baseY);
+      }
+      pendingVowels.length = 0;
+
+      const g = GLYPHS[tok.key];
+      if (!g) continue;
+
+      const gx = cx;
+      const gy = baseY - 22; // top of glyph area
+
+      renderGlyph(svg, g, gx, gy);
+      lastConsonantX = gx + (g.ex * GLYPH_SCALE + g.w * GLYPH_SCALE) / 2;
+      lastConsonantMidY = gy + 14 * GLYPH_SCALE;
+      cx += (g.w + GLYPH_GAP) * GLYPH_SCALE;
+    } else if (tok.type === 'vowel') {
+      pendingVowels.push(tok.key);
+    }
+  }
+
+  // Flush remaining vowels
+  for (const v of pendingVowels) {
+    renderVowelMark(svg, v, lastConsonantX, lastConsonantMidY, baseY);
+  }
+
+  return cx;
+}
+
+function renderGlyph(svg, g, x, y) {
+  const sw = g.thick ? 3.5 : 1.4;
+  const gs = GLYPH_SCALE;
+
+  if (g.circle) {
+    const el = makeSVG('circle', {
+      cx: x + g.cx * gs,
+      cy: y + g.cy * gs,
+      r: g.r * gs,
+      fill: 'none',
+      stroke: INK,
+      'stroke-width': sw,
+      'stroke-linecap': 'round'
+    });
+    svg.appendChild(el);
+  } else {
+    // Scale path
+    const scaledD = scalePath(g.d, gs, x, y);
+    const el = makeSVG('path', {
+      d: scaledD,
+      fill: 'none',
+      stroke: INK,
+      'stroke-width': sw,
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round'
+    });
+    svg.appendChild(el);
+  }
+}
+
+function renderVowelMark(svg, vowelKey, cx, cy, baseY) {
+  const v = VOWELS[vowelKey];
+  if (!v) return;
+
+  const vy = v.above ? baseY - 45 : baseY + 12;
+  const strokeW = v.heavy ? 2.5 : 1;
+  const fillCol = v.heavy ? INK : 'none';
+  const strokeCol = INK;
+
+  if (v.type === 'dot') {
+    const el = makeSVG('circle', {
+      cx: cx, cy: vy,
+      r: v.r,
+      fill: fillCol,
+      stroke: strokeCol,
+      'stroke-width': strokeW
+    });
+    svg.appendChild(el);
+  } else if (v.type === 'dash') {
+    const el = makeSVG('line', {
+      x1: cx - v.len/2, y1: vy,
+      x2: cx + v.len/2, y2: vy,
+      stroke: strokeCol,
+      'stroke-width': v.heavy ? 2.5 : 1.2,
+      'stroke-linecap': 'round'
+    });
+    svg.appendChild(el);
+  }
+}
+
+// Scale a path string by factor gs and translate to (tx, ty)
+function scalePath(d, gs, tx, ty) {
+  // Parse and transform path commands
+  return d.replace(/([MmLlQqCcAa])\s*([-\d.,\s]+)/g, (match, cmd, args) => {
+    const nums = args.trim().split(/[\s,]+/).map(Number);
+    const cmdU = cmd.toUpperCase();
+    let out = cmd;
+
+    if (cmdU === 'A') {
+      // Arc: rx ry x-rot large-arc sweep x y
+      const transformed = [];
+      for (let i = 0; i < nums.length; i += 7) {
+        transformed.push(
+          nums[i] * gs,   // rx
+          nums[i+1] * gs, // ry
+          nums[i+2],      // x-rotation
+          nums[i+3],      // large-arc
+          nums[i+4],      // sweep
+          nums[i+5] * gs + tx, // x
+          nums[i+6] * gs + ty  // y
+        );
+      }
+      out += ' ' + transformed.join(' ');
+    } else {
+      const transformed = [];
+      for (let i = 0; i < nums.length; i += 2) {
+        if (cmd === cmd.toUpperCase()) {
+          // Absolute
+          transformed.push(nums[i] * gs + tx, nums[i+1] * gs + ty);
+        } else {
+          // Relative
+          transformed.push(nums[i] * gs, nums[i+1] * gs);
+        }
+      }
+      out += ' ' + transformed.join(' ');
+    }
+    return out;
+  });
+}
+
+function makeSVG(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// ═══════════════════════════════════════════════════════
+//  REFERENCE CHART
+// ═══════════════════════════════════════════════════════
+
+function buildRefChart() {
+  const grid = document.getElementById('ref-grid');
+  const shown = ['p','b','t','d','k','g','ch','j','f','v','th','s','sh','n','m','ng','l','r','w','y','h'];
+
+  for (const key of shown) {
+    const g = GLYPHS[key];
+    if (!g) continue;
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+
+    // Mini SVG
+    const svgW = (g.circle ? g.cx*2+g.r*2+8 : (g.ex > 0 ? Math.max(g.w, g.ex) : g.w) + 6) * 0.85 + 10;
+    const svgH = 40;
+    const miniSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    miniSvg.setAttribute('width', Math.max(svgW, 32));
+    miniSvg.setAttribute('height', svgH);
+    miniSvg.style.verticalAlign = 'middle';
+
+    const sw = g.thick ? 3 : 1.2;
+    const offY = 10;
+
+    if (g.circle) {
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', g.cx * 0.85 + 4);
+      c.setAttribute('cy', g.cy * 0.85 + offY);
+      c.setAttribute('r', g.r * 0.85);
+      c.setAttribute('fill', 'none');
+      c.setAttribute('stroke', '#F6E8C3');
+      c.setAttribute('stroke-width', sw);
+      miniSvg.appendChild(c);
+    } else {
+      const scaledD = scalePath(g.d, 0.85, 4, offY);
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', scaledD);
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke', '#F6E8C3');
+      p.setAttribute('stroke-width', sw);
+      p.setAttribute('stroke-linecap', 'round');
+      p.setAttribute('stroke-linejoin', 'round');
+      miniSvg.appendChild(p);
+    }
+
+    const label = document.createElement('span');
+    label.className = 'ref-label';
+    label.textContent = g.label;
+
+    item.appendChild(miniSvg);
+    item.appendChild(label);
+    grid.appendChild(item);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  SPEECH RECOGNITION
+// ═══════════════════════════════════════════════════════
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+const micBtn = document.getElementById('mic-btn');
+const btnLabel = document.getElementById('btn-label');
+const statusEl = document.getElementById('status');
+const textInput = document.getElementById('text-input');
+
+function setStatus(msg, type='') {
+  statusEl.textContent = msg;
+  statusEl.className = 'status' + (type ? ' '+type : '');
+}
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add('listening');
+    btnLabel.textContent = 'Listening';
+    setStatus('🔴 Recording… speak now');
+  };
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    let final = '';
+    for (const result of e.results) {
+      if (result.isFinal) final += result[0].transcript;
+      else interim += result[0].transcript;
+    }
+    textInput.value = (final || interim);
+    if (final) {
+      renderShorthand(final);
+      setStatus('✓ Translated: "' + final.slice(0, 50) + (final.length > 50 ? '…' : '') + '"', 'ok');
+    }
+  };
+
+  recognition.onerror = (e) => {
+    setStatus('Speech error: ' + e.error, 'error');
+    stopListening();
+  };
+
+  recognition.onend = () => stopListening();
+
+} else {
+  micBtn.disabled = true;
+  micBtn.style.opacity = 0.4;
+  setStatus('Speech not supported in this browser', 'error');
+}
+
+function stopListening() {
+  isListening = false;
+  micBtn.classList.remove('listening');
+  btnLabel.textContent = 'Speak';
+  if (recognition) try { recognition.stop(); } catch(e){}
+}
+
+micBtn.addEventListener('click', () => {
+  if (!recognition) return;
+  if (isListening) {
+    stopListening();
+    setStatus('Stopped');
+  } else {
+    try {
+      recognition.start();
+    } catch(e) {
+      setStatus('Could not start: ' + e.message, 'error');
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  UI EVENTS
+// ═══════════════════════════════════════════════════════
+
+document.getElementById('translate-btn').addEventListener('click', () => {
+  const t = textInput.value.trim();
+  if (!t) { setStatus('Please enter or speak some text', 'error'); return; }
+  renderShorthand(t);
+  setStatus('✓ Translated ' + t.split(/\s+/).length + ' word(s)', 'ok');
+});
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  textInput.value = '';
+  const svg = document.getElementById('shorthand-svg');
+  svg.innerHTML = '';
+  document.getElementById('placeholder').style.display = '';
+  setStatus('Cleared');
+});
+
+textInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    document.getElementById('translate-btn').click();
+  }
+});
+
+// Zoom
+document.getElementById('zoom-in').addEventListener('click', () => {
+  zoom = Math.min(2, zoom + 0.15);
+  reapplyZoom();
+});
+document.getElementById('zoom-out').addEventListener('click', () => {
+  zoom = Math.max(0.5, zoom - 0.15);
+  reapplyZoom();
+});
+
+function reapplyZoom() {
+  const t = textInput.value.trim();
+  if (t) renderShorthand(t);
+}
+
+// Download SVG
+document.getElementById('download-btn').addEventListener('click', () => {
+  const svg = document.getElementById('shorthand-svg');
+  if (!svg.innerHTML) { setStatus('Nothing to download', 'error'); return; }
+  const blob = new Blob(['<?xml version="1.0"?>\n' + svg.outerHTML], { type: 'image/svg+xml' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pitman-shorthand.svg';
+  a.click();
+  setStatus('SVG downloaded', 'ok');
+});
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+
+buildRefChart();
+
+// Demo on load
+window.addEventListener('load', () => {
+  const demo = 'The quick brown fox';
+  textInput.value = demo;
+  setTimeout(() => {
+    renderShorthand(demo);
+    setStatus('Demo loaded — try your own text or speech', 'ok');
+  }, 300);
+});
+
+window.addEventListener('resize', () => {
+  const t = textInput.value.trim();
+  if (t) renderShorthand(t);
+});
+</script>
+</body>
+</html>
