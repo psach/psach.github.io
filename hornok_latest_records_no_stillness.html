@@ -815,6 +815,8 @@ async function poll(){
   catch(e){setStat('err');}
 }
 
+ const latest = {}; // user -> { row, ts, loc, msg, vehicle, color }
+ 
 function processSheet(csv){
   const rows=parseCSV(csv);
   if(rows.length<2)return;
@@ -828,7 +830,7 @@ function processSheet(csv){
 
 
 // Build map of latest row per user (by timestamp)
-  const latest = {}; // user -> { row, ts, loc, msg, vehicle, color }
+ 
   for(let r = 1; r < rows.length; r++){
     const row = rows[r];
     if(!row || row.length < 2) continue;
@@ -848,7 +850,7 @@ function processSheet(csv){
 	  latest[user] = { row, ts, loc, msg, vehicle, color };
 	}
   }
-  
+  console.log(latest);
  // Now process only the latest entries
   const now = Date.now(), fresh = {};
   for(const [user, entry] of Object.entries(latest)){
