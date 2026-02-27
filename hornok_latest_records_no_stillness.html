@@ -849,7 +849,7 @@ function processSheet(csv){
     }
 	
 	if(msg.trim().length>0){
-	  latest[user] = { row, ts, loc, msg, vehicle, color };
+	  latest[user].push({ row, ts, loc, msg, vehicle, color });
 	}
   }
   console.log(latest);
