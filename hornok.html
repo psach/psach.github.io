@@ -484,7 +484,7 @@ function processSheet(csv){
     const ts=parseDate((row[0]||'').trim());
     if(!user||!loc)continue;
     const dist=haversine(myLat,myLng,loc.lat,loc.lng);
-
+	console.log(rows[r]);
     // Broadcast horn
     if(msg===HORN_MSG && user!==myUsername && dist<=RADIUS_M){
       const key=`horn|${row[0]}|${user}`;
