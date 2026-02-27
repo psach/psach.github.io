@@ -850,6 +850,8 @@ const latest = {}; // user -> { row, ts, loc, msg, vehicle, color }
 	
 	if(msg.trim().length>0){
 	  latest[user].push({ row, ts, loc, msg, vehicle, color });
+	}else{
+	  latest[user] = { row, ts, loc, msg, vehicle, color };
 	}
   }
   console.log(latest);
