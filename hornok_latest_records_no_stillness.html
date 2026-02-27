@@ -843,26 +843,9 @@ const latest = {}; // user -> { row, ts, loc, msg, vehicle, color }
 
     if(!user || !loc) continue;
  
-    // If we don't have an entry yet or this row is newer, keep it
-   /* if((!latest[user] || ts > latest[user].ts ) && (msg.trim().length==0 || latest[user].msg.trim().length==0 ) ){
-      latest[user] = { row, ts, loc, msg, vehicle, color };
-    }*/
-	
-	if(msg.trim().length>0){
-	  latest[user].push({ row, ts, loc, msg, vehicle, color });
-	}else{
-	  latest[user] = { row, ts, loc, msg, vehicle, color };
-	}
-  }
-  console.log(latest);
- // Now process only the latest entries
-  const now = Date.now(), fresh = {};
-  for(const [user, entry] of Object.entries(latest)){
-    const { row, ts, loc, msg, vehicle, color } = entry;
-
+   
     // skip our own record processing for incoming logic (we still update prevLocations below)
     const dist = (myLat && myLng && loc) ? haversine(myLat, myLng, loc.lat, loc.lng) : Infinity;
-
 
 
 
