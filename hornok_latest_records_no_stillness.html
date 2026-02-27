@@ -842,7 +842,7 @@ const latest = {}; // user -> { row, ts, loc, msg, vehicle, color }
     const ts = parseDate((row[0] || '').trim());
 
     if(!user || !loc) continue;
-
+ 
     // If we don't have an entry yet or this row is newer, keep it
    /* if((!latest[user] || ts > latest[user].ts ) && (msg.trim().length==0 || latest[user].msg.trim().length==0 ) ){
       latest[user] = { row, ts, loc, msg, vehicle, color };
