@@ -475,6 +475,8 @@ function processSheet(csv){
   });
 	console.log(rows);
   const now=Date.now(),fresh={};
+  let latest ={};
+  
   for(let r=1;r<rows.length;r++){
     const row=rows[r]; if(!row||row.length<2)continue;
     const rawUser=(row[cU]||'').trim().replaceAll('"','');
@@ -483,6 +485,10 @@ function processSheet(csv){
     const loc=parseLoc((row[cL]||'').trim().replaceAll('"',''));
     const ts=parseDate((row[0]||'').trim());
     if(!user||!loc)continue;
+	if(msg.length==0 && latest[user]) continue;
+	
+	latest[user]=user;
+	
     const dist=haversine(myLat,myLng,loc.lat,loc.lng);
 	console.log(rows[r]);
     // Broadcast horn
