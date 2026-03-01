@@ -662,9 +662,12 @@ function processSheet(csv){
     const row=rows[r]; if(!row||row.length<2) continue;
     const rawUser=(row[cU]||'').replace(/"/g,'').trim();
     const {name:user,vehicle}=parseUsername(rawUser);
+	const msg=(row[cM]||'').replace(/"/g,'').trim();
     const loc=parseLoc((row[cL]||'').replace(/"/g,'').trim());
     const ts=parseAnyDate((row[0]||'').trim());
     if(!user||!loc) continue;
+	if(msg.length>0)continue;
+	
     const dist=haversine(myLat,myLng,loc.lat,loc.lng);
     if(user!==myUsername && dist<=RADIUS_M){
       latestPos[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist),vehicle};
