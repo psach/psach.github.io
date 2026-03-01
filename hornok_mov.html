@@ -673,7 +673,8 @@ function processSheet(csv){
       latestPos[user]={lat:loc.lat,lng:loc.lng,ts,dist:Math.round(dist),vehicle};
     }
   }
-
+console.log("latestPos");
+console.log(latestPos);
   // Snapshot positions from last poll — used by moving-horn filter in Pass 2
   const prevPos = {};
   Object.entries(nearbyUsers).forEach(([u,info])=>{ prevPos[u]={lat:info.lat,lng:info.lng}; });
