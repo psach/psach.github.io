@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIC STREAM</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0c0e;
+    --panel: #0f1215;
+    --border: #1e2530;
+    --green: #00ff88;
+    --green-dim: #00ff8840;
+    --green-glow: #00ff8820;
+    --amber: #ffaa00;
+    --red: #ff3344;
+    --text: #c8d8e8;
+    --muted: #4a5a6a;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Scanlines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Grid background */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  .title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--green);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .version {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--green) 0%, var(--border) 60%);
+    margin-bottom: 24px;
+  }
+
+  /* VU Meter */
+  .vu-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vu-section::before {
+    content: 'LEVEL';
+    position: absolute;
+    top: 8px; right: 12px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+  }
+
+  .vu-bars {
+    display: flex;
+    gap: 3px;
+    height: 60px;
+    align-items: flex-end;
+  }
+
+  .vu-bar {
+    flex: 1;
+    background: var(--border);
+    border-radius: 1px;
+    transition: height 0.05s ease-out, background 0.05s;
+    min-height: 2px;
+  }
+
+  .waveform-canvas {
+    width: 100%;
+    height: 80px;
+    display: block;
+    margin-top: 12px;
+  }
+
+  /* Device selector */
+  .section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .device-list::-webkit-scrollbar { width: 4px; }
+  .device-list::-webkit-scrollbar-track { background: var(--bg); }
+  .device-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .device-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+    background: transparent;
+    width: 100%;
+    text-align: left;
+  }
+
+  .device-item:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-glow);
+  }
+
+  .device-item.selected {
+    border-color: var(--green);
+    background: var(--green-dim);
+    color: var(--green);
+  }
+
+  .device-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .device-item.selected .device-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .device-item:hover .device-dot { background: var(--green); }
+
+  .device-type {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .no-devices {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    padding: 12px;
+    text-align: center;
+  }
+
+  /* Controls */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 14px 20px;
+    border: 1px solid;
+    border-radius: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--green-dim);
+    box-shadow: 0 0 20px var(--green-glow), inset 0 0 20px var(--green-glow);
+  }
+
+  .btn-primary.active {
+    background: var(--green-dim);
+    box-shadow: 0 0 30px var(--green-glow);
+  }
+
+  .btn-danger {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background: rgba(255,51,68,0.1);
+    box-shadow: 0 0 20px rgba(255,51,68,0.2);
+  }
+
+  .btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Gain slider */
+  .gain-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .gain-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    white-space: nowrap;
+    width: 50px;
+  }
+
+  .gain-val {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green);
+    width: 40px;
+    text-align: right;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    outline: none;
+    border-radius: 1px;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 1px;
+    background: var(--green);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 1px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .status-dot.on {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 1.5s infinite;
+  }
+
+  .status-dot.err { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    flex: 1;
+  }
+
+  .latency {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* Refresh btn */
+  .refresh-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.15s;
+    margin-left: auto;
+  }
+  .refresh-btn:hover { border-color: var(--green); color: var(--green); }
+
+  /* Warning */
+  .warning {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--amber);
+    padding: 8px 12px;
+    border: 1px solid rgba(255,170,0,0.3);
+    background: rgba(255,170,0,0.05);
+    border-radius: 1px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .warning.show { display: block; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="header">
+    <span class="title">// MIC STREAM</span>
+    <span class="version">v1.0.0 — AUDIO ROUTER</span>
+  </div>
+  <div class="divider"></div>
+
+  <!-- VU Meter -->
+  <div class="vu-section">
+    <div class="vu-bars" id="vuBars"></div>
+    <canvas class="waveform-canvas" id="waveCanvas"></canvas>
+  </div>
+
+  <!-- Output Device -->
+  <div class="section">
+    <div style="display:flex;align-items:center;margin-bottom:12px;">
+      <div class="section-label" style="margin-bottom:0">OUTPUT DEVICE</div>
+      <button class="refresh-btn" id="refreshBtn">↻ REFRESH</button>
+    </div>
+    <div class="device-list" id="deviceList">
+      <div class="no-devices">Click REFRESH to scan for audio output devices</div>
+    </div>
+  </div>
+
+  <!-- Gain -->
+  <div class="section">
+    <div class="section-label">INPUT GAIN</div>
+    <div class="gain-row">
+      <span class="gain-label">GAIN</span>
+      <input type="range" id="gainSlider" min="0" max="3" step="0.05" value="1">
+      <span class="gain-val" id="gainVal">1.00×</span>
+    </div>
+  </div>
+
+  <div class="warning" id="sinkWarning">
+    ⚠ setSinkId not supported — audio will play through system default output
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-primary" id="startBtn">▶ START</button>
+    <button class="btn btn-danger" id="stopBtn" disabled>■ STOP</button>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-text" id="statusText">IDLE — select output, then press START</span>
+    <span class="latency" id="latencyText"></span>
+  </div>
+</div>
+
+<script>
+(function() {
+  // --- State ---
+  let audioCtx = null, micStream = null, sourceNode = null;
+  let gainNode = null, analyser = null, destNode = null;
+  let audioEl = null, rafId = null;
+  let selectedDeviceId = null;
+  let running = false;
+  let startTime = 0;
+
+  // --- VU Bars setup ---
+  const vuBarsEl = document.getElementById('vuBars');
+  const NUM_BARS = 40;
+  const bars = [];
+  for (let i = 0; i < NUM_BARS; i++) {
+    const b = document.createElement('div');
+    b.className = 'vu-bar';
+    vuBarsEl.appendChild(b);
+    bars.push(b);
+  }
+
+  // --- Canvas ---
+  const canvas = document.getElementById('waveCanvas');
+  const ctx2d = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx2d.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // --- Device enumeration ---
+  const deviceList = document.getElementById('deviceList');
+
+  async function enumerateDevices() {
+    // Request mic permission first so labels are revealed
+    try {
+      const tmp = await navigator.mediaDevices.getUserMedia({ audio: true });
+      tmp.getTracks().forEach(t => t.stop());
+    } catch(e) { /* permission may already be granted */ }
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const outputs = devices.filter(d => d.kind === 'audiooutput');
+    return outputs;
+  }
+
+  async function refreshDevices() {
+    deviceList.innerHTML = '<div class="no-devices">Scanning...</div>';
+    try {
+      const outputs = await enumerateDevices();
+      if (outputs.length === 0) {
+        deviceList.innerHTML = '<div class="no-devices">No audio output devices found</div>';
+        return;
+      }
+      deviceList.innerHTML = '';
+      outputs.forEach(dev => {
+        const item = document.createElement('button');
+        item.className = 'device-item' + (dev.deviceId === selectedDeviceId ? ' selected' : '');
+        const dot = document.createElement('span');
+        dot.className = 'device-dot';
+        const name = document.createElement('span');
+        name.textContent = dev.label || `Output ${dev.deviceId.slice(0,8)}`;
+        const type = document.createElement('span');
+        type.className = 'device-type';
+        type.textContent = dev.deviceId === 'default' ? 'DEFAULT' :
+                           dev.label.toLowerCase().includes('bluetooth') ? 'BT' :
+                           dev.label.toLowerCase().includes('headphone') ? 'HP' : 'OUT';
+        item.appendChild(dot);
+        item.appendChild(name);
+        item.appendChild(type);
+        item.addEventListener('click', () => selectDevice(dev.deviceId, item));
+        deviceList.appendChild(item);
+      });
+    } catch(e) {
+      deviceList.innerHTML = `<div class="no-devices">Error: ${e.message}</div>`;
+    }
+  }
+
+  function selectDevice(id, el) {
+    selectedDeviceId = id;
+    document.querySelectorAll('.device-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    // Hot-swap if running
+    if (running && audioEl) applyOutputDevice();
+  }
+
+  async function applyOutputDevice() {
+    if (!audioEl) return;
+    const warnEl = document.getElementById('sinkWarning');
+    if (typeof audioEl.setSinkId === 'function') {
+      warnEl.classList.remove('show');
+      try {
+        await audioEl.setSinkId(selectedDeviceId || 'default');
+      } catch(e) {
+        setStatus(`setSinkId failed: ${e.message}`, 'err');
+      }
+    } else {
+      warnEl.classList.add('show');
+    }
+  }
+
+  // --- Gain ---
+  const gainSlider = document.getElementById('gainSlider');
+  const gainVal = document.getElementById('gainVal');
+  gainSlider.addEventListener('input', () => {
+    const v = parseFloat(gainSlider.value);
+    gainVal.textContent = v.toFixed(2) + '×';
+    if (gainNode) gainNode.gain.setTargetAtTime(v, audioCtx.currentTime, 0.01);
+  });
+
+  // --- Start / Stop ---
+  document.getElementById('startBtn').addEventListener('click', startStream);
+  document.getElementById('stopBtn').addEventListener('click', stopStream);
+  document.getElementById('refreshBtn').addEventListener('click', refreshDevices);
+
+  async function startStream() {
+    try {
+      setStatus('Requesting microphone…', '');
+      micStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          sampleRate: 48000
+        }
+      });
+
+      audioCtx = new AudioContext({ sampleRate: 48000, latencyHint: 'interactive' });
+      sourceNode = audioCtx.createMediaStreamSource(micStream);
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = parseFloat(gainSlider.value);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.6;
+      destNode = audioCtx.createMediaStreamDestination();
+
+      sourceNode.connect(gainNode);
+      gainNode.connect(analyser);
+      analyser.connect(destNode);
+
+      // Route to audio element for setSinkId
+      audioEl = new Audio();
+      audioEl.srcObject = destNode.stream;
+      audioEl.muted = false;
+      audioEl.volume = 1;
+
+      await applyOutputDevice();
+      await audioEl.play();
+
+      running = true;
+      startTime = performance.now();
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('startBtn').classList.add('active');
+      document.getElementById('stopBtn').disabled = false;
+      setStatus('STREAMING — mic open', 'on');
+      rafId = requestAnimationFrame(drawLoop);
+    } catch(e) {
+      setStatus('Error: ' + e.message, 'err');
+    }
+  }
+
+  function stopStream() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (audioEl) { audioEl.pause(); audioEl.srcObject = null; audioEl = null; }
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+    sourceNode = gainNode = analyser = destNode = null;
+    running = false;
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('startBtn').classList.remove('active');
+    document.getElementById('stopBtn').disabled = true;
+    document.getElementById('latencyText').textContent = '';
+    setStatus('IDLE — select output, then press START', '');
+    clearVisuals();
+  }
+
+  // --- Visuals ---
+  const freqData = new Uint8Array(128);
+  const timeData = new Uint8Array(2048);
+
+  function drawLoop() {
+    if (!running) return;
+    rafId = requestAnimationFrame(drawLoop);
+    analyser.getByteFrequencyData(freqData);
+    analyser.getByteTimeDomainData(timeData);
+
+    // VU bars (frequency spectrum)
+    const step = Math.floor(freqData.length / NUM_BARS);
+    for (let i = 0; i < NUM_BARS; i++) {
+      let sum = 0;
+      for (let j = 0; j < step; j++) sum += freqData[i * step + j];
+      const avg = sum / step;
+      const pct = avg / 255;
+      const h = Math.max(2, pct * 56);
+      const bar = bars[i];
+      bar.style.height = h + 'px';
+      if (pct > 0.8) bar.style.background = '#ff3344';
+      else if (pct > 0.55) bar.style.background = '#ffaa00';
+      else bar.style.background = `hsl(${150 - pct * 40}, 100%, ${35 + pct * 30}%)`;
+    }
+
+    // Waveform
+    const W = canvas.offsetWidth, H = canvas.offsetHeight;
+    ctx2d.clearRect(0, 0, W, H);
+    ctx2d.strokeStyle = '#00ff88';
+    ctx2d.lineWidth = 1.5;
+    ctx2d.shadowBlur = 8;
+    ctx2d.shadowColor = '#00ff88';
+    ctx2d.beginPath();
+    const sliceW = W / timeData.length;
+    for (let i = 0; i < timeData.length; i++) {
+      const v = timeData[i] / 128 - 1;
+      const x = i * sliceW;
+      const y = H / 2 + v * H * 0.45;
+      i === 0 ? ctx2d.moveTo(x, y) : ctx2d.lineTo(x, y);
+    }
+    ctx2d.stroke();
+    ctx2d.shadowBlur = 0;
+
+    // Latency
+    const elapsed = ((performance.now() - startTime) / 1000).toFixed(0);
+    document.getElementById('latencyText').textContent =
+      `${elapsed}s · ${(audioCtx.baseLatency * 1000).toFixed(1)}ms`;
+  }
+
+  function clearVisuals() {
+    bars.forEach(b => { b.style.height = '2px'; b.style.background = 'var(--border)'; });
+    const W = canvas.offsetWidth, H = canvas.offsetHeight;
+    ctx2d.clearRect(0, 0, W, H);
+    ctx2d.strokeStyle = '#1e2530';
+    ctx2d.lineWidth = 1;
+    ctx2d.beginPath();
+    ctx2d.moveTo(0, H / 2); ctx2d.lineTo(W, H / 2);
+    ctx2d.stroke();
+  }
+
+  function setStatus(msg, state) {
+    document.getElementById('statusText').textContent = msg;
+    const dot = document.getElementById('statusDot');
+    dot.className = 'status-dot' + (state ? ' ' + state : '');
+  }
+
+  clearVisuals();
+})();
+</script>
+</body>
+</html>
