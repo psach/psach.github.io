@@ -202,6 +202,14 @@ function newGame(){
             statusElement.textContent = status;
         }
 
+		
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  const installBtn = document.getElementById("installPWA");
+
+									   
+	installBtn.style.display = "none";
+}
+		
         updateStatus();
     </script>
 </body>
