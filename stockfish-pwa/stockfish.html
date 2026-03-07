@@ -109,6 +109,7 @@
     
     <div id="board"></div>
     <div id="status">Your move!</div>
+<button onclick="newGame()">New Game</button>
 
     <script>
         
@@ -127,6 +128,13 @@
             onDrop: onDrop,
             onSnapEnd: onSnapEnd
         });
+
+
+function newGame(){
+  game.reset();
+  board.start();
+  updateStatus();
+}
 
         // Load Stockfish
         const stockfish = new Worker('stockfish.js');
