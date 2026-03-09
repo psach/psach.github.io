@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>XFER — Base64 Transfer Terminal</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #09090f;
+    --surface: #0f0f1a;
+    --panel: #13131f;
+    --border: #1e1e35;
+    --accent: #00ffe5;
+    --accent2: #ff3cac;
+    --accent3: #ffe600;
+    --text: #c8d0e0;
+    --muted: #4a4a6a;
+    --green: #00ff88;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,255,229,0.015) 2px,
+      rgba(0,255,229,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Noise grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(0,255,229,0.5);
+    position: relative;
+  }
+  .logo span { color: var(--accent2); }
+  .logo::after {
+    content: 'FILE TRANSFER TERMINAL v2.4';
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.48rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ─── TABS ─── */
+  .tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 32px;
+    gap: 4px;
+  }
+
+  .tab {
+    padding: 14px 22px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    position: relative;
+  }
+  .tab:hover { color: var(--accent); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab .tab-icon { margin-right: 6px; }
+  .tab .badge {
+    display: inline-block;
+    background: var(--accent2);
+    color: #000;
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* ─── MAIN ─── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── PANELS ─── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .panel-header .ph-title { color: var(--accent); }
+
+  .panel-body { padding: 20px; }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: transparent;
+  }
+  .btn-primary {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .btn-primary:hover {
+    background: var(--accent);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0,255,229,0.3);
+  }
+  .btn-danger {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  .btn-danger:hover {
+    background: var(--accent2);
+    color: #000;
+    box-shadow: 0 0 20px rgba(255,60,172,0.3);
+  }
+  .btn-warning {
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+  .btn-warning:hover {
+    background: var(--accent3);
+    color: #000;
+  }
+  .btn-muted {
+    border-color: var(--muted);
+    color: var(--muted);
+  }
+  .btn-muted:hover { border-color: var(--text); color: var(--text); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ─── VIDEO / CANVAS ─── */
+  #capturePreview {
+    width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: block;
+  }
+
+  #capturedCanvas {
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: none;
+  }
+
+  /* ─── BASE64 OUTPUT ─── */
+  .b64-box {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--green);
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 14px;
+    word-break: break-all;
+    max-height: 130px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) transparent;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+  }
+
+  .b64-box::-webkit-scrollbar { width: 4px; }
+  .b64-box::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+
+  /* ─── STATS ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 12px 14px;
+  }
+  .stat-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; }
+  .stat-value { font-size: 1.1rem; color: var(--accent); margin-top: 4px; font-weight: bold; }
+
+  /* ─── PROGRESS ─── */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  /* ─── QR ZONE ─── */
+  #qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    min-height: 80px;
+  }
+
+  #qrcode canvas, #qrcode img {
+    border: 6px solid #fff;
+    border-radius: 4px;
+  }
+
+  .qr-note {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+
+  /* ─── RECEIVE ─── */
+  textarea.receive-input {
+    width: 100%;
+    height: 140px;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    padding: 14px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    word-break: break-all;
+  }
+  textarea.receive-input:focus { border-color: var(--accent); }
+  textarea.receive-input::placeholder { color: var(--muted); }
+
+  #receivedImage {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: none;
+  }
+
+  /* ─── DROP ZONE ─── */
+  .drop-zone {
+    border: 2px dashed var(--muted);
+    border-radius: 4px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(0,255,229,0.03);
+  }
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .drop-icon { font-size: 2rem; margin-bottom: 10px; }
+  .drop-text { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; }
+  .drop-text strong { color: var(--accent); }
+
+  /* ─── NOTIFY ─── */
+  #notify {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toast {
+    background: var(--panel);
+    border-left: 3px solid var(--accent);
+    padding: 12px 18px;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    animation: slideIn 0.3s ease, fadeOut 0.4s ease 2.5s forwards;
+    max-width: 300px;
+  }
+  .toast.error { border-left-color: var(--accent2); color: var(--accent2); }
+  .toast.success { border-left-color: var(--green); color: var(--green); }
+  .toast.warn { border-left-color: var(--accent3); color: var(--accent3); }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateY(10px); }
+  }
+
+  /* ─── LAYOUT ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 700px) {
+    .two-col { grid-template-columns: 1fr; }
+    main { padding: 16px; }
+    header { padding: 14px 16px; }
+    .tab-bar { padding: 0 16px; }
+    .tab { padding: 12px 14px; font-size: 0.68rem; }
+  }
+
+  .label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .terminal-line {
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    padding: 4px 0;
+  }
+  .terminal-line span { color: var(--green); }
+  .terminal-line.err span { color: var(--accent2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
+
+  /* Glitch title effect */
+  @keyframes glitch {
+    0%, 90%, 100% { text-shadow: 0 0 20px rgba(0,255,229,0.5); }
+    91% { text-shadow: -2px 0 var(--accent2), 2px 0 var(--accent), 0 0 20px rgba(0,255,229,0.5); }
+    93% { text-shadow: 2px 0 var(--accent2), -2px 0 var(--accent), 0 0 20px rgba(0,255,229,0.5); }
+    95% { text-shadow: -2px 0 var(--accent2), 2px 0 var(--accent), 0 0 20px rgba(0,255,229,0.5); }
+  }
+  .logo { animation: glitch 6s infinite; }
+
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 8px 12px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  select:focus { border-color: var(--accent); }
+
+  .copy-hint {
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">X<span>F</span>ER</div>
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <span id="headerStatus">READY</span>
+    <span>|</span>
+    <span id="sessionId">SID: ----</span>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('capture')">
+    <span class="tab-icon">⬛</span>CAPTURE
+  </button>
+  <button class="tab" onclick="switchTab('send')">
+    <span class="tab-icon">↑</span>SEND
+  </button>
+  <button class="tab" onclick="switchTab('receive')">
+    <span class="tab-icon">↓</span>RECEIVE
+  </button>
+  <button class="tab" onclick="switchTab('log')">
+    <span class="tab-icon">≡</span>LOG
+    <span class="badge" id="logBadge">0</span>
+  </button>
+</div>
+
+<main>
+
+  <!-- ═══ CAPTURE TAB ═══ -->
+  <div class="tab-content active" id="tab-capture">
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-title">// CAPTURE SOURCE</span>
+        <select id="captureMode" onchange="onModeChange()">
+          <option value="screen">SCREEN CAPTURE</option>
+          <option value="file">FILE / IMAGE UPLOAD</option>
+          <option value="camera">CAMERA / WEBCAM</option>
+        </select>
+      </div>
+      <div class="panel-body">
+
+        <!-- Screen capture -->
+        <div id="screenSection">
+          <video id="capturePreview" autoplay muted playsinline></video>
+          <div style="margin-top:14px" class="btn-group">
+            <button class="btn btn-primary" onclick="startScreenCapture()">⬛ START CAPTURE</button>
+            <button class="btn btn-warning" id="snapBtn" onclick="takeSnapshot()" disabled>◉ SNAPSHOT</button>
+            <button class="btn btn-muted" onclick="stopStream()">■ STOP</button>
+          </div>
+        </div>
+
+        <!-- File upload -->
+        <div id="fileSection" style="display:none">
+          <div class="drop-zone" id="dropZone">
+            <input type="file" accept="image/*,application/pdf,text/*" multiple onchange="handleFileSelect(this.files)" />
+            <div class="drop-icon">⬡</div>
+            <div class="drop-text">DROP FILES HERE OR <strong>CLICK TO BROWSE</strong></div>
+            <div class="drop-text" style="margin-top:6px;font-size:0.62rem">Supports: images, PDFs, text files</div>
+          </div>
+        </div>
+
+        <!-- Camera -->
+        <div id="cameraSection" style="display:none">
+          <video id="cameraPreview" autoplay muted playsinline style="width:100%;max-height:320px;background:#000;border:1px solid var(--border);border-radius:2px;display:block;"></video>
+          <div style="margin-top:14px" class="btn-group">
+            <button class="btn btn-primary" onclick="startCamera()">◉ START CAMERA</button>
+            <button class="btn btn-warning" onclick="takeCameraSnapshot()" id="camSnapBtn" disabled>⬛ SNAPSHOT</button>
+            <button class="btn btn-muted" onclick="stopCamera()">■ STOP</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Captured output -->
+    <div class="panel" id="capturedPanel" style="display:none">
+      <div class="panel-header">
+        <span class="ph-title">// CAPTURED FRAME</span>
+        <span id="captureTimestamp" style="font-size:0.62rem;color:var(--muted)"></span>
+      </div>
+      <div class="panel-body">
+        <canvas id="capturedCanvas"></canvas>
+        <img id="capturedImg" style="width:100%;max-height:320px;object-fit:contain;background:#000;border:1px solid var(--border);border-radius:2px;display:none;" />
+
+        <div class="stats-grid" style="margin-top:16px">
+          <div class="stat-card">
+            <div class="stat-label">WIDTH</div>
+            <div class="stat-value" id="statW">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">HEIGHT</div>
+            <div class="stat-value" id="statH">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">FORMAT</div>
+            <div class="stat-value" id="statFmt">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">B64 SIZE</div>
+            <div class="stat-value" id="statSize">—</div>
+          </div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="encodeProgress" style="width:0%"></div></div>
+        <div id="encodeStatus" class="terminal-line"></div>
+
+        <div style="margin-top:14px">
+          <span class="label">BASE64 OUTPUT</span>
+          <div class="b64-box" id="b64Output">—</div>
+          <div class="copy-hint">↑ Base64 encoded data ready for transfer</div>
+        </div>
+
+        <hr class="divider" />
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="copyBase64()" id="copyBtn">⧉ COPY BASE64</button>
+          <button class="btn btn-warning" onclick="goToSend()">↑ SEND THIS</button>
+          <button class="btn btn-muted" onclick="downloadCaptured()">⬇ DOWNLOAD</button>
+          <button class="btn btn-muted" onclick="clearCapture()">✕ CLEAR</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ SEND TAB ═══ -->
+  <div class="tab-content" id="tab-send">
+
+    <div class="two-col">
+      <div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="ph-title">// PAYLOAD</span>
+            <span id="sendSize" style="font-size:0.62rem;color:var(--muted)">0 chars</span>
+          </div>
+          <div class="panel-body">
+            <span class="label">BASE64 DATA (paste or auto-loaded from capture)</span>
+            <textarea class="receive-input" id="sendPayload" placeholder="Paste base64 data here, or capture from the CAPTURE tab..." oninput="onSendPayloadChange()"></textarea>
+            <div class="btn-group" style="margin-top:12px">
+              <button class="btn btn-primary" onclick="generateQR()">⬡ GENERATE QR</button>
+              <button class="btn btn-muted" onclick="clearSend()">✕ CLEAR</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="ph-title">// SHARE OPTIONS</span></div>
+          <div class="panel-body">
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="copySendPayload()">⧉ COPY TO CLIPBOARD</button>
+              <button class="btn btn-warning" onclick="downloadAsFile()">⬇ SAVE AS FILE</button>
+              <button class="btn btn-muted" onclick="shareNative()">⬆ NATIVE SHARE</button>
+            </div>
+            <hr class="divider" />
+            <div id="sendLog" style="font-size:0.68rem;color:var(--muted)">Awaiting payload...</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <div class="panel-header"><span class="ph-title">// QR CODE</span></div>
+          <div class="panel-body">
+            <div id="qr-container">
+              <div id="qrcode"></div>
+              <div class="qr-note" id="qrNote">Generate QR from payload to share with nearby devices</div>
+            </div>
+            <div style="margin-top:12px;font-size:0.65rem;color:var(--muted)">
+              ⚠ QR codes support up to ~2.9KB. For large files, use clipboard copy.
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="ph-title">// PREVIEW</span></div>
+          <div class="panel-body">
+            <img id="sendPreview" style="width:100%;max-height:220px;object-fit:contain;background:#000;border:1px solid var(--border);border-radius:2px;display:none;" />
+            <div id="sendPreviewEmpty" style="text-align:center;padding:30px;color:var(--muted);font-size:0.72rem;">No image preview</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ RECEIVE TAB ═══ -->
+  <div class="tab-content" id="tab-receive">
+
+    <div class="panel">
+      <div class="panel-header"><span class="ph-title">// INBOUND PAYLOAD</span></div>
+      <div class="panel-body">
+        <span class="label">PASTE BASE64 DATA BELOW</span>
+        <textarea class="receive-input" id="receiveInput" placeholder="Paste base64 encoded data here to decode and view..." oninput="onReceiveInput()"></textarea>
+        <div class="btn-group" style="margin-top:12px">
+          <button class="btn btn-primary" onclick="decodeReceived()">▶ DECODE</button>
+          <button class="btn btn-warning" onclick="pasteFromClipboard()">⊕ PASTE FROM CLIPBOARD</button>
+          <button class="btn btn-muted" onclick="clearReceive()">✕ CLEAR</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="receivedPanel" style="display:none">
+      <div class="panel-header">
+        <span class="ph-title">// DECODED OUTPUT</span>
+        <span id="receiveTimestamp" style="font-size:0.62rem;color:var(--muted)"></span>
+      </div>
+      <div class="panel-body">
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">TYPE</div>
+            <div class="stat-value" id="recType" style="font-size:0.85rem">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">SIZE</div>
+            <div class="stat-value" id="recSize">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">STATUS</div>
+            <div class="stat-value" id="recStatus" style="color:var(--green)">OK</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <img id="receivedImage" />
+          <div id="receivedText" style="display:none;background:#000;padding:14px;border:1px solid var(--border);border-radius:2px;font-size:0.72rem;white-space:pre-wrap;max-height:300px;overflow-y:auto;color:var(--green);"></div>
+          <div id="receivedBinary" style="display:none;text-align:center;padding:24px;color:var(--muted);font-size:0.72rem;">Binary file received — download to view</div>
+        </div>
+
+        <hr class="divider" />
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="downloadReceived()">⬇ DOWNLOAD FILE</button>
+          <button class="btn btn-warning" onclick="sendToCapture()">→ SEND TO CAPTURE</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ LOG TAB ═══ -->
+  <div class="tab-content" id="tab-log">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="ph-title">// TRANSFER LOG</span>
+        <button class="btn btn-muted" style="padding:5px 12px;font-size:0.65rem" onclick="clearLog()">CLEAR</button>
+      </div>
+      <div class="panel-body" id="logContainer" style="min-height:300px;font-size:0.68rem;font-family:var(--mono);">
+        <div class="terminal-line">— LOG INITIALIZED —</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="notify"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let currentBase64 = '';
+let currentMime = 'image/png';
+let currentStream = null;
+let cameraStream = null;
+let receivedMime = '';
+let receivedBase64 = '';
+let logEntries = [];
+let qrInstance = null;
+
+// Session ID
+document.getElementById('sessionId').textContent = 'SID: ' + Math.random().toString(36).substr(2,6).toUpperCase();
+
+// ═══════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['capture','send','receive','log'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+//  CAPTURE MODE
+// ═══════════════════════════════════════════════
+function onModeChange() {
+  const mode = document.getElementById('captureMode').value;
+  document.getElementById('screenSection').style.display = mode === 'screen' ? 'block' : 'none';
+  document.getElementById('fileSection').style.display = mode === 'file' ? 'block' : 'none';
+  document.getElementById('cameraSection').style.display = mode === 'camera' ? 'block' : 'none';
+  stopStream();
+  stopCamera();
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN CAPTURE
+// ═══════════════════════════════════════════════
+async function startScreenCapture() {
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { cursor: 'always' },
+      audio: false
+    });
+    currentStream = stream;
+    const video = document.getElementById('capturePreview');
+    video.srcObject = stream;
+    document.getElementById('snapBtn').disabled = false;
+    updateStatus('STREAMING');
+    addLog('Screen capture started', 'ok');
+    stream.getVideoTracks()[0].onended = () => {
+      stopStream();
+      addLog('Screen capture ended by user', 'warn');
+    };
+  } catch (e) {
+    if (e.name !== 'NotAllowedError') {
+      showToast('Capture failed: ' + e.message, 'error');
+    }
+    addLog('Screen capture denied: ' + e.message, 'err');
+  }
+}
+
+function takeSnapshot() {
+  const video = document.getElementById('capturePreview');
+  if (!video.srcObject) { showToast('No stream active', 'error'); return; }
+
+  const canvas = document.getElementById('capturedCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0);
+
+  encodeCanvas(canvas, 'image/png');
+  document.getElementById('captureTimestamp').textContent = new Date().toLocaleTimeString();
+  document.getElementById('capturedCanvas').style.display = 'block';
+  document.getElementById('capturedImg').style.display = 'none';
+  document.getElementById('capturedPanel').style.display = 'block';
+  addLog(`Snapshot taken [${canvas.width}×${canvas.height}]`, 'ok');
+}
+
+function stopStream() {
+  if (currentStream) {
+    currentStream.getTracks().forEach(t => t.stop());
+    currentStream = null;
+  }
+  const video = document.getElementById('capturePreview');
+  video.srcObject = null;
+  document.getElementById('snapBtn').disabled = true;
+  updateStatus('READY');
+}
+
+// ═══════════════════════════════════════════════
+//  CAMERA
+// ═══════════════════════════════════════════════
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    cameraStream = stream;
+    const video = document.getElementById('cameraPreview');
+    video.srcObject = stream;
+    document.getElementById('camSnapBtn').disabled = false;
+    updateStatus('CAMERA ACTIVE');
+    addLog('Camera started', 'ok');
+  } catch (e) {
+    showToast('Camera error: ' + e.message, 'error');
+    addLog('Camera error: ' + e.message, 'err');
+  }
+}
+
+function takeCameraSnapshot() {
+  const video = document.getElementById('cameraPreview');
+  if (!cameraStream) { showToast('Camera not active', 'error'); return; }
+
+  const canvas = document.getElementById('capturedCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0);
+
+  encodeCanvas(canvas, 'image/jpeg');
+  document.getElementById('captureTimestamp').textContent = new Date().toLocaleTimeString();
+  document.getElementById('capturedCanvas').style.display = 'block';
+  document.getElementById('capturedImg').style.display = 'none';
+  document.getElementById('capturedPanel').style.display = 'block';
+  addLog(`Camera snapshot [${canvas.width}×${canvas.height}]`, 'ok');
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  const video = document.getElementById('cameraPreview');
+  video.srcObject = null;
+  document.getElementById('camSnapBtn').disabled = true;
+}
+
+// ═══════════════════════════════════════════════
+//  FILE UPLOAD
+// ═══════════════════════════════════════════════
+function handleFileSelect(files) {
+  if (!files || files.length === 0) return;
+  const file = files[0];
+  addLog(`File selected: ${file.name} (${formatSize(file.size)})`, 'ok');
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const result = e.target.result;
+    const [header, data] = result.split(',');
+    const mime = header.match(/:(.*?);/)[1];
+
+    currentMime = mime;
+    currentBase64 = result; // full data URL
+    const pureB64 = data;
+
+    // Show preview
+    if (mime.startsWith('image/')) {
+      const img = document.getElementById('capturedImg');
+      img.src = result;
+      img.style.display = 'block';
+      document.getElementById('capturedCanvas').style.display = 'none';
+
+      // Get dimensions
+      img.onload = () => {
+        document.getElementById('statW').textContent = img.naturalWidth;
+        document.getElementById('statH').textContent = img.naturalHeight;
+      };
+    } else {
+      document.getElementById('capturedCanvas').style.display = 'none';
+      document.getElementById('capturedImg').style.display = 'none';
+    }
+
+    document.getElementById('statFmt').textContent = mime.split('/')[1].toUpperCase();
+    document.getElementById('statSize').textContent = formatSize(pureB64.length * 0.75);
+    document.getElementById('b64Output').textContent = pureB64.substring(0, 500) + (pureB64.length > 500 ? '…' : '');
+    document.getElementById('capturedPanel').style.display = 'block';
+    document.getElementById('captureTimestamp').textContent = new Date().toLocaleTimeString();
+
+    animateProgress();
+    showToast('File encoded successfully', 'success');
+    addLog(`Encoded to base64: ${formatSize(pureB64.length)} chars`, 'ok');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Drop zone
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  handleFileSelect(e.dataTransfer.files);
+});
+
+// ═══════════════════════════════════════════════
+//  ENCODE CANVAS
+// ═══════════════════════════════════════════════
+function encodeCanvas(canvas, mime) {
+  updateStatus('ENCODING...');
+  animateProgress();
+
+  setTimeout(() => {
+    const dataURL = canvas.toDataURL(mime, 0.92);
+    const b64 = dataURL.split(',')[1];
+    currentBase64 = dataURL;
+    currentMime = mime;
+
+    document.getElementById('statW').textContent = canvas.width;
+    document.getElementById('statH').textContent = canvas.height;
+    document.getElementById('statFmt').textContent = mime.split('/')[1].toUpperCase();
+    document.getElementById('statSize').textContent = formatSize(b64.length * 0.75);
+    document.getElementById('b64Output').textContent = b64.substring(0, 500) + (b64.length > 500 ? '…' : '');
+    document.getElementById('encodeStatus').innerHTML = '<span>✓ ENCODE COMPLETE — ' + formatSize(b64.length) + ' chars</span>';
+
+    updateStatus('ENCODED');
+    showToast('Frame encoded to base64', 'success');
+  }, 100);
+}
+
+function animateProgress() {
+  const bar = document.getElementById('encodeProgress');
+  bar.style.width = '0%';
+  let w = 0;
+  const interval = setInterval(() => {
+    w += Math.random() * 15;
+    if (w >= 100) { w = 100; clearInterval(interval); }
+    bar.style.width = w + '%';
+  }, 40);
+}
+
+// ═══════════════════════════════════════════════
+//  ACTIONS — CAPTURE
+// ═══════════════════════════════════════════════
+function copyBase64() {
+  if (!currentBase64) { showToast('Nothing to copy', 'error'); return; }
+  const b64 = currentBase64.includes(',') ? currentBase64.split(',')[1] : currentBase64;
+  navigator.clipboard.writeText(b64).then(() => {
+    showToast('Base64 copied to clipboard', 'success');
+    addLog('Base64 copied: ' + formatSize(b64.length) + ' chars', 'ok');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = b64;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Base64 copied (fallback)', 'success');
+  });
+}
+
+function downloadCaptured() {
+  if (!currentBase64) { showToast('Nothing to download', 'error'); return; }
+  const ext = currentMime.split('/')[1];
+  const link = document.createElement('a');
+  link.href = currentBase64;
+  link.download = 'xfer_' + Date.now() + '.' + ext;
+  link.click();
+  addLog('File downloaded: xfer.' + ext, 'ok');
+}
+
+function clearCapture() {
+  currentBase64 = '';
+  document.getElementById('capturedPanel').style.display = 'none';
+  document.getElementById('b64Output').textContent = '—';
+  document.getElementById('encodeStatus').textContent = '';
+  document.getElementById('encodeProgress').style.width = '0%';
+}
+
+function goToSend() {
+  if (!currentBase64) { showToast('No data captured', 'error'); return; }
+  const b64 = currentBase64.includes(',') ? currentBase64.split(',')[1] : currentBase64;
+  document.getElementById('sendPayload').value = b64;
+  document.getElementById('sendSize').textContent = formatSize(b64.length) + ' chars';
+  updateSendPreview(currentBase64);
+  switchTab('send');
+  addLog('Payload loaded to SEND tab', 'ok');
+}
+
+// ═══════════════════════════════════════════════
+//  SEND TAB
+// ═══════════════════════════════════════════════
+function onSendPayloadChange() {
+  const val = document.getElementById('sendPayload').value.trim();
+  document.getElementById('sendSize').textContent = formatSize(val.length) + ' chars';
+  if (val) {
+    // Try to preview as image
+    try {
+      const dataURL = 'data:image/png;base64,' + val;
+      updateSendPreview(dataURL);
+    } catch(e) {}
+  }
+}
+
+function updateSendPreview(dataURL) {
+  const img = document.getElementById('sendPreview');
+  const empty = document.getElementById('sendPreviewEmpty');
+  img.onerror = () => { img.style.display = 'none'; empty.style.display = 'block'; };
+  img.onload = () => { img.style.display = 'block'; empty.style.display = 'none'; };
+  img.src = dataURL;
+}
+
+function generateQR() {
+  const val = document.getElementById('sendPayload').value.trim();
+  if (!val) { showToast('No payload to encode', 'error'); return; }
+
+  const qrDiv = document.getElementById('qrcode');
+  qrDiv.innerHTML = '';
+
+  if (val.length > 2900) {
+    document.getElementById('qrNote').textContent = '⚠ Payload too large for QR (' + formatSize(val.length) + '). Use clipboard copy.';
+    showToast('Payload too large for QR', 'warn');
+    addLog('QR generation skipped — payload too large', 'warn');
+    return;
+  }
+
+  try {
+    new QRCode(qrDiv, {
+      text: val,
+      width: 220,
+      height: 220,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    document.getElementById('qrNote').textContent = `QR generated — ${val.length} chars`;
+    showToast('QR code generated', 'success');
+    addLog('QR generated: ' + val.length + ' chars', 'ok');
+  } catch(e) {
+    showToast('QR generation failed', 'error');
+  }
+}
+
+function copySendPayload() {
+  const val = document.getElementById('sendPayload').value.trim();
+  if (!val) { showToast('Nothing to copy', 'error'); return; }
+  navigator.clipboard.writeText(val).then(() => {
+    showToast('Payload copied to clipboard!', 'success');
+    document.getElementById('sendLog').textContent = '✓ Copied ' + formatSize(val.length) + ' chars at ' + new Date().toLocaleTimeString();
+    addLog('Payload copied: ' + formatSize(val.length), 'ok');
+  }).catch(() => showToast('Copy failed', 'error'));
+}
+
+function downloadAsFile() {
+  const val = document.getElementById('sendPayload').value.trim();
+  if (!val) { showToast('Nothing to export', 'error'); return; }
+  const blob = new Blob([val], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'xfer_payload_' + Date.now() + '.b64';
+  a.click();
+  URL.revokeObjectURL(url);
+  addLog('Payload saved as .b64 file', 'ok');
+  showToast('File saved', 'success');
+}
+
+function shareNative() {
+  const val = document.getElementById('sendPayload').value.trim();
+  if (!val) { showToast('Nothing to share', 'error'); return; }
+  if (navigator.share) {
+    navigator.share({ title: 'XFER Payload', text: val })
+      .then(() => addLog('Native share triggered', 'ok'))
+      .catch(() => {});
+  } else {
+    showToast('Native share not available in this browser', 'warn');
+  }
+}
+
+function clearSend() {
+  document.getElementById('sendPayload').value = '';
+  document.getElementById('sendSize').textContent = '0 chars';
+  document.getElementById('qrcode').innerHTML = '';
+  document.getElementById('sendPreview').style.display = 'none';
+  document.getElementById('sendPreviewEmpty').style.display = 'block';
+  document.getElementById('qrNote').textContent = 'Generate QR from payload to share with nearby devices';
+}
+
+// ═══════════════════════════════════════════════
+//  RECEIVE TAB
+// ═══════════════════════════════════════════════
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('receiveInput').value = text;
+    addLog('Pasted from clipboard: ' + formatSize(text.length) + ' chars', 'ok');
+    decodeReceived();
+  } catch(e) {
+    showToast('Clipboard access denied', 'error');
+    addLog('Clipboard paste denied', 'err');
+  }
+}
+
+function onReceiveInput() {
+  // auto-decode hint
+}
+
+function decodeReceived() {
+  let val = document.getElementById('receiveInput').value.trim();
+  if (!val) { showToast('No data to decode', 'error'); return; }
+
+  // Strip data URL prefix if present
+  let mime = 'application/octet-stream';
+  let b64 = val;
+
+  if (val.startsWith('data:')) {
+    const match = val.match(/^data:([^;]+);base64,(.+)$/s);
+    if (match) {
+      mime = match[1];
+      b64 = match[2];
+    }
+  } else {
+    // Try to guess from base64
+    try {
+      // Attempt as image
+      mime = 'image/png';
+    } catch(e) {}
+  }
+
+  receivedMime = mime;
+  receivedBase64 = b64;
+
+  const dataURL = `data:${mime};base64,${b64}`;
+
+  document.getElementById('recType').textContent = mime.split('/')[1].toUpperCase();
+  document.getElementById('recSize').textContent = formatSize(b64.length * 0.75);
+  document.getElementById('recStatus').textContent = 'OK';
+  document.getElementById('receiveTimestamp').textContent = new Date().toLocaleTimeString();
+
+  // Reset displays
+  document.getElementById('receivedImage').style.display = 'none';
+  document.getElementById('receivedText').style.display = 'none';
+  document.getElementById('receivedBinary').style.display = 'none';
+
+  if (mime.startsWith('image/')) {
+    const img = document.getElementById('receivedImage');
+    img.onload = () => {
+      document.getElementById('recType').textContent = `${mime.split('/')[1].toUpperCase()} [${img.naturalWidth}×${img.naturalHeight}]`;
+    };
+    img.onerror = () => {
+      // Try as PNG if detection failed
+      img.src = 'data:image/png;base64,' + b64;
+    };
+    img.src = dataURL;
+    img.style.display = 'block';
+    addLog(`Image decoded: ${mime}`, 'ok');
+  } else if (mime.startsWith('text/') || mime === 'application/json') {
+    try {
+      const text = atob(b64);
+      document.getElementById('receivedText').textContent = text;
+      document.getElementById('receivedText').style.display = 'block';
+      addLog('Text decoded: ' + text.length + ' chars', 'ok');
+    } catch(e) {
+      showToast('Decode error: ' + e.message, 'error');
+      addLog('Decode error: ' + e.message, 'err');
+      return;
+    }
+  } else {
+    // Try as image anyway
+    const img = document.getElementById('receivedImage');
+    img.onerror = () => {
+      img.style.display = 'none';
+      document.getElementById('receivedBinary').style.display = 'block';
+    };
+    img.onload = () => { img.style.display = 'block'; };
+    img.src = 'data:image/png;base64,' + b64;
+    addLog('Binary payload received', 'ok');
+  }
+
+  document.getElementById('receivedPanel').style.display = 'block';
+  showToast('Payload decoded successfully', 'success');
+}
+
+function downloadReceived() {
+  if (!receivedBase64) { showToast('Nothing to download', 'error'); return; }
+  const ext = receivedMime.includes('/') ? receivedMime.split('/')[1] : 'bin';
+  const link = document.createElement('a');
+  link.href = `data:${receivedMime};base64,${receivedBase64}`;
+  link.download = 'received_' + Date.now() + '.' + ext;
+  link.click();
+  addLog('Downloaded received file: .' + ext, 'ok');
+  showToast('File downloaded', 'success');
+}
+
+function sendToCapture() {
+  if (!receivedBase64) { showToast('Nothing to send', 'error'); return; }
+  currentBase64 = `data:${receivedMime};base64,${receivedBase64}`;
+  currentMime = receivedMime;
+  const img = document.getElementById('capturedImg');
+  img.src = currentBase64;
+  img.style.display = 'block';
+  document.getElementById('capturedCanvas').style.display = 'none';
+  document.getElementById('capturedPanel').style.display = 'block';
+  document.getElementById('b64Output').textContent = receivedBase64.substring(0, 500) + '…';
+  document.getElementById('statFmt').textContent = receivedMime.split('/')[1].toUpperCase();
+  document.getElementById('statSize').textContent = formatSize(receivedBase64.length * 0.75);
+  switchTab('capture');
+  addLog('Payload moved to CAPTURE tab', 'ok');
+  showToast('Loaded into CAPTURE', 'success');
+}
+
+function clearReceive() {
+  document.getElementById('receiveInput').value = '';
+  document.getElementById('receivedPanel').style.display = 'none';
+  receivedBase64 = '';
+  receivedMime = '';
+}
+
+// ═══════════════════════════════════════════════
+//  LOG
+// ═══════════════════════════════════════════════
+function addLog(msg, type) {
+  logEntries.push({ msg, type, time: new Date().toLocaleTimeString() });
+  const badge = document.getElementById('logBadge');
+  badge.textContent = logEntries.length;
+
+  const container = document.getElementById('logContainer');
+  const div = document.createElement('div');
+  div.className = 'terminal-line' + (type === 'err' ? ' err' : '');
+  div.innerHTML = `<span style="color:var(--muted)">[${new Date().toLocaleTimeString()}]</span> <span style="color:${type === 'ok' ? 'var(--green)' : type === 'err' ? 'var(--accent2)' : type === 'warn' ? 'var(--accent3)' : 'var(--accent)'}">${msg}</span>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function clearLog() {
+  logEntries = [];
+  document.getElementById('logBadge').textContent = '0';
+  document.getElementById('logContainer').innerHTML = '<div class="terminal-line">— LOG CLEARED —</div>';
+}
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + 'B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+  return (bytes / (1024 * 1024)).toFixed(2) + 'MB';
+}
+
+function updateStatus(text) {
+  document.getElementById('headerStatus').textContent = text;
+}
+
+function showToast(msg, type) {
+  const container = document.getElementById('notify');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + (type || '');
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// Init
+addLog('XFER terminal initialized', 'ok');
+addLog('Awaiting user action...', 'ok');
+</script>
+</body>
+</html>
