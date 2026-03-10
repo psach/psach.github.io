@@ -1,36 +1,722 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PWA XO Game</title>
-<meta name="theme-color" content="#0f172a" />
-<link rel="manifest" href="manifest.json" />
-<style>
-body{margin:0;font-family:system-ui;background:#0f172a;color:#e5e7eb;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.app{width:320px;background:#111827;border-radius:20px;padding:16px;text-align:center}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
-.cell{aspect-ratio:1;background:#020617;border-radius:12px;font-size:2.2rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.win{background:#166534}
-button{width:100%;padding:10px;border:none;border-radius:12px;margin-top:8px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZIP Extractor</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --border: #252525;
+      --border-bright: #333;
+      --accent: #f0c040;
+      --accent-dim: #b08a20;
+      --text: #e0e0e0;
+      --text-dim: #666;
+      --text-mid: #999;
+      --green: #4caf7d;
+      --red: #e05555;
+      --blue: #5599ee;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 80px;
+    }
+
+    /* Subtle scanline texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .logo {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+      line-height: 1;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--text-dim);
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+      width: 100%;
+      max-width: 680px;
+      border: 1.5px dashed var(--border-bright);
+      border-radius: 4px;
+      padding: 56px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(240, 192, 64, 0.03);
+    }
+
+    .drop-zone input[type=file] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+      filter: grayscale(0.3);
+    }
+
+    .drop-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 15px;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+    }
+
+    .drop-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+
+    .file-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .file-meta .name {
+      color: var(--accent);
+      font-weight: 600;
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      border-radius: 3px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover { background: #ffd060; border-color: #ffd060; }
+    .btn-primary:disabled { background: var(--border); color: var(--text-dim); border-color: var(--border); cursor: not-allowed; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-mid);
+      border-color: var(--border-bright);
+    }
+
+    .btn-ghost:hover { color: var(--text); border-color: #555; }
+
+    /* Search */
+    .search-bar {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 12px;
+      position: relative;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    .search-bar input {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 3px;
+      padding: 10px 16px 10px 38px;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar input::placeholder { color: var(--text-dim); }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    /* Stats bar */
+    .stats {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      gap: 24px;
+      margin-top: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      animation: fadeUp 0.5s 0.25s ease both;
+    }
+
+    .stats span { color: var(--text-mid); }
+    .stats strong { color: var(--accent); }
+
+    /* File list */
+    .file-list {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+
+    .list-header {
+      display: grid;
+      grid-template-columns: 1fr 90px 80px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .file-items {
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .file-items::-webkit-scrollbar { width: 4px; }
+    .file-items::-webkit-scrollbar-track { background: var(--surface); }
+    .file-items::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 1fr 90px 80px;
+      align-items: center;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+      cursor: default;
+    }
+
+    .file-row:last-child { border-bottom: none; }
+    .file-row:hover { background: rgba(255,255,255,0.02); }
+
+    .file-row.is-dir { color: var(--text-dim); }
+
+    .file-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .file-name-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-icon { flex-shrink: 0; font-size: 14px; }
+
+    .file-size {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    .file-action { text-align: right; }
+
+    .dl-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      background: transparent;
+      border: 1px solid var(--border-bright);
+      border-radius: 2px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .dl-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Progress */
+    .progress-wrap {
+      width: 100%;
+      max-width: 680px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .progress-wrap.active { display: block; }
+
+    .progress-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.2s;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 1px solid var(--border-bright);
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s;
+      white-space: nowrap;
+      z-index: 200;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.success { border-color: var(--green); color: var(--green); }
+    .toast.error { border-color: var(--red); color: var(--red); }
+
+    /* Ext badge */
+    .ext-badge {
+      font-size: 9px;
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      padding: 1px 5px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    /* ext colors */
+    .ext-js, .ext-jsx, .ext-ts, .ext-tsx { background: #332a00; color: #f0c040; }
+    .ext-html, .ext-htm { background: #2a1500; color: #e07030; }
+    .ext-css, .ext-scss, .ext-sass { background: #001a2a; color: #4099d0; }
+    .ext-json { background: #002a1a; color: #40c080; }
+    .ext-md { background: #1a1a2a; color: #8888ff; }
+    .ext-png, .ext-jpg, .ext-jpeg, .ext-gif, .ext-svg, .ext-webp { background: #2a0020; color: #d060c0; }
+    .ext-zip, .ext-gz, .ext-tar { background: #202020; color: #aaa; }
+    .ext-py { background: #002020; color: #40d0d0; }
+    .ext-other { background: #1a1a1a; color: #666; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
-<div class="app">
-<h2>XO Game</h2>
-<div id="status">Player X's turn</div>
-<div class="board" id="board"></div>
-<button onclick="reset()">Restart</button>
+
+<header>
+  <div class="logo">⚙ Utility Tool</div>
+  <h1>ZIP <span>Extractor</span></h1>
+  <p class="subtitle">Extract & download files from any .zip — runs entirely in your browser</p>
+</header>
+
+<!-- Drop zone -->
+<div class="drop-zone" id="dropZone">
+  <input type="file" id="fileInput" accept=".zip" />
+  <span class="drop-icon">🗜️</span>
+  <div class="drop-label">Drop a .zip file here or click to browse</div>
+  <div class="drop-sub">All processing is local — nothing is uploaded</div>
 </div>
+
+<!-- Toolbar (hidden until file loaded) -->
+<div class="toolbar hidden" id="toolbar">
+  <div class="file-meta">
+    <span class="name" id="metaName">—</span>
+    <span id="metaSize">—</span>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost" id="resetBtn">✕ Clear</button>
+    <button class="btn btn-primary" id="extractAllBtn">⬇ Extract All</button>
+  </div>
+</div>
+
+<!-- Search bar -->
+<div class="search-bar hidden" id="searchWrap">
+  <span class="search-icon">⌕</span>
+  <input type="text" id="searchInput" placeholder="Filter files…" />
+</div>
+
+<!-- Stats -->
+<div class="stats hidden" id="statsBar">
+  <div>Files: <strong id="statFiles">0</strong></div>
+  <div>Folders: <strong id="statFolders">0</strong></div>
+  <div>Total size: <strong id="statSize">0 B</strong></div>
+  <div id="statFiltered" class="hidden">Showing: <strong id="statFilteredCount">0</strong></div>
+</div>
+
+<!-- Progress -->
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-label">
+    <span id="progressLabel">Extracting…</span>
+    <span id="progressPct">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<!-- File list -->
+<div class="file-list hidden" id="fileList">
+  <div class="list-header">
+    <div>Name</div>
+    <div style="text-align:right">Size</div>
+    <div style="text-align:right">Save</div>
+  </div>
+  <div class="file-items" id="fileItems"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-const boardEl=document.getElementById("board"),statusEl=document.getElementById("status");
-let b,p,over;
-const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-function init(){b=Array(9).fill(null);p='X';over=false;statusEl.textContent="Player X's turn";boardEl.innerHTML='';b.forEach((_,i)=>{const d=document.createElement('div');d.className='cell';d.onclick=()=>play(i,d);boardEl.appendChild(d);});}
-function play(i,d){if(b[i]||over)return;b[i]=p;d.textContent=p;const l=w.find(x=>b[x[0]]&&b[x[0]]===b[x[1]]&&b[x[0]]===b[x[2]]);if(l){over=true;statusEl.textContent=`Player ${p} wins`;l.forEach(i=>boardEl.children[i].classList.add('win'));return;}if(b.every(Boolean)){statusEl.textContent='Draw';over=true;return;}p=p==='X'?'O':'X';statusEl.textContent=`Player ${p}'s turn`; }
-function reset(){init();}
-if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js');}
-init();
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const toolbar = document.getElementById('toolbar');
+  const searchWrap = document.getElementById('searchWrap');
+  const statsBar = document.getElementById('statsBar');
+  const fileList = document.getElementById('fileList');
+  const fileItems = document.getElementById('fileItems');
+  const searchInput = document.getElementById('searchInput');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const progressPct = document.getElementById('progressPct');
+  const resetBtn = document.getElementById('resetBtn');
+  const extractAllBtn = document.getElementById('extractAllBtn');
+
+  let zipData = null;
+  let allEntries = [];
+
+  // Drag & drop
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) loadZip(f);
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadZip(fileInput.files[0]); });
+
+  async function loadZip(file) {
+    try {
+      showProgress('Reading…', 10);
+      const ab = await file.arrayBuffer();
+      showProgress('Parsing…', 40);
+      zipData = await JSZip.loadAsync(ab);
+      showProgress('Building list…', 80);
+
+      allEntries = [];
+      let fileCount = 0, folderCount = 0, totalSize = 0;
+
+      zipData.forEach((path, entry) => {
+        allEntries.push({ path, entry });
+        if (entry.dir) folderCount++;
+        else { fileCount++; }
+      });
+
+      // Sort: dirs first, then by path
+      allEntries.sort((a, b) => {
+        if (a.entry.dir !== b.entry.dir) return a.entry.dir ? -1 : 1;
+        return a.path.localeCompare(b.path);
+      });
+
+      // Get uncompressed sizes
+      for (const item of allEntries) {
+        if (!item.entry.dir) {
+          const blob = await item.entry.async('blob');
+          item.size = blob.size;
+          totalSize += blob.size;
+          item._blob = blob;
+        }
+      }
+
+      showProgress('Done', 100);
+      setTimeout(() => { progressWrap.classList.remove('active'); }, 400);
+
+      document.getElementById('metaName').textContent = file.name;
+      document.getElementById('metaSize').textContent = formatSize(file.size);
+      document.getElementById('statFiles').textContent = fileCount;
+      document.getElementById('statFolders').textContent = folderCount;
+      document.getElementById('statSize').textContent = formatSize(totalSize);
+
+      toolbar.classList.remove('hidden');
+      searchWrap.classList.remove('hidden');
+      statsBar.classList.remove('hidden');
+      fileList.classList.remove('hidden');
+      dropZone.classList.add('hidden');
+
+      renderList(allEntries);
+      toast('✓ Loaded ' + fileCount + ' files', 'success');
+    } catch (err) {
+      hideProgress();
+      toast('✗ Failed to read ZIP: ' + err.message, 'error');
+    }
+  }
+
+  function renderList(entries) {
+    fileItems.innerHTML = '';
+    entries.forEach(({ path, entry, size, _blob }) => {
+      const row = document.createElement('div');
+      row.className = 'file-row' + (entry.dir ? ' is-dir' : '');
+
+      const namePart = path.split('/').filter(Boolean).pop() || path;
+      const ext = namePart.includes('.') ? namePart.split('.').pop().toLowerCase() : '';
+      const icon = entry.dir ? '📁' : getIcon(ext);
+      const badgeClass = entry.dir ? '' : getExtClass(ext);
+      const badge = ext && !entry.dir ? `<span class="ext-badge ${badgeClass}">${ext}</span>` : '';
+
+      row.innerHTML = `
+        <div class="file-name">
+          <span class="file-icon">${icon}</span>
+          ${badge}
+          <span class="file-name-text" title="${path}">${path}</span>
+        </div>
+        <div class="file-size">${entry.dir ? '—' : formatSize(size ?? 0)}</div>
+        <div class="file-action">
+          ${!entry.dir ? `<button class="dl-btn" data-path="${path}">DL</button>` : ''}
+        </div>
+      `;
+      fileItems.appendChild(row);
+    });
+
+    fileItems.querySelectorAll('.dl-btn').forEach(btn => {
+      btn.addEventListener('click', () => downloadFile(btn.dataset.path));
+    });
+  }
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    if (!q) {
+      renderList(allEntries);
+      document.getElementById('statFiltered').classList.add('hidden');
+      return;
+    }
+    const filtered = allEntries.filter(e => e.path.toLowerCase().includes(q));
+    renderList(filtered);
+    document.getElementById('statFiltered').classList.remove('hidden');
+    document.getElementById('statFilteredCount').textContent = filtered.filter(e => !e.entry.dir).length;
+  });
+
+  async function downloadFile(path) {
+    const item = allEntries.find(e => e.path === path);
+    if (!item) return;
+    try {
+      const blob = item._blob || await item.entry.async('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = path.split('/').pop();
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      toast('✗ Download failed', 'error');
+    }
+  }
+
+  extractAllBtn.addEventListener('click', async () => {
+    const files = allEntries.filter(e => !e.entry.dir);
+    showProgress('Extracting 0 / ' + files.length, 0);
+    for (let i = 0; i < files.length; i++) {
+      await downloadFile(files[i].path);
+      const pct = Math.round(((i + 1) / files.length) * 100);
+      showProgress(`Extracting ${i + 1} / ${files.length}`, pct);
+      await new Promise(r => setTimeout(r, 80));
+    }
+    setTimeout(() => { progressWrap.classList.remove('active'); }, 600);
+    toast('✓ All files downloaded', 'success');
+  });
+
+  resetBtn.addEventListener('click', () => {
+    zipData = null; allEntries = [];
+    toolbar.classList.add('hidden');
+    searchWrap.classList.add('hidden');
+    statsBar.classList.add('hidden');
+    fileList.classList.add('hidden');
+    dropZone.classList.remove('hidden');
+    searchInput.value = '';
+    fileInput.value = '';
+  });
+
+  function showProgress(label, pct) {
+    progressWrap.classList.add('active');
+    progressLabel.textContent = label;
+    progressPct.textContent = pct + '%';
+    progressFill.style.width = pct + '%';
+  }
+
+  function hideProgress() { progressWrap.classList.remove('active'); }
+
+  function formatSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024, sizes = ['B','KB','MB','GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
+  function getIcon(ext) {
+    const map = {
+      js:'📜', jsx:'📜', ts:'📜', tsx:'📜',
+      html:'🌐', htm:'🌐', css:'🎨', scss:'🎨', sass:'🎨',
+      json:'📋', md:'📝', txt:'📄',
+      png:'🖼', jpg:'🖼', jpeg:'🖼', gif:'🖼', svg:'🖼', webp:'🖼',
+      mp4:'🎬', mov:'🎬', avi:'🎬',
+      mp3:'🎵', wav:'🎵', ogg:'🎵',
+      pdf:'📕', zip:'📦', gz:'📦', tar:'📦',
+      py:'🐍', rb:'💎', php:'🐘', sh:'⚙',
+    };
+    return map[ext] || '📄';
+  }
+
+  function getExtClass(ext) {
+    const map = {
+      js:'ext-js', jsx:'ext-jsx', ts:'ext-ts', tsx:'ext-tsx',
+      html:'ext-html', htm:'ext-htm',
+      css:'ext-css', scss:'ext-scss', sass:'ext-sass',
+      json:'ext-json', md:'ext-md',
+      png:'ext-png', jpg:'ext-jpg', jpeg:'ext-jpeg', gif:'ext-gif', svg:'ext-svg', webp:'ext-webp',
+      zip:'ext-zip', gz:'ext-gz', tar:'ext-tar',
+      py:'ext-py',
+    };
+    return map[ext] || 'ext-other';
+  }
+
+  let toastTimer;
+  function toast(msg, type = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = 'toast'; }, 2800);
+  }
 </script>
 </body>
 </html>
