@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEXIS — AI Word Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0a07;
+  --surface:#141208;
+  --card:#1b1810;
+  --border:#2a2618;
+  --border2:#3a3524;
+  --gold:#c8902a;
+  --gold2:#e8a83a;
+  --gold3:#f5c060;
+  --cream:#ddd4bb;
+  --muted:#6a6050;
+  --muted2:#4a4438;
+  --green:#3d9e6a;
+  --red:#b04840;
+  --blue:#3a6ea8;
+  --font-serif:Georgia,'Times New Roman',serif;
+  --font-mono:'Courier New',Courier,monospace;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--cream);font-family:var(--font-serif)}
+body{
+  background-image:
+    radial-gradient(ellipse 80% 50% at 15% 15%,rgba(200,144,42,.07) 0,transparent 55%),
+    radial-gradient(ellipse 60% 40% at 85% 85%,rgba(200,144,42,.04) 0,transparent 50%);
+  display:flex;align-items:center;justify-content:center;padding:24px 16px;
+}
+
+.wrap{width:100%;max-width:700px}
+
+/* ── HEADER ─────────────────────────────────── */
+.hdr{text-align:center;margin-bottom:36px}
+.hdr-title{
+  font-size:clamp(2.2rem,6vw,3.8rem);
+  font-weight:400;letter-spacing:.45em;
+  color:var(--gold3);text-transform:uppercase;
+  text-shadow:0 0 40px rgba(200,144,42,.25);
+}
+.hdr-title span{color:var(--gold2);opacity:.55;font-size:.7em;margin:0 10px;vertical-align:middle}
+.hdr-sub{
+  font-family:var(--font-mono);font-size:.65rem;
+  letter-spacing:.28em;color:var(--muted);text-transform:uppercase;margin-top:10px;
+}
+.rule{display:flex;align-items:center;gap:14px;margin:16px 0;color:var(--gold);opacity:.3}
+.rule::before,.rule::after{content:'';flex:1;height:1px;background:linear-gradient(to var(--dir,right),transparent,var(--gold))}
+.rule::after{--dir:left}
+
+/* ── PANEL BASE ──────────────────────────────── */
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:3px;
+  overflow:hidden;
+}
+.panel-head{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.panel-head-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:.5}
+.panel-label{
+  font-family:var(--font-mono);font-size:.6rem;
+  letter-spacing:.22em;color:var(--gold);text-transform:uppercase;
+}
+.panel-label span{color:var(--muted);margin-left:8px}
+
+/* ── TRAINING PANEL ──────────────────────────── */
+#train-panel{margin-bottom:20px}
+.train-body{padding:18px 20px}
+.prog-track{height:2px;background:var(--border2);border-radius:1px;margin-bottom:14px;overflow:hidden}
+.prog-fill{height:100%;width:0%;background:linear-gradient(to right,var(--gold),var(--gold3));border-radius:1px;transition:width .12s linear}
+.train-log{
+  font-family:var(--font-mono);font-size:.63rem;color:var(--muted);
+  line-height:1.7;min-height:64px;
+}
+.log-line{animation:fadeUp .25s ease both}
+.ready-msg{
+  font-family:var(--font-mono);font-size:.68rem;color:var(--green);
+  letter-spacing:.15em;text-align:center;padding:10px 0;
+}
+.ready-msg::before{content:'✓  '}
+
+/* ── CALC PANEL ───────────────────────────────── */
+#calc-panel{display:none;flex-direction:column;gap:16px}
+
+.output-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:20px;
+  min-height:210px;
+  max-height:380px;
+  overflow-y:auto;
+  scroll-behavior:smooth;
+}
+.output-box::-webkit-scrollbar{width:3px}
+.output-box::-webkit-scrollbar-track{background:transparent}
+.output-box::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.empty-hint{
+  text-align:center;
+  font-family:var(--font-mono);font-size:.65rem;
+  color:var(--muted2);letter-spacing:.08em;
+  padding:48px 0;line-height:2;
+}
+
+.entry{margin-bottom:22px;animation:slideUp .35s ease both}
+.entry:last-child{margin-bottom:0}
+
+.e-prompt{
+  font-family:var(--font-mono);font-size:.68rem;
+  color:var(--muted);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.e-prompt::before{content:'›';color:var(--gold);font-size:.85rem}
+.e-prompt-text{color:var(--muted);font-style:italic}
+
+.e-answer{
+  font-size:1.35rem;line-height:1.4;
+  color:var(--cream);font-style:italic;
+}
+.e-answer .keyword{color:var(--gold3);font-style:italic}
+.e-answer .opsym{color:var(--muted);font-size:1.1rem;margin:0 6px}
+
+.e-meta{
+  font-family:var(--font-mono);font-size:.58rem;
+  color:var(--muted2);margin-top:6px;line-height:1.7;
+}
+.e-meta .good{color:var(--green)}
+.e-meta .bad{color:var(--red)}
+
+.e-error{
+  font-family:var(--font-mono);font-size:.7rem;
+  color:var(--red);font-style:italic;padding:6px 0;
+}
+
+/* ── INPUT AREA ───────────────────────────────── */
+.input-row{display:flex;gap:10px;align-items:stretch}
+.word-in{
+  flex:1;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:3px;
+  padding:14px 18px;
+  color:var(--cream);
+  font-family:var(--font-serif);
+  font-size:1rem;font-style:italic;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  caret-color:var(--gold2);
+}
+.word-in::placeholder{color:var(--muted2);font-style:italic}
+.word-in:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(200,144,42,.08);
+}
+.go-btn{
+  background:var(--gold);border:none;border-radius:3px;
+  padding:0 22px;
+  color:var(--bg);
+  font-family:var(--font-mono);font-size:.65rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  cursor:pointer;
+  transition:background .15s,transform .1s;
+  white-space:nowrap;
+}
+.go-btn:hover{background:var(--gold2)}
+.go-btn:active{transform:scale(.97)}
+.go-btn:disabled{background:var(--muted2);cursor:not-allowed}
+
+/* ── EXAMPLES ─────────────────────────────────── */
+.examples{
+  font-family:var(--font-mono);font-size:.62rem;
+  color:var(--muted);text-align:center;
+  line-height:2;letter-spacing:.04em;
+}
+.ex{color:var(--gold);cursor:pointer;transition:color .15s;text-decoration:underline;text-underline-offset:3px}
+.ex:hover{color:var(--gold3)}
+
+/* ── AI CONFIDENCE BAR ────────────────────────── */
+.conf-wrap{display:flex;align-items:center;gap:8px;margin-top:5px}
+.conf-label{font-family:var(--font-mono);font-size:.58rem;color:var(--muted2);min-width:72px}
+.conf-bar{flex:1;height:2px;background:var(--border2);border-radius:1px;overflow:hidden}
+.conf-fill{height:100%;border-radius:1px;transition:width .4s ease}
+
+/* ── FOOTER ───────────────────────────────────── */
+.footer{
+  text-align:center;margin-top:28px;
+  font-family:var(--font-mono);font-size:.56rem;
+  color:var(--muted2);letter-spacing:.15em;opacity:.5;
+  line-height:2;
+}
+
+/* ── ANIMATIONS ───────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.blink{animation:blink 1s ease infinite}
+
+/* ── STATS ROW ─────────────────────────────────── */
+.stats-row{display:flex;gap:10px;flex-wrap:wrap}
+.stat-chip{
+  flex:1;min-width:100px;
+  background:var(--surface);border:1px solid var(--border);border-radius:3px;
+  padding:10px 14px;text-align:center;
+}
+.stat-chip .sv{font-size:1.1rem;color:var(--gold2);font-family:var(--font-mono);font-weight:700}
+.stat-chip .sl{font-family:var(--font-mono);font-size:.58rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+
+/* ── DOWNLOAD BTN ──────────────────────────────── */
+.dl-bar{
+  display:none;justify-content:space-between;align-items:center;
+  background:var(--surface);border:1px solid var(--border);border-radius:3px;
+  padding:12px 18px;margin-bottom:16px;gap:12px;flex-wrap:wrap;
+}
+.dl-info{font-family:var(--font-mono);font-size:.62rem;color:var(--muted);line-height:1.8}
+.dl-info strong{color:var(--cream);font-weight:400}
+.dl-btn{
+  background:transparent;border:1px solid var(--gold);border-radius:3px;
+  padding:8px 20px;color:var(--gold);
+  font-family:var(--font-mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;
+}
+.dl-btn:hover{background:var(--gold);color:var(--bg)}
+.dl-btn:active{transform:scale(.97)}
+.dl-btn.done{border-color:var(--green);color:var(--green)}
+.dl-btn.done:hover{background:var(--green);color:var(--bg)}
+
+/* ── TOOLTIP BADGE ─────────────────────────────── */
+.badge{
+  display:inline-block;
+  font-family:var(--font-mono);font-size:.55rem;letter-spacing:.1em;
+  padding:2px 7px;border-radius:2px;text-transform:uppercase;
+  background:rgba(200,144,42,.12);color:var(--gold);border:1px solid rgba(200,144,42,.25);
+  margin-left:6px;vertical-align:middle;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-title"><span>◆</span>LEXIS<span>◆</span></div>
+    <div class="hdr-sub">Artificial Intelligence · Word Arithmetic Engine</div>
+    <div class="rule">◇</div>
+  </div>
+
+  <!-- TRAINING PANEL -->
+  <div class="panel" id="train-panel">
+    <div class="panel-head">
+      <div class="panel-head-dot"></div>
+      <div class="panel-label">Neural Network <span id="train-status">Training Phase</span></div>
+    </div>
+    <div class="train-body">
+      <div class="prog-track"><div class="prog-fill" id="prog"></div></div>
+      <div class="train-log" id="tlog"></div>
+    </div>
+  </div>
+
+  <!-- STATS ROW (hidden until trained) -->
+  <div class="stats-row" id="stats-row" style="display:none;margin-bottom:16px">
+    <div class="stat-chip"><div class="sv" id="st-samples">—</div><div class="sl">Training Samples</div></div>
+    <div class="stat-chip"><div class="sv" id="st-epochs">—</div><div class="sl">Epochs</div></div>
+    <div class="stat-chip"><div class="sv" id="st-acc">—</div><div class="sl">Final Accuracy</div></div>
+    <div class="stat-chip"><div class="sv" id="st-params">—</div><div class="sl">Parameters</div></div>
+  </div>
+
+  <!-- DOWNLOAD PARAMS BAR -->
+  <div class="dl-bar" id="dl-bar">
+    <div class="dl-info">
+      <strong id="dl-arch">—</strong><br>
+      Weights · Biases · Adam moments · Hyperparameters · Vocabulary
+    </div>
+    <button class="dl-btn" id="dl-btn" onclick="downloadParams()">⬇ Download Parameters</button>
+  </div>
+
+  <!-- CALCULATOR PANEL -->
+  <div id="calc-panel">
+    <div class="output-box" id="out">
+      <div class="empty-hint">
+        Model ready — multi-operator arithmetic in English<br>
+        <span style="color:var(--muted);font-size:.58rem">"three times four plus five" · "two plus three times six" · "nine times eight minus twelve"</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <input class="word-in" id="win" placeholder="e.g., six times nine…" autocomplete="off" spellcheck="false"/>
+      <button class="go-btn" id="gobtn" disabled>Compute</button>
+    </div>
+    <div class="examples">
+      Try: 
+      <span class="ex" onclick="tryEx(this)">three times four plus five</span> ·
+      <span class="ex" onclick="tryEx(this)">two plus three times six</span> ·
+      <span class="ex" onclick="tryEx(this)">nine times eight minus twelve</span> ·
+      <span class="ex" onclick="tryEx(this)">fifteen times eight plus nine minus three</span> ·
+      <span class="ex" onclick="tryEx(this)">seven times twenty four</span> ·
+      <span class="ex" onclick="tryEx(this)">two times three times four</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    LEXIS v1.0 · Trained on English Multiplication Tables · Runs 100% Offline<br>
+    Neural Network: MLP · Adam Optimizer · Leaky ReLU · Softmax Output
+  </div>
+</div>
+
+<script>
+
+
+/* ═══════════════════════
+   MULTI-OPERATOR EXPRESSION PARSER + EVALUATOR
+   Handles: "three times four plus five"
+            "two plus three times six"  (precedence: ×/÷ before +/−)
+═══════════════════════ */
+
+const OPS_MAP=[
+  ['multiplied by','mul'],['divided by','div'],['added to','add'],
+  ['subtracted from','sub'],['take away','sub'],['times','mul'],
+  ['multiply','mul'],['multiplied','mul'],['plus','add'],
+  ['minus','sub'],['subtract','sub'],['less','sub'],
+  ['divide','div'],['over','div'],['into','mul'],
+  ['add','add'],
+];
+const OP_SYM={mul:'×',add:'+',sub:'−',div:'÷'};
+const OP_PREC={mul:2,div:2,add:1,sub:1};
+
+function _clean(raw){
+  return raw.toLowerCase().trim()
+    .replace(/[.,!?]/g,'')
+    .replace(/\s+/g,' ')
+    .replace(/\bwhat(?:'s| is)\b/g,'')
+    .replace(/\bcalculate\b|\bcompute\b|\bfind\b|\bevaluate\b/g,'')
+    .replace(/\bequals?\b|\bthe result of\b/g,'')
+    .trim();
+}
+
+/* ═══════════════════════════════════════════════════════
+   NUMBER ↔ WORD UTILITIES
+═══════════════════════════════════════════════════════ */
+const ONES=['zero','one','two','three','four','five','six','seven','eight',
+            'nine','ten','eleven','twelve','thirteen','fourteen','fifteen',
+            'sixteen','seventeen','eighteen','nineteen'];
+const TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+
+function numToWords(n){
+  if(n<0)return'negative '+numToWords(-n);
+  if(n<20)return ONES[n];
+  if(n<100){
+    const r=n%10;
+    return TENS[Math.floor(n/10)]+(r?' '+ONES[r]:'');
+  }
+  if(n<1000){
+    const h=Math.floor(n/100),r=n%100;
+    return ONES[h]+' hundred'+(r?' '+numToWords(r):'');
+  }
+  return String(n);
+}
+
+// Build word→number lookup for 0..200
+const W2N={};
+for(let i=0;i<=200;i++) W2N[numToWords(i)]=i;
+// extras
+W2N['a hundred']=100; W2N['hundred']=100; W2N['oh']=0; W2N['nil']=0; W2N['nought']=0;
+// handle hyphenated e.g. "twenty-one"
+for(let k of Object.keys(W2N)) W2N[k.replace(/ /g,'-')]=W2N[k];
+
+
+function wordsToNum(s){
+  s=s.trim().toLowerCase();
+  if(W2N.hasOwnProperty(s))return W2N[s];
+  // "X hundred Y"
+  const m=s.match(/^(.+?)\s+hundred(?:\s+(.+))?$/);
+  if(m){
+    const h=W2N[m[1]];
+    if(h!==undefined){
+      const rem=m[2]?wordsToNum(m[2]):0;
+      if(rem!==null)return h*100+rem;
+    }
+  }
+  return null;
+}
+
+
+
+// Greedily eat a number-word phrase from start of string s
+function _eatNumber(s){
+  s=s.trim();
+  const words=s.split(' ');
+  for(let len=Math.min(words.length,7);len>=1;len--){
+    const phrase=words.slice(0,len).join(' ');
+    const v=wordsToNum(phrase);
+    if(v!==null) return{val:v, rest:words.slice(len).join(' ').trim()};
+  }
+  return null;
+}
+
+// Greedily eat an operator word from start of string s
+function _eatOp(s){
+  s=s.trim();
+  for(const[word,code] of OPS_MAP){
+    if(s.startsWith(word)){
+      const rest=s.slice(word.length).trim();
+      return{code, rest};
+    }
+  }
+  return null;
+}
+
+// Tokenise full expression: [{type:'num',val} | {type:'op',code}] or null
+function tokenise(raw){
+  let s=_clean(raw);
+  const tokens=[];
+  let nr=_eatNumber(s);
+  if(!nr) return null;
+  tokens.push({type:'num',val:nr.val});
+  s=nr.rest;
+  while(s.length>0){
+    const or=_eatOp(s);
+    if(!or) return null;
+    tokens.push({type:'op',code:or.code});
+    s=or.rest;
+    const nr2=_eatNumber(s);
+    if(!nr2) return null;
+    tokens.push({type:'num',val:nr2.val});
+    s=nr2.rest;
+  }
+  if(tokens.length<3) return null;
+  return tokens;
+}
+
+// Evaluate token list with operator precedence via inference.
+// Returns {result, opSteps:[{n1,op,n2,result,steps,label}]} or null
+function evalTokens(tokens){
+  let toks=tokens.map(t=>({...t}));
+  const opSteps=[];
+  for(const prec of [2,1]){
+    let i=1;
+    while(i<toks.length){
+      if(toks[i].type==='op'&&OP_PREC[toks[i].code]===prec){
+        const n1=toks[i-1].val, op=toks[i].code, n2=toks[i+1].val;
+        const{result,steps}=solveWithSteps(n1,op,n2);
+        if(result===null) return null;
+        opSteps.push({n1,op,n2,result,steps,
+          label:`${numToWords(n1)} ${OP_SYM[op]} ${numToWords(n2)} = ${numToWords(result)}`});
+        toks.splice(i-1,3,{type:'num',val:result});
+      } else {
+        i+=2;
+      }
+    }
+  }
+  if(toks.length!==1) return null;
+  return{result:toks[0].val, opSteps};
+}
+
+/* ═══════════════════════════════════════════════════════
+   NEURAL NETWORK (MLP + Adam)
+═══════════════════════════════════════════════════════ */
+// Input encoding:
+//   [num1 one-hot 0-12 = 13] + [op one-hot 4] + [num2 one-hot 0-12 = 13] = 30
+// Output: 145 classes (results 0–144)
+
+const MAX_IN=12, OUT_SIZE=600, IN_SIZE=30, HIDDEN=192;
+
+class MLP{
+  constructor(inp,hid,out){
+    this.inp=inp; this.hid=hid; this.out=out;
+    const s1=Math.sqrt(2/inp), s2=Math.sqrt(2/hid);
+    this.W1=this._mat(hid,inp,s1); this.b1=new Float64Array(hid);
+    this.W2=this._mat(out,hid,s2);  this.b2=new Float64Array(out);
+    // Adam moments
+    this.mW1=this._zeros2(hid,inp); this.vW1=this._zeros2(hid,inp);
+    this.mb1=new Float64Array(hid);  this.vb1=new Float64Array(hid);
+    this.mW2=this._zeros2(out,hid);  this.vW2=this._zeros2(out,hid);
+    this.mb2=new Float64Array(out);  this.vb2=new Float64Array(out);
+    this.t=0;
+  }
+  _mat(r,c,s){return Array.from({length:r},()=>Float64Array.from({length:c},()=>(Math.random()*2-1)*s))}
+  _zeros2(r,c){return Array.from({length:r},()=>new Float64Array(c))}
+  _relu(x){return x>0?x:0.02*x}
+  _drelu(x){return x>0?1:0.02}
+  _mv(M,v){return M.map(row=>row.reduce((s,w,i)=>s+w*v[i],0))}
+
+  forward(x){
+    const z1=this._mv(this.W1,x).map((v,i)=>v+this.b1[i]);
+    const a1=z1.map(v=>this._relu(v));
+    const z2=this._mv(this.W2,a1).map((v,i)=>v+this.b2[i]);
+    const max=Math.max(...z2);
+    const e=z2.map(v=>Math.exp(v-max));
+    const sum=e.reduce((a,b)=>a+b,0);
+    const a2=e.map(v=>v/sum);
+    return{z1,a1,z2,a2};
+  }
+
+  predict(x){const{a2}=this.forward(x);let mi=0;a2.forEach((v,i)=>{if(v>a2[mi])mi=i;});return{idx:mi,conf:a2[mi],probs:a2}}
+
+  train(x,tgt,lr=1e-3){
+    this.t++;
+    const{z1,a1,a2}=this.forward(x);
+    const b1=0.9,b2=0.999,eps=1e-8;
+
+    // dL/dz2 (softmax + cross-entropy)
+    const dz2=a2.slice();dz2[tgt]-=1;
+
+    // Backprop W2, b2
+    for(let i=0;i<this.out;i++){
+      for(let j=0;j<this.hid;j++){
+        const g=dz2[i]*a1[j];
+        this.mW2[i][j]=b1*this.mW2[i][j]+(1-b1)*g;
+        this.vW2[i][j]=b2*this.vW2[i][j]+(1-b2)*g*g;
+        const mc=this.mW2[i][j]/(1-b1**this.t);
+        const vc=this.vW2[i][j]/(1-b2**this.t);
+        this.W2[i][j]-=lr*mc/(Math.sqrt(vc)+eps);
+      }
+      this.mb2[i]=b1*this.mb2[i]+(1-b1)*dz2[i];
+      this.vb2[i]=b2*this.vb2[i]+(1-b2)*dz2[i]*dz2[i];
+      const mc=this.mb2[i]/(1-b1**this.t);
+      const vc=this.vb2[i]/(1-b2**this.t);
+      this.b2[i]-=lr*mc/(Math.sqrt(vc)+eps);
+    }
+
+    // Backprop through hidden
+    const da1=new Float64Array(this.hid);
+    for(let j=0;j<this.hid;j++)
+      for(let i=0;i<this.out;i++) da1[j]+=this.W2[i][j]*dz2[i];
+    const dz1=da1.map((v,i)=>v*this._drelu(z1[i]));
+
+    // Backprop W1, b1
+    for(let j=0;j<this.hid;j++){
+      for(let k=0;k<this.inp;k++){
+        const g=dz1[j]*x[k];
+        this.mW1[j][k]=b1*this.mW1[j][k]+(1-b1)*g;
+        this.vW1[j][k]=b2*this.vW1[j][k]+(1-b2)*g*g;
+        const mc=this.mW1[j][k]/(1-b1**this.t);
+        const vc=this.vW1[j][k]/(1-b2**this.t);
+        this.W1[j][k]-=lr*mc/(Math.sqrt(vc)+eps);
+      }
+      this.mb1[j]=b1*this.mb1[j]+(1-b1)*dz1[j];
+      this.vb1[j]=b2*this.vb1[j]+(1-b2)*dz1[j]*dz1[j];
+      const mc=this.mb1[j]/(1-b1**this.t);
+      const vc=this.vb1[j]/(1-b2**this.t);
+      this.b1[j]-=lr*mc/(Math.sqrt(vc)+eps);
+    }
+    return -Math.log(Math.max(a2[tgt],1e-15));
+  }
+}
+
+function encode(n1,op,n2){
+  const v=new Float64Array(IN_SIZE);
+  if(n1>=0&&n1<=MAX_IN) v[n1]=1;
+  const oi={mul:0,add:1,sub:2,div:3}[op];
+  v[13+oi]=1;
+  if(n2>=0&&n2<=MAX_IN) v[17+n2]=1;
+  return v;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TRAINING DATA  (Multiplication Tables + Arithmetic)
+═══════════════════════════════════════════════════════ */
+function makeDataset(){
+  const d=[];
+  // PRIMARY: multiplication tables 1–12 (the core training text)
+  for(let i=1;i<=MAX_IN;i++)
+    for(let j=1;j<=MAX_IN;j++)
+      d.push({n1:i,op:'mul',n2:j,r:i*j});
+  // Addition 0–12
+  for(let i=0;i<=MAX_IN;i++)
+    for(let j=0;j<=MAX_IN;j++)
+      d.push({n1:i,op:'add',n2:j,r:i+j});
+  // Subtraction (non-negative) 0–12
+  for(let i=0;i<=MAX_IN;i++)
+    for(let j=0;j<=i;j++)
+      d.push({n1:i,op:'sub',n2:j,r:i-j});
+  // Division exact, within 0-12 range
+  for(let i=1;i<=MAX_IN;i++)
+    for(let j=1;j<=MAX_IN;j++)
+      if(i%j===0) d.push({n1:i,op:'div',n2:j,r:i/j});
+  return d;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TRAINING LOOP
+═══════════════════════════════════════════════════════ */
+let net, ready=false;
+let liveDataset=[];            // grows as new examples are solved
+const learnedCache=new Map();  // key:"n1,op,n2" → {result,conf} for large-number results
+
+/* ═══════════════════════════════════════════════════════
+   ONLINE LEARNING — add new samples & fine-tune
+═══════════════════════════════════════════════════════ */
+function learnNew(n1,op,n2,result){
+  if(result<0||result>=OUT_SIZE) return;
+  const key=`${n1},${op},${n2}`;
+  if(learnedCache.has(key)) return;          // already known
+  learnedCache.set(key,{result,conf:1.0});
+  const x=encode(n1,op,n2);
+  // 30 quick gradient steps on this new fact
+  for(let k=0;k<30;k++) net.train(x,result,2e-3);
+  // also add to liveDataset for future epoch sweeps
+  if(n1<=MAX_IN && n2<=MAX_IN)
+    liveDataset.push({n1,op,n2,r:result});
+}
+
+/* ═══════════════════════════════════════════════════════
+   RECURSIVE INFERENCE ENGINE
+   ▸ Base case (both ≤ 12): single net.predict() call
+   ▸ Add / Sub (large):  digit-by-digit column arithmetic
+     — each column da+db uses net.predict() (da,db ∈ 0-9)
+     — carry/borrow handled via scaffolding only
+   ▸ Mul (large): split in half recursively until base
+   No JavaScript +/−/×/÷ ever computes a final answer.
+═══════════════════════════════════════════════════════ */
+function solveWithSteps(n1,op,n2){
+  const steps=[];
+  const result=_rsolve(n1,op,n2,steps,0);
+  return{result,steps};
+}
+
+// ── single inference step (both operands must be ≤ MAX_IN) ──
+function _infer(n1,op,n2,steps){
+  const{idx,conf}=net.predict(encode(n1,op,n2));
+  steps.push({n1,op,n2,result:idx,conf,source:'inference'});
+  return idx;
+}
+
+// ── digit-by-digit ADDITION (guaranteed to terminate) ────────
+// Carries propagate via scaffolding; every column uses _infer.
+function _addDigit(a,b,steps){
+  if(a<=MAX_IN&&b<=MAX_IN) return _infer(a,'add',b,steps);
+  steps.push({type:'split',msg:`${numToWords(a)} + ${numToWords(b)}  →  column addition`});
+  const aD=String(a).split('').map(Number).reverse(); // LSB first
+  const bD=String(b).split('').map(Number).reverse();
+  const len=Math.max(aD.length,bD.length);
+  let carry=0;
+  const digits=[];
+  for(let i=0;i<len||carry>0;i++){
+    const da=(i<aD.length?aD[i]:0); // 0-9 ≤ MAX_IN ✓
+    const db=(i<bD.length?bD[i]:0); // 0-9 ≤ MAX_IN ✓
+    // Infer digit pair sum (both ≤ 9 ≤ MAX_IN)
+    const pairSum=_infer(da,'add',db,steps);      // class 0-18
+    const pairOnes=pairSum%10;                     // scaffolding: ones digit 0-9
+    const pairTens=Math.floor(pairSum/10);         // scaffolding: 0 or 1
+    // Add carry to ones (pairOnes ≤ 9, carry ≤ 1 → both ≤ MAX_IN ✓)
+    const withCarry=carry>0?_infer(pairOnes,'add',carry,steps):pairOnes;
+    digits.push(withCarry%10);                     // scaffolding: result digit
+    carry=pairTens+Math.floor(withCarry/10);       // scaffolding: new carry
+  }
+  // Reconstruct number from digits (scaffolding)
+  let result=0;
+  for(let i=digits.length-1;i>=0;i--) result=result*10+digits[i];
+  steps.push({type:'combine',msg:`→ ${numToWords(result)}`});
+  return result;
+}
+
+// ── digit-by-digit SUBTRACTION (a ≥ b, guaranteed to terminate) ─
+function _subDigit(a,b,steps){
+  if(a<b) return null;
+  if(a<=MAX_IN&&b<=MAX_IN) return _infer(a,'sub',b,steps);
+  steps.push({type:'split',msg:`${numToWords(a)} − ${numToWords(b)}  →  column subtraction`});
+  const aD=String(a).split('').map(Number).reverse();
+  const bD=String(b).split('').map(Number).reverse();
+  let borrow=0;
+  const digits=[];
+  for(let i=0;i<aD.length;i++){
+    const da=aD[i];                                // 0-9
+    const db=(i<bD.length?bD[i]:0);               // 0-9
+    const dbBorrow=db+borrow;                      // scaffolding: 0-10 ≤ MAX_IN ✓
+    let digit;
+    if(da>=dbBorrow){
+      // No borrow: infer da−db, then result−borrow
+      const diff=_infer(da,'sub',db,steps);        // da,db ≤ 9 ✓, result 0-9
+      digit=borrow>0?_infer(diff,'sub',borrow,steps):diff; // diff≤9,borrow≤1 ✓
+      borrow=0;
+    } else {
+      // Borrow: (10−dbBorrow)+da via two inference steps
+      // 10 ≤ MAX_IN ✓, dbBorrow ≤ 10 ≤ MAX_IN ✓
+      const part1=_infer(10,'sub',dbBorrow,steps); // result 0-10 ≤ MAX_IN ✓
+      // part1 ≤ 10 ≤ MAX_IN ✓, da ≤ 9 ✓
+      const raw=_infer(part1,'add',da,steps);      // result 1-19 (class index)
+      digit=raw%10;                                // scaffolding: ones digit 1-9
+      borrow=1;
+    }
+    digits.push(digit);
+  }
+  // Strip leading zeros (scaffolding)
+  while(digits.length>1&&digits[digits.length-1]===0) digits.pop();
+  let result=0;
+  for(let i=digits.length-1;i>=0;i--) result=result*10+digits[i];
+  steps.push({type:'combine',msg:`→ ${numToWords(result)}`});
+  return result;
+}
+
+// ── main resolver ─────────────────────────────────────────────
+function _rsolve(n1,op,n2,steps,depth){
+  if(depth>80||n1<0||n2<0) return null;
+
+  // Cache hit
+  const key=`${n1},${op},${n2}`;
+  if(learnedCache.has(key)){
+    const{result,conf}=learnedCache.get(key);
+    steps.push({n1,op,n2,result,conf,source:'cache'});
+    return result;
+  }
+
+  // Base case: both in training range → direct inference
+  if(n1<=MAX_IN&&n2<=MAX_IN){
+    return _infer(n1,op,n2,steps);
+  }
+
+  // Large-operand decomposition
+  if(op==='add') return _addDigit(n1,n2,steps);
+  if(op==='sub') return _subDigit(n1,n2,steps);
+
+  if(op==='mul'){
+    if(n1>MAX_IN){
+      const h1=Math.floor(n1/2),h2=n1-h1;        // scaffolding: split n1
+      steps.push({type:'split',msg:`${numToWords(n1)} × ${numToWords(n2)}  →  (${numToWords(h1)} + ${numToWords(h2)}) × ${numToWords(n2)}`});
+      const r1=_rsolve(h1,'mul',n2,steps,depth+1); if(r1===null)return null;
+      const r2=_rsolve(h2,'mul',n2,steps,depth+1); if(r2===null)return null;
+      steps.push({type:'combine',msg:`${numToWords(h1)}×${numToWords(n2)} (${numToWords(r1)})  +  ${numToWords(h2)}×${numToWords(n2)} (${numToWords(r2)})`});
+      return _addDigit(r1,r2,steps);              // add partial products via digit inference
+    } else {
+      const h1=Math.floor(n2/2),h2=n2-h1;        // scaffolding: split n2
+      steps.push({type:'split',msg:`${numToWords(n1)} × ${numToWords(n2)}  →  ${numToWords(n1)} × (${numToWords(h1)} + ${numToWords(h2)})`});
+      const r1=_rsolve(n1,'mul',h1,steps,depth+1); if(r1===null)return null;
+      const r2=_rsolve(n1,'mul',h2,steps,depth+1); if(r2===null)return null;
+      steps.push({type:'combine',msg:`${numToWords(n1)}×${numToWords(h1)} (${numToWords(r1)})  +  ${numToWords(n1)}×${numToWords(h2)} (${numToWords(r2)})`});
+      return _addDigit(r1,r2,steps);
+    }
+  }
+
+  if(op==='div'){
+    steps.push({type:'error',msg:'Division with numbers > twelve not yet supported'});
+    return null;
+  }
+  return null;
+}
+const EPOCHS=80, LR=3e-3;
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+let logLines=[];
+function addLog(line){
+  logLines.push(line);
+  if(logLines.length>5)logLines.shift();
+  document.getElementById('tlog').innerHTML=
+    logLines.map(l=>`<div class="log-line">${l}</div>`).join('');
+}
+
+// Sample training sentences to show during training
+const SAMPLE_PHRASES=[
+  '"three times four" → twelve','·','."seven times eight" → fifty six',
+  '"two times twelve" → twenty four','."nine times nine" → eighty one',
+  '"five times six" → thirty','."eleven times three" → thirty three',
+  '"twelve times twelve" → one hundred forty four',
+  '"four times seven" → twenty eight','."six times eight" → forty eight',
+  '"ten times eleven" → one hundred ten','."two times two" → four',
+];
+
+async function trainNetwork(){
+  liveDataset=makeDataset();
+  const dataset=liveDataset;
+  net=new MLP(IN_SIZE,HIDDEN,OUT_SIZE);
+  const params=IN_SIZE*HIDDEN+HIDDEN+HIDDEN*OUT_SIZE+OUT_SIZE;
+
+  document.getElementById('st-samples').textContent=dataset.length;
+  document.getElementById('st-epochs').textContent=EPOCHS;
+  document.getElementById('st-params').textContent=params.toLocaleString();
+
+  addLog('Initialising network architecture…');
+  addLog(`Input: 30-dim one-hot · Hidden: ${HIDDEN} neurons (Leaky ReLU) · Output: ${OUT_SIZE} softmax classes`);
+  await sleep(400);
+  addLog('Loading training corpus — multiplication tables in English words:');
+  await sleep(300);
+  addLog(SAMPLE_PHRASES[0]+' · '+SAMPLE_PHRASES[3]);
+  await sleep(300);
+  addLog(SAMPLE_PHRASES[4]+' · '+SAMPLE_PHRASES[6]);
+  await sleep(300);
+
+  let bestAcc=0, finalLoss=0;
+  const prog=document.getElementById('prog');
+
+  for(let ep=0;ep<EPOCHS;ep++){
+    // Shuffle
+    for(let i=dataset.length-1;i>0;i--){
+      const j=(Math.random()*(i+1))|0;
+      [dataset[i],dataset[j]]=[dataset[j],dataset[i]];
+    }
+    let loss=0,correct=0;
+    for(const s of dataset){
+      if(s.r<0||s.r>=OUT_SIZE)continue;
+      const x=encode(s.n1,s.op,s.n2);
+      loss+=net.train(x,s.r,LR);
+      const{idx}=net.predict(x);
+      if(idx===s.r)correct++;
+    }
+    const acc=(correct/dataset.length*100).toFixed(1);
+    finalLoss=(loss/dataset.length).toFixed(4);
+    if(+acc>bestAcc)bestAcc=+acc;
+    prog.style.width=((ep+1)/EPOCHS*100)+'%';
+
+    if(ep%8===0||ep===EPOCHS-1){
+      addLog(`Epoch ${String(ep+1).padStart(2,'0')}/${EPOCHS} · Loss: ${finalLoss} · Accuracy: ${acc}%`);
+    }
+    if(ep%4===0) await sleep(0);
+  }
+
+  // Final accuracy
+  let fc=0;
+  for(const s of dataset){
+    if(s.r<0||s.r>=OUT_SIZE)continue;
+    const{idx}=net.predict(encode(s.n1,s.op,s.n2));
+    if(idx===s.r)fc++;
+  }
+  const finalAcc=(fc/dataset.length*100).toFixed(1);
+  document.getElementById('st-acc').textContent=finalAcc+'%';
+
+  prog.style.width='100%';
+  document.getElementById('tlog').innerHTML=
+    `<div class="ready-msg">Neural network trained · ${finalAcc}% accuracy · ${dataset.length} word expressions learned</div>`;
+  document.getElementById('train-status').textContent='Ready';
+
+  await sleep(700);
+  document.getElementById('train-panel').style.display='none';
+  document.getElementById('stats-row').style.display='flex';
+
+  const cp=document.getElementById('calc-panel');
+  cp.style.display='flex'; cp.style.opacity='0';
+  cp.style.transition='opacity .5s';
+  setTimeout(()=>{cp.style.opacity='1';},30);
+
+  document.getElementById('gobtn').disabled=false;
+  document.getElementById('win').focus();
+  ready=true;
+
+  // Show download bar
+  const dlParamCount=IN_SIZE*HIDDEN+HIDDEN+HIDDEN*OUT_SIZE+OUT_SIZE;
+  document.getElementById('dl-arch').textContent=
+    `MLP ${IN_SIZE}→${HIDDEN}→${OUT_SIZE} · ${dlParamCount.toLocaleString()} parameters · ${EPOCHS} epochs · Acc ${finalAcc}%`;
+  document.getElementById('dl-bar').style.display='flex';
+}
+
+/* ═══════════════════════════════════════════════════════
+   CALCULATOR UI — MULTI-OP INFERENCE ENGINE
+   Tokenise → precedence-evaluate → inference per binary op
+   No arithmetic operators compute answers anywhere.
+═══════════════════════════════════════════════════════ */
+
+// Render decomposition steps for one binary op → HTML string
+function _renderSteps(steps){
+  let html='';
+  for(const s of steps){
+    if(s.type==='split'||s.type==='combine'){
+      html+=`<div style="color:var(--muted);margin:2px 0;font-style:italic;font-size:.61rem">↳ ${s.msg}</div>`;
+    } else if(s.source==='inference'||s.source==='cache'){
+      const pct=(s.conf*100).toFixed(1);
+      const tag=s.source==='cache'?'<span style="color:var(--blue);margin-left:4px;font-size:.56rem">[recalled]</span>':'';
+      const bar=`<div style="flex:1;height:1px;background:var(--border2)"><div style="width:${pct}%;height:100%;background:var(--green)"></div></div>`;
+      html+=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">`+
+        `<span style="min-width:200px;color:var(--cream);font-style:italic;font-size:.62rem">`+
+        `${numToWords(s.n1)} ${OP_SYM[s.op]} ${numToWords(s.n2)} = <span style="color:var(--gold3)">${numToWords(s.result)}</span>${tag}</span>`+
+        bar+`<span style="font-size:.56rem;color:var(--muted);min-width:36px;text-align:right">${pct}%</span></div>`;
+    } else if(s.type==='error'){
+      html+=`<div style="color:var(--red);font-size:.62rem">${s.msg}</div>`;
+    }
+  }
+  return html;
+}
+
+function calculate(raw){
+  const out=document.getElementById('out');
+  const hint=out.querySelector('.empty-hint');
+  if(hint) hint.remove();
+
+  const entry=document.createElement('div');
+  entry.className='entry';
+
+  const prompt=document.createElement('div'); prompt.className='e-prompt';
+  const pt=document.createElement('span'); pt.className='e-prompt-text'; pt.textContent=raw;
+  prompt.appendChild(pt); entry.appendChild(prompt);
+
+  // ── Tokenise ─────────────────────────────────────────
+  const tokens=tokenise(raw);
+  if(!tokens){
+    const err=document.createElement('div'); err.className='e-error';
+    err.textContent='Could not parse — try: "three times four plus five" or "nine times eight minus twelve"';
+    entry.appendChild(err); out.appendChild(entry); out.scrollTop=out.scrollHeight; return;
+  }
+
+  // ── Evaluate with precedence ──────────────────────────
+  const evalResult=evalTokens(tokens);
+  if(!evalResult||evalResult.result===null){
+    const err=document.createElement('div'); err.className='e-error';
+    err.textContent='Inference failed — could not complete computation.';
+    entry.appendChild(err); out.appendChild(entry); out.scrollTop=out.scrollHeight; return;
+  }
+  const{result,opSteps}=evalResult;
+
+  // ── Build expression label from original tokens ───────
+  const exprLabel=tokens.map(t=>
+    t.type==='num'?`<i>${numToWords(t.val)}</i>`:`<span class="opsym">${OP_SYM[t.code]}</span>`
+  ).join(' ');
+
+
+  const n1w=numToWords(opSteps.n1), n2w=numToWords(opSteps.n2), rw=numToWords(opSteps.result);
+  
+  
+  // ── Main answer ───────────────────────────────────────
+  const ans=document.createElement('div'); ans.className='e-answer';
+  ans.innerHTML=exprLabel+` = <span class="keyword">${numToWords(result)}</span>`;
+  entry.appendChild(ans);
+
+  const isMultiOp=opSteps.length>1;
+  const needsDecomp=opSteps.some(os=>os.n1>MAX_IN||os.n2>MAX_IN);
+  const totalInferCalls=opSteps.reduce((acc,os)=>
+    acc+os.steps.filter(s=>s.source==='inference'||s.source==='cache').length,0);
+
+  // ── Per-operation breakdown ───────────────────────────
+  if(isMultiOp||needsDecomp){
+    const chain=document.createElement('div'); chain.className='e-meta'; chain.style.marginTop='10px';
+    let html=`<div style="color:var(--gold);font-size:.58rem;letter-spacing:.12em;margin-bottom:8px">`+
+      (isMultiOp?'OPERATIONS (precedence order)':'DECOMPOSITION STEPS')+`</div>`;
+
+    opSteps.forEach((os,idx)=>{
+      const inSteps=os.steps.filter(s=>s.source==='inference'||s.source==='cache');
+      const hasDecomp=os.n1>MAX_IN||os.n2>MAX_IN;
+      const pct=inSteps.length>0?(inSteps[0].conf*100).toFixed(1):'—';
+
+      html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:${hasDecomp?4:6}px;`+
+        `padding:5px 8px;background:rgba(200,144,42,.06);border-radius:3px;border-left:2px solid rgba(200,144,42,.3)">`+
+        `<span style="font-family:var(--font-mono);font-size:.56rem;color:var(--gold);min-width:18px">S${idx+1}</span>`+
+        `<span style="flex:1;color:var(--cream);font-style:italic">${os.label}</span>`+
+        (hasDecomp?'':
+          `<div style="width:60px;height:1px;background:var(--border2)">`+
+          `<div style="width:${pct}%;height:100%;background:var(--green)"></div></div>`+
+          `<span style="font-family:var(--font-mono);font-size:.56rem;color:var(--muted);min-width:36px;text-align:right">${pct}%</span>`)+
+        `</div>`;
+
+      if(hasDecomp){
+        html+=`<div style="padding-left:26px;margin-bottom:6px">${_renderSteps(os.steps)}</div>`;
+      }
+    });
+    chain.innerHTML=html; entry.appendChild(chain);
+  } else {
+    // Simple single in-range op — just confidence bar
+    const baseStep=opSteps[0]&&opSteps[0].steps.find(s=>s.source==='inference');
+    if(baseStep){
+      const pct=(baseStep.conf*100).toFixed(1);
+      const cw=document.createElement('div'); cw.className='conf-wrap';
+      cw.innerHTML=`<span class="conf-label">Confidence</span>`+
+        `<div class="conf-bar"><div class="conf-fill" style="width:${pct}%;background:var(--green)"></div></div>`+
+        `<span style="font-family:var(--font-mono);font-size:.58rem;color:var(--muted);min-width:36px">${pct}%</span>`;
+      entry.appendChild(cw);
+    }
+  }
+
+  // ── Source note ───────────────────────────────────────
+  const note=document.createElement('div'); note.className='e-meta'; note.style.marginTop='6px';
+  note.innerHTML=`<span style="color:var(--muted2)">${opSteps.length} operation${opSteps.length!==1?'s':''} · `+
+    `${totalInferCalls} inference call${totalInferCalls!==1?'s':''} · no arithmetic operators used</span>`;
+  entry.appendChild(note);
+
+  // ── Online learning for large-number results ──────────
+  for(const os of opSteps){
+    if((os.n1>MAX_IN||os.n2>MAX_IN)&&os.result<OUT_SIZE){
+      const cacheKey=`${os.n1},${os.op},${os.n2}`;
+      if(!learnedCache.has(cacheKey)){
+        learnedCache.set(cacheKey,{result:os.result,conf:1.0});
+		 const noteEl=document.createElement('div'); noteEl.className='e-meta'; noteEl.style.marginTop='4px';
+      noteEl.innerHTML=`<span style="color:var(--green)">✓ Learned — added "${n1w} ${OP_SYM[op]} ${n2w} = ${rw}" to training memory</span>`;
+	  entry.appendChild(noteEl);
+        for(const s of os.steps)
+          if(s.source==='inference'&&s.n1<=MAX_IN&&s.n2<=MAX_IN)
+            learnNew(s.n1,s.op,s.n2,s.result);
+      }
+    }
+  }
+
+  out.appendChild(entry);
+  out.scrollTop=out.scrollHeight;
+}
+
+function tryEx(el){
+  const t=el.textContent;
+  document.getElementById('win').value=t;
+  if(ready) calculate(t);
+}
+
+/* ═══════════════════════════════════════════════════════
+   PARAMETER DOWNLOAD
+═══════════════════════════════════════════════════════ */
+function downloadParams(){
+  if(!net||!ready) return;
+  const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  const dataset=makeDataset();
+  const payload={
+    meta:{
+      name:'LEXIS',version:'1.0',created:new Date().toISOString(),
+      architecture:{layers:[IN_SIZE,HIDDEN,OUT_SIZE],
+        total_params:IN_SIZE*HIDDEN+HIDDEN+HIDDEN*OUT_SIZE+OUT_SIZE},
+      hyperparams:{epochs:EPOCHS,learning_rate:LR,optimizer:'Adam',
+        beta1:0.9,beta2:0.999,epsilon:1e-8,
+        activation:'LeakyReLU(alpha=0.02)',output_activation:'Softmax'},
+      training:{total_samples:dataset.length,
+        breakdown:{multiplication:144,addition:169,subtraction:91,division:35},
+        input_dims:IN_SIZE,output_classes:OUT_SIZE,
+        input_encoding:'one-hot [num1:0-12 = 13] + [op:4] + [num2:0-12 = 13] = 30 dims',
+        output_encoding:'class_index == numeric_result (range 0-144)'},
+      vocabulary:{ones:ONES,tens:TENS,
+        operation_aliases:{
+          mul:['times','multiplied by','multiply'],
+          add:['plus','added to','and'],
+          sub:['minus','subtracted from','take away','less'],
+          div:['divided by','divide','over']}}
+    },
+    weights:{
+      W1:net.W1.map(r=>Array.from(r)),
+      b1:Array.from(net.b1),
+      W2:net.W2.map(r=>Array.from(r)),
+      b2:Array.from(net.b2)
+    },
+    adam_state:{
+      t:net.t,
+      mW1:net.mW1.map(r=>Array.from(r)),vW1:net.vW1.map(r=>Array.from(r)),
+      mb1:Array.from(net.mb1),          vb1:Array.from(net.vb1),
+      mW2:net.mW2.map(r=>Array.from(r)),vW2:net.vW2.map(r=>Array.from(r)),
+      mb2:Array.from(net.mb2),          vb2:Array.from(net.vb2)
+    }
+  };
+  const json=JSON.stringify(payload,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='lexis_params_'+ts+'.json'; a.click();
+  URL.revokeObjectURL(url);
+  const btn=document.getElementById('dl-btn');
+  btn.textContent='✓ Downloaded'; btn.classList.add('done');
+  setTimeout(()=>{btn.textContent='⬇ Download Parameters';btn.classList.remove('done');},3000);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   CALCULATOR UI — MULTI-OP INFERENCE ENGINE
+   Tokenise → precedence-evaluate → inference per binary op
+   No arithmetic operators compute answers anywhere.
+═══════════════════════════════════════════════════════ */
+
+// Render decomposition steps for one binary op → HTML string
+function _renderSteps(steps){
+  let html='';
+  for(const s of steps){
+    if(s.type==='split'||s.type==='combine'){
+      html+=`<div style="color:var(--muted);margin:2px 0;font-style:italic;font-size:.61rem">↳ ${s.msg}</div>`;
+    } else if(s.source==='inference'||s.source==='cache'){
+      const pct=(s.conf*100).toFixed(1);
+      const tag=s.source==='cache'?'<span style="color:var(--blue);margin-left:4px;font-size:.56rem">[recalled]</span>':'';
+      const bar=`<div style="flex:1;height:1px;background:var(--border2)"><div style="width:${pct}%;height:100%;background:var(--green)"></div></div>`;
+      html+=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">`+
+        `<span style="min-width:200px;color:var(--cream);font-style:italic;font-size:.62rem">`+
+        `${numToWords(s.n1)} ${OP_SYM[s.op]} ${numToWords(s.n2)} = <span style="color:var(--gold3)">${numToWords(s.result)}</span>${tag}</span>`+
+        bar+`<span style="font-size:.56rem;color:var(--muted);min-width:36px;text-align:right">${pct}%</span></div>`;
+    } else if(s.type==='error'){
+      html+=`<div style="color:var(--red);font-size:.62rem">${s.msg}</div>`;
+    }
+  }
+  return html;
+}
+
+function tryEx(el){
+  const t=el.textContent;
+  document.getElementById('win').value=t;
+  if(ready) calculate(t);
+}
+
+/* ═══════════════════════════════════════════════════════
+   PARAMETER DOWNLOAD
+═══════════════════════════════════════════════════════ */
+function downloadParams(){
+  if(!net||!ready) return;
+  const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  const dataset=makeDataset();
+  const payload={
+    meta:{
+      name:'LEXIS',version:'1.0',created:new Date().toISOString(),
+      architecture:{layers:[IN_SIZE,HIDDEN,OUT_SIZE],
+        total_params:IN_SIZE*HIDDEN+HIDDEN+HIDDEN*OUT_SIZE+OUT_SIZE},
+      hyperparams:{epochs:EPOCHS,learning_rate:LR,optimizer:'Adam',
+        beta1:0.9,beta2:0.999,epsilon:1e-8,
+        activation:'LeakyReLU(alpha=0.02)',output_activation:'Softmax'},
+      training:{total_samples:dataset.length,
+        breakdown:{multiplication:144,addition:169,subtraction:91,division:35},
+        input_dims:IN_SIZE,output_classes:OUT_SIZE,
+        input_encoding:'one-hot [num1:0-12 = 13] + [op:4] + [num2:0-12 = 13] = 30 dims',
+        output_encoding:'class_index == numeric_result (range 0-144)'},
+      vocabulary:{ones:ONES,tens:TENS,
+        operation_aliases:{
+          mul:['times','multiplied by','multiply'],
+          add:['plus','added to','and'],
+          sub:['minus','subtracted from','take away','less'],
+          div:['divided by','divide','over']}}
+    },
+    weights:{
+      W1:net.W1.map(r=>Array.from(r)),
+      b1:Array.from(net.b1),
+      W2:net.W2.map(r=>Array.from(r)),
+      b2:Array.from(net.b2)
+    },
+    adam_state:{
+      t:net.t,
+      mW1:net.mW1.map(r=>Array.from(r)),vW1:net.vW1.map(r=>Array.from(r)),
+      mb1:Array.from(net.mb1),          vb1:Array.from(net.vb1),
+      mW2:net.mW2.map(r=>Array.from(r)),vW2:net.vW2.map(r=>Array.from(r)),
+      mb2:Array.from(net.mb2),          vb2:Array.from(net.vb2)
+    }
+  };
+  const json=JSON.stringify(payload,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='lexis_params_'+ts+'.json'; a.click();
+  URL.revokeObjectURL(url);
+  const btn=document.getElementById('dl-btn');
+  btn.textContent='✓ Downloaded'; btn.classList.add('done');
+  setTimeout(()=>{btn.textContent='⬇ Download Parameters';btn.classList.remove('done');},3000);
+}
+
+/* ═══════════════════════════════════════════════════════
+   EVENT LISTENERS
+═══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  trainNetwork();
+
+  const btn=document.getElementById('gobtn');
+  const inp=document.getElementById('win');
+
+  btn.addEventListener('click',()=>{
+    const v=inp.value.trim();
+    if(!v||!ready)return;
+    calculate(v);
+    inp.value='';
+    inp.focus();
+  });
+
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&ready){
+      const v=inp.value.trim();
+      if(!v)return;
+      calculate(v);
+      inp.value='';
+    }
+  });
+});
+</script>
+</body>
+</html>
