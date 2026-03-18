@@ -973,7 +973,7 @@ function calculate(raw){
       if(!learnedCache.has(cacheKey)){
         learnedCache.set(cacheKey,{result:os.result,conf:1.0});
 		 const noteEl=document.createElement('div'); noteEl.className='e-meta'; noteEl.style.marginTop='4px';
-      noteEl.innerHTML=`<span style="color:var(--green)">✓ Learned — added "${n1w} ${OP_SYM[op]} ${n2w} = ${rw}" to training memory</span>`;
+      noteEl.innerHTML=`<span style="color:var(--green)">✓ Learned — added "${raw}" to training memory</span>`;
 	  entry.appendChild(noteEl);
         for(const s of os.steps)
           if(s.source==='inference'&&s.n1<=MAX_IN&&s.n2<=MAX_IN)
