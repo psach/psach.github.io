@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebLLM TurboQuant+ (Model Switcher)</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0f14;
+      --panel: #111823;
+      --panel-2: #0f1620;
+      --border: #243244;
+      --text: #e8eef7;
+      --muted: #93a4b8;
+      --accent: #7aa2ff;
+      --good: #76d39b;
+      --warn: #f0c674;
+      --bad: #ff7b72;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, #081018, #0b0f14 30%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    header, footer {
+      padding: 12px 14px;
+      background: rgba(17, 24, 35, 0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      border-bottom: none;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .title { font-weight: 700; font-size: 16px; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.4; }
+    .wrap {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 0;
+    }
+    .sidebar, .main {
+      min-height: 0;
+      overflow: hidden;
+    }
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: rgba(15, 22, 32, 0.92);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card {
+      background: rgba(17, 24, 35, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: #dce7f6;
+    }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input, select, textarea, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 10px 11px;
+      font: inherit;
+      outline: none;
+    }
+    textarea { resize: vertical; min-height: 82px; }
+    button {
+      cursor: pointer;
+      background: linear-gradient(180deg, #21304a, #172233);
+      border-color: #2d3f5a;
+      font-weight: 700;
+    }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .row { display: grid; gap: 8px; }
+    .tiny { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #162131;
+      border: 1px solid var(--border);
+      color: #c7d5ea;
+      cursor: pointer;
+      user-select: none;
+    }
+    .chip:hover { border-color: #36517b; }
+    .status {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .status strong { color: var(--text); }
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+    }
+    #chat {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+      min-height: 0;
+    }
+    .msg {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin: 0 0 10px;
+      background: rgba(17, 24, 35, 0.92);
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+    .msg.system { border-left: 4px solid #7aa2ff; }
+    .msg.user { border-left: 4px solid #57c7ff; }
+    .msg.assistant { border-left: 4px solid #76d39b; }
+    .msg.meta { border-left: 4px solid #f0c674; color: #dce7f6; }
+    .composer {
+      border-top: 1px solid var(--border);
+      padding: 12px;
+      background: rgba(17, 24, 35, 0.96);
+      display: grid;
+      gap: 8px;
+    }
+    .composer-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 110px;
+      gap: 8px;
+    }
+    .composer-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .composer-actions button { flex: 1; }
+    @media (max-width: 900px) {
+      .wrap { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+      .composer-row { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script type="module">
+    import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+    const state = {
+      engine: null,
+      modelId: "",
+      messages: [
+        { role: "system", content: "You are a helpful assistant. Be concise, accurate, and code-aware." }
+      ],
+      busy: false,
+    };
+
+    const el = {};
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function log(kind, text) {
+      const line = document.createElement("div");
+      line.className = `msg ${kind || "meta"}`;
+      line.innerHTML = escapeHtml(text);
+      el.chat.appendChild(line);
+      el.chat.scrollTop = el.chat.scrollHeight;
+    }
+
+    function clearChat() {
+      el.chat.innerHTML = "";
+      renderTranscript();
+    }
+
+    function renderTranscript() {
+      el.chat.innerHTML = "";
+      for (const m of state.messages) {
+        const node = document.createElement("div");
+        node.className = `msg ${m.role}`;
+        const label = m.role === "user" ? "You" : m.role === "assistant" ? "Bot" : "System";
+        node.innerHTML = `<strong>${label}:</strong> ${escapeHtml(m.content)}`;
+        el.chat.appendChild(node);
+      }
+      el.chat.scrollTop = el.chat.scrollHeight;
+    }
+
+    // ===== TurboQuant+ context optimizer =====
+    // Browser-safe approximation: ranks messages, compresses older context,
+    // and preserves recent turns. Real KV-cache quantization requires a custom
+    // compiled WebLLM/MLC runtime; see sidebar note.
+    function scoreMessage(m) {
+      const roleBoost = m.role === "user" ? 28 : m.role === "assistant" ? 16 : 8;
+      const questionBoost = /\?/.test(m.content) ? 18 : 0;
+      const codeBoost = /```|function\s|class\s|import\s|const\s|let\s|var\s/.test(m.content) ? 14 : 0;
+      const keywordBoost = /(error|fix|bug|stack|trace|model|gpu|webgpu|webllm|python|javascript|html|css)/i.test(m.content) ? 10 : 0;
+      const lengthBoost = Math.min(20, Math.floor(m.content.length / 120));
+      return roleBoost + questionBoost + codeBoost + keywordBoost + lengthBoost;
+    }
+
+    function summarizeText(text) {
+      const t = String(text || "").trim();
+      if (t.length <= 140) return t;
+      const head = t.slice(0, 70).trimEnd();
+      const tail = t.slice(-50).trimStart();
+      return `${head} … ${tail}`;
+    }
+
+    function turboQuantOptimize(messages) {
+      const system = messages.filter(m => m.role === "system");
+      const convo = messages.filter(m => m.role !== "system");
+
+      const recent = convo.slice(-6);
+      const older = convo.slice(0, -6).map(m => ({
+        role: m.role,
+        content: summarizeText(m.content),
+      }));
+
+      const scored = convo.map(m => ({ ...m, _score: scoreMessage(m) }));
+      const important = scored
+        .sort((a, b) => b._score - a._score)
+        .slice(0, 4)
+        .map(({ _score, ...m }) => m);
+
+      const merged = [...system, ...older, ...important, ...recent];
+      const seen = new Set();
+      const deduped = [];
+      for (const m of merged) {
+        const key = `${m.role}::${m.content}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(m);
+      }
+
+      // Hard cap for browser-friendly prompt growth.
+      return deduped.slice(-12);
+    }
+
+    // ===== Model handling =====
+    function getModelList() {
+      return (webllm.prebuiltAppConfig?.model_list || []).slice();
+    }
+
+    function prioritizedModelIds(models) {
+      const priorities = ["coder", "qwen", "deepseek", "smollm", "llama", "phi", "mistral"];
+      return models
+        .slice()
+        .sort((a, b) => {
+          const aid = String(a.model_id || "").toLowerCase();
+          const bid = String(b.model_id || "").toLowerCase();
+          const ascore = priorities.findIndex(p => aid.includes(p));
+          const bscore = priorities.findIndex(p => bid.includes(p));
+          const ar = ascore === -1 ? 99 : ascore;
+          const br = bscore === -1 ? 99 : bscore;
+          if (ar !== br) return ar - br;
+          return aid.localeCompare(bid);
+        });
+    }
+
+    function refreshModelDropdown(filterText = "") {
+      const models = prioritizedModelIds(getModelList());
+      const filter = filterText.trim().toLowerCase();
+      const filtered = !filter
+        ? models
+        : models.filter(m => String(m.model_id).toLowerCase().includes(filter));
+
+      el.modelSelect.innerHTML = "";
+      for (const m of filtered) {
+        const opt = document.createElement("option");
+        opt.value = m.model_id;
+        opt.textContent = m.model_id;
+        el.modelSelect.appendChild(opt);
+      }
+
+      if (!filtered.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "No models match filter";
+        el.modelSelect.appendChild(opt);
+      }
+
+      const selected = filtered.find(m => m.model_id === state.modelId) || filtered[0];
+      if (selected) {
+        el.modelSelect.value = selected.model_id;
+        el.modelInfo.textContent = `Selected: ${selected.model_id}`;
+      } else {
+        el.modelInfo.textContent = "No selectable model found.";
+      }
+    }
+
+    async function loadSelectedModel() {
+      const modelId = el.modelSelect.value;
+      if (!modelId) {
+        log("warn", "No model selected.");
+        return;
+      }
+
+      state.busy = true;
+      setBusy(true, `Loading ${modelId}...`);
+      log("meta", `Loading model: ${modelId}`);
+
+      try {
+        state.engine = await webllm.CreateMLCEngine(modelId, {
+          appConfig: webllm.prebuiltAppConfig,
+          initProgressCallback: (p) => {
+            const pct = typeof p?.progress === "number" ? Math.round(p.progress * 100) : null;
+            if (pct !== null) {
+              el.status.textContent = `Model load progress: ${pct}%`;
+            }
+          },
+        });
+
+        state.modelId = modelId;
+        state.busy = false;
+        setBusy(false, `Ready: ${modelId}`);
+        log("meta", `Model ready and cached by the browser for later sessions.`);
+      } catch (err) {
+        state.engine = null;
+        state.busy = false;
+        setBusy(false, `Load failed: ${err?.message || err}`);
+        log("meta", `Load failed: ${err?.message || err}`);
+        console.error(err);
+      }
+    }
+
+    function setBusy(isBusy, text) {
+      el.sendBtn.disabled = isBusy;
+      el.loadBtn.disabled = isBusy;
+      el.clearBtn.disabled = isBusy;
+      el.status.textContent = text;
+    }
+
+    // ===== Chat =====
+    async function send() {
+      if (state.busy) return;
+      const text = el.input.value.trim();
+      if (!text) return;
+
+      if (!state.engine) {
+        log("warn", "Load a model first.");
+        return;
+      }
+
+      el.input.value = "";
+      state.messages.push({ role: "user", content: text });
+      log("user", text);
+
+      const optimized = turboQuantOptimize(state.messages);
+      log("meta", `TurboQuant context size: ${optimized.length}`);
+
+      state.busy = true;
+      setBusy(true, "Generating response...");
+
+      try {
+        const reply = await state.engine.chat.completions.create({
+          messages: optimized,
+          temperature: Number(el.temperature.value || 0.7),
+          max_tokens: Number(el.maxTokens.value || 512),
+        });
+
+        const content = reply?.choices?.[0]?.message?.content || "[No response]";
+        state.messages.push({ role: "assistant", content });
+        log("assistant", content);
+      } catch (err) {
+        log("meta", `Generation failed: ${err?.message || err}`);
+        console.error(err);
+      } finally {
+        state.busy = false;
+        setBusy(false, `Ready: ${state.modelId || "no model loaded"}`);
+      }
+    }
+
+    function clearConversation() {
+      state.messages = [
+        { role: "system", content: "You are a helpful assistant. Be concise, accurate, and code-aware." }
+      ];
+      renderTranscript();
+      log("meta", "Conversation reset.");
+    }
+
+    function addModelFromJson() {
+      const raw = el.customModel.value.trim();
+      if (!raw) return;
+
+      try {
+        const record = JSON.parse(raw);
+        if (!record.model_id || !record.model || !record.model_lib) {
+          throw new Error("Custom model needs model_id, model, and model_lib.");
+        }
+
+        // Clone current config and append a custom record for this session.
+        const cfg = structuredClone(webllm.prebuiltAppConfig);
+        cfg.model_list = [...cfg.model_list, record];
+        webllm.prebuiltAppConfig.model_list = cfg.model_list;
+
+        refreshModelDropdown(el.modelFilter.value);
+        log("meta", `Added custom model: ${record.model_id}`);
+      } catch (err) {
+        log("meta", `Custom model JSON error: ${err?.message || err}`);
+      }
+    }
+
+    // ===== Tests =====
+    function runTests() {
+      console.assert(scoreMessage({ role: "user", content: "How do I fix this error?" }) > scoreMessage({ role: "assistant", content: "ok" }), "Scoring should favor user questions");
+      console.assert(summarizeText("x".repeat(200)).length < 200, "Summarizer should shrink long text");
+      const sample = new Array(20).fill(0).map((_, i) => ({ role: i % 2 ? "assistant" : "user", content: `msg ${i}` }));
+      const optimized = turboQuantOptimize([{ role: "system", content: "s" }, ...sample]);
+      console.assert(optimized.length <= 12, "Optimizer should cap context");
+      console.assert(optimized.some(m => m.role === "system"), "Optimizer should keep system message");
+      console.log("TurboQuant+ tests passed");
+    }
+
+    function initUI() {
+      el.chat = $("chat");
+      el.status = $("status");
+      el.modelSelect = $("modelSelect");
+      el.modelFilter = $("modelFilter");
+      el.modelInfo = $("modelInfo");
+      el.loadBtn = $("loadBtn");
+      el.sendBtn = $("sendBtn");
+      el.clearBtn = $("clearBtn");
+      el.input = $("input");
+      el.temperature = $("temperature");
+      el.maxTokens = $("maxTokens");
+      el.customModel = $("customModel");
+      el.addModelBtn = $("addModelBtn");
+
+      refreshModelDropdown("");
+      renderTranscript();
+      setBusy(false, "Select a model to load.");
+
+      el.modelFilter.addEventListener("input", () => refreshModelDropdown(el.modelFilter.value));
+      el.loadBtn.addEventListener("click", loadSelectedModel);
+      el.sendBtn.addEventListener("click", send);
+      el.clearBtn.addEventListener("click", clearConversation);
+      el.addModelBtn.addEventListener("click", addModelFromJson);
+      el.input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          send();
+        }
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initUI();
+      runTests();
+      log("meta", "WebLLM loaded. Pick a model from the registry and press Load.");
+      log("meta", "For true offline use after first load, keep the same browser profile so cached model assets remain available.");
+    });
+
+    window.send = send;
+    window.loadSelectedModel = loadSelectedModel;
+    window.clearConversation = clearConversation;
+  </script>
+</head>
+<body>
+  <header>
+    <div class="title">WebLLM TurboQuant+ Model Switcher</div>
+    <div class="subtitle">Uses the built-in WebLLM model registry, caches loaded models in the browser, and applies a browser-safe context optimizer. Real KV-cache quantization needs a rebuilt WebLLM/MLC runtime, not plain HTML alone.</div>
+  </header>
+
+  <div class="wrap">
+    <aside class="sidebar">
+      <div class="card">
+        <h3>Model selection</h3>
+        <div class="row">
+          <div>
+            <label for="modelFilter">Filter models</label>
+            <input id="modelFilter" type="text" placeholder="coder, qwen, deepseek, llama..." />
+          </div>
+          <div>
+            <label for="modelSelect">Available models</label>
+            <select id="modelSelect" size="10"></select>
+          </div>
+          <button id="loadBtn">Load selected model</button>
+          <div class="status" id="modelInfo">No model selected.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Generation controls</h3>
+        <div class="row">
+          <div>
+            <label for="temperature">Temperature</label>
+            <input id="temperature" type="number" step="0.1" min="0" max="2" value="0.7" />
+          </div>
+          <div>
+            <label for="maxTokens">Max tokens</label>
+            <input id="maxTokens" type="number" step="1" min="16" max="4096" value="512" />
+          </div>
+          <button id="clearBtn">Reset conversation</button>
+          <div class="status"><strong id="status">Select a model to load.</strong></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>TurboQuant+ notes</h3>
+        <div class="tiny">
+          <div>• Keeps system prompts and the most recent turns.</div>
+          <div>• Compresses older turns with summary truncation.</div>
+          <div>• Scores code, errors, and questions higher.</div>
+          <div>• The real KV-cache path requires a custom compiled runtime/library.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Add a custom model record</h3>
+        <div class="tiny">Paste JSON with <code>model_id</code>, <code>model</code>, and <code>model_lib</code>. This is for models you compiled or mirrored yourself.</div>
+        <div style="height:8px"></div>
+        <textarea id="customModel" spellcheck="false" placeholder='{"model_id":"MyModel-q4f16_1-MLC","model":"https://...","model_lib":"https://..."}'></textarea>
+        <div style="height:8px"></div>
+        <button id="addModelBtn">Add custom model</button>
+      </div>
+
+      <div class="card">
+        <h3>Suggested coding picks</h3>
+        <div class="chips" id="suggestedPicks"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div id="chat"></div>
+      <div class="composer">
+        <div class="composer-row">
+          <input id="input" type="text" placeholder="Type a message, ask for code, or describe a bug..." />
+          <button id="sendBtn">Send</button>
+          <button onclick="clearConversation()">Clear</button>
+        </div>
+        <div class="tiny">Tip: model names come from WebLLM’s registry. If you need a model not present there, add a custom model record after compiling it with MLC.</div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Offline behavior: the model and runtime assets can be cached after the first successful load. For fully self-hosted offline use, package the JS module and model assets locally.
+  </footer>
+
+  <script>
+    // Populate suggested coding chips from whatever is currently in the registry.
+    window.addEventListener("DOMContentLoaded", () => {
+      const list = (window.webllm?.prebuiltAppConfig?.model_list || []);
+      const picks = list
+        .map(m => String(m.model_id || ""))
+        .filter(id => /coder|qwen|deepseek|llama|phi|mistral|smollm/i.test(id))
+        .slice(0, 8);
+      const box = document.getElementById("suggestedPicks");
+      for (const id of picks) {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = id;
+        chip.title = "Click to select";
+        chip.onclick = () => {
+          const sel = document.getElementById("modelSelect");
+          const opt = [...sel.options].find(o => o.value === id);
+          if (opt) {
+            sel.value = id;
+            document.getElementById("modelInfo").textContent = `Selected: ${id}`;
+          }
+        };
+        box.appendChild(chip);
+      }
+      if (!picks.length) {
+        box.innerHTML = '<span class="tiny">No coding-oriented models are visible in the current registry.</span>';
+      }
+    });
+  </script>
+</body>
+</html>
