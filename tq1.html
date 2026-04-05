@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>WebLLM TurboQuant Chat (Fixed)</title>
+<style>
+body{font-family:Arial;background:#0b1020;color:#eee;margin:0}
+.container{display:flex;height:100vh}
+.sidebar{width:280px;padding:15px;background:#111830}
+.main{flex:1;display:flex;flex-direction:column}
+#chat{flex:1;overflow:auto;padding:10px}
+.msg{margin:6px;padding:8px;border-radius:8px}
+.user{background:#2a3}
+.assistant{background:#333}
+textarea{width:100%;height:80px}
+button{padding:8px;margin:4px}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="sidebar">
+<h3>Settings</h3>
+
+<label>Model</label>
+<select id="model">
+<option value="Llama-3.1-8B-Instruct-q4f32_1-MLC">Llama 8B</option>
+<option value="SmolLM-135M-Instruct-q4f32_1-MLC">SmolLM 135M</option>
+</select>
+
+<label>Mode</label>
+<select id="mode">
+<option value="none">none</option>
+<option value="turboquant">turboquant</option>
+</select>
+
+<label>Bits</label>
+<select id="bits">
+<option value="4">4</option>
+<option value="3">3</option>
+</select>
+
+<button id="load">Load Model</button>
+</div>
+
+<div class="main">
+<div id="chat"></div>
+
+<div>
+<textarea id="input"></textarea>
+<button id="send">Send</button>
+</div>
+</div>
+</div>
+
+<script type="module">
+import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+let engine=null;
+let systemPrompt="You are a helpful assistant.";
+let messages=[];
+
+const chatDiv=document.getElementById("chat");
+
+function render(){
+chatDiv.innerHTML="";
+messages.forEach(m=>{
+let d=document.createElement("div");
+d.className="msg "+m.role;
+d.textContent=m.content;
+chatDiv.appendChild(d);
+});
+chatDiv.scrollTop=chatDiv.scrollHeight;
+}
+
+document.getElementById("load").onclick=async()=>{
+const model=document.getElementById("model").value;
+const mode=document.getElementById("mode").value;
+const bits=Number(document.getElementById("bits").value);
+
+engine=await webllm.CreateMLCEngine(model,{},{
+kv_cache_compression:mode,
+kv_cache_quantization_bits:bits
+});
+
+if(mode==="turboquant" && engine.enableTurboQuant){
+engine.enableTurboQuant({bits});
+}
+
+alert("Model loaded");
+};
+
+document.getElementById("send").onclick=async()=>{
+const text=document.getElementById("input").value.trim();
+if(!text||!engine)return;
+
+messages.push({role:"user",content:text});
+render();
+
+const apiMessages=[
+{role:"system",content:systemPrompt},
+...messages
+];
+
+const assistantMsg={role:"assistant",content:""};
+messages.push(assistantMsg);
+render();
+
+let reply=await engine.chat.completions.create({
+messages:apiMessages
+});
+
+assistantMsg.content=reply.choices[0].message.content;
+render();
+
+document.getElementById("input").value="";
+};
+</script>
+</body>
+</html>
