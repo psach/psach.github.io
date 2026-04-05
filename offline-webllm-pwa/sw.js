@@ -1,12 +1,12 @@
 const CACHE = "webllm-offline-chat-v1";
 const APP_SHELL = [
-  "/",
-  "/index.html",
-  "/styles.css",
-  "/src/main.js",
-  "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
+  "/offline-webllm-pwa",
+  "index.html",
+  "styles.css",
+  "src/main.js",
+  "manifest.webmanifest",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
