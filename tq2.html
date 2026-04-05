@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebLLM TurboQuant Chat</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: rgba(17,24,48,.88);
+      --text: #e8ecff;
+      --muted: #9aa6d6;
+      --line: rgba(255,255,255,0.08);
+      --accent: #7c8cff;
+      --accent-2: #4fe3c1;
+      --shadow: 0 16px 50px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(124,140,255,.22), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(79,227,193,.10), transparent 22%),
+        linear-gradient(180deg, #070a14 0%, #0b1020 100%);
+      color: var(--text);
+      font-family: var(--sans);
+    }
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      min-height: 100vh;
+    }
+    .card {
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .sidebar {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 30px rgba(124,140,255,.35);
+      display: grid;
+      place-items: center;
+      color: #04101d;
+      font-weight: 800;
+    }
+    .brand h1 { margin: 0; font-size: 18px; }
+    .brand p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .section-title {
+      color: #cdd5ff;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin: 8px 0 2px;
+    }
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin: 0 0 6px;
+    }
+    input, select, textarea, button { font: inherit; }
+    input[type="text"], select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(8,12,25,.8);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: rgba(124,140,255,.5);
+      box-shadow: 0 0 0 3px rgba(124,140,255,.15);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(8,12,25,.75);
+    }
+    .toggle small { color: var(--muted); display:block; margin-top: 3px; }
+    .switch { position: relative; width: 50px; height: 28px; flex: 0 0 auto; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      transition: .2s ease;
+      border: 1px solid var(--line);
+    }
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      top: 2px;
+      border-radius: 50%;
+      background: white;
+      transition: .2s ease;
+    }
+    .switch input:checked + .slider { background: rgba(79,227,193,.28); }
+    .switch input:checked + .slider:before {
+      transform: translateX(22px);
+      background: #d6fff6;
+    }
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: #07111c;
+      font-weight: 700;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 12px 28px rgba(124,140,255,.24);
+    }
+    .btn.secondary {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .pill {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .pill strong { color: var(--text); font-weight: 700; }
+    .chat {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .chat-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .chat-header h2 { margin: 0; font-size: 18px; }
+    .chat-header .meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .chat-body {
+      overflow: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg {
+      max-width: min(800px, 92%);
+      padding: 14px 15px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.5;
+    }
+    .msg.user {
+      margin-left: auto;
+      background: rgba(124,140,255,.12);
+      border-color: rgba(124,140,255,.18);
+    }
+    .msg.assistant {
+      margin-right: auto;
+      background: rgba(255,255,255,.04);
+    }
+    .msg.system {
+      margin: 0 auto;
+      max-width: 100%;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255,255,255,.03);
+    }
+    .composer {
+      padding: 16px 18px 18px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      gap: 10px;
+    }
+    .composer textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .actions-left, .actions-right {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .status-line {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+      font-family: var(--mono);
+      white-space: pre-wrap;
+    }
+    .progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+    }
+    .progress > div {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width .2s ease;
+    }
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .log {
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: pre-wrap;
+      color: #d7ddff;
+      background: rgba(8,12,25,.6);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      min-height: 120px;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .kbd {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255,255,255,.04);
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { order: 2; }
+      .chat { order: 1; min-height: 70vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="card sidebar">
+      <div class="brand">
+        <div class="logo">TQ</div>
+        <div>
+          <h1>WebLLM TurboQuant</h1>
+          <p>Single-file chat UI</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Engine</div>
+        <label for="model">Model preset</label>
+        <select id="model">
+          <option value="SmolLM-135M-Instruct-q0f16-MLC">SmolLM-135M-Instruct-q0f16-MLC</option>
+          <option value="SmolLM-135M-Instruct-q4f16_1-MLC">SmolLM-135M-Instruct-q4f16_1-MLC</option>
+          <option value="SmolLM2-135M-Instruct-q4f16_1-MLC">SmolLM2-135M-Instruct-q4f16_1-MLC</option>
+          <option value="Llama-3.1-8B-Instruct-q4f32_1-MLC">Llama-3.1-8B-Instruct-q4f32_1-MLC</option>
+        </select>
+
+        <div style="height:10px"></div>
+
+        <label for="mode">Cache mode</label>
+        <select id="mode">
+          <option value="none">none</option>
+          <option value="turboquant">turboquant</option>
+        </select>
+
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <div>
+            <label for="bits">TurboQuant bits</label>
+            <select id="bits">
+              <option value="4" selected>4</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <div>
+            <label for="temp">Temperature</label>
+            <input id="temp" type="text" value="0.7" />
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle">
+        <div>
+          <div style="font-weight:700">Stream output</div>
+          <small>Uses WebLLM streaming completions</small>
+        </div>
+        <label class="switch" title="Streaming on">
+          <input id="stream" type="checkbox" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle">
+        <div>
+          <div style="font-weight:700">TurboQuant hook</div>
+          <small>Runtime hint until matching kernels exist</small>
+        </div>
+        <label class="switch" title="TurboQuant">
+          <input id="tqToggle" type="checkbox" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button id="initBtn" class="btn">Load model</button>
+      <button id="stopBtn" class="btn secondary" disabled>Stop generation</button>
+
+      <div>
+        <div class="section-title">Status</div>
+        <div class="pill"><strong id="engineState">idle</strong><span>engine</span></div>
+        <div style="height:10px"></div>
+        <div class="progress"><div id="bar"></div></div>
+        <div id="status" class="status-line">Ready.</div>
+      </div>
+
+      <div>
+        <div class="section-title">Runtime log</div>
+        <div id="log" class="log"></div>
+      </div>
+
+      <div class="small">
+        Keyboard: <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> to send.
+      </div>
+    </aside>
+
+    <main class="card chat">
+      <div class="chat-header">
+        <div>
+          <h2>Chat</h2>
+          <div class="meta">WebLLM chat with a fixed message-role flow</div>
+        </div>
+        <div class="pill"><strong id="modeTag">none</strong><span>kv cache</span></div>
+      </div>
+
+      <div id="chatBody" class="chat-body">
+        <div class="msg system">Load a model, then start chatting.</div>
+      </div>
+
+      <div class="composer">
+        <textarea id="prompt" placeholder="Write a message..."></textarea>
+        <div class="actions">
+          <div class="actions-left">
+            <button id="sendBtn" class="btn" disabled>Send</button>
+            <button id="clearBtn" class="btn secondary">Clear chat</button>
+          </div>
+          <div class="actions-right">
+            <span class="pill">Model: <strong id="modelTag">not loaded</strong></span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+    const $ = (id) => document.getElementById(id);
+
+    const chatBody = $("chatBody");
+    const logBox = $("log");
+    const statusBox = $("status");
+    const engineState = $("engineState");
+    const bar = $("bar");
+    const modelTag = $("modelTag");
+    const modeTag = $("modeTag");
+
+    const initBtn = $("initBtn");
+    const sendBtn = $("sendBtn");
+    const stopBtn = $("stopBtn");
+    const clearBtn = $("clearBtn");
+
+    const modelSelect = $("model");
+    const modeSelect = $("mode");
+    const tqToggle = $("tqToggle");
+    const bitsSelect = $("bits");
+    const tempInput = $("temp");
+    const streamToggle = $("stream");
+    const promptInput = $("prompt");
+
+    let engine = null;
+    let abortController = null;
+    const systemPrompt = "You are a helpful assistant.";
+    let messages = []; // only user/assistant messages
+
+    function setStatus(text) {
+      statusBox.textContent = text;
+      appendLog(text);
+    }
+
+    function appendLog(text) {
+      const ts = new Date().toLocaleTimeString();
+      logBox.textContent += `[${ts}] ${text}\n`;
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function setProgress(p) {
+      const pct = Math.max(0, Math.min(100, Math.round((p || 0) * 100)));
+      bar.style.width = pct + "%";
+    }
+
+    function setEngineState(text) {
+      engineState.textContent = text;
+    }
+
+    function renderMessages() {
+      chatBody.innerHTML = "";
+      if (!messages.length) {
+        const empty = document.createElement("div");
+        empty.className = "msg system";
+        empty.textContent = "No messages yet.";
+        chatBody.appendChild(empty);
+      } else {
+        for (const msg of messages) {
+          const div = document.createElement("div");
+          div.className = "msg " + msg.role;
+          div.textContent = msg.content;
+          chatBody.appendChild(div);
+        }
+      }
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function addMessage(role, content) {
+      messages.push({ role, content });
+      renderMessages();
+    }
+
+    function getEngineConfig() {
+      return {
+        initProgressCallback: (report) => {
+          if (report?.text) setStatus(report.text);
+          if (typeof report?.progress === "number") setProgress(report.progress);
+        },
+        logLevel: "INFO",
+      };
+    }
+
+    function getModelOptions() {
+      const mode = modeSelect.value;
+      const bits = Number(bitsSelect.value);
+      const temperature = Number(tempInput.value || "0.7");
+      const model = modelSelect.value.trim();
+      return { mode, bits, temperature, model };
+    }
+
+    async function loadEngine() {
+      const { model, mode, bits } = getModelOptions();
+      modelTag.textContent = model || "unknown";
+      modeTag.textContent = mode;
+
+      initBtn.disabled = true;
+      sendBtn.disabled = true;
+      setEngineState("loading");
+      setStatus("Creating engine...");
+
+      try {
+        const appConfig = webllm.prebuiltAppConfig;
+
+        engine = await webllm.CreateMLCEngine(
+          model,
+          {
+            ...getEngineConfig(),
+            appConfig,
+          },
+          {
+            context_window_size: 2048,
+            kv_cache_compression: mode,
+            kv_cache_quantization_bits: bits,
+          }
+        );
+
+        if (mode === "turboquant") {
+          appendLog(`TurboQuant requested (${bits} bits). Requires matching compiled wasm/kernel support.`);
+          if (typeof engine.enableTurboQuant === "function") {
+            engine.enableTurboQuant({ bits });
+            appendLog("TurboQuant runtime hook activated.");
+          } else {
+            appendLog("TurboQuant runtime hook not found; using fallback path.");
+          }
+        }
+
+        setEngineState("ready");
+        setStatus("Model loaded.");
+        sendBtn.disabled = false;
+        stopBtn.disabled = false;
+      } catch (err) {
+        console.error(err);
+        setEngineState("error");
+        setStatus("Load failed: " + (err?.message || err));
+        appendLog("ERROR: " + (err?.stack || err));
+      } finally {
+        initBtn.disabled = false;
+      }
+    }
+
+    function stopGeneration() {
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+        appendLog("Generation stopped by user.");
+        setStatus("Generation stopped.");
+      }
+    }
+
+    async function sendMessage() {
+      const text = promptInput.value.trim();
+      if (!text || !engine) return;
+
+      addMessage("user", text);
+      promptInput.value = "";
+
+      messages.push({ role: "assistant", content: "" });
+      const assistantIndex = messages.length - 1;
+      renderMessages();
+
+      abortController = new AbortController();
+      stopBtn.disabled = false;
+      sendBtn.disabled = true;
+      setStatus("Generating...");
+
+      const { temperature } = getModelOptions();
+      const apiMessages = [{ role: "system", content: systemPrompt }, ...messages];
+
+      try {
+        if (streamToggle.checked) {
+          const chunks = await engine.chat.completions.create({
+            messages: apiMessages,
+            temperature,
+            stream: true,
+            stream_options: { include_usage: true },
+            signal: abortController.signal,
+          });
+
+          let acc = "";
+          for await (const chunk of chunks) {
+            const delta = chunk.choices?.[0]?.delta?.content || "";
+            if (delta) {
+              acc += delta;
+              messages[assistantIndex].content = acc;
+              renderMessages();
+            }
+            if (chunk.usage) {
+              appendLog("usage: " + JSON.stringify(chunk.usage));
+            }
+          }
+          setStatus("Done.");
+        } else {
+          const reply = await engine.chat.completions.create({
+            messages: apiMessages,
+            temperature,
+            signal: abortController.signal,
+          });
+          messages[assistantIndex].content = reply.choices?.[0]?.message?.content || "";
+          renderMessages();
+          setStatus("Done.");
+        }
+      } catch (err) {
+        console.error(err);
+        messages[assistantIndex].content = "[error] " + (err?.message || err);
+        renderMessages();
+        setStatus("Generation failed: " + (err?.message || err));
+        appendLog("ERROR: " + (err?.stack || err));
+      } finally {
+        abortController = null;
+        sendBtn.disabled = !engine;
+      }
+    }
+
+    initBtn.addEventListener("click", loadEngine);
+    sendBtn.addEventListener("click", sendMessage);
+    stopBtn.addEventListener("click", stopGeneration);
+    clearBtn.addEventListener("click", () => {
+      messages = [];
+      renderMessages();
+      appendLog("Chat cleared.");
+    });
+
+    promptInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.ctrlKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    tqToggle.addEventListener("change", () => {
+      modeSelect.value = tqToggle.checked ? "turboquant" : "none";
+      modeTag.textContent = modeSelect.value;
+    });
+
+    modeSelect.addEventListener("change", () => {
+      tqToggle.checked = modeSelect.value === "turboquant";
+      modeTag.textContent = modeSelect.value;
+    });
+
+    renderMessages();
+    appendLog("Page loaded.");
+    appendLog("WebLLM API: CreateMLCEngine + engine.chat.completions.create()");
+    appendLog("System prompt is prepended at request time, so the last message remains user/assistant as required.");
+    appendLog("TurboQuant remains a runtime hint until matching wasm/kernel support is present.");
+  </script>
+</body>
+</html>
