@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WebLLM Debug Chat</title>
+<style>
+:root {
+  --bg0: #070a0f;
+  --bg1: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --dim: #484f58;
+  --c1: #22d3ee;
+  --c2: #a78bfa;
+  --c3: #fb923c;
+  --c4: #4ade80;
+  --c5: #facc15;
+  --c6: #f472b6;
+  --red: #f85149;
+  --green: #3fb950;
+  --mono: 'Courier New', 'Consolas', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg0); color: var(--text); font-family: var(--mono); font-size: 13px; overflow: hidden; }
+
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+#topbar {
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  flex-shrink: 0;
+}
+#topbar .logo {
+  font-size: 14px; font-weight: bold; color: var(--c1);
+  letter-spacing: .05em; white-space: nowrap;
+}
+#topbar .logo span { color: var(--muted); font-weight: normal; }
+.toggles { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+.tog {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 4px;
+  border: 1px solid var(--border); cursor: pointer;
+  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  background: transparent; user-select: none; transition: all .15s;
+}
+.tog .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background .15s; }
+.tog.on { color: var(--text); border-color: var(--accent, var(--c1)); }
+.tog.on .dot { background: var(--accent, var(--c1)); }
+
+/* ── MODEL LOADER ───────────────────────────────────────────── */
+#loader-bar {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 8px 14px; display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap; flex-shrink: 0;
+}
+#loader-bar select, #loader-bar .q-sel {
+  background: var(--bg1); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-family: var(--mono); font-size: 11px;
+  padding: 4px 8px; cursor: pointer;
+}
+#load-btn {
+  padding: 4px 14px; background: var(--c1); color: #000;
+  border: none; border-radius: 4px; font-family: var(--mono);
+  font-size: 11px; font-weight: bold; cursor: pointer;
+}
+#load-btn:disabled { background: var(--bg3); color: var(--muted); cursor: default; }
+#load-btn:hover:not(:disabled) { filter: brightness(1.1); }
+.model-meta { font-size: 10px; color: var(--muted); }
+#progress-wrap { flex: 1; min-width: 160px; }
+#progress-bar {
+  width: 100%; height: 6px; background: var(--bg3);
+  border-radius: 3px; overflow: hidden; margin-bottom: 3px;
+}
+#progress-fill { height: 100%; background: var(--c1); width: 0; transition: width .3s; border-radius: 3px; }
+#progress-text { font-size: 10px; color: var(--muted); }
+#gpu-badge {
+  font-size: 10px; padding: 2px 8px; border-radius: 3px;
+  border: 1px solid; white-space: nowrap;
+}
+#gpu-badge.ok { color: var(--green); border-color: #3fb95040; background: #0a1a0a; }
+#gpu-badge.err { color: var(--red); border-color: #f8514940; background: #1a0a0a; }
+
+/* ── MAIN SPLIT ─────────────────────────────────────────────── */
+#main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── CHAT ───────────────────────────────────────────────────── */
+#chat-col {
+  display: flex; flex-direction: column;
+  flex: 1; min-width: 0; border-right: 1px solid var(--border);
+}
+#messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+#messages::-webkit-scrollbar { width: 4px; }
+#messages::-webkit-scrollbar-track { background: transparent; }
+#messages::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
+
+.msg { display: flex; gap: 10px; max-width: 95%; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.msg.ai   { align-self: flex-start; }
+.msg .avatar {
+  width: 26px; height: 26px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: bold; flex-shrink: 0;
+}
+.msg.user .avatar { background: var(--c2); color: #000; }
+.msg.ai   .avatar { background: var(--c1); color: #000; }
+.bubble {
+  padding: 8px 11px; border-radius: 6px;
+  font-size: 12px; line-height: 1.6; white-space: pre-wrap;
+  max-width: calc(100% - 36px);
+}
+.msg.user .bubble { background: var(--bg3); border: 1px solid var(--border); }
+.msg.ai   .bubble { background: var(--bg2); border: 1px solid var(--c1)22; }
+.bubble.streaming::after { content: '▋'; animation: blink .7s step-end infinite; color: var(--c1); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.sys-msg {
+  font-size: 10px; color: var(--muted); text-align: center;
+  padding: 4px 0; border-top: 1px solid var(--border); margin: 2px 0;
+}
+
+#input-row {
+  padding: 10px 14px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; flex-shrink: 0; background: var(--bg1);
+}
+#user-input {
+  flex: 1; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 5px; color: var(--text); font-family: var(--mono);
+  font-size: 12px; padding: 8px 10px; resize: none; height: 38px;
+  outline: none;
+}
+#user-input:focus { border-color: var(--c1); }
+#send-btn {
+  padding: 0 16px; background: var(--c1); color: #000; border: none;
+  border-radius: 5px; font-family: var(--mono); font-size: 12px;
+  font-weight: bold; cursor: pointer; height: 38px;
+}
+#send-btn:disabled { background: var(--bg3); color: var(--muted); cursor: default; }
+#send-btn:hover:not(:disabled) { filter: brightness(1.1); }
+
+/* ── DEBUG PANEL ────────────────────────────────────────────── */
+#debug-col {
+  width: 480px; min-width: 380px; max-width: 55vw;
+  display: flex; flex-direction: column; overflow: hidden;
+  flex-shrink: 0;
+}
+#debug-col.hidden { display: none; }
+
+#phase-nav {
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  padding: 8px 12px; display: flex; gap: 4px; flex-wrap: wrap; align-items: center;
+  flex-shrink: 0;
+}
+.pnav-btn {
+  padding: 3px 9px; font-size: 10px; border-radius: 4px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; font-family: var(--mono);
+  transition: all .15s;
+}
+.pnav-btn.active { color: #000; border-color: transparent; font-weight: bold; }
+.pnav-btn.done { opacity: .5; }
+.pnav-btn.pending { opacity: .35; }
+
+#debug-body { flex: 1; overflow-y: auto; padding: 12px; }
+#debug-body::-webkit-scrollbar { width: 4px; }
+#debug-body::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
+
+#debug-footer {
+  padding: 10px 12px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; align-items: center; background: var(--bg1);
+  flex-shrink: 0;
+}
+.step-info { font-size: 10px; color: var(--muted); flex: 1; }
+#prev-btn, #next-btn {
+  padding: 5px 14px; font-size: 11px; border-radius: 4px;
+  font-family: var(--mono); cursor: pointer; border: 1px solid;
+}
+#prev-btn { background: transparent; border-color: var(--border); color: var(--muted); }
+#prev-btn:hover:not(:disabled) { border-color: var(--text); color: var(--text); }
+#next-btn { background: var(--c1); color: #000; border-color: var(--c1); font-weight: bold; }
+#next-btn:disabled { background: var(--bg3); color: var(--dim); border-color: var(--border); cursor: default; }
+#next-btn:hover:not(:disabled) { filter: brightness(1.1); }
+#auto-btn {
+  padding: 5px 10px; font-size: 11px; border-radius: 4px;
+  font-family: var(--mono); cursor: pointer;
+  background: transparent; border: 1px solid var(--border); color: var(--muted);
+}
+#auto-btn:hover { color: var(--text); border-color: var(--text); }
+
+/* ── PHASE PANEL CONTENT ────────────────────────────────────── */
+.phase-header { margin-bottom: 10px; }
+.phase-title { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
+.phase-desc { font-size: 11px; color: var(--muted); }
+.badge-row { display: flex; gap: 6px; margin-top: 5px; }
+.badge {
+  font-size: 9px; padding: 1px 7px; border-radius: 3px;
+  border: 1px solid; text-transform: uppercase; letter-spacing: .06em;
+}
+.badge.real { color: var(--green); border-color: #3fb95050; background: #0a1a0a; }
+.badge.sim  { color: var(--muted); border-color: var(--border); background: var(--bg3); }
+.badge.turbo { color: var(--c5); border-color: #facc1550; background: #1a1400; }
+
+.trio { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 8px; }
+@media (max-width: 900px) { .trio { grid-template-columns: 1fr; } }
+
+.tcol { border-radius: 5px; padding: 9px 10px; }
+.tcol.inp { background: #06090d; border-left: 3px solid var(--acc); }
+.tcol.proc { background: var(--bg2); border-left: 3px solid var(--border); }
+.tcol.out { background: #06090d; border-left: 3px solid var(--acc); }
+.col-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; }
+.type-line { font-size: 10px; color: var(--muted); margin-bottom: 1px; }
+.shape-line { font-size: 10px; font-weight: bold; color: var(--acc, var(--c1)); margin-bottom: 7px; }
+.eq { font-size: 11px; line-height: 1.85; color: #c9d1d9; white-space: pre-wrap; }
+.hl { font-weight: bold; } /* color set inline via style */
+.dbox {
+  background: #040608; border: 1px solid var(--bg3);
+  border-radius: 3px; padding: 5px 8px; font-size: 11px;
+  margin: 4px 0; word-break: break-all; color: #c9d1d9;
+}
+.srow { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px solid var(--bg3); font-size: 10px; }
+.srow:last-child { border-bottom: none; }
+.sk { color: var(--muted); } .sv { color: var(--text); font-weight: 500; }
+
+.chip {
+  display: inline-block; padding: 2px 7px; border-radius: 3px;
+  font-size: 11px; margin: 2px; border: 1px solid;
+}
+.mbar-wrap { display: flex; align-items: flex-end; gap: 1px; height: 22px; margin: 5px 0; }
+.mbar { border-radius: 1px; min-height: 2px; flex: 1; }
+.spk-wrap { display: flex; align-items: flex-end; gap: 1px; height: 24px; margin: 4px 0; }
+.spk { border-radius: 1px; min-height: 2px; flex: 1; }
+.heat-wrap { overflow-x: auto; }
+.heat-row { display: flex; gap: 2px; margin-bottom: 2px; }
+.hcell { width: 15px; height: 13px; border-radius: 2px; }
+.barrow { display: flex; align-items: center; gap: 6px; margin: 2px 0; font-size: 10px; }
+.barbg { flex: 1; height: 8px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.barfill { height: 100%; border-radius: 2px; transition: width .3s; }
+.norm-btns { display: flex; gap: 5px; margin-top: 7px; }
+.nbtn {
+  padding: 3px 8px; font-size: 10px; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 3px; color: var(--muted);
+  cursor: pointer; font-family: var(--mono);
+}
+.nbtn.act { border-color: color-mix(in srgb, var(--acc) 60%, transparent); color: var(--acc); }
+.slider-row { display: flex; align-items: center; gap: 8px; font-size: 11px; margin: 8px 0; }
+.slider-row input[type=range] { flex: 1; accent-color: var(--acc); }
+
+/* ── PHASE IDLE STATE ───────────────────────────────────────── */
+#debug-idle {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: 12px; color: var(--muted); text-align: center; padding: 20px;
+}
+#debug-idle .big { font-size: 32px; }
+#debug-idle p { font-size: 11px; line-height: 1.7; max-width: 280px; }
+
+/* ── TURBO BANNER ───────────────────────────────────────────── */
+#turbo-info {
+  background: #141200; border: 1px solid #facc1530;
+  border-radius: 5px; padding: 7px 10px; margin-bottom: 10px;
+  font-size: 10px; color: #facc1580; display: none;
+}
+#turbo-info.show { display: block; }
+
+/* ── RESIZE HANDLE ──────────────────────────────────────────── */
+#resizer {
+  width: 4px; background: var(--border); cursor: col-resize;
+  flex-shrink: 0; transition: background .15s;
+}
+#resizer:hover { background: var(--c1); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="logo">⬡ WebLLM <span>Debug Chat</span></div>
+    <div class="toggles">
+      <div class="tog" id="tog-debug"   style="--accent:#22d3ee" data-key="debug">
+        <div class="dot"></div> Debug Panel
+      </div>
+      <div class="tog on" id="tog-manual" style="--accent:#fb923c" data-key="manual">
+        <div class="dot"></div> Manual Step
+      </div>
+      <div class="tog" id="tog-auto"   style="--accent:#4ade80"  data-key="auto">
+        <div class="dot"></div> Auto Step
+      </div>
+      <div class="tog" id="tog-turbo"  style="--accent:#facc15" data-key="turbo">
+        <div class="dot"></div> TurboQuant
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL LOADER -->
+  <div id="loader-bar">
+    <span style="font-size:10px;color:var(--muted)">Model</span>
+    <select id="model-sel">
+      <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5-0.5B · 0.5B params · ~400 MB</option>
+      <option value="TinyLlama-1.1B-Chat-v1.0-q4f16_1-MLC">TinyLlama-1.1B · ~600 MB</option>
+      <option value="Llama-3.2-1B-Instruct-q4f32_1-MLC" selected>Llama-3.2-1B · ~800 MB</option>
+      <option value="Llama-3.2-3B-Instruct-q4f32_1-MLC">Llama-3.2-3B · ~2 GB</option>
+      <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5-mini · ~2.2 GB</option>
+      <option value="Llama-3.1-8B-Instruct-q4f32_1-MLC">Llama-3.1-8B · ~5 GB</option>
+      <option value="Mistral-7B-Instruct-v0.3-q4f16_1-MLC">Mistral-7B · ~4 GB</option>
+    </select>
+    <span style="font-size:10px;color:var(--muted)">Quant</span>
+    <select id="quant-sel" class="q-sel">
+      <option value="q4f32_1">q4f32 — standard</option>
+      <option value="q4f16_1">q4f16 — balanced</option>
+      <option value="q3f16_1">q3f16 — turbo</option>
+    </select>
+    <button id="load-btn">▶ Load Model</button>
+    <div id="progress-wrap" style="display:none">
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+      <div id="progress-text">Initialising…</div>
+    </div>
+    <div id="gpu-badge" class="err">WebGPU checking…</div>
+    <div id="model-meta" class="model-meta"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- CHAT COLUMN -->
+    <div id="chat-col">
+      <div id="messages">
+        <div class="sys-msg">Model not loaded · select a model above and click Load</div>
+      </div>
+      <div id="input-row">
+        <textarea id="user-input" placeholder="Type a message… (Enter to send, Shift+Enter for newline)" disabled></textarea>
+        <button id="send-btn" disabled>Send</button>
+      </div>
+    </div>
+
+    <!-- RESIZE HANDLE -->
+    <div id="resizer"></div>
+
+    <!-- DEBUG COLUMN -->
+    <div id="debug-col" class="hidden">
+
+      <div id="phase-nav">
+        <span style="font-size:10px;color:var(--muted);margin-right:4px">PHASE</span>
+        <button class="pnav-btn pending" data-phase="0">① Tok</button>
+        <button class="pnav-btn pending" data-phase="1">② Emb</button>
+        <button class="pnav-btn pending" data-phase="2">③ Attn</button>
+        <button class="pnav-btn pending" data-phase="3">④ FFN</button>
+        <button class="pnav-btn pending" data-phase="4">⑤ Norm</button>
+        <button class="pnav-btn pending" data-phase="5">⑥ Sample</button>
+      </div>
+
+      <div id="debug-body">
+        <div id="debug-idle">
+          <div class="big">⬡</div>
+          <p>Load a model, then send a message.<br>Each inference phase will appear here with<br><strong>INPUT → PROCESS → OUTPUT</strong>.</p>
+          <p style="margin-top:8px;font-size:10px">Toggle <strong style="color:var(--c3)">Manual Step</strong> to walk phases one at a time.</p>
+        </div>
+        <div id="debug-content" style="display:none"></div>
+      </div>
+
+      <div id="debug-footer">
+        <div class="step-info" id="step-info">Ready</div>
+        <button id="auto-btn" style="display:none">⚡ Auto</button>
+        <button id="prev-btn" disabled>← Prev</button>
+        <button id="next-btn" disabled>Next →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════════════
+// WEBLLM IMPORT
+// ═══════════════════════════════════════════════════════════════
+let webllm;
+try {
+  webllm = await import("https://esm.sh/@mlc-ai/web-llm");
+} catch(e) {
+  console.warn("WebLLM import failed:", e);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const S = {
+  engine: null,
+  loaded: false,
+  busy: false,
+  toggles: { debug: false, manual: true, auto: false, turbo: false },
+  phase: -1,        // current debug phase (0-5)
+  phaseData: [],    // computed data for each phase
+  messages: [],     // chat history [{role,content}]
+  pendingResponse: null,
+  normMode: 'rms',
+  sampleTemp: 0.9,
+  curNorm: 'rms',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MATH UTILS
+// ═══════════════════════════════════════════════════════════════
+function lcg(seed) {
+  let s = (seed >>> 0) || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+function softmax(a) {
+  const m = Math.max(...a);
+  const e = a.map(x => Math.exp(x - m));
+  const s = e.reduce((a, b) => a + b, 0);
+  return e.map(x => x / s);
+}
+function entropy(ps) { return -ps.reduce((s, p) => s + (p > 1e-9 ? p * Math.log2(p) : 0), 0); }
+function pseudoEmbed(id, d = 10) {
+  let s = (id * 1664525 + 1013904223) >>> 0;
+  return Array.from({ length: d }, () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return +((s >>> 16) / 32768 - 1).toFixed(3);
+  });
+}
+function bpeTokenize(text) {
+  const raw = text.match(/\w+|[^\w\s]/g) || [];
+  const tokens = []; let id = 1000;
+  for (const w of raw) {
+    if (w.length <= 4) tokens.push({ t: w, id: id++ });
+    else for (let i = 0; i < w.length; i += 4)
+      tokens.push({ t: w.slice(i, i + 4), id: id++ });
+  }
+  return tokens;
+}
+function attnMatrix(n) {
+  return Array.from({ length: n }, (_, i) =>
+    softmax(Array.from({ length: n }, (_, j) =>
+      j > i ? -1e9 : Math.cos((i - j) * 0.4) + (((i * 31 + j * 17) % 7) - 3) * 0.2
+    ))
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHASE DEFINITIONS
+// ═══════════════════════════════════════════════════════════════
+const PHASES = [
+  { id: 'tok',  label: '① Tokenize', acc: '#22d3ee', real: true  },
+  { id: 'emb',  label: '② Embed',    acc: '#a78bfa', real: false },
+  { id: 'attn', label: '③ Attend',   acc: '#fb923c', real: false },
+  { id: 'ffn',  label: '④ FFN',      acc: '#4ade80', real: false },
+  { id: 'norm', label: '⑤ Norm',     acc: '#facc15', real: false },
+  { id: 'samp', label: '⑥ Sample',   acc: '#f472b6', real: true  },
+];
+
+// MODEL HYPERPARAMS BY NAME
+function modelParams(modelId) {
+  if (modelId.includes('8B'))  return { d: 4096, H: 32, L: 32, ff: 14336, V: 128256 };
+  if (modelId.includes('7B'))  return { d: 4096, H: 32, L: 32, ff: 14336, V: 32000  };
+  if (modelId.includes('3B'))  return { d: 3072, H: 24, L: 28, ff: 8192,  V: 128256 };
+  if (modelId.includes('1.1B'))return { d: 2048, H: 32, L: 22, ff: 5632,  V: 32000  };
+  if (modelId.includes('1B'))  return { d: 2048, H: 32, L: 16, ff: 8192,  V: 128256 };
+  if (modelId.includes('Phi')) return { d: 3072, H: 32, L: 32, ff: 8192,  V: 32064  };
+  return { d: 896, H: 14, L: 24, ff: 4864, V: 151936 }; // Qwen2.5-0.5B
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PHASE RENDERERS → return HTML string
+// ═══════════════════════════════════════════════════════════════
+function col3(inp, proc, out, acc) {
+  return `<div class="trio" style="--acc:${acc}">
+    <div class="tcol inp"><div class="col-lbl">INPUT</div>${inp}</div>
+    <div class="tcol proc"><div class="col-lbl">PROCESS</div>${proc}</div>
+    <div class="tcol out"><div class="col-lbl">OUTPUT</div>${out}</div>
+  </div>`;
+}
+function srow(k, v) { return `<div class="srow"><span class="sk">${k}</span><span class="sv">${v}</span></div>`; }
+function mbars(vals, acc) {
+  const mn = Math.min(...vals), mx = Math.max(...vals);
+  return `<div class="mbar-wrap">${vals.map(v => `<div class="mbar" style="height:${Math.max(2, (v - mn) / (mx - mn || 1) * 20) + 2}px;background:${acc};opacity:.7"></div>`).join('')}</div>`;
+}
+
+function renderPhase(idx, data) {
+  const ph = PHASES[idx];
+  const { tokens, mp, input, logprobsData, turbo } = data;
+  const acc = ph.acc;
+  const turboTag = turbo ? `<span class="badge turbo">TurboQuant q3f16</span>` : '';
+
+  let header = `
+    <div class="phase-header">
+      <div class="phase-title" style="color:${acc}">${ph.label}</div>
+      <div class="phase-desc">${phaseDesc(idx)}</div>
+      <div class="badge-row">
+        <span class="badge ${ph.real ? 'real' : 'sim'}">${ph.real ? 'REAL · WebLLM data' : 'SIMULATED · derived from tokens'}</span>
+        ${turboTag}
+      </div>
+    </div>`;
+
+  let body = '';
+  switch (idx) {
+    case 0: body = renderTok(tokens, mp, input, acc); break;
+    case 1: body = renderEmb(tokens, mp, acc); break;
+    case 2: body = renderAttn(tokens, mp, acc); break;
+    case 3: body = renderFFN(tokens, mp, acc); break;
+    case 4: body = renderNorm(tokens, mp, acc); break;
+    case 5: body = renderSamp(tokens, mp, acc, logprobsData, input); break;
+  }
+  return header + body;
+}
+
+function phaseDesc(i) {
+  return [
+    'Raw text → integer token IDs via Byte-Pair Encoding',
+    'Token IDs → dense vectors in ℝ^{d_model} + positional signal',
+    'Each token attends to all prior tokens via scaled dot-product',
+    'Per-token 2-layer MLP with GELU — enriches representations',
+    'Rescale activation magnitudes to unit RMS for stable training',
+    'Project hidden state → vocabulary logits → sample next token',
+  ][i];
+}
+
+function renderTok(tokens, mp, input, acc) {
+  const n = tokens.length, wc = input.trim().split(/\s+/).length;
+  const idArr = tokens.slice(0, 12).map(t => t.id).join(', ') + (tokens.length > 12 ? '…' : '');
+  return col3(
+    /* IN  */ `<div class="type-line">Type: UTF-8 string</div>
+               <div class="shape-line">string → [${n} integers]</div>
+               <div class="dbox">"${escHtml(input)}"</div>
+               ${srow('chars', input.length)} ${srow('words', wc)} ${srow('|V|', mp.V.toLocaleString())}`,
+    /* PRO */ `<div class="eq"><span class="hl" style="color:${acc}">BPE</span> (Byte-Pair Encoding):
+  |V| = ${mp.V.toLocaleString()}
+
+  1. Pre-tokenise whitespace/punct
+  2. Represent as char sequences
+  3. merge(a,b)→ab  while freq>θ
+  4. Map pieces → integer IDs
+
+  T=[t₁,…,tₙ],  tᵢ∈{0…|V|-1}</div>`,
+    /* OUT */ `<div class="type-line">Type: integer token ID list</div>
+               <div class="shape-line">→ [${n} × uint32]</div>
+               <div style="display:flex;flex-wrap:wrap;margin:5px 0">${tokens.map(t => `<span class="chip" style="color:${acc};border-color:${acc}44;background:${acc}0e">${escHtml(t.t)}<sup style="font-size:8px;opacity:.5">${t.id}</sup></span>`).join('')}</div>
+               ${srow('n_tokens', n)} ${srow('tok/word', (n / wc).toFixed(2))} ${srow('ch/tok', (input.length / n).toFixed(2))}`
+  );
+}
+
+function renderEmb(tokens, mp, acc) {
+  const show = tokens.slice(0, 4);
+  const memMB = (mp.V * mp.d * 2 / 1e6).toFixed(0);
+  const peVals = Array.from({ length: 8 }, (_, p) => Math.sin(p));
+  const ids = tokens.map(t => t.id);
+  return col3(
+    /* IN  */ `<div class="type-line">Type: integer token ID list</div>
+               <div class="shape-line">[${tokens.length} × uint32]</div>
+               <div class="dbox" style="font-size:10px">[${ids.slice(0,10).join(', ')}${ids.length>10?'…':''}]</div>
+               ${srow('n_tokens', tokens.length)} ${srow('|V|', mp.V.toLocaleString())}`,
+    /* PRO */ `<div class="eq"><span class="hl" style="color:${acc}">E</span> ∈ ℝ^{${mp.V.toLocaleString()}×${mp.d}}
+eᵢ = E[tᵢ]    O(1) row lookup
+
+<span class="hl" style="color:${acc}">PE</span>(pos,2k)=sin(pos/10000^{2k/d})
+<span class="hl" style="color:${acc}">PE</span>(pos,2k+1)=cos(…)
+
+xᵢ = eᵢ + PE(i,·)
+
+d_model = ${mp.d}
+Params:  ${(mp.V*mp.d/1e6).toFixed(0)}M
+Memory:  ${memMB} MB (fp16)</div>`,
+    /* OUT */ `<div class="type-line">Type: float32 vectors X</div>
+               <div class="shape-line">[${tokens.length}×int] → [${tokens.length}×${mp.d}]</div>
+               ${show.map(tk => { const e = pseudoEmbed(tk.id); return `<div style="margin-bottom:5px"><div style="font-size:9px;color:${acc}">"${escHtml(tk.t)}" id=${tk.id}</div>${mbars(e, acc)}<div style="font-size:8px;color:var(--muted)">[${e.slice(0,3).join(', ')}…]</div></div>`; }).join('')}
+               <div style="font-size:9px;color:var(--muted);margin-top:4px">PE sparkline pos 0–7</div>
+               <div class="spk-wrap">${peVals.map((v, i) => `<div class="spk" style="height:${Math.max(2, (v + 1) / 2 * 20) + 2}px;background:${acc};opacity:.7"></div>`).join('')}</div>`
+  );
+}
+
+function renderAttn(tokens, mp, acc) {
+  const n = Math.min(tokens.length, 9);
+  const toks = tokens.slice(0, n);
+  const mat = attnMatrix(n);
+  const ents = mat.map(r => entropy(r).toFixed(2));
+  const dh = Math.floor(mp.d / mp.H);
+  const labels = toks.map(t => t.t.slice(0, 3));
+  return col3(
+    /* IN  */ `<div class="type-line">Type: embedded sequence X</div>
+               <div class="shape-line">[${tokens.length}×${mp.d} float32]</div>
+               <div style="display:flex;flex-wrap:wrap;gap:3px;margin:5px 0">${toks.map(t => `<span style="font-size:10px;padding:1px 5px;border-radius:3px;border:1px solid ${acc}40;color:${acc}">"${escHtml(t.t)}"</span>`).join('')}</div>
+               ${srow('n_tokens', tokens.length)} ${srow('d_model', mp.d)} ${srow('n_heads', mp.H)}`,
+    /* PRO */ `<div class="eq">Per head h (H=${mp.H}):
+  <span class="hl" style="color:${acc}">Q</span>=X·W_Q, <span class="hl" style="color:${acc}">K</span>=X·W_K, <span class="hl" style="color:${acc}">V</span>=X·W_V
+  W∈ℝ^{${mp.d}×${dh}} (d_h=${dh})
+
+<span class="hl" style="color:${acc}">A</span>=softmax(QKᵀ/√${dh})·V
+  causal: j>i → −∞
+
+Out=Concat(A₁…A${mp.H})·W_O
+
+O(n²·d) per layer</div>`,
+    /* OUT */ `<div class="type-line">Type: context vectors H</div>
+               <div class="shape-line">[${n}×${mp.d}] → [${n}×${mp.d}] (same shape)</div>
+               <div class="heat-wrap">
+                 <div style="display:flex;gap:2px;margin-bottom:2px">${labels.map(l => `<div style="width:15px;font-size:7px;color:var(--muted);text-align:center;overflow:hidden">${l}</div>`).join('')}</div>
+                 ${mat.map((row, i) => `<div class="heat-row">${row.map((v, j) => `<div class="hcell" style="background:rgba(251,146,60,${(0.05 + v * 0.8).toFixed(2)})" title="${labels[i]}→${labels[j]}: ${v.toFixed(2)}"></div>`).join('')}<span style="font-size:8px;color:var(--muted);margin-left:3px">H=${ents[i]}</span></div>`).join('')}
+               </div>
+               ${srow('avg entropy', (ents.reduce((s, v) => s + +v, 0) / n).toFixed(2) + ' bits')}`
+  );
+}
+
+function renderFFN(tokens, mp, acc) {
+  const gelu = x => x * (1 / (1 + Math.exp(-1.702 * x)));
+  const xs = Array.from({ length: 11 }, (_, i) => -2.5 + i * 0.5);
+  const gv = xs.map(gelu); const mg = Math.min(...gv), xg = Math.max(...gv);
+  const pos = [0, Math.floor(tokens.length / 2), tokens.length - 1].filter(i => i < tokens.length);
+  return col3(
+    /* IN  */ `<div class="type-line">Type: attention output H</div>
+               <div class="shape-line">[${tokens.length}×${mp.d} float32]</div>
+               ${pos.map(i => { const e = pseudoEmbed(tokens[i].id, 10); return `<div style="margin-bottom:5px"><div style="font-size:9px;color:${acc}">[${i}] "${escHtml(tokens[i].t)}"</div>${mbars(e, acc)}</div>`; }).join('')}
+               ${srow('d_ff', mp.ff.toLocaleString())} ${srow('params/layer', (2*mp.d*mp.ff/1e6).toFixed(0)+'M')}`,
+    /* PRO */ `<div class="eq">Per-token MLP:
+  <span class="hl" style="color:${acc}">FFN</span>(h)=W₂·GELU(W₁h+b₁)+b₂
+  W₁∈ℝ^{${mp.ff}×${mp.d}}
+  W₂∈ℝ^{${mp.d}×${mp.ff}}
+  d_ff = 4×d = ${mp.ff.toLocaleString()}
+
+<span class="hl" style="color:${acc}">GELU</span>(x)=x·σ(1.702x)
+
+Residual:
+  h'=LayerNorm(h+FFN(h))
+
+FLOPs/tok: ${(2*mp.ff*mp.d*2/1e6).toFixed(0)}M</div>`,
+    /* OUT */ `<div class="type-line">Type: enriched vectors H'</div>
+               <div class="shape-line">[${tokens.length}×${mp.d}] → [${tokens.length}×${mp.d}]</div>
+               ${pos.map(i => { const e = pseudoEmbed(tokens[i].id * 37 + 999, 10); return `<div style="margin-bottom:5px"><div style="font-size:9px;color:${acc}">[${i}] "${escHtml(tokens[i].t)}" post-FFN</div>${mbars(e, acc)}</div>`; }).join('')}
+               <div style="font-size:9px;color:var(--muted);margin-top:4px">GELU curve</div>
+               <div style="display:flex;align-items:flex-end;gap:1px;height:20px">${gv.map(v => `<div style="flex:1;background:${acc};opacity:.7;height:${Math.max(1, (v - mg) / (xg - mg || 1) * 18) + 2}px;border-radius:1px"></div>`).join('')}</div>`
+  );
+}
+
+function renderNorm(tokens, mp, acc) {
+  const r = lcg(tokens.reduce((s, t) => s + t.id, 0));
+  const raw = Array.from({ length: 16 }, () => r() * 4 - 1.5);
+  const rms = Math.sqrt(raw.reduce((s, v) => s + v * v, 0) / raw.length);
+  const mean = raw.reduce((s, v) => s + v, 0) / raw.length;
+  const std = Math.sqrt(raw.reduce((s, v) => s + (v - mean) ** 2, 0) / raw.length);
+  const normed = (S.curNorm === 'rms') ? raw.map(v => v / rms) : raw.map(v => (v - mean) / (std + 1e-5));
+  const mn = Math.min(...raw), mx = Math.max(...raw);
+  const mn2 = Math.min(...normed), mx2 = Math.max(...normed);
+  const newRMS = Math.sqrt(normed.reduce((s, v) => s + v * v, 0) / normed.length);
+  return col3(
+    /* IN  */ `<div class="type-line">Type: raw activation h</div>
+               <div class="shape-line">ℝ^{${mp.d}} (16-dim slice)</div>
+               <div style="display:flex;gap:1px;height:22px;align-items:flex-end;margin:6px 0">${raw.map(v => `<div style="flex:1;height:${Math.max(2, (v-mn)/(mx-mn||1)*20)+2}px;background:${v>=mean?acc:'var(--muted)'};opacity:.65;border-radius:1px"></div>`).join('')}</div>
+               ${srow('mean μ', mean.toFixed(3))} ${srow('std σ', std.toFixed(3))} ${srow('RMS', rms.toFixed(3))}`,
+    /* PRO */ `<div class="eq">${S.curNorm === 'rms' ? `<span class="hl" style="color:${acc}">RMSNorm</span> (Llama/Claude):
+  RMS(h)=√((1/d)Σᵢhᵢ²)
+        = ${rms.toFixed(4)}
+  ĥ = (h/RMS(h)) · γ
+  γ ∈ ℝ^{${mp.d}} learned` : `<span class="hl" style="color:${acc}">LayerNorm</span> (GPT):
+  μ=${mean.toFixed(3)}, σ=${std.toFixed(3)}
+  ĥ=(h−μ)/√(σ²+1e-5)·γ+β`}
+
+Pre-norm placement:
+  h_out=h+Sub(Norm(h))</div>
+               <div class="norm-btns" style="--acc:${acc}">
+                 <button class="nbtn ${S.curNorm==='rms'?'act':''}" onclick="window.__setNorm('rms')">RMSNorm</button>
+                 <button class="nbtn ${S.curNorm==='ln'?'act':''}"  onclick="window.__setNorm('ln')">LayerNorm</button>
+               </div>`,
+    /* OUT */ `<div class="type-line">Type: normalised ĥ</div>
+               <div class="shape-line">ℝ^{${mp.d}} → ℝ^{${mp.d}} (rescaled)</div>
+               <div style="display:flex;gap:1px;height:22px;align-items:flex-end;margin:6px 0">${normed.map(v => `<div style="flex:1;height:${Math.max(2,(v-mn2)/(mx2-mn2||1)*20)+2}px;background:${acc};opacity:.7;border-radius:1px"></div>`).join('')}</div>
+               ${srow('new RMS', newRMS.toFixed(3))} ${srow('new range', '['+mn2.toFixed(2)+', '+mx2.toFixed(2)+']')}`
+  );
+}
+
+function renderSamp(tokens, mp, acc, logprobsData, input) {
+  const lastTok = tokens[tokens.length - 1] || { t: '?', id: 1234 };
+  const VOCAB = ['the','of','is','in','and','a','to','it','that','we','can','you',
+    'how','what','which','when','where','model','layer','token','attention','word','output'];
+  let probs, labels, isReal = false;
+
+  if (logprobsData && logprobsData.length > 0) {
+    // Use real logprobs from WebLLM
+    labels = logprobsData.map(x => x.token);
+    probs = softmax(logprobsData.map(x => x.logprob));
+    isReal = true;
+  } else {
+    const r = lcg(lastTok.id);
+    const rawLogits = VOCAB.map(() => r() * 6 - 2);
+    probs = softmax(rawLogits.map(l => l / S.sampleTemp));
+    labels = VOCAB;
+  }
+  const idx = [...Array(labels.length).keys()].sort((a, b) => probs[b] - probs[a]);
+  const top10 = idx.slice(0, 10);
+  const maxP = probs[idx[0]];
+  const H = entropy(probs).toFixed(2);
+  const last3 = tokens.slice(-3).map(t => `"${t.t}"`).join(' ');
+
+  return col3(
+    /* IN  */ `<div class="type-line">Type: final normalised ĥ_last</div>
+               <div class="shape-line">ℝ^{${mp.d}} (last token pos)</div>
+               <div class="dbox" style="font-size:10px">Predict after: ${last3} → ?</div>
+               ${srow('logit shape', '1 × '+mp.V.toLocaleString())} ${srow('source', isReal?'WebLLM real':'simulated')}`,
+    /* PRO */ `<div class="eq"><span class="hl" style="color:${acc}">logits</span>=ĥ·W_vocab^T ∈ℝ^{${mp.V.toLocaleString()}}
+
+<span class="hl" style="color:${acc}">P</span>(k)=exp(logitsₖ/T)/Σexp(logitsⱼ/T)
+T = <span id="tshow">${S.sampleTemp.toFixed(1)}</span>
+
+Top-k: keep k highest
+Top-p: ΣP(k)≥p
+
+PPL=exp(−log P(next|ctx))</div>
+               <div class="slider-row" style="--acc:${acc}">
+                 <span style="color:var(--muted)">T</span>
+                 <input type="range" min="0.1" max="2" step="0.1" value="${S.sampleTemp}"
+                   oninput="window.__setTemp(+this.value)">
+                 <span id="tval" style="color:${acc};min-width:26px">${S.sampleTemp.toFixed(1)}</span>
+               </div>`,
+    /* OUT */ `<div class="type-line">Type: probability distribution P</div>
+               <div class="shape-line">ℝ^{${mp.d}} → P∈[0,1]^{${mp.V.toLocaleString()}}</div>
+               ${top10.map((i, rank) => `<div class="barrow">
+                 <span style="width:58px;color:${rank===0?'var(--green)':acc};font-size:10px">${rank===0?'✓ ':'  '}"${escHtml(labels[i])}"</span>
+                 <div class="barbg"><div class="barfill" style="width:${(probs[i]/maxP*100).toFixed(1)}%;background:${rank===0?'var(--green)':acc};opacity:${.45+probs[i]/maxP*.5}"></div></div>
+                 <span style="width:36px;text-align:right;font-size:10px;color:var(--muted)">${(probs[i]*100).toFixed(1)}%</span>
+               </div>`).join('')}
+               ${srow('entropy H(P)', H + ' bits')} ${srow('greedy', '"' + labels[idx[0]] + '"')}`
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HTML HELPERS
+// ═══════════════════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI ELEMENTS
+// ═══════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const messagesEl  = $('messages');
+const inputEl     = $('user-input');
+const sendBtn     = $('send-btn');
+const loadBtn     = $('load-btn');
+const modelSel    = $('model-sel');
+const quantSel    = $('quant-sel');
+const progressWrap= $('progress-wrap');
+const progressFill= $('progress-fill');
+const progressText= $('progress-text');
+const gpuBadge    = $('gpu-badge');
+const debugCol    = $('debug-col');
+const debugBody   = $('debug-body');
+const debugIdle   = $('debug-idle');
+const debugContent= $('debug-content');
+const phaseNav    = $('phase-nav');
+const stepInfo    = $('step-info');
+const nextBtn     = $('next-btn');
+const prevBtn     = $('prev-btn');
+const autoBtn     = $('auto-btn');
+const modelMeta   = $('model-meta');
+
+// ─── WebGPU check ───
+(async () => {
+  if (!navigator.gpu) {
+    gpuBadge.textContent = '✗ WebGPU not supported';
+    gpuBadge.className = 'gpu-badge err';
+    addSysMsg('⚠ WebGPU is not available. Use Chrome 113+ or Edge 113+.');
+    return;
+  }
+  const adapter = await navigator.gpu.requestAdapter();
+  if (!adapter) {
+    gpuBadge.textContent = '✗ No GPU adapter';
+    gpuBadge.className = 'gpu-badge err';
+    return;
+  }
+  gpuBadge.textContent = '✓ WebGPU ready';
+  gpuBadge.className = 'gpu-badge ok';
+})();
+
+// ─── Toggles ───
+document.querySelectorAll('.tog').forEach(el => {
+  el.addEventListener('click', () => {
+    const key = el.dataset.key;
+    if (key === 'auto') { S.toggles.manual = false; S.toggles.auto = true; }
+    else if (key === 'manual') { S.toggles.auto = false; S.toggles.manual = true; }
+    else S.toggles[key] = !S.toggles[key];
+    syncToggles();
+  });
+});
+function syncToggles() {
+  ['debug','manual','auto','turbo'].forEach(k => {
+    const el = $(`tog-${k}`);
+    if (el) el.classList.toggle('on', !!S.toggles[k]);
+  });
+  debugCol.classList.toggle('hidden', !S.toggles.debug);
+  autoBtn.style.display = S.toggles.manual ? 'block' : 'none';
+  // TurboQuant: update quant selector hint
+  if (S.toggles.turbo) {
+    quantSel.value = 'q3f16_1';
+    $('turbo-info') && ($('turbo-info').classList.add('show'));
+  }
+}
+syncToggles();
+
+// ─── Model load ───
+loadBtn.addEventListener('click', loadModel);
+async function loadModel() {
+  if (!webllm) { addSysMsg('WebLLM library failed to load. Check network.'); return; }
+  let modelId = modelSel.value;
+  // Apply TurboQuant: replace quant suffix
+  if (S.toggles.turbo) {
+    modelId = modelId.replace(/q\d+f\d+_\d/, quantSel.value);
+  }
+  loadBtn.disabled = true;
+  progressWrap.style.display = 'flex';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Initialising…';
+  addSysMsg(`Loading ${modelId}…`);
+  try {
+    S.engine = await webllm.CreateMLCEngine(modelId, {
+      initProgressCallback: (p) => {
+        const pct = Math.round((p.progress || 0) * 100);
+        progressFill.style.width = pct + '%';
+        progressText.textContent = `${p.text || 'Loading…'} (${pct}%)`;
+      }
+    });
+    S.loaded = true;
+    const mp = modelParams(modelId);
+    modelMeta.textContent = `d=${mp.d} H=${mp.H} L=${mp.L} ff=${mp.ff.toLocaleString()}`;
+    progressText.textContent = '✓ Model loaded and ready';
+    progressFill.style.background = 'var(--green)';
+    addSysMsg(`✓ ${modelId} loaded · send a message to chat`);
+    inputEl.disabled = false;
+    sendBtn.disabled = false;
+    inputEl.focus();
+  } catch (err) {
+    progressText.textContent = `✗ Error: ${err.message}`;
+    progressFill.style.background = 'var(--red)';
+    addSysMsg(`✗ Load failed: ${err.message}`);
+    loadBtn.disabled = false;
+  }
+}
+
+// ─── Chat send ───
+sendBtn.addEventListener('click', sendMessage);
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+async function sendMessage() {
+  const text = inputEl.value.trim();
+  if (!text || !S.loaded || S.busy) return;
+  S.busy = true;
+  inputEl.value = '';
+  inputEl.disabled = true;
+  sendBtn.disabled = true;
+  addMsg('user', text);
+  S.messages.push({ role: 'user', content: text });
+
+  const modelId = modelSel.value;
+  const mp = modelParams(modelId);
+
+  if (S.toggles.debug) {
+    await runDebugInference(text, mp);
+  } else {
+    await runNormalInference(text, mp);
+  }
+
+  S.busy = false;
+  inputEl.disabled = false;
+  sendBtn.disabled = false;
+  inputEl.focus();
+}
+
+// ─── Normal inference ───
+async function runNormalInference(text, mp) {
+  const bubble = addMsg('ai', '');
+  bubble.classList.add('streaming');
+  let full = '';
+  try {
+    const stream = await S.engine.chat.completions.create({
+      messages: S.messages,
+      stream: true,
+    });
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content || '';
+      full += delta;
+      bubble.textContent = full;
+      bubble.classList.add('streaming');
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+  } catch (e) {
+    full = `[Error: ${e.message}]`;
+    bubble.textContent = full;
+  }
+  bubble.classList.remove('streaming');
+  S.messages.push({ role: 'assistant', content: full });
+}
+
+// ─── Debug inference ───
+async function runDebugInference(userText, mp) {
+  // Tokenize (real if possible, else BPE approx)
+  let tokens;
+  try {
+    const ids = await S.engine.tokenize(userText);
+    tokens = ids.map((id, i) => ({ id, t: `t${id}`, pos: i }));
+    // Try to get decoded token strings
+    for (let i = 0; i < tokens.length; i++) {
+      try { tokens[i].t = await S.engine.detokenize([tokens[i].id]); } catch (_) {}
+    }
+  } catch (_) {
+    tokens = bpeTokenize(userText);
+  }
+  if (!tokens.length) tokens = bpeTokenize(userText);
+
+  // Run actual generation (with logprobs) in background
+  let logprobsData = null;
+  let responseText = '';
+  const genPromise = (async () => {
+    try {
+      const stream = await S.engine.chat.completions.create({
+        messages: S.messages,
+        stream: true,
+        logprobs: true,
+        top_logprobs: 12,
+      });
+      for await (const chunk of stream) {
+        const delta = chunk.choices[0]?.delta?.content || '';
+        responseText += delta;
+        // Capture first logprobs available
+        if (!logprobsData && chunk.choices[0]?.logprobs?.content?.length) {
+          const lc = chunk.choices[0].logprobs.content[0];
+          if (lc?.top_logprobs) {
+            logprobsData = lc.top_logprobs.map(x => ({ token: x.token, logprob: x.logprob }));
+          }
+        }
+      }
+    } catch (e) { responseText = `[Error: ${e.message}]`; }
+  })();
+
+  // Build phase data
+  S.phaseData = PHASES.map((ph, i) => ({
+    tokens, mp,
+    input: userText,
+    logprobsData: null, // filled after gen
+    turbo: S.toggles.turbo,
+  }));
+
+  // Show debug panel
+  debugIdle.style.display = 'none';
+  debugContent.style.display = 'block';
+  S.phase = 0;
+  updatePhaseNav();
+  renderCurrentPhase();
+
+  // Update step controls
+  prevBtn.disabled = true;
+  nextBtn.disabled = false;
+  nextBtn.textContent = 'Next →';
+  stepInfo.textContent = `Phase 1 of 6 · ${S.toggles.manual ? 'click Next to advance' : 'auto-advancing…'}`;
+
+  if (S.toggles.auto) {
+    // Auto-advance mode
+    await genPromise;
+    S.phaseData[5] = { ...S.phaseData[5], logprobsData };
+    autoBtn.style.display = 'none';
+    for (let i = 0; i < 6; i++) {
+      S.phase = i;
+      updatePhaseNav();
+      renderCurrentPhase();
+      if (i < 5) await sleep(900);
+    }
+    await finaliseResponse(responseText);
+  } else {
+    // Manual step mode
+    autoBtn.style.display = 'block';
+    autoBtn.onclick = async () => {
+      autoBtn.style.display = 'none';
+      await genPromise;
+      S.phaseData[5] = { ...S.phaseData[5], logprobsData };
+      while (S.phase < 5) {
+        S.phase++;
+        updatePhaseNav();
+        renderCurrentPhase();
+        await sleep(900);
+      }
+      await finaliseResponse(responseText);
+    };
+    // Wait for user to step through
+    await new Promise(resolve => {
+      window.__phaseResolve = resolve;
+    });
+    await genPromise;
+    S.phaseData[5] = { ...S.phaseData[5], logprobsData };
+    renderCurrentPhase(); // re-render phase 6 with real data
+    // Wait for final "Next" click
+    await new Promise(resolve => { window.__phaseResolve = resolve; });
+    await finaliseResponse(responseText);
+  }
+}
+
+async function finaliseResponse(responseText) {
+  nextBtn.disabled = true;
+  prevBtn.disabled = true;
+  stepInfo.textContent = '✓ All phases complete';
+  nextBtn.textContent = 'Done ✓';
+  addMsg('ai', responseText);
+  S.messages.push({ role: 'assistant', content: responseText });
+}
+
+// ─── Phase navigation ───
+nextBtn.addEventListener('click', () => {
+  if (S.phase >= 5) {
+    if (window.__phaseResolve) { const r = window.__phaseResolve; window.__phaseResolve = null; r(); }
+    return;
+  }
+  S.phase++;
+  updatePhaseNav();
+  renderCurrentPhase();
+  prevBtn.disabled = S.phase === 0;
+  if (S.phase === 5) {
+    nextBtn.textContent = 'Commit Response →';
+    stepInfo.textContent = 'Phase 6 of 6 · sampling complete';
+  } else {
+    stepInfo.textContent = `Phase ${S.phase + 1} of 6 · ${S.toggles.manual ? 'click Next to advance' : '…'}`;
+  }
+  // If at phase 5 (last), resolve after render
+  if (S.phase === 5 && !window.__phaseResolve) return;
+});
+
+prevBtn.addEventListener('click', () => {
+  if (S.phase <= 0) return;
+  S.phase--;
+  updatePhaseNav();
+  renderCurrentPhase();
+  prevBtn.disabled = S.phase === 0;
+  nextBtn.disabled = false;
+  nextBtn.textContent = 'Next →';
+  stepInfo.textContent = `Phase ${S.phase + 1} of 6`;
+});
+
+// Phase nav buttons
+phaseNav.querySelectorAll('.pnav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = +btn.dataset.phase;
+    if (!S.phaseData.length) return;
+    if (idx <= S.phase || !S.toggles.manual) {
+      S.phase = idx;
+      updatePhaseNav();
+      renderCurrentPhase();
+    }
+  });
+});
+
+function updatePhaseNav() {
+  phaseNav.querySelectorAll('.pnav-btn').forEach((btn, i) => {
+    btn.className = 'pnav-btn ' + (i < S.phase ? 'done' : i === S.phase ? 'active' : 'pending');
+    if (i === S.phase) {
+      btn.style.background = PHASES[i].acc;
+      btn.style.color = '#000';
+      btn.style.borderColor = 'transparent';
+    } else {
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
+  });
+}
+
+function renderCurrentPhase() {
+  if (!S.phaseData.length) return;
+  debugContent.innerHTML = renderPhase(S.phase, S.phaseData[S.phase]);
+  debugBody.scrollTop = 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHAT UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function addMsg(role, content) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const av = document.createElement('div');
+  av.className = 'avatar';
+  av.textContent = role === 'user' ? 'U' : 'AI';
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.textContent = content;
+  div.appendChild(av);
+  div.appendChild(bub);
+  // Remove welcome msg
+  const sys = messagesEl.querySelector('.sys-msg');
+  if (sys && sys.textContent.includes('not loaded')) sys.remove();
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return bub;
+}
+function addSysMsg(text) {
+  const d = document.createElement('div');
+  d.className = 'sys-msg';
+  d.textContent = text;
+  messagesEl.appendChild(d);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL CALLBACKS for inline HTML buttons
+// ═══════════════════════════════════════════════════════════════
+window.__setNorm = (v) => {
+  S.curNorm = v;
+  if (S.phaseData.length && S.phase === 4) renderCurrentPhase();
+};
+window.__setTemp = (v) => {
+  S.sampleTemp = v;
+  const tshow = document.getElementById('tshow');
+  const tval = document.getElementById('tval');
+  if (tshow) tshow.textContent = v.toFixed(1);
+  if (tval) tval.textContent = v.toFixed(1);
+  if (S.phaseData.length && S.phase === 5) renderCurrentPhase();
+};
+
+// ═══════════════════════════════════════════════════════════════
+// RESIZE HANDLE
+// ═══════════════════════════════════════════════════════════════
+const resizer = $('resizer');
+let resizing = false, startX, startW;
+resizer.addEventListener('mousedown', e => {
+  resizing = true; startX = e.clientX;
+  startW = debugCol.offsetWidth;
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+});
+document.addEventListener('mousemove', e => {
+  if (!resizing) return;
+  const dw = startX - e.clientX;
+  const nw = Math.max(320, Math.min(window.innerWidth * 0.7, startW + dw));
+  debugCol.style.width = nw + 'px';
+});
+document.addEventListener('mouseup', () => {
+  resizing = false;
+  document.body.style.cursor = '';
+  document.body.style.userSelect = '';
+});
+</script>
+</body>
+</html>
