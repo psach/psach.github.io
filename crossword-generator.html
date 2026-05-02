@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XWORD — Crossword Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Courier+Prime:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0c0a;
+  --surface: #161512;
+  --surface2: #1e1c18;
+  --cream: #f2ead8;
+  --cream2: #e8dfc9;
+  --gold: #c8a84b;
+  --gold2: #e8c96d;
+  --cell-active-bg: #ffd700;
+  --cell-word-bg: #fff8dc;
+  --cell-correct: #d4f0de;
+  --cell-wrong: #fad4d4;
+  --cell-revealed: #dde4ff;
+  --text: #f2ead8;
+  --text-dim: #8a7f6a;
+  --border: rgba(200,168,75,0.2);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Outfit',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── GRID DECORATION ── */
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(200,168,75,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(200,168,75,.025) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+
+/* ── INPUT SCREEN ── */
+#input-screen{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:48px 20px;
+  position:relative;z-index:1;
+}
+
+.hero{text-align:center;margin-bottom:48px}
+
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(56px,9vw,112px);
+  font-weight:900;letter-spacing:-3px;line-height:.88;
+  color:var(--cream);
+  text-shadow:0 0 80px rgba(200,168,75,.15);
+}
+
+.hero-title em{color:var(--gold);font-style:normal}
+
+.hero-sub{
+  font-size:11px;letter-spacing:5px;text-transform:uppercase;
+  color:var(--gold);margin-top:16px;font-weight:500;
+}
+
+.input-container{width:100%;max-width:700px}
+
+.textarea-wrapper{
+  position:relative;
+  border:1px solid var(--border);
+  background:var(--surface);
+  border-radius:3px;
+  transition:border-color .2s;
+}
+.textarea-wrapper:focus-within{border-color:rgba(200,168,75,.5)}
+
+.textarea-label{
+  position:absolute;top:14px;left:18px;
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);font-weight:500;pointer-events:none;
+}
+
+#word-input{
+  width:100%;min-height:260px;background:transparent;border:none;outline:none;
+  color:var(--cream);font-family:'Outfit',sans-serif;font-size:14px;line-height:1.75;
+  padding:42px 18px 0;resize:vertical;
+}
+#word-input::placeholder{color:var(--text-dim)}
+
+.textarea-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 18px;border-top:1px solid rgba(255,255,255,.06);
+}
+
+.word-count{font-size:11px;color:var(--text-dim)}
+.word-count span{color:var(--gold);font-weight:600}
+
+.sample-btn{
+  font-size:11px;color:var(--text-dim);background:none;border:none;
+  cursor:pointer;text-decoration:underline;font-family:'Outfit',sans-serif;
+}
+.sample-btn:hover{color:var(--gold)}
+
+.controls-row{display:flex;gap:12px;margin-top:16px}
+
+.settings-toggle{
+  display:flex;align-items:center;gap:8px;padding:0 22px;height:52px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:3px;
+  color:var(--text-dim);font-family:'Outfit',sans-serif;font-size:13px;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.settings-toggle:hover{border-color:var(--gold);color:var(--gold)}
+
+.generate-btn{
+  flex:1;height:52px;background:var(--gold);border:none;border-radius:3px;
+  color:#0d0c0a;font-family:'Outfit',sans-serif;font-weight:700;
+  font-size:13px;letter-spacing:2.5px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.generate-btn:hover{background:var(--gold2);transform:translateY(-1px)}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.generate-btn.loading::after{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+  animation:shimmer 1s infinite;
+}
+@keyframes shimmer{to{left:100%}}
+
+#error-msg{
+  color:#e87a6a;font-size:13px;text-align:center;
+  margin-top:12px;display:none;padding:10px;
+  background:rgba(232,122,106,.1);border:1px solid rgba(232,122,106,.2);
+  border-radius:3px;
+}
+
+/* ── SETTINGS PANEL ── */
+#settings-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;
+}
+
+#settings-panel{
+  position:fixed;top:0;right:-380px;width:360px;height:100vh;
+  background:var(--surface);border-left:1px solid var(--border);
+  z-index:100;transition:right .3s cubic-bezier(.4,0,.2,1);
+  padding:32px 24px;overflow-y:auto;
+}
+#settings-panel.open{right:0}
+
+.settings-hdr{
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
+  color:var(--cream);margin-bottom:32px;padding-bottom:16px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.close-btn{background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1}
+.close-btn:hover{color:var(--cream)}
+
+.s-group{margin-bottom:28px}
+.s-label{
+  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--gold);font-weight:600;margin-bottom:8px;display:block;
+}
+.s-desc{font-size:12px;color:var(--text-dim);margin-bottom:10px;line-height:1.5}
+
+select,.s-input{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:3px;color:var(--cream);font-family:'Outfit',sans-serif;
+  font-size:14px;padding:11px 14px;outline:none;-webkit-appearance:none;
+}
+select:focus,.s-input:focus{border-color:var(--gold)}
+.select-wrap{position:relative}
+.select-wrap::after{
+  content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--gold);pointer-events:none;
+}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.toggle-row .s-desc{margin:0;flex:1}
+
+.toggle{position:relative;width:46px;height:26px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{
+  position:absolute;inset:0;background:var(--surface2);
+  border:1px solid var(--border);border-radius:13px;cursor:pointer;transition:.25s;
+}
+.toggle-track::before{
+  content:'';position:absolute;width:18px;height:18px;
+  left:3px;top:3px;background:var(--text-dim);border-radius:50%;transition:.25s;
+}
+.toggle input:checked+.toggle-track{background:var(--gold);border-color:var(--gold)}
+.toggle input:checked+.toggle-track::before{transform:translateX(20px);background:var(--bg)}
+
+/* ── GAME SCREEN ── */
+#game-screen{display:none;min-height:100vh;flex-direction:column}
+#game-screen.active{display:flex}
+
+/* ── TIMER BAR ── */
+.timer-bar-wrap{
+  position:fixed;top:0;left:0;right:0;height:3px;z-index:200;
+  background:rgba(255,255,255,.05);
+}
+#timer-bar{height:100%;background:var(--gold);transition:width 1s linear,background .5s}
+#timer-bar.warn{background:#e87a50}
+#timer-bar.crit{background:#c94f4f}
+
+/* ── HEADER ── */
+.game-hdr{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  padding:14px 28px;border-bottom:1px solid rgba(255,255,255,.08);
+  background:var(--surface);flex-shrink:0;position:sticky;top:0;z-index:50;
+}
+
+.g-title{
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:900;
+  letter-spacing:-1px;color:var(--cream);
+}
+.g-title em{color:var(--gold);font-style:normal}
+
+.timer-box{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);padding:8px 18px;border-radius:3px;
+  border:1px solid var(--border);cursor:pointer;
+}
+.timer-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim)}
+#timer-val{
+  font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;
+  color:var(--gold);min-width:58px;text-align:center;
+}
+#timer-val.warn{color:#e87a50;animation:pulse 1s infinite}
+#timer-val.crit{color:#c94f4f;animation:pulse .5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+.stats{display:flex;gap:16px}
+.stat{text-align:center}
+.stat-v{font-family:'Courier Prime',monospace;font-size:18px;font-weight:700;color:var(--gold)}
+.stat-l{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim)}
+
+.hdr-btns{display:flex;gap:8px}
+.hbtn{
+  padding:8px 16px;background:transparent;border:1px solid rgba(200,168,75,.25);
+  border-radius:3px;color:var(--text-dim);font-family:'Outfit',sans-serif;
+  font-size:11px;letter-spacing:1.5px;cursor:pointer;transition:all .2s;text-transform:uppercase;
+}
+.hbtn:hover{border-color:var(--gold);color:var(--gold)}
+.hbtn.primary{background:var(--gold);border-color:var(--gold);color:#0d0c0a;font-weight:700}
+.hbtn.primary:hover{background:var(--gold2)}
+
+/* ── GAME BODY ── */
+.game-body{display:grid;grid-template-columns:1fr 290px;flex:1;overflow:hidden}
+
+/* ── GRID AREA ── */
+.grid-area{
+  padding:28px;overflow:auto;display:flex;
+  align-items:flex-start;justify-content:center;
+}
+
+.grid-wrap{
+  background:var(--cream2);padding:3px;
+  border:3px solid #111;display:inline-block;
+  box-shadow:6px 6px 0 rgba(200,168,75,.12),14px 14px 0 rgba(200,168,75,.05);
+}
+
+#cw-grid{border-collapse:collapse;display:block}
+
+.gc{width:36px;height:36px;border:1.5px solid #999;position:relative;padding:0}
+.gc.blk{background:#111;border-color:#111}
+.gc.wht{background:#fff;cursor:text}
+.gc.wht:hover{background:#fefcf7}
+.gc.aw{background:var(--cell-word-bg) !important}
+.gc.ac{background:var(--cell-active-bg) !important}
+.gc.ok{background:var(--cell-correct) !important}
+.gc.bad{background:var(--cell-wrong) !important}
+.gc.rev{background:var(--cell-revealed) !important}
+
+.cn{
+  position:absolute;top:1px;left:2px;
+  font-size:8.5px;font-family:'Courier Prime',monospace;font-weight:700;
+  color:#333;line-height:1;pointer-events:none;z-index:1;
+}
+
+.ci{
+  position:absolute;inset:0;width:100%;height:100%;
+  border:none;outline:none;background:transparent;
+  text-align:center;font-family:'Courier Prime',monospace;
+  font-size:17px;font-weight:700;color:#111;
+  text-transform:uppercase;cursor:pointer;
+  padding-top:9px;caret-color:transparent;
+  -webkit-user-select:none;user-select:none;
+}
+
+/* ── CLUES PANEL ── */
+.clues-panel{
+  background:var(--surface);border-left:1px solid rgba(255,255,255,.08);
+  overflow-y:auto;display:flex;flex-direction:column;
+}
+.clues-sec{padding:18px 16px}
+.clues-sec+.clues-sec{border-top:1px solid rgba(255,255,255,.07)}
+.clues-hdr{
+  font-family:'Playfair Display',serif;font-size:12px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.clues-hdr::after{content:'';flex:1;height:1px;background:rgba(200,168,75,.2)}
+
+.cli{
+  display:flex;gap:8px;margin-bottom:8px;cursor:pointer;
+  padding:5px 6px;border-radius:2px;transition:background .15s;
+}
+.cli:hover{background:rgba(255,255,255,.04)}
+.cli.active{background:rgba(200,168,75,.1)}
+.cli-n{
+  font-family:'Courier Prime',monospace;font-size:12px;font-weight:700;
+  color:var(--gold);min-width:22px;text-align:right;
+  padding-top:1px;flex-shrink:0;
+}
+.cli-t{font-size:12px;line-height:1.5;color:var(--text-dim)}
+.cli.active .cli-t{color:var(--cream)}
+
+/* ── MODALS ── */
+.modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);
+  z-index:300;align-items:center;justify-content:center;
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid rgba(200,168,75,.3);
+  border-radius:4px;padding:44px 40px;max-width:420px;width:90%;text-align:center;
+}
+.modal-icon{font-size:52px;margin-bottom:14px}
+.modal-ttl{
+  font-family:'Playfair Display',serif;font-size:30px;font-weight:700;
+  color:var(--cream);margin-bottom:12px;
+}
+.modal-txt{font-size:14px;color:var(--text-dim);line-height:1.65;margin-bottom:28px}
+.modal-acts{display:flex;gap:12px;justify-content:center}
+
+/* ── WORD DIRECTION BADGE ── */
+.dir-badge{
+  position:absolute;bottom:0;right:0;width:0;height:0;
+  border-style:solid;border-width:0 0 8px 8px;
+  border-color:transparent transparent rgba(200,168,75,.6) transparent;
+  pointer-events:none;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(200,168,75,.25);border-radius:3px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:780px){
+  .game-body{grid-template-columns:1fr}
+  .clues-panel{max-height:280px;border-left:none;border-top:1px solid rgba(255,255,255,.08)}
+  .game-hdr{padding:10px 14px}
+  .grid-area{padding:16px}
+  .stats{display:none}
+}
+@media(max-width:480px){
+  .hdr-btns .hbtn:not(.primary){display:none}
+  .gc{width:28px;height:28px}
+  .ci{font-size:13px;padding-top:7px}
+  .cn{font-size:7px}
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<!-- Timer bar -->
+<div class="timer-bar-wrap"><div id="timer-bar" style="width:100%"></div></div>
+
+<!-- Settings overlay -->
+<div id="settings-overlay" onclick="closeSettings()"></div>
+
+<!-- Settings panel -->
+<div id="settings-panel">
+  <div class="settings-hdr">
+    Settings
+    <button class="close-btn" onclick="closeSettings()">×</button>
+  </div>
+
+  <div class="s-group">
+    <span class="s-label">Reveal Timer</span>
+    <p class="s-desc">Answers auto-reveal after this duration (if enabled below)</p>
+    <div class="select-wrap">
+      <select id="s-timer" onchange="onTimerChange()">
+        <option value="60">1 minute</option>
+        <option value="300" selected>5 minutes</option>
+        <option value="600">10 minutes</option>
+        <option value="900">15 minutes</option>
+        <option value="1800">30 minutes</option>
+        <option value="3600">60 minutes</option>
+        <option value="custom">Custom…</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="s-group" id="custom-grp" style="display:none">
+    <span class="s-label">Custom Duration (minutes)</span>
+    <input class="s-input" type="number" id="s-custom" min="1" max="240" value="20" placeholder="Minutes">
+  </div>
+
+  <div class="s-group">
+    <div class="toggle-row">
+      <p class="s-desc">Auto-reveal answers when timer ends</p>
+      <label class="toggle">
+        <input type="checkbox" id="s-autoreveal" checked>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="s-group">
+    <span class="s-label">Words in Puzzle</span>
+    <p class="s-desc">How many words to attempt to place</p>
+    <div class="select-wrap">
+      <select id="s-wordcount">
+        <option value="20">~20 words (Quick)</option>
+        <option value="35" selected>~35 words (Standard)</option>
+        <option value="50">~50 words (Challenge)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="s-group">
+    <span class="s-label">Minimum Word Length</span>
+    <div class="select-wrap">
+      <select id="s-minlen">
+        <option value="3">3 letters</option>
+        <option value="4" selected>4 letters</option>
+        <option value="5">5 letters</option>
+        <option value="6">6 letters</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="s-group">
+    <span class="s-label">Grid Size</span>
+    <div class="select-wrap">
+      <select id="s-gridsize">
+        <option value="19">19 × 19</option>
+        <option value="23" selected>23 × 23</option>
+        <option value="27">27 × 27</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ INPUT SCREEN ════════════ -->
+<div id="input-screen">
+  <div class="hero">
+    <h1 class="hero-title">CROSS<em>WORD</em></h1>
+    <p class="hero-sub">Puzzle Generator — paste any text, play instantly</p>
+  </div>
+
+  <div class="input-container">
+    <div class="textarea-wrapper">
+      <span class="textarea-label">Your text — up to 5,000 words</span>
+      <textarea id="word-input" spellcheck="false"
+        placeholder="&#10;&#10;Paste any article, story, Wikipedia entry, or list of words here.&#10;&#10;The generator extracts unique words, builds clues from context, and assembles an interactive crossword puzzle automatically…"></textarea>
+      <div class="textarea-footer">
+        <div class="word-count"><span id="wc">0</span> words · <span id="cc">0</span> chars</div>
+        <button class="sample-btn" onclick="loadSample()">Load sample text</button>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <button class="settings-toggle" onclick="openSettings()">⚙ Settings</button>
+      <button class="generate-btn" id="gen-btn" onclick="generate()">Generate Puzzle</button>
+    </div>
+    <div id="error-msg"></div>
+  </div>
+</div>
+
+<!-- ════════════ GAME SCREEN ════════════ -->
+<div id="game-screen">
+  <div class="game-hdr">
+    <div class="g-title">X<em>WORD</em></div>
+
+    <div class="timer-box" title="Click to pause/resume" onclick="togglePause()">
+      <span class="timer-lbl" id="timer-lbl">Reveal in</span>
+      <span id="timer-val">05:00</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-v" id="s-filled">0</div><div class="stat-l">Filled</div></div>
+      <div class="stat"><div class="stat-v" id="s-correct">—</div><div class="stat-l">Correct</div></div>
+      <div class="stat"><div class="stat-v" id="s-total">0</div><div class="stat-l">Total</div></div>
+    </div>
+
+    <div class="hdr-btns">
+      <button class="hbtn" onclick="checkAnswers()">Check</button>
+      <button class="hbtn" onclick="revealAll(false)">Reveal</button>
+      <button class="hbtn primary" onclick="startOver()">New Puzzle</button>
+    </div>
+  </div>
+
+  <div class="game-body">
+    <div class="grid-area">
+      <div class="grid-wrap">
+        <table id="cw-grid"></table>
+      </div>
+    </div>
+    <div class="clues-panel">
+      <div class="clues-sec">
+        <div class="clues-hdr">Across</div>
+        <div id="across-clues"></div>
+      </div>
+      <div class="clues-sec">
+        <div class="clues-hdr">Down</div>
+        <div id="down-clues"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-bg" id="m-reveal">
+  <div class="modal">
+    <div class="modal-icon">⏰</div>
+    <div class="modal-ttl">Time's Up!</div>
+    <div class="modal-txt">Your time has expired. The correct answers have been filled in. Study the solution and try again!</div>
+    <div class="modal-acts">
+      <button class="hbtn" onclick="closeModal('m-reveal')">View Solution</button>
+      <button class="hbtn primary" onclick="startOver()">New Puzzle</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="m-complete">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-ttl">Solved!</div>
+    <div class="modal-txt" id="m-complete-txt">Congratulations! You've completed the crossword perfectly!</div>
+    <div class="modal-acts">
+      <button class="hbtn primary" onclick="startOver()">New Puzzle</button>
+      <button class="hbtn" onclick="closeModal('m-complete')">Keep Playing</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ -->
+<!--              JAVASCRIPT            -->
+<!-- ════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ══════════ STATE ══════════ */
+const G = {
+  grid: null,        // 2D array of chars or null
+  rows: 0,
+  cols: 0,
+  placements: [],    // [{word,row,col,direction,number}]
+  numbers: {},       // "r,c" -> number
+  wordClues: {},     // word -> clue string
+  cell: null,        // [r,c] current cell
+  dir: 'across',
+  timerSecs: 300,
+  remaining: 300,
+  paused: false,
+  timerInterval: null,
+  totalCells: 0,
+  revealed: false
+};
+
+/* ══════════ WORD EXTRACTION ══════════ */
+const STOP = new Set(
+  'the and for are but not you all any can had her was one our out day get has him his how man new now old see two way who boy did its let put say she too use that with have from they this will your each which their there been more very what know just into time year than like come make over also back after first well only then even most take good some could these look such long many great give should between would about after again before being below does down during each from further here into most move need next once only other over same still such than then there through under until upon very when where while with within would'.split(' ')
+);
+
+function extractWords(text) {
+  const maxW   = +document.getElementById('s-wordcount').value || 35;
+  const minLen = +document.getElementById('s-minlen').value    || 4;
+
+  // split into sentences for context clues
+  const sents = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 8);
+
+  const raw   = text.toLowerCase().match(/[a-z]+/g) || [];
+  const seen  = new Set();
+  const out   = [];
+
+  for (const w of raw) {
+    if (w.length < minLen || w.length > 14 || seen.has(w) || STOP.has(w)) continue;
+    seen.add(w);
+
+    // build fill-in-the-blank clue
+    const sent = sents.find(s => new RegExp(`\\b${w}\\b`,'i').test(s));
+    let clue = sent
+      ? sent.replace(new RegExp(`\\b${w}\\b`,'gi'), '_'.repeat(w.length)).trim()
+      : `${w.length}-letter word`;
+    if (clue.length > 95) clue = clue.slice(0,92) + '…';
+
+    out.push({ word: w, clue });
+    if (out.length >= maxW * 2) break;
+  }
+
+  return out.sort((a,b) => b.word.length - a.word.length).slice(0, maxW);
+}
+
+/* ══════════ CROSSWORD GENERATOR ══════════ */
+class CWGen {
+  constructor(wordList, size = 23) {
+    this.words    = wordList;
+    this.size     = size;
+    this.g        = Array.from({length:size}, () => Array(size).fill(null));
+    this.placed   = [];
+    this.clueMap  = Object.fromEntries(wordList.map(w => [w.word, w.clue]));
+  }
+
+  run() {
+    const sorted = [...this.words].map(w=>w.word).sort((a,b)=>b.length-a.length);
+    if (!sorted.length) return null;
+
+    // place first word horizontally at centre
+    const f = sorted[0];
+    const sc = Math.floor((this.size - f.length) / 2);
+    const sr = Math.floor(this.size / 2);
+    this._place(f, sr, sc, 'across');
+
+    // place rest with multi-pass retry
+    const remaining = sorted.slice(1);
+    let passes = 0;
+    while (remaining.length && passes < 4) {
+      let placed = false;
+      for (let i = remaining.length-1; i >= 0; i--) {
+        if (this._try(remaining[i])) { remaining.splice(i,1); placed = true; }
+      }
+      if (!placed) passes++;
+    }
+
+    return this._build();
+  }
+
+  _try(word) {
+    let best = null, bestScore = -Infinity;
+
+    for (const p of this.placed) {
+      const nd = p.direction === 'across' ? 'down' : 'across';
+      for (let pi = 0; pi < p.word.length; pi++) {
+        for (let wi = 0; wi < word.length; wi++) {
+          if (p.word[pi] !== word[wi]) continue;
+          let r, c;
+          if (p.direction === 'across') { r = p.row - wi; c = p.col + pi; }
+          else                          { r = p.row + pi; c = p.col - wi; }
+          if (!this._can(word, r, c, nd)) continue;
+          const sc = this._score(word, r, c, nd);
+          if (sc > bestScore) { bestScore = sc; best = {word,r,c,d:nd}; }
+        }
+      }
+    }
+    if (best) { this._place(best.word, best.r, best.c, best.d); return true; }
+    return false;
+  }
+
+  _can(word, row, col, dir) {
+    const len = word.length, sz = this.size;
+    if (dir === 'across') {
+      if (col < 0 || col + len > sz || row < 0 || row >= sz) return false;
+      if (col > 0       && this.g[row][col-1]   !== null) return false;
+      if (col+len < sz  && this.g[row][col+len]  !== null) return false;
+    } else {
+      if (row < 0 || row + len > sz || col < 0 || col >= sz) return false;
+      if (row > 0       && this.g[row-1][col]   !== null) return false;
+      if (row+len < sz  && this.g[row+len][col]  !== null) return false;
+    }
+
+    let cross = 0;
+    for (let i = 0; i < len; i++) {
+      const r = dir==='across' ? row    : row+i;
+      const c = dir==='across' ? col+i  : col;
+      const ex = this.g[r][c];
+      if (ex !== null) {
+        if (ex !== word[i]) return false;
+        cross++;
+      } else {
+        // perpendicular adjacency must be empty
+        if (dir === 'across') {
+          if (r>0    && this.g[r-1][c] !== null) return false;
+          if (r<sz-1 && this.g[r+1][c] !== null) return false;
+        } else {
+          if (c>0    && this.g[r][c-1] !== null) return false;
+          if (c<sz-1 && this.g[r][c+1] !== null) return false;
+        }
+      }
+    }
+    return this.placed.length === 0 || cross > 0;
+  }
+
+  _score(word, row, col, dir) {
+    let cross = 0;
+    for (let i = 0; i < word.length; i++) {
+      const r = dir==='across'?row:row+i, c = dir==='across'?col+i:col;
+      if (this.g[r][c] !== null) cross++;
+    }
+    const dist = Math.abs(row+word.length/2 - this.size/2) + Math.abs(col+word.length/2 - this.size/2);
+    return cross*10 - dist*.5;
+  }
+
+  _place(word, row, col, dir) {
+    this.placed.push({word, row, col, direction:dir});
+    for (let i = 0; i < word.length; i++) {
+      const r = dir==='across'?row:row+i, c = dir==='across'?col+i:col;
+      this.g[r][c] = word[i];
+    }
+  }
+
+  _build() {
+    let minR=this.size, maxR=0, minC=this.size, maxC=0;
+    for (const p of this.placed) {
+      const er = p.direction==='down'  ? p.row+p.word.length-1 : p.row;
+      const ec = p.direction==='across'? p.col+p.word.length-1 : p.col;
+      minR=Math.min(minR,p.row); maxR=Math.max(maxR,er);
+      minC=Math.min(minC,p.col); maxC=Math.max(maxC,ec);
+    }
+    minR=Math.max(0,minR-1); maxR=Math.min(this.size-1,maxR+1);
+    minC=Math.max(0,minC-1); maxC=Math.min(this.size-1,maxC+1);
+
+    const rows=maxR-minR+1, cols=maxC-minC+1;
+    const grid = [];
+    for (let r=minR; r<=maxR; r++) {
+      const row=[];
+      for (let c=minC; c<=maxC; c++) row.push(this.g[r][c]);
+      grid.push(row);
+    }
+
+    const placements = this.placed.map(p=>({
+      ...p, row:p.row-minR, col:p.col-minC
+    }));
+
+    // assign numbers left→right, top→bottom
+    const numbers={};
+    let num=1;
+    for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) {
+      if (!grid[r][c]) continue;
+      const sa = placements.some(p=>p.direction==='across'&&p.row===r&&p.col===c);
+      const sd = placements.some(p=>p.direction==='down'  &&p.row===r&&p.col===c);
+      if (sa||sd) { numbers[`${r},${c}`]=num++; }
+    }
+    for (const p of placements) p.number = numbers[`${p.row},${p.col}`];
+
+    return { grid, placements, numbers, rows, cols, wordClues:this.clueMap };
+  }
+}
+
+/* ══════════ UI HELPERS ══════════ */
+function openSettings()  { document.getElementById('settings-panel').classList.add('open'); document.getElementById('settings-overlay').style.display='block'; }
+function closeSettings() { document.getElementById('settings-panel').classList.remove('open'); document.getElementById('settings-overlay').style.display='none'; }
+function closeModal(id)  { document.getElementById(id).classList.remove('open'); }
+function onTimerChange() { document.getElementById('custom-grp').style.display = document.getElementById('s-timer').value==='custom'?'block':'none'; }
+
+function timerSecs() {
+  const v = document.getElementById('s-timer').value;
+  if (v==='custom') return (+document.getElementById('s-custom').value||5)*60;
+  return +v;
+}
+
+function fmt(s) {
+  return `${String(Math.floor(Math.max(0,s)/60)).padStart(2,'0')}:${String(Math.max(0,s)%60).padStart(2,'0')}`;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg; el.style.display='block';
+  setTimeout(()=>el.style.display='none', 4000);
+}
+
+/* word count display */
+document.getElementById('word-input').addEventListener('input', function(){
+  const t=this.value;
+  document.getElementById('wc').textContent=(t.trim()?t.trim().split(/\s+/).length:0).toLocaleString();
+  document.getElementById('cc').textContent=t.length.toLocaleString();
+});
+
+function loadSample() {
+  const s = `The mitochondria is the powerhouse of the cell. Photosynthesis converts sunlight into chemical energy through chlorophyll. Darwin proposed the theory of evolution by natural selection. Quantum mechanics describes the behavior of subatomic particles. The Renaissance was a cultural movement that began in Italy. Shakespeare wrote tragedies, comedies, and historical plays. The French Revolution transformed political power in Europe. Newton discovered gravity when an apple fell from a tree. Electricity is generated by rotating magnets inside coils of copper. Tectonic plates move slowly across the mantle beneath the oceans. Bacteria reproduce rapidly through binary fission. Neurons transmit electrical signals across synapses. The Amazon rainforest produces significant amounts of oxygen. Volcanoes erupt when magma rises through the crust. Galaxies contain billions of stars held together by gravity. Mathematics underlies patterns found throughout nature and science. Philosophy examines fundamental questions about existence and knowledge. Architecture blends engineering with artistic expression. Democracy requires citizens to participate in governance. Economics studies how societies allocate scarce resources. Literature reflects the culture and values of its time. Chemistry explores how atoms and molecules interact and transform. Psychology investigates behavior and mental processes. Geography shapes human civilizations and trade routes. Music communicates emotion through rhythm, melody, and harmony.`;
+  document.getElementById('word-input').value = s;
+  document.getElementById('word-input').dispatchEvent(new Event('input'));
+}
+
+/* ══════════ GENERATE ══════════ */
+function generate() {
+  const text = document.getElementById('word-input').value.trim();
+  if (!text) { showError('Please paste some text first.'); return; }
+
+  const btn = document.getElementById('gen-btn');
+  btn.disabled=true; btn.classList.add('loading'); btn.textContent='Generating…';
+
+  setTimeout(() => {
+    try {
+      const wordList = extractWords(text);
+      if (wordList.length < 5) {
+        showError('Not enough unique words. Try pasting more text.'); reset_btn(); return;
+      }
+      const size = +document.getElementById('s-gridsize').value || 23;
+      const gen  = new CWGen(wordList, size);
+      const res  = gen.run();
+      if (!res || res.placements.length < 3) {
+        showError('Could not build a crossword. Try different or longer text.'); reset_btn(); return;
+      }
+      startGame(res);
+    } catch(e) {
+      console.error(e); showError('Something went wrong. Please try again.'); reset_btn();
+    }
+  }, 80);
+}
+
+function reset_btn() {
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=false; btn.classList.remove('loading'); btn.textContent='Generate Puzzle';
+}
+
+/* ══════════ GAME START ══════════ */
+function startGame(res) {
+  Object.assign(G, {
+    grid: res.grid, rows: res.rows, cols: res.cols,
+    placements: res.placements, numbers: res.numbers, wordClues: res.wordClues,
+    cell: null, dir: 'across',
+    timerSecs: timerSecs(), remaining: timerSecs(),
+    paused: false, totalCells: 0, revealed: false
+  });
+  G.remaining = G.timerSecs;
+
+  renderGrid(res);
+  renderClues(res);
+
+  document.getElementById('s-total').textContent = G.totalCells;
+  document.getElementById('s-filled').textContent = 0;
+  document.getElementById('s-correct').textContent = '—';
+
+  document.getElementById('input-screen').style.display = 'none';
+  document.getElementById('game-screen').classList.add('active');
+
+  clearInterval(G.timerInterval);
+  updateTimer();
+  G.timerInterval = setInterval(tick, 1000);
+}
+
+/* ══════════ GRID RENDER ══════════ */
+function renderGrid(res) {
+  G.totalCells = 0;
+  const tbl = document.getElementById('cw-grid');
+  tbl.innerHTML = '';
+
+  for (let r=0; r<res.rows; r++) {
+    const tr = document.createElement('tr');
+    for (let c=0; c<res.cols; c++) {
+      const td = document.createElement('td');
+      td.className = 'gc';
+      td.dataset.r = r; td.dataset.c = c;
+
+      if (res.grid[r][c] !== null) {
+        td.classList.add('wht');
+        G.totalCells++;
+
+        const num = res.numbers[`${r},${c}`];
+        if (num) {
+          const ns = document.createElement('span');
+          ns.className='cn'; ns.textContent=num; td.appendChild(ns);
+        }
+
+        const inp = document.createElement('input');
+        inp.className='ci'; inp.maxLength=1;
+        inp.dataset.ans = res.grid[r][c];
+        inp.autocomplete='off'; inp.spellcheck=false;
+        inp.readOnly = true; // prevent mobile keyboard on tap until focused properly
+
+        inp.addEventListener('mousedown', e => { e.preventDefault(); cellClick(r,c); });
+        inp.addEventListener('touchstart', e => { e.preventDefault(); cellClick(r,c); }, {passive:false});
+        inp.addEventListener('keydown', e => keyDown(e,r,c));
+        inp.addEventListener('focus', () => { inp.readOnly=false; });
+        inp.addEventListener('blur',  () => { inp.readOnly=true;  });
+
+        td.appendChild(inp);
+      } else {
+        td.classList.add('blk');
+      }
+      tr.appendChild(td);
+    }
+    tbl.appendChild(tr);
+  }
+}
+
+/* ══════════ CELL / KEYBOARD ══════════ */
+function $cell(r,c) { return document.querySelector(`td[data-r="${r}"][data-c="${c}"]`); }
+function $inp(r,c)  { const td=$cell(r,c); return td?td.querySelector('.ci'):null; }
+
+function cellClick(r,c) {
+  if (G.cell && G.cell[0]===r && G.cell[1]===c) {
+    // toggle direction if both directions exist at this cell
+    if (wordAt(r,c,'across') && wordAt(r,c,'down'))
+      G.dir = G.dir==='across'?'down':'across';
+  } else {
+    G.cell=[r,c];
+    if (!wordAt(r,c,G.dir)) G.dir=G.dir==='across'?'down':'across';
+  }
+  highlight(); focus(r,c);
+}
+
+function focus(r,c) {
+  const inp=$inp(r,c);
+  if (!inp) return;
+  inp.readOnly=false;
+  inp.focus();
+}
+
+function wordAt(r,c,dir) {
+  return G.placements.find(p => {
+    if (p.direction!==dir) return false;
+    if (dir==='across') return p.row===r && c>=p.col && c<p.col+p.word.length;
+    return p.col===c && r>=p.row && r<p.row+p.word.length;
+  }) || null;
+}
+
+function inWord(p,r,c) {
+  if (p.direction==='across') return p.row===r && c>=p.col && c<p.col+p.word.length;
+  return p.col===c && r>=p.row && r<p.row+p.word.length;
+}
+
+function highlight() {
+  document.querySelectorAll('.gc.wht').forEach(td => td.classList.remove('aw','ac'));
+  document.querySelectorAll('.cli.active').forEach(el => el.classList.remove('active'));
+  if (!G.cell) return;
+
+  const [r,c] = G.cell;
+  const p = wordAt(r,c,G.dir);
+  if (!p) return;
+
+  // word cells
+  for (let i=0;i<p.word.length;i++) {
+    const cr=p.direction==='across'?p.row:p.row+i;
+    const cc=p.direction==='across'?p.col+i:p.col;
+    const td=$cell(cr,cc);
+    if (td) td.classList.add('aw');
+  }
+  // active cell
+  const act=$cell(r,c);
+  if (act) { act.classList.remove('aw'); act.classList.add('ac'); }
+
+  // clue
+  const clueEl=document.querySelector(`.cli[data-n="${p.number}"][data-d="${p.direction}"]`);
+  if (clueEl) { clueEl.classList.add('active'); clueEl.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+}
+
+function keyDown(e,r,c) {
+  const k=e.key;
+
+  // letter
+  if (k.length===1 && /[a-zA-Z]/.test(k)) {
+    e.preventDefault();
+    const inp=$inp(r,c);
+    if (inp) {
+      inp.value=k.toUpperCase();
+      updateStats();
+      checkWin();
+    }
+    advance(r,c,1);
+    return;
+  }
+
+  // navigation
+  if (k==='Backspace'||k==='Delete') {
+    e.preventDefault();
+    const inp=$inp(r,c);
+    if (inp&&inp.value) { inp.value=''; updateStats(); }
+    else advance(r,c,-1);
+    return;
+  }
+
+  if (k==='Tab') { e.preventDefault(); nextWord(e.shiftKey); return; }
+
+  if (k==='ArrowRight') { e.preventDefault(); G.dir='across'; moveRaw(r,c,0,1); return; }
+  if (k==='ArrowLeft')  { e.preventDefault(); G.dir='across'; moveRaw(r,c,0,-1);return; }
+  if (k==='ArrowDown')  { e.preventDefault(); G.dir='down';   moveRaw(r,c,1,0); return; }
+  if (k==='ArrowUp')    { e.preventDefault(); G.dir='down';   moveRaw(r,c,-1,0);return; }
+}
+
+function moveRaw(r,c,dr,dc) {
+  const nr=r+dr, nc=c+dc;
+  if (nr<0||nr>=G.rows||nc<0||nc>=G.cols) return;
+  if (G.grid[nr][nc]===null) return;
+  G.cell=[nr,nc];
+  highlight(); focus(nr,nc);
+}
+
+function advance(r,c,dir) {
+  const p=wordAt(r,c,G.dir);
+  if (!p) return;
+  const dr=G.dir==='down'?dir:0;
+  const dc=G.dir==='across'?dir:0;
+  const nr=r+dr, nc=c+dc;
+  if (inWord(p,nr,nc)) { G.cell=[nr,nc]; highlight(); focus(nr,nc); }
+}
+
+function nextWord(rev=false) {
+  const ps=G.placements;
+  const cur=G.cell?wordAt(G.cell[0],G.cell[1],G.dir):null;
+  let idx=cur?ps.indexOf(cur):-1;
+  idx=rev?(idx-1+ps.length)%ps.length:(idx+1)%ps.length;
+  const nxt=ps[idx];
+  G.cell=[nxt.row,nxt.col]; G.dir=nxt.direction;
+  highlight(); focus(nxt.row,nxt.col);
+}
+
+/* ══════════ CLUES RENDER ══════════ */
+function renderClues(res) {
+  const aDiv=document.getElementById('across-clues');
+  const dDiv=document.getElementById('down-clues');
+  aDiv.innerHTML=''; dDiv.innerHTML='';
+
+  const ac=res.placements.filter(p=>p.direction==='across').sort((a,b)=>a.number-b.number);
+  const dn=res.placements.filter(p=>p.direction==='down').sort((a,b)=>a.number-b.number);
+
+  for (const p of ac) aDiv.appendChild(mkClue(p,'across',res.wordClues));
+  for (const p of dn) dDiv.appendChild(mkClue(p,'down',  res.wordClues));
+}
+
+function mkClue(p,dir,wc) {
+  const d=document.createElement('div');
+  d.className='cli'; d.dataset.n=p.number; d.dataset.d=dir;
+  const clue=wc[p.word]||`${p.word.length}-letter word`;
+  d.innerHTML=`<span class="cli-n">${p.number}</span><span class="cli-t">${clue} <em style="opacity:.5;font-style:normal">(${p.word.length})</em></span>`;
+  d.addEventListener('click',()=>{
+    G.cell=[p.row,p.col]; G.dir=dir; highlight(); focus(p.row,p.col);
+  });
+  return d;
+}
+
+/* ══════════ STATS ══════════ */
+function updateStats() {
+  let filled=0;
+  document.querySelectorAll('.ci').forEach(i=>{ if(i.value) filled++; });
+  document.getElementById('s-filled').textContent=filled;
+  document.getElementById('s-correct').textContent='—';
+}
+
+function checkWin() {
+  const inputs=[...document.querySelectorAll('.ci')];
+  if (!inputs.every(i=>i.value)) return;
+  if (inputs.every(i=>i.value.toLowerCase()===i.dataset.ans.toLowerCase())) {
+    clearInterval(G.timerInterval);
+    setTimeout(()=>document.getElementById('m-complete').classList.add('open'),400);
+  }
+}
+
+/* ══════════ ACTIONS ══════════ */
+function checkAnswers() {
+  let correct=0;
+  document.querySelectorAll('.ci').forEach(inp=>{
+    const td=inp.closest('.gc');
+    td.classList.remove('ok','bad','rev');
+    if (inp.value) {
+      if (inp.value.toLowerCase()===inp.dataset.ans.toLowerCase()) { td.classList.add('ok'); correct++; }
+      else td.classList.add('bad');
+    }
+  });
+  document.getElementById('s-correct').textContent=correct;
+  setTimeout(()=>{
+    document.querySelectorAll('.gc.ok,.gc.bad').forEach(td=>td.classList.remove('ok','bad'));
+  }, 2500);
+}
+
+function revealAll(fromTimer=false) {
+  clearInterval(G.timerInterval);
+  G.revealed=true;
+  document.querySelectorAll('.ci').forEach(inp=>{
+    if (!inp.value||inp.value.toLowerCase()!==inp.dataset.ans.toLowerCase()) {
+      inp.value=inp.dataset.ans.toUpperCase();
+      inp.closest('.gc').classList.add('rev');
+    }
+  });
+  updateStats();
+  if (fromTimer) document.getElementById('m-reveal').classList.add('open');
+}
+
+function startOver() {
+  clearInterval(G.timerInterval);
+  G.totalCells=0; G.cell=null;
+  document.getElementById('game-screen').classList.remove('active');
+  document.getElementById('input-screen').style.display='';
+  document.querySelectorAll('.modal-bg').forEach(m=>m.classList.remove('open'));
+  reset_btn();
+}
+
+/* ══════════ TIMER ══════════ */
+function tick() {
+  if (G.paused) return;
+  G.remaining--;
+  updateTimer();
+  if (G.remaining<=0) {
+    clearInterval(G.timerInterval);
+    if (document.getElementById('s-autoreveal').checked) revealAll(true);
+  }
+}
+
+function togglePause() {
+  G.paused=!G.paused;
+  document.getElementById('timer-lbl').textContent = G.paused?'Paused':'Reveal in';
+}
+
+function updateTimer() {
+  const s=Math.max(0,G.remaining), tot=G.timerSecs;
+  const pct=(s/tot)*100;
+  const bar=document.getElementById('timer-bar');
+  const val=document.getElementById('timer-val');
+  val.textContent=fmt(s);
+  bar.style.width=pct+'%';
+  const cls = s<=60?'crit':s<=tot*.25?'warn':'';
+  bar.className=''; if(cls) bar.classList.add(cls);
+  val.className=''; if(cls) val.classList.add(cls);
+}
+</script>
+</body>
+</html>
