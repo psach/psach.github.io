@@ -2664,8 +2664,8 @@ if (!userId) {
 }
 
 // Visit count per user+url
-let visitCount = parseInt(localStorage.getItem(window.location.href+"visit_count") || "0") + 1;
-localStorage.setItem(window.location.href+"visit_count", visitCount);
+let visitCount = parseInt(localStorage.getItem(window.location.href + "|" + userId + "|visit_count") || "0") + 1;
+localStorage.setItem(window.location.href + "|" + userId + "|visit_count", visitCount);
 
 // Prepare payload
 let payload = encodeURIComponent(
