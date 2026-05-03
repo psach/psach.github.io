@@ -2663,9 +2663,9 @@ if (!userId) {
     localStorage.setItem("is_unique", "true");
 }
 
-// Visit count per user
-let visitCount = parseInt(localStorage.getItem("visit_count") || "0") + 1;
-localStorage.setItem("visit_count", visitCount);
+// Visit count per user+url
+let visitCount = parseInt(localStorage.getItem(window.location.href+"visit_count") || "0") + 1;
+localStorage.setItem(window.location.href+"visit_count", visitCount);
 
 // Prepare payload
 let payload = encodeURIComponent(
