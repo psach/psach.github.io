@@ -2686,6 +2686,7 @@ fetch(SHEET_CSV_URL)
 
     let total = 0;
     let uniqueUsers = new Set();
+    let totalUsers = new Set();
 
     rows.forEach(row => {
         let cols = row.split(",");
@@ -2695,7 +2696,7 @@ fetch(SHEET_CSV_URL)
                 let parts = decodeURIComponent(data).split("|");
                  let url = parts[0];
                 let user = parts[1];
-                total++;
+                totalUsers.add(url);
                 uniqueUsers.add(url+user);
             }
         }
