@@ -1138,7 +1138,6 @@ if (!userId) {
     localStorage.setItem("is_unique", "true");
 }
 
-// Visit count per user
 // Visit count per user+url
 let visitCount = parseInt(localStorage.getItem(window.location.href + "|" + userId + "|visit_count") || "0") + 1;
 localStorage.setItem(window.location.href + "|" + userId + "|visit_count", visitCount);
@@ -1162,6 +1161,7 @@ fetch(SHEET_CSV_URL)
 
     let total = 0;
     let uniqueUsers = new Set();
+    let totalUsers = new Set();
 
     rows.forEach(row => {
         let cols = row.split(",");
@@ -1170,15 +1170,17 @@ fetch(SHEET_CSV_URL)
             if (data) {
                 let parts = decodeURIComponent(data).split("|");
                 let url = parts[0];
-              
                 let user = parts[1];
-                total++;
+                let c = parts[2];
+                if(window.location.href===url){
+                totalUsers.add(url+c);
                 uniqueUsers.add(url+user);
+                }
             }
         }
     });
 
-    document.getElementById("totalCount").innerText = total;
+    document.getElementById("totalCount").innerText = totalUsers.size;
     document.getElementById("uniqueCount").innerText = uniqueUsers.size;
 })
 .catch(err => {
