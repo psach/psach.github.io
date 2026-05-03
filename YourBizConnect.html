@@ -2696,8 +2696,10 @@ fetch(SHEET_CSV_URL)
                 let parts = decodeURIComponent(data).split("|");
                  let url = parts[0];
                 let user = parts[1];
+                if(window.location.href===url){
                 totalUsers.add(url);
                 uniqueUsers.add(url+user);
+                }
             }
         }
     });
