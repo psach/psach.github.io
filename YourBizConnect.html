@@ -2704,7 +2704,7 @@ fetch(SHEET_CSV_URL)
         }
     });
 
-    document.getElementById("totalCount").innerText = total;
+    document.getElementById("totalCount").innerText = totalUsers.size;
     document.getElementById("uniqueCount").innerText = uniqueUsers.size;
 })
 .catch(err => {
