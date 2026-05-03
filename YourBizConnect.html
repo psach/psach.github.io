@@ -2694,10 +2694,11 @@ fetch(SHEET_CSV_URL)
             let data = cols[1]; // your form field column
             if (data) {
                 let parts = decodeURIComponent(data).split("|");
-                 let url = parts[0];
+                let url = parts[0];
                 let user = parts[1];
+                let c = parts[2];
                 if(window.location.href===url){
-                totalUsers.add(url);
+                totalUsers.add(url+c);
                 uniqueUsers.add(url+user);
                 }
             }
