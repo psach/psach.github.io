@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ Crossword Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0b0b0b; --surface:#141414; --surface2:#1c1c1c; --surface3:#242424;
+  --border:#2a2a2a; --border2:#333;
+  --text:#e8e4dc; --muted:#888; --muted2:#555;
+  --gold:#c8a96e; --gold2:#d4b87a; --gold3:#e8d09a;
+  --red:#c0392b; --red2:#e74c3c;
+  --blue:#4a90d9; --green:#4dbb7a; --orange:#f0b429;
+  --cell:#fffef5; --cell-border:#b8b0a0; --cell-num:#666; --cell-letter:#1a1a1a;
+  --noun-c:#4a90d9; --verb-c:#f0b429; --adj-c:#4dbb7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+button,select,textarea,input{font-family:'DM Sans',sans-serif;}
+
+/* ── HEADER ── */
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;flex-wrap:wrap;}
+.logo{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;letter-spacing:2px;color:var(--gold);white-space:nowrap;}
+.logo em{font-style:normal;color:var(--muted);font-size:10px;letter-spacing:4px;display:block;font-weight:400;font-family:'IBM Plex Mono',monospace;margin-top:1px;}
+.model-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+select{background:var(--surface2);color:var(--text);border:1px solid var(--border2);padding:7px 10px;border-radius:5px;font-size:12px;cursor:pointer;outline:none;}
+select:focus{border-color:var(--gold);}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.pill.idle{background:#1e1e1e;color:var(--muted);}
+.pill.loading{background:#1c1600;color:var(--gold);}
+.pill.ready{background:#0a1a0e;color:#4caf50;}
+.pill.error{background:#1a0808;color:var(--red2);}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.dot.spin{animation:dotPulse 1s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+/* ── PROGRESS ── */
+#prog{display:none;padding:7px 18px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+#prog.vis{display:block;}
+.pbar{height:3px;background:var(--border2);border-radius:2px;overflow:hidden;margin-bottom:5px;}
+#pfill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold3));width:0%;transition:width .3s;}
+#ptxt{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+
+/* ── LAYOUT ── */
+#layout{display:grid;grid-template-columns:350px 1fr;flex:1;overflow:hidden;}
+
+/* ── LEFT ── */
+#left{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sec{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sec-ttl{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+textarea#itxt{width:100%;height:130px;background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:5px;padding:10px;font-size:12px;line-height:1.5;resize:vertical;outline:none;}
+textarea#itxt:focus{border-color:var(--gold);}
+.manual-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+#manual-word{flex:1;min-width:80px;background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:5px;padding:6px 8px;font-size:12px;outline:none;}
+#manual-word:focus{border-color:var(--gold);}
+#manual-type{background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:5px;padding:6px 8px;font-size:12px;outline:none;}
+#manual-clue{width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:5px;padding:6px 8px;font-size:12px;outline:none;margin-top:6px;}
+#manual-clue:focus,#manual-word:focus{border-color:var(--gold);}
+.row-btns{display:flex;gap:6px;margin-top:6px;}
+
+/* Buttons */
+.btn{padding:7px 13px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;white-space:nowrap;}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn-gold{background:var(--gold);color:#111;}
+.btn-gold:hover:not(:disabled){background:var(--gold2);}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border2);}
+.btn-ghost:hover:not(:disabled){background:var(--surface3);}
+.btn-outline-red{background:transparent;color:var(--red2);border:1px solid var(--red);}
+.btn-outline-red:hover:not(:disabled){background:var(--red);color:#fff;}
+.btn-sm{padding:5px 10px;font-size:11px;}
+
+/* ── WORD TABLE ── */
+#wt-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.wt-head{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+#wcnt{font-size:11px;color:var(--muted);}
+#wt-scroll{flex:1;overflow-y:auto;}
+.word-cols{display:grid;grid-template-columns:1fr 1fr 1fr;height:100%;}
+.wcol{border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.wcol:last-child{border-right:none;}
+.wcol-hdr{padding:7px 8px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;position:sticky;top:0;background:var(--surface);z-index:1;flex-shrink:0;}
+.wcol-hdr.noun{color:var(--noun-c);}
+.wcol-hdr.verb{color:var(--verb-c);}
+.wcol-hdr.adj{color:var(--adj-c);}
+.cdot{width:6px;height:6px;border-radius:50%;}
+.cdot.noun{background:var(--noun-c);} .cdot.verb{background:var(--verb-c);} .cdot.adj{background:var(--adj-c);}
+#nouns-list,#verbs-list,#adjs-list{flex:1;overflow-y:auto;}
+.wcard{padding:7px 8px;border-bottom:1px solid #1c1c1c;cursor:grab;transition:background .1s;user-select:none;position:relative;}
+.wcard:hover{background:var(--surface2);}
+.wcard.dragging{opacity:.4;cursor:grabbing;}
+.wcard.placed .ww{text-decoration:line-through;opacity:.4;}
+.ww{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--text);letter-spacing:.5px;display:flex;align-items:center;gap:5px;}
+.ww-del{opacity:0;background:none;border:none;color:var(--red2);cursor:pointer;padding:0 2px;font-size:11px;line-height:1;transition:opacity .1s;}
+.wcard:hover .ww-del{opacity:1;}
+.wclue{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;}
+.drag-icon{font-size:9px;color:var(--muted2);flex-shrink:0;}
+.wt-foot{padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0;}
+
+/* empty state */
+.empty-st{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 16px;color:var(--muted);text-align:center;gap:8px;}
+.empty-ico{font-size:36px;opacity:.25;}
+.empty-ttl{font-family:'Playfair Display',serif;font-size:16px;color:var(--text);opacity:.35;}
+.empty-sub{font-size:11px;line-height:1.5;max-width:180px;}
+
+/* ── RIGHT ── */
+#right{display:flex;flex-direction:column;overflow:hidden;}
+#ctrl-bar{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0;gap:8px;flex-wrap:wrap;}
+.ctrl-grp{display:flex;align-items:center;gap:6px;}
+.ctrl-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.dir-btn{padding:5px 11px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;transition:all .15s;font-weight:500;}
+.dir-btn.active{background:var(--gold);color:#111;border-color:var(--gold);font-weight:600;}
+#val-info{font-size:11px;}
+.vstatus{display:flex;align-items:center;gap:5px;}
+.vstatus.ok{color:#4caf50;} .vstatus.err{color:var(--red2);} .vstatus.info{color:var(--muted);}
+.ans-tog{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.sw{width:32px;height:18px;background:var(--border2);border-radius:9px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.sw.on{background:var(--gold);}
+.sw::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;}
+.sw.on::after{transform:translateX(14px);}
+
+/* ── CROSSWORD AREA ── */
+#cw-area{flex:1;display:flex;overflow:hidden;}
+#cw-scroll{flex:1;overflow:auto;padding:20px;display:flex;align-items:flex-start;justify-content:center;}
+#cw-grid{display:inline-grid;gap:0;border:2px solid var(--border2);}
+.gc{width:33px;height:33px;position:relative;background:#181818;}
+.gc.lc{background:var(--cell);cursor:crosshair;}
+.gc.lc:hover{background:#fff8ee;}
+.gc.dz{background:#161616;border:1px dashed #2a2a2a;cursor:crosshair;}
+.gc.dz:hover{background:#1c1c1c;}
+.gc.prev{background:#ffe0b2 !important;}
+.gc.confl{background:#ffcdd2 !important;}
+.gc.placed-new{animation:cellFlash .4s ease;}
+@keyframes cellFlash{0%{background:#c8ffd4 !important;}100%{}}
+.cnum{position:absolute;top:1px;left:2px;font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--cell-num);line-height:1;pointer-events:none;font-weight:600;}
+.clet{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--cell-letter);pointer-events:none;}
+.clet.hide{visibility:hidden;}
+
+/* ── CLUES PANEL ── */
+#clue-panel{width:210px;flex-shrink:0;border-left:1px solid var(--border);overflow-y:auto;padding:10px;background:var(--surface);}
+.cg-ttl{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.cg{margin-bottom:16px;}
+.ci{display:flex;gap:5px;margin-bottom:5px;font-size:11px;line-height:1.4;}
+.ci-n{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--gold);min-width:18px;flex-shrink:0;}
+.ci-t{color:var(--muted);}
+
+/* ── EXPORT BAR ── */
+#exp-bar{padding:8px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0;flex-wrap:wrap;gap:8px;}
+.exp-tog-wrap{display:flex;align-items:center;gap:8px;}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="logo">CROSSWORD BUILDER<em>POWERED BY WEBLLM</em></div>
+  <div class="model-row">
+    <div id="mstatus" class="pill idle"><div class="dot"></div><span>Not loaded</span></div>
+    <select id="msel">
+      <option value="TinyLlama-1.1B-Chat-v1.0-q4f32_1-MLC">TinyLlama 1.1B — Fastest (~600 MB)</option>
+      <option value="Llama-3.2-1B-Instruct-q4f32_1-MLC" selected>Llama 3.2 1B — Fast (~800 MB)</option>
+      <option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen 2.5 1.5B (~900 MB)</option>
+      <option value="Llama-3.2-3B-Instruct-q4f32_1-MLC">Llama 3.2 3B — Better (~2 GB)</option>
+      <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi 3.5 Mini — Best (~2.2 GB)</option>
+      <option value="gemma-2-2b-it-q4f16_1-MLC">Gemma 2 2B (~1.5 GB)</option>
+    </select>
+    <button class="btn btn-gold btn-sm" id="load-btn">Load Model</button>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div id="prog">
+  <div class="pbar"><div id="pfill"></div></div>
+  <div id="ptxt">Initializing…</div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div id="layout">
+
+  <!-- LEFT PANEL -->
+  <div id="left">
+    <!-- Input Section -->
+    <div class="sec">
+      <div class="sec-ttl">Input Text — AI Extraction</div>
+      <textarea id="itxt" placeholder="Paste any text here. The AI will extract nouns, verbs, and adjectives with crossword clues…
+
+Example: The ancient forest stood silent and enormous, where creatures discovered hidden pathways…"></textarea>
+      <div class="row-btns" style="margin-top:8px;">
+        <button class="btn btn-gold" id="ext-btn" disabled style="flex:1">Extract with AI</button>
+        <button class="btn btn-ghost btn-sm" id="clr-txt-btn">Clear</button>
+      </div>
+    </div>
+
+    <!-- Manual Entry -->
+    <div class="sec">
+      <div class="sec-ttl">Manual Entry (no AI needed)</div>
+      <div class="manual-row">
+        <input id="manual-word" type="text" placeholder="WORD" maxlength="15">
+        <select id="manual-type">
+          <option value="noun">Noun</option>
+          <option value="verb">Verb</option>
+          <option value="adjective">Adjective</option>
+        </select>
+      </div>
+      <input id="manual-clue" type="text" placeholder="Crossword clue…">
+      <div class="row-btns">
+        <button class="btn btn-ghost" id="add-word-btn" style="flex:1">+ Add Word</button>
+      </div>
+    </div>
+
+    <!-- Word Table -->
+    <div id="wt-wrap">
+      <div class="wt-head">
+        <span class="sec-ttl" style="margin:0">Extracted Words</span>
+        <span id="wcnt">0 words</span>
+      </div>
+      <div id="wt-scroll">
+        <div id="empty-words" class="empty-st">
+          <div class="empty-ico">📝</div>
+          <div class="empty-ttl">No words yet</div>
+          <div class="empty-sub">Load a model and extract, or add words manually above.</div>
+        </div>
+        <div id="word-cols" class="word-cols" style="display:none">
+          <div class="wcol">
+            <div class="wcol-hdr noun"><div class="cdot noun"></div>NOUNS</div>
+            <div id="nouns-list"></div>
+          </div>
+          <div class="wcol">
+            <div class="wcol-hdr verb"><div class="cdot verb"></div>VERBS</div>
+            <div id="verbs-list"></div>
+          </div>
+          <div class="wcol">
+            <div class="wcol-hdr adj"><div class="cdot adj"></div>ADJ</div>
+            <div id="adjs-list"></div>
+          </div>
+        </div>
+      </div>
+      <div class="wt-foot">
+        <button class="btn btn-gold" id="build-btn" disabled style="flex:1">⊞ Auto-Build Crossword</button>
+        <button class="btn btn-ghost btn-sm" id="reset-btn">Reset Grid</button>
+        <button class="btn btn-outline-red btn-sm" id="clr-words-btn">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right">
+    <!-- Control Bar -->
+    <div id="ctrl-bar">
+      <div class="ctrl-grp">
+        <span class="ctrl-lbl">Drop Dir:</span>
+        <button class="dir-btn active" id="dir-a">→ ACROSS</button>
+        <button class="dir-btn" id="dir-d">↓ DOWN</button>
+      </div>
+      <div id="val-info"><span class="vstatus info">Drag words to grid or auto-build</span></div>
+      <div class="ctrl-grp">
+        <span class="ctrl-lbl">Answers:</span>
+        <div class="sw on" id="ans-sw"></div>
+      </div>
+    </div>
+
+    <!-- Grid + Clues -->
+    <div id="cw-area">
+      <div id="cw-scroll">
+        <div id="cw-grid"></div>
+      </div>
+      <div id="clue-panel">
+        <div class="cg" id="across-grp">
+          <div class="cg-ttl">ACROSS</div>
+          <div id="across-list"><span style="font-size:10px;color:var(--muted)">—</span></div>
+        </div>
+        <div class="cg" id="down-grp">
+          <div class="cg-ttl">DOWN</div>
+          <div id="down-list"><span style="font-size:10px;color:var(--muted)">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Bar -->
+    <div id="exp-bar">
+      <div class="exp-tog-wrap">
+        <span style="font-size:11px;color:var(--muted)">Export:</span>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:var(--muted);">
+          <div class="sw on" id="exp-sw"></div>
+          <span id="exp-lbl">With Answers</span>
+        </label>
+      </div>
+      <div class="ctrl-grp">
+        <button class="btn btn-ghost btn-sm" id="exp-blank-btn">⬇ Blank</button>
+        <button class="btn btn-ghost btn-sm" id="exp-ans-btn">⬇ Answered</button>
+        <button class="btn btn-gold btn-sm" id="exp-btn">⬇ Export Image</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+(async () => {
+
+// ═══════════════════════════════════════════════════════
+// WEBLLM IMPORT
+// ═══════════════════════════════════════════════════════
+let CreateMLCEngine = null;
+try {
+  const wl = await import("https://esm.run/@mlc-ai/web-llm");
+  CreateMLCEngine = wl.CreateMLCEngine;
+} catch(e) {
+  console.warn("WebLLM load failed:", e);
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const GS = 23; // Grid size
+let engine = null, engineLoaded = false;
+let words = []; // [{word, type, clue}]
+let cw = null;  // {grid, placements, numbered}
+let showAns = true, expAns = true;
+let dropDir = 'across';
+let dragW = null;
+let prevKey = null, prevCells = [];
+
+const $ = id => document.getElementById(id);
+
+// ═══════════════════════════════════════════════════════
+// CROSSWORD ALGORITHM
+// ═══════════════════════════════════════════════════════
+
+function mkGrid(s){ return Array.from({length:s}, ()=>Array(s).fill(null)); }
+
+function canPlace(grid, placements, word, r0, c0, dir){
+  const dr = dir==='down'?1:0, dc = dir==='across'?1:0;
+  const er = r0+dr*(word.length-1), ec = c0+dc*(word.length-1);
+  if(r0<0||c0<0||er>=GS||ec>=GS) return false;
+  // Check cells before/after word
+  const pr=r0-dr, pc=c0-dc;
+  if(pr>=0&&pc>=0&&grid[pr][pc]!==null) return false;
+  const qr=er+dr, qc=ec+dc;
+  if(qr<GS&&qc<GS&&grid[qr][qc]!==null) return false;
+  let inter = 0;
+  for(let i=0;i<word.length;i++){
+    const r=r0+dr*i, c=c0+dc*i, ltr=word[i], cell=grid[r][c];
+    if(cell!==null){
+      if(cell!==ltr) return false;
+      inter++;
+    } else {
+      // Check perpendicular neighbors (no adjacent parallel words)
+      const pd=dc, pd2=dr; // perpendicular deltas
+      if(r-pd>=0&&c-pd2>=0&&grid[r-pd][c-pd2]!==null) return false;
+      if(r+pd<GS&&c+pd2<GS&&grid[r+pd][c+pd2]!==null) return false;
+    }
+  }
+  if(placements.length>0 && inter===0) return false;
+  return true;
+}
+
+function placeWord(grid, word, r0, c0, dir){
+  const dr=dir==='down'?1:0, dc=dir==='across'?1:0;
+  for(let i=0;i<word.length;i++) grid[r0+dr*i][c0+dc*i]=word[i];
+}
+
+function numberGrid(grid){
+  const num={};
+  let n=1;
+  for(let r=0;r<GS;r++) for(let c=0;c<GS;c++){
+    if(grid[r][c]===null) continue;
+    const sa=(c===0||grid[r][c-1]===null)&&c+1<GS&&grid[r][c+1]!==null;
+    const sd=(r===0||grid[r-1][c]===null)&&r+1<GS&&grid[r+1][c]!==null;
+    if(sa||sd) num[`${r},${c}`]=n++;
+  }
+  return num;
+}
+
+function buildAuto(wordObjs){
+  const grid = mkGrid(GS);
+  const placements = [];
+  const seen = new Set();
+  const uniq = wordObjs
+    .map(w=>({...w, word:w.word.toUpperCase().replace(/[^A-Z]/g,'')}))
+    .filter(w=>w.word.length>=3&&w.word.length<=GS-2&&!seen.has(w.word)&&seen.add(w.word));
+  if(!uniq.length) return null;
+  const sorted = [...uniq].sort((a,b)=>b.word.length-a.word.length);
+
+  // Place first word horizontally in centre
+  const fw = sorted[0];
+  const r0 = Math.floor(GS/2), c0 = Math.floor((GS-fw.word.length)/2);
+  placeWord(grid, fw.word, r0, c0, 'across');
+  placements.push({...fw, row:r0, col:c0, direction:'across'});
+
+  for(let wi=1;wi<sorted.length;wi++){
+    const wo=sorted[wi], w=wo.word;
+    let best=null, bestScore=-1;
+    for(const pl of placements){
+      const td = pl.direction==='across'?'down':'across';
+      const dr=td==='down'?1:0, dc=td==='across'?1:0;
+      for(let pi=0;pi<pl.word.length;pi++){
+        for(let wj=0;wj<w.length;wj++){
+          if(pl.word[pi]!==w[wj]) continue;
+          let r,c;
+          if(pl.direction==='across'){r=pl.row-wj*dr; c=pl.col+pi-wj*dc;}
+          else {r=pl.row+pi-wj*dr; c=pl.col-wj*dc;}
+          if(canPlace(grid,placements,w,r,c,td)){
+            const score=100-Math.abs(r-GS/2)-Math.abs(c-GS/2);
+            if(score>bestScore){bestScore=score;best={r,c,dir:td};}
+          }
+        }
+      }
+    }
+    if(best){
+      placeWord(grid,w,best.r,best.c,best.dir);
+      placements.push({...wo,row:best.r,col:best.c,direction:best.dir});
+    }
+  }
+
+  const numbered = numberGrid(grid);
+  placements.forEach(p=>{ p.number=numbered[`${p.row},${p.col}`]||null; });
+  return {grid, placements, numbered};
+}
+
+function bounds(state){
+  let r1=GS,r2=0,c1=GS,c2=0;
+  for(let r=0;r<GS;r++) for(let c=0;c<GS;c++) if(state.grid[r][c]!==null){
+    r1=Math.min(r1,r);r2=Math.max(r2,r);c1=Math.min(c1,c);c2=Math.max(c2,c);
+  }
+  return {r1:Math.max(0,r1-1),r2:Math.min(GS-1,r2+1),c1:Math.max(0,c1-1),c2:Math.min(GS-1,c2+1)};
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER GRID
+// ═══════════════════════════════════════════════════════
+function renderGrid(){
+  const el = $('cw-grid');
+  // Determine display range
+  let r1,r2,c1,c2;
+  if(cw){
+    const b=bounds(cw);r1=b.r1;r2=b.r2;c1=b.c1;c2=b.c2;
+  } else {
+    // Show a starter drop zone (centred 15×15)
+    r1=4;r2=18;c1=4;c2=18;
+  }
+  const rows=r2-r1+1, cols=c2-c1+1;
+  el.style.gridTemplateColumns=`repeat(${cols},33px)`;
+  el.style.gridTemplateRows=`repeat(${rows},33px)`;
+
+  const grid = cw?cw.grid:mkGrid(GS);
+  const numbered = cw?cw.numbered:{};
+
+  let html='';
+  for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++){
+    const ltr=grid[r][c];
+    const num=numbered[`${r},${c}`];
+    if(ltr!==null){
+      html+=`<div class="gc lc" data-r="${r}" data-c="${c}">
+        ${num?`<div class="cnum">${num}</div>`:''}
+        <div class="clet${showAns?'':' hide'}">${ltr}</div>
+      </div>`;
+    } else {
+      html+=`<div class="gc dz" data-r="${r}" data-c="${c}"></div>`;
+    }
+  }
+  el.innerHTML=html;
+
+  // Event delegation on grid
+  el.ondragover=e=>{
+    e.preventDefault();
+    const gc=e.target.closest('.gc');
+    if(!gc) return;
+    const key=`${gc.dataset.r},${gc.dataset.c},${dropDir}`;
+    if(key!==prevKey){ prevKey=key; showPreview(+gc.dataset.r,+gc.dataset.c); }
+  };
+  el.ondragleave=e=>{
+    if(!el.contains(e.relatedTarget)){clearPreview();prevKey=null;}
+  };
+  el.ondrop=e=>{
+    e.preventDefault();
+    clearPreview();prevKey=null;
+    const gc=e.target.closest('.gc');
+    if(gc) doDrop(+gc.dataset.r,+gc.dataset.c);
+  };
+
+  renderClues();
+}
+
+function renderClues(){
+  if(!cw){$('across-list').innerHTML='<span style="font-size:10px;color:var(--muted)">—</span>';$('down-list').innerHTML='<span style="font-size:10px;color:var(--muted)">—</span>';return;}
+  const ac=cw.placements.filter(p=>p.direction==='across'&&p.number).sort((a,b)=>a.number-b.number);
+  const dn=cw.placements.filter(p=>p.direction==='down'&&p.number).sort((a,b)=>a.number-b.number);
+  const html=list=>list.map(p=>`<div class="ci"><span class="ci-n">${p.number}.</span><span class="ci-t">${p.clue} <em style="opacity:.5">(${p.word.length})</em></span></div>`).join('')||'<span style="font-size:10px;color:var(--muted)">—</span>';
+  $('across-list').innerHTML=html(ac);
+  $('down-list').innerHTML=html(dn);
+}
+
+function renderWords(){
+  const ns=words.filter(w=>w.type==='noun');
+  const vs=words.filter(w=>w.type==='verb');
+  const as=words.filter(w=>w.type==='adjective');
+  const placed = new Set(cw?cw.placements.map(p=>p.word):[]);
+  const card=(w)=>{
+    const p=placed.has(w.word);
+    return `<div class="wcard${p?' placed':''}" draggable="true" data-word="${w.word}" data-type="${w.type}" data-clue="${w.clue.replace(/"/g,'&quot;')}">
+      <div class="ww"><span class="drag-icon">⠿</span>${w.word}<button class="ww-del" data-del="${w.word}" title="Remove">✕</button></div>
+      <div class="wclue">${w.clue}</div>
+    </div>`;
+  };
+  $('nouns-list').innerHTML=ns.map(card).join('');
+  $('verbs-list').innerHTML=vs.map(card).join('');
+  $('adjs-list').innerHTML=as.map(card).join('');
+  const total=words.length;
+  $('wcnt').textContent=`${total} word${total!==1?'s':''}`;
+  $('empty-words').style.display=total?'none':'flex';
+  $('word-cols').style.display=total?'grid':'none';
+  $('build-btn').disabled=total===0;
+  // Drag start
+  document.querySelectorAll('.wcard').forEach(c=>{
+    c.addEventListener('dragstart',e=>{
+      dragW={word:c.dataset.word,type:c.dataset.type,clue:c.dataset.clue};
+      e.dataTransfer.effectAllowed='copy';
+      e.dataTransfer.setData('text/plain',dragW.word);
+      c.classList.add('dragging');
+    });
+    c.addEventListener('dragend',e=>{
+      c.classList.remove('dragging');dragW=null;clearPreview();prevKey=null;
+    });
+  });
+  // Delete buttons
+  document.querySelectorAll('.ww-del').forEach(b=>{
+    b.addEventListener('click',e=>{
+      e.stopPropagation();
+      const wrd=b.dataset.del;
+      words=words.filter(w=>w.word!==wrd);
+      renderWords();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAG-DROP
+// ═══════════════════════════════════════════════════════
+function showPreview(r0,c0){
+  clearPreview();
+  if(!dragW) return;
+  const word=dragW.word;
+  const dr=dropDir==='down'?1:0, dc=dropDir==='across'?1:0;
+  const grid=cw?cw.grid:mkGrid(GS);
+  for(let i=0;i<word.length;i++){
+    const r=r0+dr*i, c=c0+dc*i;
+    const cel=document.querySelector(`#cw-grid [data-r="${r}"][data-c="${c}"]`);
+    if(cel){
+      const ex=grid[r]?.[c];
+      cel.classList.add(ex&&ex!==word[i]?'confl':'prev');
+      prevCells.push(cel);
+    }
+  }
+}
+
+function clearPreview(){
+  prevCells.forEach(c=>c.classList.remove('prev','confl'));
+  prevCells=[];
+}
+
+function doDrop(r0,c0){
+  if(!dragW) return;
+  const wo=words.find(w=>w.word===dragW.word);
+  if(!wo){dragW=null;return;}
+  if(!cw){
+    cw={grid:mkGrid(GS),placements:[],numbered:{}};
+  }
+  if(!canPlace(cw.grid,cw.placements,wo.word,r0,c0,dropDir)){
+    setStatus2('err','✗ Cannot place here — conflicts or no intersection');
+    dragW=null; return;
+  }
+  placeWord(cw.grid,wo.word,r0,c0,dropDir);
+  cw.placements.push({...wo,row:r0,col:c0,direction:dropDir});
+  cw.numbered=numberGrid(cw.grid);
+  cw.placements.forEach(p=>p.number=cw.numbered[`${p.row},${p.col}`]||null);
+  dragW=null;
+  renderGrid();
+  renderWords();
+  // Flash newly placed cells
+  setTimeout(()=>{
+    const dr=dropDir==='down'?1:0, dc=dropDir==='across'?1:0;
+    for(let i=0;i<wo.word.length;i++){
+      const cel=document.querySelector(`#cw-grid [data-r="${r0+dr*i}"][data-c="${c0+dc*i}"]`);
+      if(cel){cel.classList.add('placed-new');setTimeout(()=>cel.classList.remove('placed-new'),500);}
+    }
+  },50);
+  setStatus2('ok',`✓ "${wo.word}" placed`);
+  setTimeout(()=>setStatus2('info',`${cw.placements.length} words placed`),2500);
+}
+
+function setStatus2(type,msg){
+  $('val-info').innerHTML=`<span class="vstatus ${type}">${msg}</span>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// WEBLLM
+// ═══════════════════════════════════════════════════════
+function setModelStatus(type,txt){
+  const el=$('mstatus');
+  el.className=`pill ${type}`;
+  el.innerHTML=`<div class="dot${type==='loading'?' spin':''}"></div><span>${txt}</span>`;
+}
+
+async function loadModel(){
+  if(!CreateMLCEngine){ setModelStatus('error','WebLLM unavailable — use manual entry'); return; }
+  $('load-btn').disabled=true; $('msel').disabled=true;
+  setModelStatus('loading','Downloading…');
+  $('prog').classList.add('vis');
+  try{
+    engine=await CreateMLCEngine($('msel').value,{
+      initProgressCallback:(rpt)=>{
+        const p=Math.round((rpt.progress||0)*100);
+        $('pfill').style.width=p+'%';
+        $('ptxt').textContent=rpt.text||`Loading: ${p}%`;
+      }
+    });
+    engineLoaded=true;
+    setModelStatus('ready','Model ready');
+    $('prog').classList.remove('vis');
+    $('ext-btn').disabled=false;
+    $('msel').disabled=false;
+    $('load-btn').textContent='Reload';
+    $('load-btn').disabled=false;
+  } catch(e){
+    setModelStatus('error','Failed — '+e.message.slice(0,30));
+    $('ptxt').textContent='Error: '+e.message;
+    $('load-btn').disabled=false; $('msel').disabled=false;
+    $('load-btn').textContent='Retry';
+  }
+}
+
+async function extractWords(){
+  const txt=$('itxt').value.trim();
+  if(!txt||!engineLoaded) return;
+  $('ext-btn').disabled=true; $('ext-btn').textContent='Extracting…';
+  const prompt=`Extract 10-15 key nouns, verbs, and adjectives from the text. Use UPPERCASE words of 4-12 letters. Write a concise NYT-style crossword clue for each (no blank underscores).
+
+Return ONLY a JSON array, no markdown, no extra text:
+[{"word":"FOREST","type":"noun","clue":"Dense wooded area"},{"word":"DISCOVER","type":"verb","clue":"Find for the first time"},...]
+
+Types must be exactly "noun", "verb", or "adjective".
+
+Text: ${txt.substring(0,1200)}`;
+  try{
+    const rep=await engine.chat.completions.create({messages:[{role:'user',content:prompt}],temperature:.2,max_tokens:900});
+    const raw=rep.choices[0].message.content;
+    let parsed=[];
+    try{
+      const m=raw.match(/\[[\s\S]*?\]/);
+      if(m) parsed=JSON.parse(m[0]);
+    }catch(e){console.warn('Parse err',e,raw);}
+    const fresh=parsed
+      .filter(w=>w.word&&w.type&&w.clue&&['noun','verb','adjective'].includes(w.type.toLowerCase()))
+      .map(w=>({word:w.word.toUpperCase().replace(/[^A-Z]/g,''),type:w.type.toLowerCase(),clue:String(w.clue)}))
+      .filter(w=>w.word.length>=3&&w.word.length<=12);
+    // Merge avoiding duplicates
+    const existingWords=new Set(words.map(w=>w.word));
+    words=[...words,...fresh.filter(w=>!existingWords.has(w.word))];
+    renderWords();
+  }catch(e){
+    alert('Extraction failed: '+e.message);
+  }finally{
+    $('ext-btn').disabled=false; $('ext-btn').textContent='Extract with AI';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT TO CANVAS
+// ═══════════════════════════════════════════════════════
+function exportImg(withAns){
+  if(!cw){ alert('Build the crossword first.'); return; }
+  const CELL=46, M=40;
+  const b=bounds(cw);
+  const {r1,r2,c1,c2}=b;
+  const cols=c2-c1+1, rows=r2-r1+1;
+  const gw=cols*CELL, gh=rows*CELL;
+
+  const ac=cw.placements.filter(p=>p.direction==='across'&&p.number).sort((a,b)=>a.number-b.number);
+  const dn=cw.placements.filter(p=>p.direction==='down'&&p.number).sort((a,b)=>a.number-b.number);
+  const maxRows=Math.max(ac.length,dn.length,1);
+  const CLH=16, CLM=44;
+  const clueW=Math.max((gw+M*2)/2, 280);
+  const clueH=maxRows*CLH+CLM+20;
+  const canW=gw+M*2;
+  const canH=gh+M*2+clueH+10;
+
+  const cv=document.createElement('canvas');
+  cv.width=canW; cv.height=canH;
+  const ctx=cv.getContext('2d');
+
+  // BG
+  ctx.fillStyle='#0c0c0c'; ctx.fillRect(0,0,canW,canH);
+  // Title
+  ctx.fillStyle='#c8a96e';
+  ctx.font='bold 16px Georgia,serif'; ctx.textAlign='center';
+  ctx.fillText('CROSSWORD PUZZLE', canW/2, 26);
+  if(!withAns){ ctx.fillStyle='#555'; ctx.font='11px monospace'; ctx.fillText('BLANK PUZZLE', canW/2, 40); }
+
+  // Grid
+  for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++){
+    const x=M+(c-c1)*CELL, y=M+(r-r1)*CELL+10;
+    const ltr=cw.grid[r][c];
+    if(ltr!==null){
+      ctx.fillStyle='#fffef5'; ctx.fillRect(x,y,CELL,CELL);
+      ctx.strokeStyle='#888'; ctx.lineWidth=1; ctx.strokeRect(x,y,CELL,CELL);
+      const num=cw.numbered[`${r},${c}`];
+      if(num){ ctx.fillStyle='#555'; ctx.font='8px monospace'; ctx.textAlign='left'; ctx.fillText(num,x+2,y+9); }
+      if(withAns){
+        ctx.fillStyle='#1a1a1a'; ctx.font='bold 22px Georgia,serif';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(ltr,x+CELL/2,y+CELL/2+1);
+        ctx.textBaseline='alphabetic';
+      }
+    } else {
+      ctx.fillStyle='#181818'; ctx.fillRect(x,y,CELL,CELL);
+      ctx.strokeStyle='#2a2a2a'; ctx.lineWidth=.5; ctx.strokeRect(x,y,CELL,CELL);
+    }
+  }
+  ctx.textBaseline='alphabetic';
+
+  // Divider line
+  const divY=gh+M*2+18;
+  ctx.strokeStyle='#333'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(M,divY); ctx.lineTo(canW-M,divY); ctx.stroke();
+
+  // Clues
+  const cy=divY+14;
+  ctx.textAlign='left';
+  // Across header
+  ctx.fillStyle='#c8a96e'; ctx.font='bold 11px monospace';
+  ctx.fillText('ACROSS',M,cy);
+  ctx.fillText('DOWN',M+clueW,cy);
+
+  ac.forEach((p,i)=>{
+    const y2=cy+14+i*CLH;
+    ctx.fillStyle='#c8a96e'; ctx.font='bold 9px monospace'; ctx.fillText(`${p.number}.`,M,y2);
+    ctx.fillStyle='#ccc'; ctx.font='10px sans-serif'; ctx.fillText(p.clue.substring(0,42)+'  ('+p.word.length+')',M+18,y2);
+  });
+  dn.forEach((p,i)=>{
+    const y2=cy+14+i*CLH;
+    const x2=M+clueW;
+    ctx.fillStyle='#c8a96e'; ctx.font='bold 9px monospace'; ctx.fillText(`${p.number}.`,x2,y2);
+    ctx.fillStyle='#ccc'; ctx.font='10px sans-serif'; ctx.fillText(p.clue.substring(0,42)+'  ('+p.word.length+')',x2+18,y2);
+  });
+
+  const link=document.createElement('a');
+  link.download=withAns?'crossword-answered.png':'crossword-blank.png';
+  link.href=cv.toDataURL('image/png');
+  link.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// ANSWER VISIBILITY
+// ═══════════════════════════════════════════════════════
+function updateAnsVis(){
+  document.querySelectorAll('.clet').forEach(el=>el.classList.toggle('hide',!showAns));
+}
+
+// ═══════════════════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════════════════
+$('load-btn').onclick=loadModel;
+$('ext-btn').onclick=extractWords;
+$('clr-txt-btn').onclick=()=>{ $('itxt').value=''; };
+
+$('add-word-btn').onclick=()=>{
+  const w=$('manual-word').value.trim().toUpperCase().replace(/[^A-Z]/g,'');
+  const t=$('manual-type').value;
+  const c=$('manual-clue').value.trim();
+  if(w.length<3||w.length>12){ alert('Word must be 3–12 letters.'); return; }
+  if(!c){ alert('Please enter a clue.'); return; }
+  if(words.some(x=>x.word===w)){ alert('Word already added.'); return; }
+  words.push({word:w,type:t,clue:c});
+  $('manual-word').value=''; $('manual-clue').value='';
+  renderWords();
+};
+
+$('manual-word').addEventListener('keydown',e=>{ if(e.key==='Enter') $('manual-clue').focus(); });
+$('manual-clue').addEventListener('keydown',e=>{ if(e.key==='Enter') $('add-word-btn').click(); });
+
+$('build-btn').onclick=()=>{
+  if(!words.length) return;
+  cw=buildAuto(words);
+  renderGrid(); renderWords();
+  const placed=cw?cw.placements.length:0;
+  setStatus2(placed>0?'ok':'info',placed>0?`✓ ${placed}/${words.length} words placed`:'No placements found');
+};
+
+$('reset-btn').onclick=()=>{ cw=null; renderGrid(); renderWords(); setStatus2('info','Grid cleared'); };
+$('clr-words-btn').onclick=()=>{ words=[]; cw=null; renderGrid(); renderWords(); };
+
+$('dir-a').onclick=()=>{ dropDir='across'; $('dir-a').classList.add('active'); $('dir-d').classList.remove('active'); };
+$('dir-d').onclick=()=>{ dropDir='down'; $('dir-d').classList.add('active'); $('dir-a').classList.remove('active'); };
+
+$('ans-sw').onclick=()=>{ showAns=!showAns; $('ans-sw').classList.toggle('on',showAns); updateAnsVis(); };
+
+$('exp-sw').onclick=()=>{ expAns=!expAns; $('exp-sw').classList.toggle('on',expAns); $('exp-lbl').textContent=expAns?'With Answers':'Blank Puzzle'; };
+$('exp-btn').onclick=()=>exportImg(expAns);
+$('exp-blank-btn').onclick=()=>exportImg(false);
+$('exp-ans-btn').onclick=()=>exportImg(true);
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+renderGrid();
+renderWords();
+if(!CreateMLCEngine){
+  setModelStatus('error','WebLLM unavailable in this env');
+  $('ext-btn').title='WebLLM could not be loaded. Use manual entry.';
+}
+
+})();
+</script>
+</body>
+</html>
