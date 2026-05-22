@@ -146,6 +146,10 @@
       transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
     }
 
+    input::placeholder, textarea::placeholder {
+      color: #94a3b8;
+    }
+
     input:focus, select:focus, textarea:focus {
       border-color: #5b8def;
       box-shadow: 0 0 0 4px rgba(91, 141, 239, 0.12);
@@ -302,16 +306,16 @@
           <h3>Exporter Details</h3>
           <div class="form-grid">
             <div class="field full">
-              <label>Exporter Name</label>
-              <input name="exporter_name" type="text" placeholder="Exporter / Seller name" />
+              <label>Exporter Name:</label>
+              <input name="exporter_name" type="text" value="Rahul Exports Pvt Ltd" />
             </div>
             <div class="field">
-              <label>Mobile Number</label>
-              <input name="exporter_mobile" type="tel" placeholder="10-digit mobile number" />
+              <label>Mobile Number:</label>
+              <input name="exporter_mobile" type="tel" value="9876543210" />
             </div>
             <div class="field">
-              <label>Ask Price</label>
-              <input name="ask_price" type="text" placeholder="₹ Ask price" />
+              <label>Ask Price:</label>
+              <input name="ask_price" type="text" value="₹ 12,50,000" />
             </div>
           </div>
         </article>
@@ -320,16 +324,16 @@
           <h3>Importer Details</h3>
           <div class="form-grid">
             <div class="field full">
-              <label>Importer Name</label>
-              <input name="importer_name" type="text" placeholder="Importer / Buyer name" />
+              <label>Importer Name:</label>
+              <input name="importer_name" type="text" value="Global Trade Links" />
             </div>
             <div class="field">
-              <label>Mobile Number</label>
-              <input name="importer_mobile" type="tel" placeholder="10-digit mobile number" />
+              <label>Mobile Number:</label>
+              <input name="importer_mobile" type="tel" value="9123456780" />
             </div>
             <div class="field">
-              <label>Buy Price</label>
-              <input name="buy_price" type="text" placeholder="₹ Buy price" />
+              <label>Buy Price:</label>
+              <input name="buy_price" type="text" value="₹ 11,75,000" />
             </div>
           </div>
         </article>
@@ -338,28 +342,28 @@
           <h3>Script Details</h3>
           <div class="form-grid">
             <div class="field">
-              <label>Script / Scrip Number</label>
-              <input name="script_number" type="text" placeholder="RoDTEP script number" />
+              <label>Script / Scrip Number:</label>
+              <input name="script_number" type="text" value="RDTP-2026-00125" />
             </div>
             <div class="field">
-              <label>Script Value</label>
-              <input name="script_value" type="text" placeholder="₹ Script value" />
+              <label>Script Value:</label>
+              <input name="script_value" type="text" value="₹ 15,00,000" />
             </div>
             <div class="field">
-              <label>Qty / Balance</label>
-              <input name="qty_balance" type="text" placeholder="Optional" />
+              <label>Qty / Balance:</label>
+              <input name="qty_balance" type="text" value="3,00,000 balance" />
             </div>
             <div class="field">
-              <label>Status</label>
+              <label>Status:</label>
               <select name="status">
-                <option>Available</option>
+                <option selected>Available</option>
                 <option>Pending</option>
                 <option>Under Verification</option>
               </select>
             </div>
             <div class="field full">
-              <label>Short Notes</label>
-              <textarea name="short_notes" rows="4" placeholder="Optional notes only"></textarea>
+              <label>Short Notes:</label>
+              <textarea name="short_notes" rows="4">Ready for transfer after verification</textarea>
             </div>
           </div>
         </article>
@@ -368,17 +372,17 @@
           <h3>IGST Refund / Drawback</h3>
           <div class="form-grid">
             <div class="field full">
-              <label>Is your IGST refund / drawback held up?</label>
+              <label>Is your IGST refund / drawback held up?:</label>
               <select name="refund_status" id="refundStatus" onchange="toggleRefundDetails()">
                 <option value="No">No</option>
-                <option value="Yes">Yes</option>
+                <option value="Yes" selected>Yes</option>
               </select>
             </div>
-            <div class="field full" id="refundDetails" style="display:none;">
-              <label>If yes, please upload details and contact number</label>
+            <div class="field full" id="refundDetails" style="display:block;">
+              <label>If yes, please upload details and contact number:</label>
               <input id="refundAttachment" type="file" />
               <div style="height:10px;"></div>
-              <input name="refund_contact" type="tel" placeholder="Contact number" />
+              <input name="refund_contact" type="tel" value="9988776655" />
             </div>
           </div>
         </article>
@@ -387,7 +391,7 @@
           <h3>Verification Upload</h3>
           <div class="form-grid">
             <div class="field full">
-              <label>Upload Script PDF / Screenshot</label>
+              <label>Upload Script PDF / Screenshot:</label>
               <input id="scriptAttachment" type="file" />
             </div>
           </div>
@@ -454,24 +458,23 @@
 
     form.addEventListener('submit', function () {
       const get = (name) => (form.querySelector(`[name="${name}"]`) || {}).value?.trim() || '';
-
       googleRow.value = [
-        get('exporter_name'),
-        get('exporter_mobile'),
-        get('importer_name'),
-        get('importer_mobile'),
-        get('script_number'),
-        get('script_value'),
-        get('ask_price'),
-        get('buy_price'),
-        get('qty_balance'),
-        get('status'),
-        get('short_notes'),
-        get('refund_status'),
-        get('refund_contact'),
-        fileNameOnly(refundAttachment),
-        fileNameOnly(scriptAttachment)
-      ].join('|');
+        `Exporter Name: ${get('exporter_name')}`,
+        `Exporter Mobile: ${get('exporter_mobile')}`,
+        `Importer Name: ${get('importer_name')}`,
+        `Importer Mobile: ${get('importer_mobile')}`,
+        `Script Number: ${get('script_number')}`,
+        `Script Value: ${get('script_value')}`,
+        `Ask Price: ${get('ask_price')}`,
+        `Buy Price: ${get('buy_price')}`,
+        `Qty / Balance: ${get('qty_balance')}`,
+        `Status: ${get('status')}`,
+        `Short Notes: ${get('short_notes')}`,
+        `IGST Refund / Drawback Held Up: ${get('refund_status')}`,
+        `Refund Contact: ${get('refund_contact')}`,
+        `Refund Attachment: ${fileNameOnly(refundAttachment)}`,
+        `Script Attachment: ${fileNameOnly(scriptAttachment)}`
+      ].join(' | ');
 
       setTimeout(openModal, 350);
     });
