@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoDTEP Script Buy & Sell</title>
+  <style>
+    :root {
+      --saffron: #f97316;
+      --green: #15803d;
+      --navy: #123a63;
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dbe2ea;
+      --shadow: 0 10px 30px rgba(18, 58, 99, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        linear-gradient(180deg, rgba(249,115,22,0.08), transparent 180px),
+        linear-gradient(180deg, rgba(21,128,61,0.05), transparent 300px),
+        var(--bg);
+    }
+
+    .topbar {
+      background: linear-gradient(90deg, var(--navy), #0f4c81);
+      color: #fff;
+      padding: 22px 16px;
+      text-align: center;
+      border-bottom: 4px solid var(--saffron);
+    }
+
+    .brand {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      margin: 0;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+    }
+
+    .container {
+      width: min(1100px, calc(100% - 24px));
+      margin: 24px auto 40px;
+    }
+
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .span-12 { grid-column: span 12; }
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+
+    h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(249,115,22,0.12);
+      color: #9a3412;
+      margin-bottom: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field { display: grid; gap: 6px; }
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 13px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #5b8def;
+      box-shadow: 0 0 0 4px rgba(91, 141, 239, 0.12);
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--navy), #0f4c81);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #eef3f8;
+      color: var(--navy);
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 18px 10px 28px;
+    }
+
+    @media (max-width: 820px) {
+      .span-6, .span-4 { grid-column: span 12; }
+      .form-grid { grid-template-columns: 1fr; }
+      .brand { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="brand">RoDTEP Script Exchange</h1>
+    <p class="subtitle">Minimal Indian-theme portal for script buy / sell enquiries</p>
+  </header>
+
+  <main class="container">
+    <form id="enquiryForm" action="https://docs.google.com/forms/d/e/1FAIpQLSdkpigeav-VUny7TPTYeVVHN1kYCJrMVgiMQc0OrmW9ulSMUw/formResponse" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="entry.387627" id="googleRow" />
+    <section class="hero">
+      <span class="tag">Simple • Fast • Industry Standard</span>
+      <h2>Essential details only</h2>
+      <p>Keep the form lean and practical. The required fields are exporter mobile, importer mobile, script details, and ask / buy price. Everything else can stay optional.</p>
+    </section>
+
+    <section class="grid">
+            <article class="card span-6">
+        <h3>Exporter Details</h3>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Exporter Name</label>
+            <input name="exporter_name" type="text" placeholder="Exporter / Seller name" />
+          </div>
+          <div class="field">
+            <label>Mobile Number</label>
+            <input name="exporter_mobile" type="tel" placeholder="10-digit mobile number" />
+          </div>
+          <div class="field">
+            <label>Ask Price</label>
+            <input name="ask_price" type="text" placeholder="₹ Ask price" />
+          </div>
+        </div>
+      </article>
+
+            <article class="card span-6">
+        <h3>Importer Details</h3>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Importer Name</label>
+            <input name="importer_name" type="text" placeholder="Importer / Buyer name" />
+          </div>
+          <div class="field">
+            <label>Mobile Number</label>
+            <input name="importer_mobile" type="tel" placeholder="10-digit mobile number" />
+          </div>
+          <div class="field">
+            <label>Buy Price</label>
+            <input name="buy_price" type="text" placeholder="₹ Buy price" />
+          </div>
+        </div>
+      </article>
+
+      <article class="card span-12">
+        <h3>Script Details</h3>
+        <div class="form-grid">
+          <div class="field">
+            <label>Script / Scrip Number</label>
+            <input name="script_number" type="text" placeholder="RoDTEP script number" />
+          </div>
+          <div class="field">
+            <label>Script Value</label>
+            <input name="script_value" type="text" placeholder="₹ Script value" />
+          </div>
+          <div class="field">
+            <label>Qty / Balance</label>
+            <input name="qty_balance" type="text" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select name="status">
+              <option>Available</option>
+              <option>Pending</option>
+              <option>Under Verification</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Short Notes</label>
+            <textarea name="short_notes" rows="4" placeholder="Optional notes only"></textarea>
+          </div>
+        </div>
+      </article><article class="card span-12">
+        <h3>IGST Refund / Drawback</h3>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Is your IGST refund / drawback held up?</label>
+            <select name="refund_status" id="refundStatus" onchange="toggleRefundDetails()">
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+          <div class="field full" id="refundDetails" style="display:none;">
+            <label>If yes, please upload details and contact number</label>
+            <input id="refundAttachment" type="file" />
+            <div style="height:10px;"></div>
+            <input name="refund_contact" type="tel" placeholder="Contact number" />
+          </div>
+        </div>
+      </article>
+
+      <article class="card span-12">
+        <h3>Verification Upload</h3>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Upload Script PDF / Screenshot</label>
+            <input id="scriptAttachment" type="file" />
+          </div>
+        </div>
+        <p class="note">Keep this section optional in the UI, but available for users who need to attach supporting proof.</p>
+      </article>
+    </section>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="submit">Submit Enquiry</button>
+      <button class="btn btn-secondary" type="reset">Reset Form</button>
+    </div>
+
+    <p class="note">Designed with a clean Indian colour palette: saffron, green, navy, and white. The form now submits one pipe-separated row to Google Forms, and file inputs contribute only the file names, not the binary files.</p>
+      </form>
+  </main>
+
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
+  <footer class="footer">© 2026 RoDTEP Script Exchange</footer>
+  <script>
+    function toggleRefundDetails() {
+      const status = document.getElementById('refundStatus');
+      const details = document.getElementById('refundDetails');
+      if (status && details) {
+        details.style.display = status.value === 'Yes' ? 'block' : 'none';
+      }
+    }
+
+    function fileNameOnly(input) {
+      return input && input.files && input.files.length ? input.files[0].name : '';
+    }
+
+    const form = document.getElementById('enquiryForm');
+    const googleRow = document.getElementById('googleRow');
+    const refundAttachment = document.getElementById('refundAttachment');
+    const scriptAttachment = document.getElementById('scriptAttachment');
+
+    if (form && googleRow) {
+      form.addEventListener('submit', function () {
+        const get = (name) => (form.querySelector(`[name="${name}"]`) || {}).value?.trim() || '';
+        googleRow.value = [
+          get('exporter_name'),
+          get('exporter_mobile'),
+          get('importer_name'),
+          get('importer_mobile'),
+          get('script_number'),
+          get('script_value'),
+          get('ask_price'),
+          get('buy_price'),
+          get('qty_balance'),
+          get('status'),
+          get('short_notes'),
+          get('refund_status'),
+          get('refund_contact'),
+          fileNameOnly(refundAttachment),
+          fileNameOnly(scriptAttachment)
+        ].join('|');
+      });
+    }
+  </script>
+</body>
+</html>
