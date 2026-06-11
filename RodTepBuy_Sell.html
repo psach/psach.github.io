@@ -307,15 +307,15 @@
           <div class="form-grid">
             <div class="field full">
               <label>Exporter Name:</label>
-              <input name="exporter_name" type="text" value="Rahul Exports Pvt Ltd" />
+              <input name="exporter_name" type="text" />
             </div>
             <div class="field">
               <label>Mobile Number:</label>
-              <input name="exporter_mobile" type="tel" value="9876543210" />
+              <input name="exporter_mobile" type="tel" />
             </div>
             <div class="field">
               <label>Ask Price:</label>
-              <input name="ask_price" type="text" value="₹ 12,50,000" />
+              <input name="ask_price" type="text" />
             </div>
           </div>
         </article>
@@ -325,15 +325,15 @@
           <div class="form-grid">
             <div class="field full">
               <label>Importer Name:</label>
-              <input name="importer_name" type="text" value="Global Trade Links" />
+              <input name="importer_name" type="text" />
             </div>
             <div class="field">
               <label>Mobile Number:</label>
-              <input name="importer_mobile" type="tel" value="9123456780" />
+              <input name="importer_mobile" type="tel" />
             </div>
             <div class="field">
               <label>Buy Price:</label>
-              <input name="buy_price" type="text" value="₹ 11,75,000" />
+              <input name="buy_price" type="text" />
             </div>
           </div>
         </article>
@@ -343,27 +343,28 @@
           <div class="form-grid">
             <div class="field">
               <label>Script / Scrip Number:</label>
-              <input name="script_number" type="text" value="RDTP-2026-00125" />
+              <input name="script_number" type="text" />
             </div>
             <div class="field">
               <label>Script Value:</label>
-              <input name="script_value" type="text" value="₹ 15,00,000" />
+              <input name="script_value" type="text" />
             </div>
             <!-- div class="field">
               <label>Qty / Balance:</label>
-              <input name="qty_balance" type="text" value="3,00,000 balance" />
+              <input name="qty_balance" type="text" />
           </div -->
             <div class="field">
               <label>Status:</label>
               <select name="status">
-                <option selected>Available</option>
+                <option selected></option>
+                <option>Available</option>
                 <option>Pending</option>
                 <option>Under Verification</option>
               </select>
             </div>
             <div class="field full">
               <label>Short Notes:</label>
-              <textarea name="short_notes" rows="4">Ready for transfer after verification</textarea>
+              <textarea name="short_notes" rows="4"></textarea>
             </div>
           </div>
         </article>
@@ -375,14 +376,14 @@
               <label>Is your IGST refund / drawback held up?:</label>
               <select name="refund_status" id="refundStatus" onchange="toggleRefundDetails()">
                 <option value="No">No</option>
-                <option value="Yes" selected>Yes</option>
+                <option value="Yes">Yes</option>
               </select>
             </div>
-            <div class="field full" id="refundDetails" style="display:block;">
+            <div class="field full" id="refundDetails" style="display:none;">
               <label>If yes, please upload details and contact number:</label>
               <input id="refundAttachment" type="file" />
               <div style="height:10px;"></div>
-              <input name="refund_contact" type="tel" value="9988776655" />
+              <input name="refund_contact" type="tel" />
             </div>
           </div>
         </article>
