@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Standalone Offline PWA Crossword Generator powered by WebLLM. Create interactive crosswords from any text using on-device AI.">
+    <meta name="theme-color" content="#18181b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>CrossLLM • AI Crossword Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --accent: #22c55e;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .crossword-grid {
+            display: grid;
+            gap: 1px;
+            background-color: #3f3f46;
+            padding: 3px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+            margin: 0 auto;
+        }
+        
+        .crossword-cell {
+            width: 32px;
+            height: 32px;
+            background-color: #18181b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 15px;
+            font-weight: 600;
+            color: #e4e4e7;
+            border: 1px solid #3f3f46;
+            user-select: none;
+            transition: all 0.1s ease;
+        }
+        
+        .crossword-cell.white {
+            background-color: #fafafa;
+            color: #18181b;
+            border-color: #52525b;
+        }
+        
+        .crossword-cell.black {
+            background-color: #27272a;
+            border-color: #3f3f46;
+        }
+        
+        .crossword-cell input {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #18181b;
+            caret-color: #22c55e;
+        }
+        
+        .crossword-cell .number {
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            font-size: 8px;
+            font-weight: 700;
+            color: #52525b;
+            line-height: 1;
+        }
+        
+        .crossword-cell.highlight {
+            background-color: #fef08c !important;
+            color: #18181b !important;
+        }
+        
+        .crossword-cell.correct {
+            background-color: #dcfce7 !important;
+        }
+        
+        .crossword-cell.incorrect {
+            background-color: #fee2e2 !important;
+        }
+
+        .clue-item {
+            transition: all 0.1s ease;
+        }
+        
+        .clue-item:hover {
+            background-color: #27272a;
+        }
+        
+        .clue-item.active {
+            background-color: #22c55e;
+            color: #18181b;
+            font-weight: 600;
+        }
+
+        .section-header {
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #71717a;
+        }
+
+        .puzzle-container {
+            scrollbar-width: none;
+        }
+        
+        .puzzle-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-active {
+            background-color: #22c55e;
+            color: #18181b;
+            font-weight: 600;
+        }
+
+        .model-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .model-card.active {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        .grid-container {
+            max-height: calc(100vh - 280px);
+            overflow: auto;
+            scrollbar-width: thin;
+        }
+
+        @media (max-width: 1024px) {
+            .crossword-cell {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+            .crossword-cell .number {
+                font-size: 7px;
+            }
+        }
+        
+        .no-scroll {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .status-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200 no-scroll">
+    <div class="h-screen flex flex-col max-w-[1600px] mx-auto">
+        <!-- Top Navigation -->
+        <nav class="h-14 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-xl flex items-center px-4 z-50 flex-shrink-0">
+            <div class="flex items-center justify-between w-full">
+                <div class="flex items-center gap-x-3">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-x-2.5">
+                        <div class="w-9 h-9 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-th-large text-zinc-950 text-3xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-display text-2xl font-semibold tracking-tighter">CrossLLM</span>
+                            <span class="text-[10px] font-mono text-emerald-400 tracking-[1.5px] ml-0.5">AI</span>
+                        </div>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-x-1.5 text-xs px-2.5 py-1 bg-zinc-900 rounded-full border border-zinc-800">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full status-dot"></div>
+                        <span class="text-emerald-400 font-medium text-xs">OFFLINE PWA</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-x-2">
+                    <!-- Model Selector - Always visible, compact on mobile -->
+                    <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-3xl p-1 text-sm">
+                        <div class="hidden sm:block px-3 text-xs text-zinc-500">MODEL</div>
+                        <select id="model-select" class="bg-transparent border-none text-sm font-medium focus:outline-none pr-2 sm:pr-8 w-[138px] sm:w-auto">
+                            <option value="Phi-3.5-mini-instruct-q4f16_1-MLC">Phi-3.5 Mini (Best)</option>
+                            <option value="Llama-3.2-3B-Instruct-q4f16_1-MLC">Llama 3.2 3B</option>
+                            <option value="Qwen2-1.5B-Instruct-q4f16_1-MLC">Qwen2 1.5B (Fast)</option>
+                        </select>
+                    </div>
+
+                    <!-- PWA Install Button -->
+                    <button id="install-btn" 
+                            class="hidden items-center gap-x-2 px-4 py-1.5 text-sm font-semibold bg-white text-zinc-900 hover:bg-zinc-100 transition-colors rounded-3xl shadow-sm">
+                        <i class="fa-solid fa-download mr-1.5"></i>
+                        <span>Install App</span>
+                    </button>
+
+                    <button onclick="showHelp()" 
+                            class="w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-2xl transition-colors">
+                        <i class="fa-solid fa-question-circle text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
+            
+            <!-- LEFT: INPUT PANEL -->
+            <div class="w-full lg:w-80 xl:w-96 border-r border-zinc-800 flex flex-col bg-zinc-900/50 flex-shrink-0">
+                <div class="p-4 border-b border-zinc-800 flex-shrink-0">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <div class="section-header">Source Text</div>
+                            <div class="text-lg font-semibold tracking-tight">Up to 5,000 words</div>
+                        </div>
+                        <button onclick="loadExampleText()" 
+                                class="text-xs px-3 py-1 bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-2xl flex items-center gap-x-1.5 text-emerald-400">
+                            <i class="fa-solid fa-magic text-xs"></i>
+                            <span class="font-medium">Example</span>
+                        </button>
+                    </div>
+                    
+                    <textarea id="input-text" rows="9" 
+                              class="w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500/70 rounded-3xl p-4 text-sm resize-y font-light placeholder:text-zinc-500"
+                              placeholder="Paste any article, notes, story, or document here (max ~5000 words). The AI will extract key terms and generate clever clues..."></textarea>
+                    
+                    <div class="flex justify-between items-center mt-2 text-[10px] text-zinc-500 px-1">
+                        <div><span id="word-count">0</span> words / <span id="char-count">0</span> chars</div>
+                        <div class="flex items-center gap-x-1">
+                            <i class="fa-solid fa-info-circle"></i>
+                            <span>AI will process this</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generation Controls -->
+                <div class="p-4 flex-1 flex flex-col">
+                    <div class="section-header mb-2">Generation Settings</div>
+                    
+                    <div class="space-y-4 flex-1">
+                        <!-- Number of words -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1.5 px-0.5">
+                                <div class="font-medium text-zinc-400">Number of answers</div>
+                                <div id="num-words-value" class="font-mono text-emerald-400">12</div>
+                            </div>
+                            <input type="range" id="num-words" min="6" max="18" step="1" value="12"
+                                   class="w-full accent-emerald-500">
+                        </div>
+
+                        <!-- Clue Style -->
+                        <div>
+                            <div class="text-xs font-medium text-zinc-400 mb-1.5 px-0.5">Clue Style</div>
+                            <div class="flex bg-zinc-950 border border-zinc-700 rounded-3xl p-1 text-sm">
+                                <div onclick="setClueStyle(this, 'definition')" class="clue-style-btn flex-1 text-center py-1.5 rounded-3xl cursor-pointer bg-emerald-500 text-zinc-950 font-semibold" data-style="definition">
+                                    Definition
+                                </div>
+                                <div onclick="setClueStyle(this, 'contextual')" class="clue-style-btn flex-1 text-center py-1.5 rounded-3xl cursor-pointer text-zinc-300" data-style="contextual">
+                                    Contextual
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-1">
+                            <button id="generate-btn"
+                                    class="w-full flex items-center justify-center gap-x-3 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition-all text-zinc-950 font-bold py-3.5 rounded-3xl text-base shadow-lg shadow-emerald-950/50">
+                                <i class="fa-solid fa-magic mr-2"></i>
+                                <span id="generate-btn-text">GENERATE CROSSWORD WITH AI</span>
+                            </button>
+                            
+                            <!-- Enhanced Processing Status -->
+                            <div id="progress-container" class="hidden mt-3 bg-zinc-950 border border-zinc-800 rounded-3xl p-3">
+                                <!-- Step Indicator -->
+                                <div class="flex items-center justify-between mb-2 px-1">
+                                    <div class="text-[10px] font-semibold tracking-wider text-emerald-400">PROCESSING STEPS</div>
+                                    <div id="step-counter" class="text-[10px] font-mono text-zinc-400">Step <span id="current-step">1</span>/5</div>
+                                </div>
+                                
+                                <!-- Current Status -->
+                                <div class="flex items-center gap-x-2 mb-2 px-1">
+                                    <div id="progress-text" class="flex-1 text-sm font-medium text-emerald-300">Preparing input...</div>
+                                    <div id="progress-percent" class="font-mono text-xs text-emerald-400 tabular-nums">0%</div>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden mb-2">
+                                    <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                
+                                <!-- Step Pills -->
+                                <div class="flex gap-1 text-[10px]">
+                                    <div id="step-1" class="flex-1 text-center py-0.5 rounded-2xl bg-emerald-900/60 text-emerald-300">1. Validate</div>
+                                    <div id="step-2" class="flex-1 text-center py-0.5 rounded-2xl bg-zinc-800 text-zinc-400">2. Load AI</div>
+                                    <div id="step-3" class="flex-1 text-center py-0.5 rounded-2xl bg-zinc-800 text-zinc-400">3. Generate</div>
+                                    <div id="step-4" class="flex-1 text-center py-0.5 rounded-2xl bg-zinc-800 text-zinc-400">4. Layout</div>
+                                    <div id="step-5" class="flex-1 text-center py-0.5 rounded-2xl bg-zinc-800 text-zinc-400">5. Render</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Error State -->
+                            <div id="error-container" class="hidden mt-3 bg-red-950/60 border border-red-800 rounded-3xl p-3 text-sm">
+                                <div class="flex items-start gap-x-2">
+                                    <i class="fa-solid fa-exclamation-triangle text-red-400 mt-0.5"></i>
+                                    <div class="flex-1">
+                                        <div id="error-title" class="font-semibold text-red-300">Generation Failed</div>
+                                        <div id="error-message" class="text-red-300/90 text-xs mt-0.5 leading-snug"></div>
+                                        <div class="flex gap-x-2 mt-2">
+                                            <button onclick="retryGeneration()" 
+                                                    class="text-xs px-3 py-1 bg-red-800 hover:bg-red-700 rounded-2xl text-red-200">Try Again</button>
+                                            <button onclick="retryWithDifferentModel()" 
+                                                    class="text-xs px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-2xl text-zinc-300">Try Different Model</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-[10px] text-center text-zinc-500 mt-auto pt-3 border-t border-zinc-800">
+                        Runs 100% in your browser • No data leaves your device
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER: INTERACTIVE GRID -->
+            <div class="flex-1 flex flex-col min-h-0 bg-zinc-950 border-r border-zinc-800">
+                <!-- Grid Header -->
+                <div class="px-5 pt-4 pb-3 flex-shrink-0 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/60">
+                    <div class="flex items-center gap-x-3">
+                        <div>
+                            <div id="puzzle-title" class="font-display text-2xl font-semibold tracking-tighter">Your Crossword</div>
+                            <div id="puzzle-meta" class="text-xs text-zinc-500 flex items-center gap-x-2">
+                                <span id="grid-size">—</span> 
+                                <span class="text-emerald-400">•</span> 
+                                <span id="word-count-meta">0 words placed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-x-2">
+                        <!-- Solution Toggle -->
+                        <div class="flex items-center bg-zinc-900 border border-zinc-700 rounded-3xl p-1 text-sm">
+                            <div class="px-3 text-xs text-zinc-400">SOLUTION</div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="show-solution-toggle" class="sr-only peer" onchange="toggleSolution()">
+                                <div class="w-9 h-5 bg-zinc-700 peer-focus:outline-none peer-focus:ring-0 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
+
+                        <button onclick="checkPuzzle()" 
+                                class="px-4 py-1.5 text-sm font-semibold flex items-center gap-x-2 bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-3xl border border-zinc-700">
+                            <i class="fa-solid fa-check-double"></i>
+                            <span class="hidden sm:inline">Check</span>
+                        </button>
+                        
+                        <button onclick="resetUserInputs()" 
+                                class="px-4 py-1.5 text-sm font-semibold flex items-center gap-x-2 bg-zinc-800 hover:bg-zinc-700 transition-colors rounded-3xl border border-zinc-700">
+                            <i class="fa-solid fa-undo"></i>
+                            <span class="hidden sm:inline">Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid Area -->
+                <div class="flex-1 flex items-center justify-center p-4 lg:p-6 overflow-auto puzzle-container" id="grid-scroll-container">
+                    <div id="crossword-wrapper" class="relative">
+                        <!-- Dynamic grid injected here by JS -->
+                        <div id="crossword-grid" 
+                             class="crossword-grid mx-auto"
+                             style="grid-template-columns: repeat(15, 32px);">
+                            <!-- Populated by JS -->
+                        </div>
+                        
+                        <!-- Empty State -->
+                        <div id="empty-state" class="flex flex-col items-center justify-center text-center py-12 px-6">
+                            <div class="w-16 h-16 bg-zinc-900 rounded-3xl flex items-center justify-center mb-4 border border-zinc-700">
+                                <i class="fa-solid fa-th-large text-4xl text-zinc-600"></i>
+                            </div>
+                            <div class="text-xl font-semibold tracking-tight text-zinc-300">No puzzle yet</div>
+                            <p class="text-sm text-zinc-500 max-w-[220px] mt-1.5">Paste text on the left and click <span class="font-medium text-emerald-400">"Generate Crossword"</span> to create your interactive puzzle.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid Footer Controls -->
+                <div class="px-5 py-3 border-t border-zinc-800 flex-shrink-0 bg-zinc-900/60 flex items-center justify-between text-sm">
+                    <div class="flex items-center gap-x-2 text-xs">
+                        <div class="flex items-center gap-x-1 text-emerald-400">
+                            <i class="fa-solid fa-keyboard"></i>
+                            <span class="font-medium">Arrow keys</span>
+                        </div>
+                        <span class="text-zinc-600">•</span>
+                        <span class="text-zinc-400">Click clues to highlight</span>
+                    </div>
+                    
+                    <div class="flex gap-x-2">
+                        <button onclick="regenerateLayout()" 
+                                class="text-xs px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-2xl flex items-center gap-x-1.5 border border-zinc-700">
+                            <i class="fa-solid fa-sync text-xs"></i>
+                            <span>Regenerate Layout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: CLUES + EXPORT -->
+            <div class="w-full lg:w-80 xl:w-96 border-l border-zinc-800 flex flex-col bg-zinc-900/40 flex-shrink-0">
+                <div class="p-4 border-b border-zinc-800 flex-shrink-0">
+                    <div class="section-header mb-1">Clues</div>
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm font-medium">Across &amp; Down</div>
+                        <div id="clues-count" class="text-xs px-2 py-0.5 bg-zinc-800 rounded-full text-emerald-400 font-mono">0</div>
+                    </div>
+                </div>
+
+                <!-- Clues List -->
+                <div class="flex-1 overflow-auto p-2 space-y-1 text-sm" id="clues-list">
+                    <!-- Populated dynamically -->
+                    <div class="px-3 py-8 text-center text-xs text-zinc-500" id="clues-empty-state">
+                        Clues will appear here after generation
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="p-4 border-t border-zinc-800 flex-shrink-0 bg-zinc-900">
+                    <div class="section-header mb-2.5">Export &amp; Share</div>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportAsImage(false)" 
+                                class="flex flex-col items-center justify-center gap-y-1 py-3 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 transition-all rounded-3xl border border-zinc-700 text-xs font-medium">
+                            <i class="fa-solid fa-image text-emerald-400 mb-0.5"></i>
+                            <div>PNG <span class="font-mono text-[10px]">(Puzzle)</span></div>
+                        </button>
+                        
+                        <button onclick="exportAsImage(true)" 
+                                class="flex flex-col items-center justify-center gap-y-1 py-3 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 transition-all rounded-3xl border border-zinc-700 text-xs font-medium">
+                            <i class="fa-solid fa-image text-emerald-400 mb-0.5"></i>
+                            <div>PNG <span class="font-mono text-[10px]">(Solution)</span></div>
+                        </button>
+                        
+                        <button onclick="printPuzzle()" 
+                                class="col-span-2 flex items-center justify-center gap-x-2 py-2.5 bg-white text-zinc-900 hover:bg-zinc-100 transition-colors rounded-3xl text-sm font-semibold shadow-sm">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Print / Save as PDF</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-2 text-[10px] text-center text-zinc-500">
+                        Exports work completely offline
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[100] space-y-2"></div>
+
+    <script type="module">
+        // ==================== TAILWIND CONFIG ====================
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#22c55e');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        // ==================== GLOBAL STATE ====================
+        let currentPuzzle = null; // { grid, placements, width, height, title, solutionMap }
+        let userInputs = {}; // "r,c": letter
+        let currentEngine = null;
+        let currentModelId = "Phi-3.5-mini-instruct-q4f16_1-MLC";
+        let clueStyle = "definition";
+        let showSolution = false;
+        let highlightedPlacement = null;
+
+        // WebLLM import
+        let webllmModule = null;
+
+        // ==================== PWA INSTALL ====================
+        let deferredPrompt = null;
+
+        function initPWA() {
+            const installBtn = document.getElementById('install-btn');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.style.display = 'flex';
+                installBtn.onclick = async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            showToast('Thanks! CrossLLM installed successfully.', 'success');
+                        }
+                        deferredPrompt = null;
+                        installBtn.style.display = 'none';
+                    }
+                };
+            });
+
+            // Register basic service worker for PWA (offline shell)
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => {
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('activate', (e) => {
+                        self.clients.claim();
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        // Basic offline support - let browser handle most
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl).catch(() => {});
+            }
+
+            // Show install button hint if not triggered
+            setTimeout(() => {
+                if (!deferredPrompt && installBtn.style.display !== 'flex') {
+                    // Could show a subtle hint but skip for clean UI
+                }
+            }, 8000);
+        }
+
+        // ==================== TOAST ====================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-3 rounded-3xl shadow-xl flex items-center gap-x-3 text-sm border ${type === 'success' ? 'bg-emerald-950 border-emerald-800 text-emerald-300' : 'bg-red-950 border-red-800 text-red-300'}`;
+            
+            toast.innerHTML = `
+                <div class="flex-1">${message}</div>
+                <button class="text-xs opacity-60 hover:opacity-100">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.2s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 200);
+            }, 4200);
+            
+            toast.querySelector('button').onclick = () => toast.remove();
+        }
+
+        // ==================== INPUT HANDLING ====================
+        function initInputHandlers() {
+            const textarea = document.getElementById('input-text');
+            const wordCount = document.getElementById('word-count');
+            const charCount = document.getElementById('char-count');
+
+            function updateCounts() {
+                const text = textarea.value.trim();
+                const words = text ? text.split(/\s+/).length : 0;
+                wordCount.textContent = words;
+                charCount.textContent = text.length;
+                
+                if (words > 5200) {
+                    wordCount.classList.add('text-red-400');
+                } else {
+                    wordCount.classList.remove('text-red-400');
+                }
+            }
+
+            textarea.addEventListener('input', updateCounts);
+            updateCounts();
+
+            // Range input
+            const range = document.getElementById('num-words');
+            const rangeVal = document.getElementById('num-words-value');
+            
+            range.addEventListener('input', () => {
+                rangeVal.textContent = range.value;
+            });
+        }
+
+        function loadExampleText() {
+            const example = `Artificial Intelligence has transformed how we interact with technology. Large language models like GPT and Claude demonstrate remarkable capabilities in understanding context, generating creative content, and solving complex problems. 
+
+WebLLM brings this power directly into web browsers using WebGPU acceleration, enabling fully private, offline AI experiences without sending data to servers. This represents a significant step toward democratizing advanced AI capabilities.
+
+Crossword puzzles remain one of the most popular word games worldwide. They improve vocabulary, enhance cognitive function, and provide entertainment across all age groups. Modern AI can now generate high-quality themed crosswords tailored to any source material.
+
+The combination of on-device LLMs and classic puzzle mechanics opens exciting new possibilities for education, training, and leisure. Users can create personalized puzzles from their own notes, articles, or study materials in seconds.`;
+
+            document.getElementById('input-text').value = example.trim();
+            document.getElementById('word-count').textContent = example.trim().split(/\s+/).length;
+            document.getElementById('char-count').textContent = example.trim().length;
+            
+            showToast('Example text loaded. Ready to generate!', 'success');
+        }
+
+        function setClueStyle(element, style) {
+            clueStyle = style;
+            document.querySelectorAll('.clue-style-btn').forEach(el => {
+                el.classList.remove('bg-emerald-500', 'text-zinc-950', 'font-semibold');
+                el.classList.add('text-zinc-300');
+            });
+            element.classList.add('bg-emerald-500', 'text-zinc-950', 'font-semibold');
+            element.classList.remove('text-zinc-300');
+        }
+
+        // ==================== WEBLLM ====================
+        async function loadWebLLM() {
+            if (webllmModule) return webllmModule;
+            
+            try {
+                // Dynamic import from CDN (works in modern browsers)
+                webllmModule = await import('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.79/dist/web-llm.min.js');
+                return webllmModule;
+            } catch (err) {
+                console.error("Failed to load WebLLM from CDN. Trying fallback...", err);
+                // Fallback attempt
+                try {
+                    webllmModule = await import('https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm/dist/web-llm.min.js');
+                    return webllmModule;
+                } catch (e2) {
+                    throw new Error("Could not load WebLLM library. Please check your internet connection for first-time model download.");
+                }
+            }
+        }
+
+        async function initEngine(modelId, progressCallback) {
+            const webllm = await loadWebLLM();
+            
+            if (currentEngine && currentModelId === modelId) {
+                return currentEngine;
+            }
+            
+            if (currentEngine) {
+                try { await currentEngine.unload(); } catch(e){}
+            }
+            
+            currentModelId = modelId;
+            
+            const engine = await webllm.CreateMLCEngine(
+                modelId,
+                {
+                    initProgressCallback: (report) => {
+                        if (progressCallback) progressCallback(report);
+                    },
+                    logLevel: "ERROR"
+                }
+            );
+            
+            currentEngine = engine;
+            return engine;
+        }
+
+        async function generateWithLLM(text, numTerms = 12) {
+            const modelSelect = document.getElementById('model-select');
+            const modelId = modelSelect.value || currentModelId;
+            const btnText = document.getElementById('generate-btn-text');
+
+            // Note: Main status UI is controlled by generateCrossword() via updateProcessingStatus()
+            btnText.innerHTML = `<span class="animate-pulse">GENERATING CLUES...</span>`;
+
+            try {
+                const updateProgress = (report) => {
+                    const pct = Math.round((report.progress || 0) * 100);
+                    const statusMsg = report.text 
+                        ? (report.text.length > 48 ? report.text.substring(0, 48) + '...' : report.text)
+                        : `Downloading model (${pct}%)`;
+                    
+                    updateProcessingStatus(2, statusMsg, 15 + (pct * 0.35));
+                };
+
+                const engine = await initEngine(modelId, updateProgress);
+                
+                // Build prompt
+                const truncatedText = text.length > 14500 ? text.substring(0, 14500) + "\n\n[Text truncated for length]" : text;
+                
+                const systemPrompt = `You are an expert crossword puzzle designer and educator. 
+Your goal is to create high-quality, fair crossword clues from source material.
+
+TASK:
+1. Analyze the TEXT below.
+2. Select exactly ${numTerms} distinctive and meaningful single words or very short phrases (3-12 letters ideal) that capture key ideas, people, concepts, or terms from the text. Prioritize specific, memorable, or thematic terms. Avoid generic words.
+3. For each selected term, write a concise, clever crossword-style clue (max 11 words). 
+   - If style is "definition": Write a direct but elegant definition-style clue.
+   - If style is "contextual": Make the clue reference the specific context or phrasing from the TEXT.
+4. Output ONLY clean JSON with no extra text, markdown, or explanations.
+
+JSON SCHEMA:
+{
+  "puzzleTitle": "Creative short title (3-6 words)",
+  "selectedTerms": [
+    {
+      "answer": "UPPERCASEWORD",
+      "clue": "Concise clue text here"
+    }
+  ]
+}`;
+
+                const userPrompt = `TEXT TO ANALYZE:\n"""\n${truncatedText}\n"""\n\nCLUE STYLE PREFERENCE: ${clueStyle.toUpperCase()}\n\nGenerate exactly ${numTerms} high-quality terms and clues now.`;
+
+                updateProcessingStatus(3, `Generating clues with ${modelId.split('-')[0]}...`, 68);
+
+                const messages = [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userPrompt }
+                ];
+
+                const response = await engine.chat.completions.create({
+                    messages: messages,
+                    temperature: 0.65,
+                    max_tokens: 1800,
+                    stream: false
+                });
+
+                let content = response.choices[0].message.content.trim();
+                
+                // Clean possible markdown or extra text
+                content = content.replace(/```json|```/g, '').trim();
+                
+                let parsed;
+                try {
+                    parsed = JSON.parse(content);
+                } catch (parseErr) {
+                    // Try to extract JSON from response
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        parsed = JSON.parse(jsonMatch[0]);
+                    } else {
+                        throw new Error("Model did not return valid JSON. Try a different model or shorter text.");
+                    }
+                }
+
+                if (!parsed.selectedTerms || !Array.isArray(parsed.selectedTerms)) {
+                    throw new Error("Invalid response structure from model.");
+                }
+
+                // Validate and clean terms
+                parsed.selectedTerms = parsed.selectedTerms
+                    .filter(t => t.answer && t.clue)
+                    .map(t => ({
+                        answer: t.answer.toUpperCase().replace(/[^A-Z]/g, ''),
+                        clue: t.clue.trim()
+                    }))
+                    .filter(t => t.answer.length >= 3 && t.answer.length <= 14);
+
+                if (parsed.selectedTerms.length < 5) {
+                    throw new Error("Too few valid terms extracted. Try more descriptive text or different model.");
+                }
+
+                updateProcessingStatus(3, `Successfully extracted terms`, 82);
+
+                return {
+                    title: parsed.puzzleTitle || "AI Generated Crossword",
+                    terms: parsed.selectedTerms.slice(0, numTerms)
+                };
+
+            } catch (error) {
+                console.error("LLM Generation Error:", error);
+                // Error UI is handled by showError() in the new flow
+                throw error;
+            } finally {
+                // Status UI is managed by the main generateCrossword() function
+            }
+        }
+
+        // ==================== CROSSWORD LAYOUT GENERATOR (Built-in lightweight) ====================
+        function generateLayout(terms) {
+            if (!terms || terms.length === 0) return null;
+
+            let placements = [];
+            let letterMap = new Map(); // key "r,c" -> letter
+
+            const canPlace = (word, startRow, startCol, direction) => {
+                for (let i = 0; i < word.length; i++) {
+                    const r = direction === 'across' ? startRow : startRow + i;
+                    const c = direction === 'across' ? startCol + i : startCol;
+                    const key = `${r},${c}`;
+                    
+                    if (letterMap.has(key) && letterMap.get(key) !== word[i]) {
+                        return false;
+                    }
+                    
+                    // Prevent extreme out of bounds
+                    if (r < 0 || c < 0 || r > 35 || c > 35) return false;
+                }
+                return true;
+            };
+
+            const doPlace = (word, startRow, startCol, direction, clue, number) => {
+                for (let i = 0; i < word.length; i++) {
+                    const r = direction === 'across' ? startRow : startRow + i;
+                    const c = direction === 'across' ? startCol + i : startCol;
+                    letterMap.set(`${r},${c}`, word[i]);
+                }
+                placements.push({
+                    word,
+                    clue,
+                    row: startRow,
+                    col: startCol,
+                    dir: direction,
+                    number: number || (placements.length + 1)
+                });
+            };
+
+            // Sort longest first for better results
+            const sortedTerms = [...terms].sort((a, b) => b.answer.length - a.answer.length);
+
+            // Place the longest word first in a central position
+            const firstTerm = sortedTerms[0];
+            const firstWord = firstTerm.answer;
+            const startR = 12;
+            const startC = Math.max(3, 14 - Math.floor(firstWord.length / 2));
+            
+            doPlace(firstWord, startR, startC, 'across', firstTerm.clue);
+
+            // Try to place remaining words with intersections
+            for (let idx = 1; idx < sortedTerms.length; idx++) {
+                const term = sortedTerms[idx];
+                const word = term.answer;
+                let placedSuccessfully = false;
+
+                // Search for intersection opportunities from already placed words
+                for (let pIdx = 0; pIdx < placements.length && !placedSuccessfully; pIdx++) {
+                    const placed = placements[pIdx];
+                    
+                    for (let letterIdx = 0; letterIdx < placed.word.length && !placedSuccessfully; letterIdx++) {
+                        const existingLetter = placed.word[letterIdx];
+                        const placedR = placed.row + (placed.dir === 'across' ? 0 : letterIdx);
+                        const placedC = placed.col + (placed.dir === 'across' ? letterIdx : 0);
+
+                        // Find matching letter position in new word
+                        for (let wIdx = 0; wIdx < word.length; wIdx++) {
+                            if (word[wIdx] !== existingLetter) continue;
+
+                            const newDir = placed.dir === 'across' ? 'down' : 'across';
+                            let newStartR, newStartC;
+
+                            if (newDir === 'down') {
+                                newStartR = placedR - wIdx;
+                                newStartC = placedC;
+                            } else {
+                                newStartR = placedR;
+                                newStartC = placedC - wIdx;
+                            }
+
+                            if (canPlace(word, newStartR, newStartC, newDir)) {
+                                doPlace(word, newStartR, newStartC, newDir, term.clue);
+                                placedSuccessfully = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Fallback placement if no good intersection found
+                if (!placedSuccessfully) {
+                    // Try placing below the current structure
+                    let maxRow = 0;
+                    placements.forEach(p => {
+                        const endR = p.row + (p.dir === 'down' ? p.word.length - 1 : 0);
+                        if (endR > maxRow) maxRow = endR;
+                    });
+                    
+                    const tryRow = maxRow + 3;
+                    const tryCol = 4 + (idx % 3) * 3;
+                    
+                    if (canPlace(word, tryRow, tryCol, 'across')) {
+                        doPlace(word, tryRow, tryCol, 'across', term.clue);
+                        placedSuccessfully = true;
+                    } else if (canPlace(word, tryRow, tryCol + 8, 'across')) {
+                        doPlace(word, tryRow, tryCol + 8, 'across', term.clue);
+                    }
+                }
+            }
+
+            if (placements.length === 0) return null;
+
+            // Calculate bounding box + padding
+            let minR = Infinity, maxR = -Infinity;
+            let minC = Infinity, maxC = -Infinity;
+
+            letterMap.forEach((_, key) => {
+                const [r, c] = key.split(',').map(Number);
+                minR = Math.min(minR, r);
+                maxR = Math.max(maxR, r);
+                minC = Math.min(minC, c);
+                maxC = Math.max(maxC, c);
+            });
+
+            const padding = 1;
+            const height = maxR - minR + 1 + padding * 2;
+            const width = maxC - minC + 1 + padding * 2;
+            const offsetR = minR - padding;
+            const offsetC = minC - padding;
+
+            // Create final grid
+            const grid = Array.from({ length: height }, () => Array(width).fill(''));
+
+            letterMap.forEach((letter, key) => {
+                const [r, c] = key.split(',').map(Number);
+                const gr = r - offsetR;
+                const gc = c - offsetC;
+                if (gr >= 0 && gr < height && gc >= 0 && gc < width) {
+                    grid[gr][gc] = letter;
+                }
+            });
+
+            // Shift placements
+            placements.forEach(p => {
+                p.row -= offsetR;
+                p.col -= offsetC;
+            });
+
+            // Re-number placements in standard crossword order (top-to-bottom, left-to-right)
+            const sortedPlacements = [...placements].sort((a, b) => {
+                if (a.row !== b.row) return a.row - b.row;
+                return a.col - b.col;
+            });
+
+            sortedPlacements.forEach((p, index) => {
+                const original = placements.find(pl => pl.word === p.word && pl.row === p.row && pl.col === p.col);
+                if (original) original.number = index + 1;
+            });
+
+            // Create solution map for quick lookup
+            const solutionMap = {};
+            for (let r = 0; r < height; r++) {
+                for (let c = 0; c < width; c++) {
+                    if (grid[r][c]) {
+                        solutionMap[`${r},${c}`] = grid[r][c];
+                    }
+                }
+            }
+
+            return {
+                grid,
+                placements,
+                width,
+                height,
+                title: terms[0]?.title || "AI Crossword",
+                solutionMap
+            };
+        }
+
+        // ==================== RENDER INTERACTIVE GRID ====================
+        function renderCrossword(puzzle) {
+            const container = document.getElementById('crossword-grid');
+            const wrapper = document.getElementById('crossword-wrapper');
+            const emptyState = document.getElementById('empty-state');
+            
+            container.innerHTML = '';
+            emptyState.style.display = 'none';
+            container.style.display = 'grid';
+
+            if (!puzzle || !puzzle.grid) {
+                emptyState.style.display = 'flex';
+                container.style.display = 'none';
+                return;
+            }
+
+            currentPuzzle = puzzle;
+            userInputs = {};
+
+            // Set grid columns
+            container.style.gridTemplateColumns = `repeat(${puzzle.width}, 32px)`;
+            if (window.innerWidth < 1024) {
+                container.style.gridTemplateColumns = `repeat(${puzzle.width}, 28px)`;
+            }
+
+            // Create cells
+            for (let r = 0; r < puzzle.height; r++) {
+                for (let c = 0; c < puzzle.width; c++) {
+                    const cell = document.createElement('div');
+                    const key = `${r},${c}`;
+                    const hasLetter = puzzle.grid[r][c] !== '';
+                    
+                    cell.className = `crossword-cell ${hasLetter ? 'white' : 'black'}`;
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+
+                    if (hasLetter) {
+                        // Number (if start of word)
+                        const placement = puzzle.placements.find(p => 
+                            (p.dir === 'across' && p.row === r && p.col === c) || 
+                            (p.dir === 'down' && p.row === r && p.col === c)
+                        );
+                        
+                        if (placement) {
+                            const num = document.createElement('div');
+                            num.className = 'number';
+                            num.textContent = placement.number;
+                            cell.appendChild(num);
+                        }
+
+                        // Input field
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.autocomplete = 'off';
+                        input.spellcheck = false;
+                        input.dataset.key = key;
+                        
+                        input.oninput = (e) => handleCellInput(e, r, c);
+                        input.onkeydown = (e) => handleCellKeydown(e, r, c);
+                        input.onfocus = () => highlightWordForCell(r, c);
+                        
+                        cell.appendChild(input);
+                        
+                        // Restore previous user input if exists
+                        if (userInputs[key]) {
+                            input.value = userInputs[key];
+                        }
+                    }
+                    
+                    container.appendChild(cell);
+                }
+            }
+
+            // Update meta
+            document.getElementById('puzzle-title').textContent = puzzle.title || "AI Crossword";
+            document.getElementById('grid-size').textContent = `${puzzle.width}×${puzzle.height}`;
+            document.getElementById('word-count-meta').textContent = `${puzzle.placements.length} words placed`;
+
+            // Render clues
+            renderClues(puzzle);
+
+            // Attach global keyboard for better navigation
+            attachGlobalKeyboard();
+        }
+
+        function handleCellInput(e, row, col) {
+            const key = `${row},${col}`;
+            const val = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+            e.target.value = val;
+            
+            userInputs[key] = val;
+            
+            // Auto advance to next cell in word direction if possible
+            if (val && currentPuzzle) {
+                const placement = findPlacementForCell(row, col);
+                if (placement) {
+                    let nextR = row;
+                    let nextC = col;
+                    
+                    if (placement.dir === 'across') {
+                        nextC = col + 1;
+                    } else {
+                        nextR = row + 1;
+                    }
+                    
+                    const nextKey = `${nextR},${nextC}`;
+                    const nextCell = document.querySelector(`.crossword-cell[data-row="${nextR}"][data-col="${nextC}"] input`);
+                    
+                    if (nextCell && currentPuzzle.solutionMap[nextKey]) {
+                        nextCell.focus();
+                        nextCell.select();
+                    }
+                }
+            }
+        }
+
+        function handleCellKeydown(e, row, col) {
+            const key = `${row},${col}`;
+            let nextR = row, nextC = col;
+
+            if (e.key === 'ArrowRight') nextC = col + 1;
+            else if (e.key === 'ArrowLeft') nextC = col - 1;
+            else if (e.key === 'ArrowDown') nextR = row + 1;
+            else if (e.key === 'ArrowUp') nextR = row - 1;
+            else if (e.key === 'Backspace' && !e.target.value) {
+                // Move to previous cell
+                const placement = findPlacementForCell(row, col);
+                if (placement) {
+                    if (placement.dir === 'across') nextC = col - 1;
+                    else nextR = row - 1;
+                }
+            } else {
+                return;
+            }
+
+            e.preventDefault();
+
+            const nextInput = document.querySelector(
+                `.crossword-cell[data-row="${nextR}"][data-col="${nextC}"] input`
+            );
+            
+            if (nextInput) {
+                nextInput.focus();
+                if (e.key === 'Backspace') nextInput.select();
+            }
+        }
+
+        function findPlacementForCell(row, col) {
+            if (!currentPuzzle) return null;
+            return currentPuzzle.placements.find(p => {
+                if (p.dir === 'across') {
+                    return p.row === row && col >= p.col && col < p.col + p.word.length;
+                } else {
+                    return p.col === col && row >= p.row && row < p.row + p.word.length;
+                }
+            });
+        }
+
+        function highlightWordForCell(row, col) {
+            clearHighlights();
+            
+            const placement = findPlacementForCell(row, col);
+            if (!placement) return;
+
+            highlightedPlacement = placement;
+
+            // Highlight all cells in the word
+            for (let i = 0; i < placement.word.length; i++) {
+                const r = placement.dir === 'across' ? placement.row : placement.row + i;
+                const c = placement.dir === 'across' ? placement.col + i : placement.col;
+                
+                const cell = document.querySelector(`.crossword-cell[data-row="${r}"][data-col="${c}"]`);
+                if (cell) cell.classList.add('highlight');
+            }
+
+            // Highlight active clue
+            document.querySelectorAll('.clue-item').forEach(el => {
+                el.classList.remove('active');
+                if (parseInt(el.dataset.number) === placement.number && el.dataset.dir === placement.dir) {
+                    el.classList.add('active');
+                    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            });
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.crossword-cell.highlight').forEach(cell => {
+                cell.classList.remove('highlight');
+            });
+            document.querySelectorAll('.clue-item.active').forEach(el => el.classList.remove('active'));
+            highlightedPlacement = null;
+        }
+
+        function attachGlobalKeyboard() {
+            // Already handled per input, but we can add escape to clear highlight
+            document.onkeydown = function(e) {
+                if (e.key === "Escape") {
+                    clearHighlights();
+                }
+            };
+        }
+
+        // ==================== CLUES RENDER ====================
+        function renderClues(puzzle) {
+            const container = document.getElementById('clues-list');
+            const empty = document.getElementById('clues-empty-state');
+            container.innerHTML = '';
+            
+            if (!puzzle || !puzzle.placements || puzzle.placements.length === 0) {
+                empty.style.display = 'block';
+                document.getElementById('clues-count').textContent = '0';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            document.getElementById('clues-count').textContent = puzzle.placements.length;
+
+            const across = puzzle.placements.filter(p => p.dir === 'across').sort((a,b) => a.number - b.number);
+            const down = puzzle.placements.filter(p => p.dir === 'down').sort((a,b) => a.number - b.number);
+
+            // Across header
+            if (across.length > 0) {
+                const header = document.createElement('div');
+                header.className = 'px-3 pt-2 pb-1 text-xs font-bold tracking-wider text-emerald-400/90';
+                header.innerHTML = `ACROSS <span class="text-emerald-400/60">(${across.length})</span>`;
+                container.appendChild(header);
+
+                across.forEach(p => {
+                    const item = createClueItem(p);
+                    container.appendChild(item);
+                });
+            }
+
+            // Down header
+            if (down.length > 0) {
+                const header = document.createElement('div');
+                header.className = 'px-3 pt-4 pb-1 text-xs font-bold tracking-wider text-emerald-400/90';
+                header.innerHTML = `DOWN <span class="text-emerald-400/60">(${down.length})</span>`;
+                container.appendChild(header);
+
+                down.forEach(p => {
+                    const item = createClueItem(p);
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        function createClueItem(placement) {
+            const div = document.createElement('div');
+            div.className = `clue-item px-3 py-2.5 mx-1 rounded-2xl flex gap-x-3 text-sm cursor-pointer border border-transparent`;
+            div.dataset.number = placement.number;
+            div.dataset.dir = placement.dir;
+            
+            div.innerHTML = `
+                <div class="font-mono w-5 text-right flex-shrink-0 text-emerald-400/90 font-semibold">${placement.number}</div>
+                <div class="flex-1 leading-tight pr-1">${placement.clue}</div>
+                <div class="text-[10px] self-start mt-0.5 px-1.5 py-px rounded bg-zinc-800 text-zinc-500 font-mono flex-shrink-0">${placement.word.length}</div>
+            `;
+            
+            div.onclick = () => {
+                highlightPlacement(placement);
+            };
+            
+            return div;
+        }
+
+        function highlightPlacement(placement) {
+            clearHighlights();
+            
+            highlightedPlacement = placement;
+            
+            // Highlight cells
+            for (let i = 0; i < placement.word.length; i++) {
+                const r = placement.dir === 'across' ? placement.row : placement.row + i;
+                const c = placement.dir === 'across' ? placement.col + i : placement.col;
+                
+                const cell = document.querySelector(`.crossword-cell[data-row="${r}"][data-col="${c}"]`);
+                if (cell) {
+                    cell.classList.add('highlight');
+                    // Focus first input
+                    if (i === 0) {
+                        const input = cell.querySelector('input');
+                        if (input) setTimeout(() => input.focus(), 50);
+                    }
+                }
+            }
+            
+            // Highlight clue
+            document.querySelectorAll('.clue-item').forEach(el => {
+                if (parseInt(el.dataset.number) === placement.number && el.dataset.dir === placement.dir) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        // ==================== SOLUTION TOGGLE & CHECK ====================
+        function toggleSolution() {
+            showSolution = document.getElementById('show-solution-toggle').checked;
+            
+            if (!currentPuzzle) return;
+            
+            const cells = document.querySelectorAll('.crossword-cell.white');
+            
+            cells.forEach(cell => {
+                const r = parseInt(cell.dataset.row);
+                const c = parseInt(cell.dataset.col);
+                const key = `${r},${c}`;
+                const solutionLetter = currentPuzzle.solutionMap[key];
+                const input = cell.querySelector('input');
+                
+                if (!input || !solutionLetter) return;
+
+                if (showSolution) {
+                    if (!input.value || input.value !== solutionLetter) {
+                        input.style.color = '#166534';
+                        input.style.fontWeight = '700';
+                        input.value = solutionLetter;
+                    }
+                    input.disabled = true;
+                } else {
+                    input.style.color = '';
+                    input.style.fontWeight = '';
+                    input.disabled = false;
+                    // Restore user input if any
+                    if (userInputs[key]) {
+                        input.value = userInputs[key];
+                    } else {
+                        input.value = '';
+                    }
+                }
+            });
+        }
+
+        function checkPuzzle() {
+            if (!currentPuzzle) {
+                showToast("No puzzle to check yet.", "error");
+                return;
+            }
+            
+            let correct = 0;
+            let total = 0;
+            
+            const cells = document.querySelectorAll('.crossword-cell.white input');
+            
+            cells.forEach(input => {
+                const cell = input.parentElement;
+                const r = parseInt(cell.dataset.row);
+                const c = parseInt(cell.dataset.col);
+                const key = `${r},${c}`;
+                const solution = currentPuzzle.solutionMap[key];
+                
+                if (!solution) return;
+                total++;
+                
+                const userVal = (input.value || '').toUpperCase();
+                
+                if (userVal === solution) {
+                    correct++;
+                    cell.classList.add('correct');
+                    cell.classList.remove('incorrect');
+                    setTimeout(() => cell.classList.remove('correct'), 1400);
+                } else if (userVal) {
+                    cell.classList.add('incorrect');
+                    setTimeout(() => cell.classList.remove('incorrect'), 1400);
+                }
+            });
+            
+            const percent = total > 0 ? Math.round((correct / total) * 100) : 0;
+            
+            if (percent === 100) {
+                showToast(`Perfect! You solved the entire puzzle (${correct}/${total})`, 'success');
+            } else {
+                showToast(`Checked: ${correct}/${total} correct (${percent}%)`, 'success');
+            }
+        }
+
+        function resetUserInputs() {
+            if (!currentPuzzle) return;
+            
+            userInputs = {};
+            showSolution = false;
+            document.getElementById('show-solution-toggle').checked = false;
+            
+            const inputs = document.querySelectorAll('.crossword-cell.white input');
+            inputs.forEach(input => {
+                input.value = '';
+                input.style.color = '';
+                input.style.fontWeight = '';
+                input.disabled = false;
+                const cell = input.parentElement;
+                cell.classList.remove('correct', 'incorrect', 'highlight');
+            });
+            
+            clearHighlights();
+            showToast('Puzzle inputs cleared.');
+        }
+
+        // ==================== STATUS & ERROR HELPERS ====================
+        let currentGenerationState = {
+            step: 0,
+            totalSteps: 5,
+            isProcessing: false
+        };
+
+        function updateProcessingStatus(step, message, percent = null) {
+            const container = document.getElementById('progress-container');
+            const textEl = document.getElementById('progress-text');
+            const percentEl = document.getElementById('progress-percent');
+            const bar = document.getElementById('progress-bar');
+            const stepCounter = document.getElementById('current-step');
+            
+            if (!container || !textEl) return;
+            
+            container.classList.remove('hidden');
+            document.getElementById('error-container').classList.add('hidden');
+            
+            currentGenerationState.step = step;
+            stepCounter.textContent = step;
+            
+            // Update step pills
+            for (let i = 1; i <= 5; i++) {
+                const pill = document.getElementById(`step-${i}`);
+                if (!pill) continue;
+                
+                if (i < step) {
+                    pill.className = 'flex-1 text-center py-0.5 rounded-2xl bg-emerald-800 text-emerald-300';
+                    pill.innerHTML = `<i class="fa-solid fa-check mr-1"></i>${pill.textContent.split('. ')[1] || pill.textContent}`;
+                } else if (i === step) {
+                    pill.className = 'flex-1 text-center py-0.5 rounded-2xl bg-emerald-500 text-zinc-950 font-semibold';
+                } else {
+                    pill.className = 'flex-1 text-center py-0.5 rounded-2xl bg-zinc-800 text-zinc-400';
+                }
+            }
+            
+            textEl.textContent = message;
+            
+            if (percent !== null) {
+                percentEl.textContent = Math.round(percent) + '%';
+                bar.style.width = percent + '%';
+            } else {
+                // Indeterminate feel for some steps
+                percentEl.textContent = '';
+                bar.style.width = (step / currentGenerationState.totalSteps * 100) + '%';
+            }
+        }
+
+        function showError(title, message, canRetry = true) {
+            const progressContainer = document.getElementById('progress-container');
+            const errorContainer = document.getElementById('error-container');
+            const errorTitle = document.getElementById('error-title');
+            const errorMsg = document.getElementById('error-message');
+            const btn = document.getElementById('generate-btn');
+            
+            progressContainer.classList.add('hidden');
+            errorContainer.classList.remove('hidden');
+            
+            errorTitle.textContent = title;
+            errorMsg.innerHTML = message;
+            
+            // Re-enable generate button
+            btn.disabled = false;
+            btn.classList.remove('opacity-60', 'cursor-not-allowed');
+            document.getElementById('generate-btn-text').innerHTML = 'GENERATE CROSSWORD WITH AI';
+            
+            currentGenerationState.isProcessing = false;
+        }
+
+        function hideError() {
+            document.getElementById('error-container').classList.add('hidden');
+        }
+
+        function resetProcessingUI() {
+            const container = document.getElementById('progress-container');
+            const errorContainer = document.getElementById('error-container');
+            const bar = document.getElementById('progress-bar');
+            const btn = document.getElementById('generate-btn');
+            
+            container.classList.add('hidden');
+            errorContainer.classList.add('hidden');
+            bar.style.width = '0%';
+            
+            // Reset step pills
+            for (let i = 1; i <= 5; i++) {
+                const pill = document.getElementById(`step-${i}`);
+                if (pill) {
+                    pill.className = 'flex-1 text-center py-0.5 rounded-2xl bg-zinc-800 text-zinc-400';
+                    // restore original text if needed
+                }
+            }
+            
+            btn.disabled = false;
+            btn.classList.remove('opacity-60', 'cursor-not-allowed');
+            document.getElementById('generate-btn-text').innerHTML = 'GENERATE CROSSWORD WITH AI';
+            currentGenerationState.isProcessing = false;
+        }
+
+        async function retryGeneration() {
+            hideError();
+            await generateCrossword();
+        }
+
+        function retryWithDifferentModel() {
+            hideError();
+            const modelSelect = document.getElementById('model-select');
+            // Cycle to next model
+            const options = Array.from(modelSelect.options);
+            const currentIndex = options.findIndex(o => o.value === modelSelect.value);
+            const nextIndex = (currentIndex + 1) % options.length;
+            modelSelect.value = options[nextIndex].value;
+            
+            showToast(`Switched to ${options[nextIndex].text}. Retrying...`, 'success');
+            setTimeout(() => generateCrossword(), 400);
+        }
+
+        // ==================== GENERATE FLOW ====================
+        async function generateCrossword() {
+            const textarea = document.getElementById('input-text');
+            const text = textarea.value.trim();
+            const btn = document.getElementById('generate-btn');
+            const btnText = document.getElementById('generate-btn-text');
+            
+            if (!text || text.length < 40) {
+                showToast("Please enter at least a short paragraph of text (40+ characters).", "error");
+                return;
+            }
+            
+            if (currentGenerationState.isProcessing) return;
+            currentGenerationState.isProcessing = true;
+            
+            hideError();
+            btn.disabled = true;
+            btnText.innerHTML = `<span class="animate-pulse">STARTING...</span>`;
+            
+            const numWords = parseInt(document.getElementById('num-words').value);
+            
+            try {
+                // === Step 1: Validate Input ===
+                updateProcessingStatus(1, "Validating input text...", 8);
+                await new Promise(r => setTimeout(r, 180)); // small delay for UX
+                
+                // === Step 2 & 3 handled inside generateWithLLM ===
+                const result = await generateWithLLM(text, numWords);
+                
+                if (!result || !result.terms || result.terms.length < 5) {
+                    throw new Error("Not enough high-quality terms were extracted from the text.");
+                }
+                
+                // === Step 4: Build Layout ===
+                updateProcessingStatus(4, "Arranging words into crossword grid...", 88);
+                await new Promise(r => setTimeout(r, 120));
+                
+                const puzzle = generateLayout(result.terms);
+                
+                if (!puzzle || puzzle.placements.length < 4) {
+                    showToast("Warning: Only placed " + (puzzle?.placements.length || 0) + " words. Layout may be sparse.", "error");
+                }
+                
+                puzzle.title = result.title;
+                
+                // === Step 5: Render ===
+                updateProcessingStatus(5, "Rendering interactive puzzle...", 96);
+                await new Promise(r => setTimeout(r, 80));
+                
+                renderCrossword(puzzle);
+                
+                // Finish
+                document.getElementById('progress-bar').style.width = '100%';
+                setTimeout(() => {
+                    document.getElementById('progress-container').classList.add('hidden');
+                    showToast(`✓ Generated "${puzzle.title}" with ${puzzle.placements.length} words`, 'success');
+                }, 650);
+                
+                // Auto focus first cell
+                setTimeout(() => {
+                    const firstInput = document.querySelector('.crossword-cell.white input');
+                    if (firstInput) firstInput.focus();
+                }, 900);
+                
+            } catch (err) {
+                console.error("Generation error:", err);
+                // Error is already shown via showError() inside generateWithLLM for most cases
+                if (!document.getElementById('error-container').classList.contains('hidden')) {
+                    // already handled
+                } else {
+                    showError("Unexpected Error", err.message || "Something went wrong. Please try again or use different text.");
+                }
+            } finally {
+                currentGenerationState.isProcessing = false;
+                btn.disabled = false;
+                btn.classList.remove('opacity-60', 'cursor-not-allowed');
+                btnText.innerHTML = 'GENERATE CROSSWORD WITH AI';
+            }
+        }
+
+        function regenerateLayout() {
+            if (!currentPuzzle || !currentPuzzle.placements) {
+                showToast("Generate a puzzle first.", "error");
+                return;
+            }
+            
+            // Re-run layout with same terms but different placement attempt
+            const terms = currentPuzzle.placements.map(p => ({
+                answer: p.word,
+                clue: p.clue
+            }));
+            
+            const newPuzzle = generateLayout(terms);
+            if (newPuzzle) {
+                newPuzzle.title = currentPuzzle.title;
+                renderCrossword(newPuzzle);
+                showToast("Layout regenerated with new arrangement.");
+            } else {
+                showToast("Could not improve layout.", "error");
+            }
+        }
+
+        // ==================== EXPORT ====================
+        function exportAsImage(includeSolution) {
+            if (!currentPuzzle) {
+                showToast("No puzzle to export.", "error");
+                return;
+            }
+            
+            const originalShowSolution = showSolution;
+            
+            // Temporarily set solution visibility
+            if (includeSolution) {
+                showSolution = true;
+                // We will manually draw on canvas instead of relying on DOM
+            }
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', { alpha: true });
+            
+            const cellSize = 38;
+            const padding = 30;
+            const headerHeight = 55;
+            const clueHeight = Math.ceil(currentPuzzle.placements.length / 2) * 22 + 60;
+            
+            canvas.width = currentPuzzle.width * cellSize + padding * 2;
+            canvas.height = currentPuzzle.height * cellSize + padding * 2 + headerHeight + (includeSolution ? clueHeight : 30);
+            
+            // Background
+            ctx.fillStyle = '#18181b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Title
+            ctx.fillStyle = '#e4e4e7';
+            ctx.font = '700 22px Inter, system-ui, sans-serif';
+            ctx.fillText(currentPuzzle.title || "CrossLLM Crossword", padding, 32);
+            
+            ctx.font = '500 11px Inter, system-ui, sans-serif';
+            ctx.fillStyle = '#71717a';
+            ctx.fillText(`${currentPuzzle.width}×${currentPuzzle.height}  •  ${currentPuzzle.placements.length} words  •  Generated with WebLLM`, padding, 48);
+            
+            // Draw grid
+            const gridStartY = padding + headerHeight - 10;
+            
+            for (let r = 0; r < currentPuzzle.height; r++) {
+                for (let c = 0; c < currentPuzzle.width; c++) {
+                    const x = padding + c * cellSize;
+                    const y = gridStartY + r * cellSize;
+                    const key = `${r},${c}`;
+                    const letter = currentPuzzle.grid[r][c];
+                    const isWhite = !!letter;
+                    
+                    if (isWhite) {
+                        // White cell
+                        ctx.fillStyle = '#fafafa';
+                        ctx.fillRect(x, y, cellSize - 1, cellSize - 1);
+                        
+                        // Border
+                        ctx.strokeStyle = '#52525b';
+                        ctx.lineWidth = 1.5;
+                        ctx.strokeRect(x, y, cellSize - 1, cellSize - 1);
+                        
+                        // Number
+                        const placement = currentPuzzle.placements.find(p => 
+                            (p.dir === 'across' && p.row === r && p.col === c) || 
+                            (p.dir === 'down' && p.row === r && p.col === c)
+                        );
+                        
+                        if (placement) {
+                            ctx.fillStyle = '#3f3f46';
+                            ctx.font = '700 9px Inter, system-ui, sans-serif';
+                            ctx.fillText(placement.number.toString(), x + 3, y + 10);
+                        }
+                        
+                        // Letter
+                        let displayLetter = '';
+                        if (includeSolution) {
+                            displayLetter = letter;
+                        } else if (userInputs[key]) {
+                            displayLetter = userInputs[key];
+                        }
+                        
+                        if (displayLetter) {
+                            ctx.fillStyle = includeSolution ? '#166534' : '#18181b';
+                            ctx.font = '700 20px Inter, system-ui, sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(displayLetter, x + cellSize / 2 - 1, y + cellSize / 2 + 7);
+                            ctx.textAlign = 'start';
+                        }
+                    } else {
+                        // Black cell
+                        ctx.fillStyle = '#27272a';
+                        ctx.fillRect(x, y, cellSize - 1, cellSize - 1);
+                    }
+                }
+            }
+            
+            // Add clues if solution export
+            if (includeSolution) {
+                let clueY = gridStartY + currentPuzzle.height * cellSize + 25;
+                
+                ctx.fillStyle = '#e4e4e7';
+                ctx.font = '600 13px Inter, system-ui, sans-serif';
+                ctx.fillText("ACROSS", padding, clueY);
+                clueY += 18;
+                
+                ctx.font = '400 11px Inter, system-ui, sans-serif';
+                ctx.fillStyle = '#a1a1aa';
+                
+                const across = currentPuzzle.placements.filter(p => p.dir === 'across').sort((a,b)=>a.number-b.number);
+                across.forEach(p => {
+                    ctx.fillText(`${p.number}. ${p.clue}`, padding, clueY);
+                    clueY += 17;
+                });
+                
+                clueY += 8;
+                ctx.fillStyle = '#e4e4e7';
+                ctx.font = '600 13px Inter, system-ui, sans-serif';
+                ctx.fillText("DOWN", padding, clueY);
+                clueY += 18;
+                
+                ctx.font = '400 11px Inter, system-ui, sans-serif';
+                ctx.fillStyle = '#a1a1aa';
+                
+                const down = currentPuzzle.placements.filter(p => p.dir === 'down').sort((a,b)=>a.number-b.number);
+                down.forEach(p => {
+                    ctx.fillText(`${p.number}. ${p.clue}`, padding, clueY);
+                    clueY += 17;
+                });
+            }
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = `crossllm-${currentPuzzle.title.toLowerCase().replace(/\s+/g, '-')}-${includeSolution ? 'solution' : 'puzzle'}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // Restore state
+            showSolution = originalShowSolution;
+            document.getElementById('show-solution-toggle').checked = originalShowSolution;
+            
+            showToast(`Exported ${includeSolution ? 'solution' : 'puzzle'} as PNG`);
+        }
+
+        function printPuzzle() {
+            if (!currentPuzzle) {
+                showToast("Generate a puzzle first to print.", "error");
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            const includeSolution = document.getElementById('show-solution-toggle').checked;
+            
+            let html = `
+                <html>
+                <head>
+                    <title>${currentPuzzle.title} - CrossLLM Crossword</title>
+                    <style>
+                        body { font-family: system-ui, -apple-system, sans-serif; padding: 30px; background: white; color: black; }
+                        .header { margin-bottom: 20px; }
+                        h1 { font-size: 28px; margin: 0 0 4px; }
+                        .meta { color: #666; font-size: 13px; }
+                        .grid { display: grid; gap: 1px; background: #333; padding: 3px; width: fit-content; margin: 20px 0; }
+                        .cell { width: 34px; height: 34px; background: white; display: flex; align-items: center; justify-content: center; position: relative; font-size: 17px; font-weight: 700; border: 1px solid #555; }
+                        .black { background: #222; }
+                        .number { position: absolute; top: 2px; left: 3px; font-size: 9px; font-weight: 700; color: #444; }
+                        .clues { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+                        .clue-header { font-weight: 700; font-size: 15px; margin-bottom: 8px; color: #111; }
+                        .clue { margin-bottom: 6px; font-size: 13.5px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>${currentPuzzle.title}</h1>
+                        <div class="meta">${currentPuzzle.width}×${currentPuzzle.height} • ${currentPuzzle.placements.length} words • Generated offline with WebLLM</div>
+                    </div>
+                    
+                    <div class="grid" style="grid-template-columns: repeat(${currentPuzzle.width}, 34px);">
+            `;
+            
+            for (let r = 0; r < currentPuzzle.height; r++) {
+                for (let c = 0; c < currentPuzzle.width; c++) {
+                    const letter = currentPuzzle.grid[r][c];
+                    const isWhite = !!letter;
+                    const key = `${r},${c}`;
+                    
+                    if (isWhite) {
+                        const placement = currentPuzzle.placements.find(p => 
+                            (p.dir === 'across' && p.row === r && p.col === c) || 
+                            (p.dir === 'down' && p.row === r && p.col === c)
+                        );
+                        
+                        let display = '';
+                        if (includeSolution) {
+                            display = letter;
+                        } else if (userInputs[key]) {
+                            display = userInputs[key];
+                        }
+                        
+                        html += `<div class="cell"><span class="number">${placement ? placement.number : ''}</span>${display}</div>`;
+                    } else {
+                        html += `<div class="cell black"></div>`;
+                    }
+                }
+            }
+            
+            html += `</div>`;
+            
+            // Clues
+            html += `<div class="clues">`;
+            
+            const across = currentPuzzle.placements.filter(p => p.dir === 'across').sort((a,b) => a.number - b.number);
+            const down = currentPuzzle.placements.filter(p => p.dir === 'down').sort((a,b) => a.number - b.number);
+            
+            html += `<div><div class="clue-header">ACROSS</div>`;
+            across.forEach(p => {
+                html += `<div class="clue"><strong>${p.number}.</strong> ${p.clue}</div>`;
+            });
+            html += `</div>`;
+            
+            html += `<div><div class="clue-header">DOWN</div>`;
+            down.forEach(p => {
+                html += `<div class="clue"><strong>${p.number}.</strong> ${p.clue}</div>`;
+            });
+            html += `</div></div>`;
+            
+            html += `<div style="margin-top:40px; font-size:11px; color:#888;">Created with CrossLLM • Fully offline AI crossword generator</div>`;
+            html += `</body></html>`;
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            
+            setTimeout(() => {
+                printWindow.print();
+            }, 650);
+        }
+
+        // ==================== INIT ====================
+        function init() {
+            initTailwind();
+            initPWA();
+            initInputHandlers();
+            
+            // Set initial clue style
+            const defBtn = document.querySelector('.clue-style-btn[data-style="definition"]');
+            if (defBtn) defBtn.classList.add('bg-emerald-500', 'text-zinc-950', 'font-semibold');
+            
+            // Model select change
+            const modelSelect = document.getElementById('model-select');
+            modelSelect.addEventListener('change', () => {
+                currentModelId = modelSelect.value;
+                if (currentEngine) {
+                    currentEngine.unload().catch(() => {});
+                    currentEngine = null;
+                }
+            });
+            
+            // Keyboard shortcut hint
+            console.log('%c[CrossLLM] Standalone offline PWA ready. Use arrow keys in grid.', 'color:#52525b');
+            
+            // Welcome toast on first visit (subtle)
+            setTimeout(() => {
+                if (!localStorage.getItem('crossllm-visited')) {
+                    // showToast("Welcome! Paste text and generate your first AI crossword.", "success");
+                    localStorage.setItem('crossllm-visited', 'true');
+                }
+            }, 1200);
+            
+            // Make sure range value is shown
+            document.getElementById('num-words-value').textContent = document.getElementById('num-words').value;
+            
+            // Attach generate button listener (reliable in module scope)
+            const genBtn = document.getElementById('generate-btn');
+            if (genBtn) {
+                genBtn.addEventListener('click', generateCrossword);
+            }
+            
+            // Demo tip
+            // Uncomment if you want auto-load example on dev
+            // loadExampleText();
+        }
+
+        // Boot app
+        window.onload = init;
+        
+        // Expose functions to global scope because onclick handlers run in global scope (module script limitation)
+        window.generateCrossword = generateCrossword;
+        window.retryGeneration = retryGeneration;
+        window.retryWithDifferentModel = retryWithDifferentModel;
+        window.setClueStyle = setClueStyle;
+        window.loadExampleText = loadExampleText;
+        window.regenerateLayout = regenerateLayout;
+        window.checkPuzzle = checkPuzzle;
+        window.resetUserInputs = resetUserInputs;
+        window.exportAsImage = exportAsImage;
+        window.printPuzzle = printPuzzle;
+        window.showHelp = () => {
+            alert("CrossLLM - Offline AI Crossword Generator\n\n1. Paste text (up to 5000 words)\n2. Choose model and settings\n3. Click Generate\n4. Interact with the grid using arrow keys\n5. Toggle solution / Check answers / Export PNG or Print");
+        };
+
+        // Expose for debugging
+        window.CrossLLM = { generateCrossword, resetUserInputs, exportAsImage };
+    </script>
+</body>
+</html>
