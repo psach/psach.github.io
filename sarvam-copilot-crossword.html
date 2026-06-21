@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>clue-lite-nlp — Interactive Crossword Builder (Sarvam optional)</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 20px; }
+    h1 { margin: 0 0 8px 0; font-size: 20px; }
+    .muted { color: #6b7280; font-size: 13px; }
+    .layout { display: grid; grid-template-columns: 560px 1fr; gap: 16px; align-items: start; }
+    .card { border: 1px solid #d0d7de; border-radius: 16px; padding: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.06); background: white; }
+    textarea { width: 100%; min-height: 110px; padding: 10px; border-radius: 12px; border: 1px solid #d0d7de; }
+    button { padding: 9px 12px; border-radius: 12px; border: 1px solid #d0d7de; background: #111827; color: white; cursor: pointer; }
+    button.secondary { background: white; color: #111827; }
+    button:hover { opacity: .92; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid #d0d7de; font-size: 12px; background: #f8fafc; }
+    canvas { border-radius: 14px; border: 1px solid #d0d7de; background: #fff; touch-action: none; }
+    .wordbank { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { user-select: none; padding: 6px 10px; border-radius: 999px; border: 1px solid #d0d7de; background: #fff; cursor: grab; font-size: 12px; }
+    .chip:active { cursor: grabbing; }
+    .gridControls label { font-size: 12px; color: #374151; }
+    .gridControls input, .gridControls select { padding: 6px; border-radius: 10px; border: 1px solid #d0d7de; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .clues { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .clues h3 { margin: 0 0 8px 0; font-size: 13px; }
+    .clues ol { margin: 0; padding-left: 18px; }
+    .clues li { font-size: 12px; color: #111827; margin-bottom: 4px; }
+    .note { font-size: 12px; color: #6b7280; }
+    .danger { color: #b91c1c; }
+ol {
+  list-style-type: none;
+}
+  </style>
+</head>
+<body>
+  <h1>Interactive Crossword Builder</h1>
+  <div class="muted">Auto-build a crossword from text (offline POS tagging) or optionally use Sarvam to extract answers + clues online. Drag words to place, validate, and export PNG (blank/clues/answers).</div>
+
+  <div class="layout" style="margin-top:12px;">
+    <div class="card">
+      <div class="row" style="justify-content: space-between;">
+        <b>1) Input text</b>
+        <div class="row">
+          <button id="autoBtn">Auto build</button>
+          <button id="clearBtn" class="secondary">Clear</button>
+        </div>
+      </div>
+      <textarea id="text">We plan to migrate RouterOS quickly with resilient rollback to reduce credit risk across customer systems.</textarea>
+
+      <div class="row gridControls" style="margin-top:10px;">
+        <label class="pill">Grid size <input id="size" type="number" min="8" max="25" value="15" style="width:70px" /></label>
+        <label class="pill">Clue style
+          <select id="clueStyle">
+            <option value="blank" selected>blank</option>
+            <option value="question">question</option>
+          </select>
+        </label>
+        <label class="pill">Orientation
+          <select id="orient">
+            <option value="across" selected>across</option>
+            <option value="down">down</option>
+          </select>
+        </label>
+        <label class="pill">Show answers <input id="showAnswers" type="checkbox" /></label>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <label class="pill"><input id="useSarvam" type="checkbox" /> Use Sarvam online extraction</label>
+        <label class="pill">Model
+          <input id="sarvamModel" type="text" value="sarvam-105b" style="width:130px" />
+        </label>
+        <label class="pill">API key
+          <input id="sarvamKey" type="password" placeholder="sk_..." style="width:220px" />
+        </label>
+        <label class="pill"><input id="rememberKey" type="checkbox" /> Remember for this session</label>
+      </div>
+      <div class="note danger" id="keyWarn" style="margin-top:6px; display:none;">Security: entering an API key in the browser can expose it. This demo keeps it in-memory unless you enable session remember.</div>
+
+      <div class="row" style="margin-top:10px; justify-content: space-between;">
+        <b>2) Crossword grid</b>
+        <div class="row">
+          <button id="validateBtn" class="secondary">Validate</button>
+          <button id="exportBtn">Export PNG</button>
+        </div>
+      </div>
+      <canvas id="grid" width="520" height="520"></canvas>
+      <div id="status" class="note" style="margin-top:8px;"></div>
+
+      <div class="two" style="margin-top:12px;">
+        <div>
+          <b>Word bank (drag onto grid)</b>
+          <div id="bank" class="wordbank" style="margin-top:8px;"></div>
+          <div class="note" style="margin-top:6px;">Tip: drag a chip onto a cell. Choose orientation (across/down). Conflicts are rejected.</div>
+        </div>
+        <div>
+          <b>Export options</b>
+          <div class="row gridControls" style="margin-top:8px;">
+            <label class="pill"><input id="expBlank" type="checkbox" checked /> Blank</label>
+            <label class="pill"><input id="expClues" type="checkbox" checked /> With clues</label>
+            <label class="pill"><input id="expAnswers" type="checkbox" /> With answers</label>
+          </div>
+          <div class="note" style="margin-top:6px;">Export creates one PNG per selected option.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <b>Clues</b>
+      <div class="clues" style="margin-top:10px;">
+        <div>
+          <h3>Across</h3>
+          <ol id="across"></ol>
+        </div>
+        <div>
+          <h3>Down</h3>
+          <ol id="down"></ol>
+        </div>
+      </div>
+      <div class="note" style="margin-top:10px;">Validation checks intersections and typed letters. Keep grid blank for players by disabling “Show answers”.</div>
+    </div>
+  </div>
+
+  <script src="../dist/clue-lite-nlp.umd.cjs"></script>
+  <script src="./crossword-ui.js"></script>
+</body>
+</html>
