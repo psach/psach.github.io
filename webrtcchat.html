@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC Chat – Free STUN + TURN + Signaling</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+    h1 { font-size: 1.4rem; margin-bottom: 8px; }
+    .status {
+      padding: 10px;
+      background: #f0f4f8;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .room {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px;
+      font-size: 15px;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    #chatBox {
+      height: 380px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      overflow-y: auto;
+      background: #fafafa;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .msg {
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .msg.me {
+      align-self: flex-end;
+      background: #007bff;
+      color: white;
+    }
+    .msg.them {
+      align-self: flex-start;
+      background: #e9ecef;
+    }
+    .msg .time {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+    #messageInput {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebRTC Chat (Internet Ready)</h1>
+  <p>Uses free Metered signaling + Open Relay TURN</p>
+
+  <div class="room">
+    <input id="roomInput" type="text" placeholder="Room name (e.g. chat-123)" value="demo-chat">
+    <button id="joinBtn">Join Room</button>
+    <button id="leaveBtn" disabled>Leave</button>
+  </div>
+
+  <div class="status" id="status">Status: Ready – enter a room name and join</div>
+
+  <div id="chatBox"></div>
+
+  <div class="input-row">
+    <input id="messageInput" type="text" placeholder="Type a message..." disabled>
+    <button id="sendBtn" disabled>Send</button>
+  </div>
+
+  <script type="module">
+    // ← Replace with your real publishable key (pk_live_...)
+    const API_KEY = "0cZ71ygYSIG5WGgacPBo9fZKO2R88QsEBdkV8cZ8P46dAJpy";
+
+    import { MeteredPeer } from "https://esm.sh/@metered-ca/realtime@latest";
+
+    const statusEl = document.getElementById("status");
+    const roomInput = document.getElementById("roomInput");
+    const joinBtn = document.getElementById("joinBtn");
+    const leaveBtn = document.getElementById("leaveBtn");
+    const chatBox = document.getElementById("chatBox");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    let peer = null;
+
+    function setStatus(msg) {
+      statusEl.textContent = "Status: " + msg;
+      console.log(msg);
+    }
+
+    function addMessage(text, isMe = false) {
+      const div = document.createElement("div");
+      div.className = "msg " + (isMe ? "me" : "them");
+      const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      div.innerHTML = `${text}<div class="time">${time}</div>`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    joinBtn.onclick = async () => {
+      const room = roomInput.value.trim();
+      if (!room) return alert("Enter a room name");
+
+      try {
+        peer = new MeteredPeer({ apiKey: API_KEY });
+
+        // Receive chat messages
+        peer.on("data", ({ data, senderPeerId }) => {
+          if (typeof data === "string") {
+            addMessage(data, false);
+          } else if (data && data.text) {
+            addMessage(data.text, false);
+          }
+        });
+
+        peer.on("peer-joined", ({ peer: remote }) => {
+          setStatus("Peer joined the room");
+        });
+
+        peer.on("peer-left", () => {
+          setStatus("Peer left the room");
+        });
+
+        await peer.join(room);
+
+        joinBtn.disabled = true;
+        leaveBtn.disabled = false;
+        roomInput.disabled = true;
+        messageInput.disabled = false;
+        sendBtn.disabled = false;
+        messageInput.focus();
+
+        setStatus(`Joined room "${room}" – waiting for messages`);
+      } catch (err) {
+        setStatus("Error: " + err.message);
+        console.error(err);
+      }
+    };
+
+    sendBtn.onclick = sendMessage;
+    messageInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text || !peer) return;
+
+      // Send to all peers in the room
+      peer.send(text);          // simple string
+      // or peer.send({ text }); // object form also works
+
+      addMessage(text, true);
+      messageInput.value = "";
+      messageInput.focus();
+    }
+
+    leaveBtn.onclick = () => {
+      if (peer) {
+        peer.leave();
+        peer = null;
+      }
+      chatBox.innerHTML = "";
+      joinBtn.disabled = false;
+      leaveBtn.disabled = true;
+      roomInput.disabled = false;
+      messageInput.disabled = true;
+      sendBtn.disabled = true;
+      setStatus("Left the room");
+    };
+  </script>
+</body>
+</html>
