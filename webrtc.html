@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Production WebRTC – Internet Ready (Free STUN + TURN + Signaling)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 20px auto; padding: 0 16px; }
+    h1 { font-size: 1.4rem; }
+    .videos { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
+    video { width: 320px; height: 240px; background: #111; border-radius: 8px; object-fit: cover; }
+    input, button { padding: 10px 14px; margin: 4px 8px 4px 0; font-size: 15px; }
+    .status { margin: 12px 0; padding: 10px; background: #f0f4f8; border-radius: 6px; }
+    .room { margin: 16px 0; }
+  </style>
+</head>
+<body>
+  <h1>Production WebRTC Video Call (Internet + Free STUN/TURN)</h1>
+  <p>Works across different networks using free Metered signaling + Open Relay TURN.</p>
+
+  <div class="room">
+    <input id="roomInput" type="text" placeholder="Enter room name (e.g. demo-123)" value="demo-room">
+    <button id="joinBtn">Join Room</button>
+    <button id="leaveBtn" disabled>Leave</button>
+  </div>
+
+  <div class="status" id="status">Status: Ready – enter a room name and join</div>
+
+  <div class="videos">
+    <div>
+      <strong>You (Local)</strong><br>
+      <video id="localVideo" autoplay playsinline muted></video>
+    </div>
+    <div>
+      <strong>Remote</strong><br>
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+  </div>
+
+  <script type="module">
+    // Replace with your free publishable key from metered.ca
+    const API_KEY = "0cZ71ygYSIG5WGgacPBo9fZKO2R88QsEBdkV8cZ8P46dAJpy";
+
+    import { MeteredPeer } from "https://esm.sh/@metered-ca/realtime@latest";
+
+    const localVideo = document.getElementById("localVideo");
+    const remoteVideo = document.getElementById("remoteVideo");
+    const statusEl = document.getElementById("status");
+    const roomInput = document.getElementById("roomInput");
+    const joinBtn = document.getElementById("joinBtn");
+    const leaveBtn = document.getElementById("leaveBtn");
+
+    let peer = null;
+    let localStream = null;
+
+    function setStatus(msg) {
+      statusEl.textContent = "Status: " + msg;
+      console.log(msg);
+    }
+
+    joinBtn.onclick = async () => {
+      const room = roomInput.value.trim();
+      if (!room) return alert("Enter a room name");
+
+      try {
+        // 1. Get camera + mic
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
+        });
+        localVideo.srcObject = localStream;
+
+        // 2. Create peer (signaling + TURN auto-injected)
+        peer = new MeteredPeer({ apiKey: API_KEY });
+
+        // 3. When another peer joins
+        peer.on("peer-joined", ({ peer: remote }) => {
+          setStatus("Peer joined – connecting...");
+          remote.on("stream-added", ({ stream }) => {
+            remoteVideo.srcObject = stream;
+            setStatus("Connected! Video flowing");
+          });
+        });
+
+        peer.on("peer-left", () => {
+          remoteVideo.srcObject = null;
+          setStatus("Peer left");
+        });
+
+        // 4. Join the same room (both users must use identical room name)
+        await peer.join(room);
+
+        // 5. Publish our stream
+        peer.addStream(localStream);
+
+        joinBtn.disabled = true;
+        leaveBtn.disabled = false;
+        roomInput.disabled = true;
+        setStatus(`Joined room "${room}" – waiting for peer...`);
+      } catch (err) {
+        setStatus("Error: " + err.message);
+        console.error(err);
+      }
+    };
+
+    leaveBtn.onclick = () => {
+      if (peer) {
+        peer.leave();
+        peer = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+        localStream = null;
+      }
+      localVideo.srcObject = null;
+      remoteVideo.srcObject = null;
+      joinBtn.disabled = false;
+      leaveBtn.disabled = true;
+      roomInput.disabled = false;
+      setStatus("Left the room");
+    };
+  </script>
+</body>
+</html>
