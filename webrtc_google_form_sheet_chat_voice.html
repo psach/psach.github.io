@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WebRTC P2P Chat + Voice — Google Form/Sheet</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#eef3f8;background:#0a1017}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#0a1017,#152130);min-height:100vh}
+main{max-width:1100px;margin:auto;padding:16px}.card{background:#111a24e8;border:1px solid #2b3a4b;border-radius:16px;padding:16px;margin:12px 0}
+h1{font-size:22px;margin:0 0 5px}h2{font-size:16px;margin:0 0 10px}.muted{color:#9eacba;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:#aab6c3;margin:9px 0 5px}input{width:100%;padding:10px;border-radius:10px;border:1px solid #36495b;background:#0c141d;color:#eef3f8}
+button{padding:10px 14px;margin:4px 2px;border-radius:10px;border:1px solid #405369;background:#13202d;color:#eef3f8;cursor:pointer}.row{display:flex;gap:6px;flex-wrap:wrap}
+.pill{display:inline-block;padding:5px 9px;border-radius:20px;background:#1e2b39;font-size:12px}.log,.chat{height:280px;overflow:auto;background:#080d13;border:1px solid #263543;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word}
+.chat{height:330px;white-space:normal}.msg{padding:8px 10px;margin:5px 0;border-radius:10px;background:#182431}.msg.me{background:#173522}.msg.sys{background:#241f17}.small{font-size:11px;color:#8092a4}audio{width:100%;margin-top:10px}
+</style>
+</head>
+<body>
+<main>
+<div class="card"><h1>WebRTC P2P Chat + Voice</h1><div class="muted">Google Form publishes temporary signaling. Published Google Sheet CSV is read by the clients. Chat and voice use WebRTC after signaling.</div></div>
+<div class="card"><h2>Preconfigured signaling</h2>
+<label>Google Form response URL</label><input id="formUrl" readonly>
+<div class="grid"><div><label>Google Sheet CSV URL</label><input id="csvUrl" readonly></div><div><label>Room code</label><input id="room" placeholder="e.g. ABC-123"></div></div>
+<div class="small">Form fields: Room, Peer, Type, PayLoad. Entry IDs are preconfigured.</div></div>
+<div class="grid">
+<div class="card"><h2>Room / Signaling</h2><div class="row"><button onclick="host()">Create / Host</button><button onclick="join()">Join</button><button onclick="searchSheet()">Refresh Sheet</button><button onclick="disconnect()">Disconnect</button></div><div style="margin-top:7px">Peer: <span class="pill" id="peer"></span></div><div style="margin-top:7px">State: <span class="pill" id="state">idle</span></div></div>
+<div class="card"><h2>Voice</h2><div class="row"><button id="voiceBtn" onclick="toggleVoice()">🎙 Start microphone</button><button onclick="muteVoice()">Mute / Unmute</button></div><div class="muted" id="voiceState">microphone off</div><audio id="remoteAudio" autoplay playsinline controls></audio></div>
+</div>
+<div class="card"><h2>Chat</h2><div id="chat" class="chat"></div><div class="row" style="margin-top:8px"><input id="message" placeholder="Message" onkeydown="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()">Send</button></div></div>
+<div class="grid"><div class="card"><h2>WebRTC / ICE details</h2><pre id="log"></pre></div><div class="card"><h2>Google Sheet records</h2><pre id="records"></pre></div></div>
+</main>
+<script>
+const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse";
+const SHEET_ID="1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc";
+const CSV_URL="https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv";
+const ENTRY={room:"entry.2110898792",peer:"entry.1013260375",type:"entry.1722712182",payload:"entry.1320930057"};
+const ICE_CONFIG={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]};
+const peer=(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36)).slice(0,8);
+let pc=null,dc=null,role="",poller=null,seen=new Set(),localStream=null,remoteStream=new MediaStream();
+document.getElementById("formUrl").value=FORM_URL;document.getElementById("csvUrl").value=CSV_URL;document.getElementById("peer").textContent=peer;document.getElementById("remoteAudio").srcObject=remoteStream;
+function $(id){return document.getElementById(id)} function room(){return $("room").value.trim()} function setState(s){$("state").textContent=s}
+function log(s){const x=$("log");x.textContent+=s+"\n";x.scrollTop=x.scrollHeight} function addMessage(who,text){const d=document.createElement("div");d.className="msg "+(who==="me"?"me":who==="system"?"sys":"");d.textContent=who+": "+text;$("chat").appendChild(d);$("chat").scrollTop=$("chat").scrollHeight}
+function requireRoom(){if(!room()){alert("Enter a room code.");return false}return true}
+function submitToGoogleForm(type,payload){return new Promise(resolve=>{const frameName="gf_"+Date.now()+"_"+Math.random().toString(36).slice(2);const iframe=document.createElement("iframe");iframe.name=frameName;iframe.style.display="none";document.body.appendChild(iframe);const form=document.createElement("form");form.action=FORM_URL;form.method="POST";form.target=frameName;form.style.display="none";[[ENTRY.room,room()],[ENTRY.peer,peer],[ENTRY.type,type],[ENTRY.payload,payload]].forEach(([name,value])=>{const i=document.createElement("input");i.name=name;i.value=value;form.appendChild(i)});document.body.appendChild(form);let done=false;const finish=()=>{if(done)return;done=true;setTimeout(()=>{form.remove();iframe.remove()},500);resolve()};iframe.onload=finish;form.submit();setTimeout(finish,1800)})}
+async function publish(type,payload){await submitToGoogleForm(type,payload);log("Published "+type+" via Google Form")}
+function parseCSV(text){const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<text.length;i++){const ch=text[i],next=text[i+1];if(quoted){if(ch==='"'&&next==='"'){cell+='"';i++}else if(ch==='"')quoted=false;else cell+=ch}else{if(ch==='"')quoted=true;else if(ch===','){row.push(cell);cell=""}else if(ch==='\n'){row.push(cell);rows.push(row);row=[];cell=""}else if(ch!=='\r')cell+=ch}}if(cell.length||row.length){row.push(cell);rows.push(row)}return rows}
+function normalized(s){return String(s||"").trim().toLowerCase()} function findColumn(headers,names){for(const n of names){const i=headers.indexOf(normalized(n));if(i>=0)return i}return -1}
+async function readRoomRecords(){const response=await fetch(CSV_URL+"&t="+Date.now(),{cache:"no-store"});if(!response.ok)throw new Error("Google Sheet HTTP "+response.status);const rows=parseCSV(await response.text());if(!rows.length)return[];const headers=rows[0].map(normalized);const ri=findColumn(headers,["room"]),pi=findColumn(headers,["peer"]),ti=findColumn(headers,["type"]),xi=findColumn(headers,["payload","payLoad"]);if([ri,pi,ti,xi].some(x=>x<0))throw new Error("Sheet columns not found. Expected Room, Peer, Type, PayLoad.");const result=[];for(let i=1;i<rows.length;i++){const r=rows[i];if(normalized(r[ri])===normalized(room()))result.push({timestamp:r[0]||"",peer:r[pi]||"",type:r[ti]||"",payload:r[xi]||""})}return result}
+async function searchSheet(){if(!requireRoom())return[];try{const records=await readRoomRecords();$("records").textContent=records.map(r=>"["+r.timestamp+"] "+r.peer+" :: "+r.type+"\n"+r.payload.slice(0,1200)+"\n").join("\n");return records}catch(e){log("Sheet error: "+e);$("records").textContent=String(e);return[]}}
+function createPeerConnection(){if(pc)try{pc.close()}catch(e){}pc=new RTCPeerConnection(ICE_CONFIG);pc.onicecandidate=e=>log(e.candidate?"ICE candidate: "+e.candidate.candidate:"ICE gathering complete");pc.onicegatheringstatechange=()=>log("ICE gathering: "+pc.iceGatheringState);pc.oniceconnectionstatechange=()=>{log("ICE connection: "+pc.iceConnectionState);setState(pc.iceConnectionState)};pc.onconnectionstatechange=()=>{log("Connection: "+pc.connectionState);setState(pc.connectionState)};pc.onsignalingstatechange=()=>log("Signaling: "+pc.signalingState);pc.ondatachannel=e=>setupDataChannel(e.channel);pc.ontrack=e=>{for(const t of e.streams[0]?.getTracks()||[])if(!remoteStream.getTrackById(t.id))remoteStream.addTrack(t);$("remoteAudio").srcObject=remoteStream;$("remoteAudio").play().catch(()=>{});log("Remote audio track received")};return pc}
+function setupDataChannel(channel){dc=channel;dc.onopen=()=>{setState("connected");log("DataChannel OPEN");addMessage("system","P2P connection established")};dc.onclose=()=>log("DataChannel CLOSED");dc.onerror=e=>log("DataChannel error: "+e);dc.onmessage=e=>addMessage("peer",e.data)}
+async function waitForIce(){if(!pc||pc.iceGatheringState==="complete")return;await new Promise(resolve=>{const timer=setTimeout(resolve,12000);const listener=()=>{if(pc.iceGatheringState==="complete"){clearTimeout(timer);pc.removeEventListener("icegatheringstatechange",listener);resolve()}};pc.addEventListener("icegatheringstatechange",listener)})}
+async function host(){if(!requireRoom())return;role="host";seen=new Set();setState("creating");createPeerConnection();dc=pc.createDataChannel("chat");setupDataChannel(dc);const offer=await pc.createOffer();await pc.setLocalDescription(offer);await waitForIce();await publish("offer",JSON.stringify(pc.localDescription));setState("waiting-answer");log("Waiting for answer...");startPolling()}
+async function join(){if(!requireRoom())return;role="guest";setState("searching");const records=await searchSheet();const offers=records.filter(r=>r.type.toLowerCase()==="offer"&&r.peer!==peer);if(!offers.length){setState("no-offer");addMessage("system","No offer found for this room.");return}const offer=offers[offers.length-1];createPeerConnection();await pc.setRemoteDescription(JSON.parse(offer.payload));const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await waitForIce();await publish("answer",JSON.stringify(pc.localDescription));setState("waiting-connect");startPolling()}
+function startPolling(){clearInterval(poller);poller=setInterval(pollSignals,1800);pollSignals()}
+async function pollSignals(){if(!room())return;const records=await searchSheet();for(const record of records){const key=record.timestamp+"|"+record.peer+"|"+record.type;if(seen.has(key))continue;seen.add(key);if(record.peer===peer)continue;if(role==="host"&&record.type.toLowerCase()==="answer"&&pc&&!pc.currentRemoteDescription){try{await pc.setRemoteDescription(JSON.parse(record.payload));log("Remote answer applied")}catch(e){log("Remote answer error: "+e)}}}}
+function sendMessage(){const input=$("message"),text=input.value.trim();if(!text)return;if(!dc||dc.readyState!=="open"){addMessage("system","WebRTC DataChannel is not connected.");return}dc.send(text);addMessage("me",text);input.value=""}
+async function toggleVoice(){if(!pc){addMessage("system","Establish the WebRTC connection first.");return}if(localStream){localStream.getTracks().forEach(t=>t.enabled=true);$("voiceBtn").textContent="🎙 Microphone ON";$("voiceState").textContent="microphone on";return}try{localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});const track=localStream.getAudioTracks()[0];pc.addTrack(track,localStream);$("voiceBtn").textContent="🎙 Microphone ON";$("voiceState").textContent="microphone on";log("Local microphone added. A new offer/renegotiation is required if voice is enabled after the initial connection.");}catch(e){addMessage("system","Microphone permission failed: "+e)}}
+function muteVoice(){if(!localStream){addMessage("system","Microphone is not active.");return}const t=localStream.getAudioTracks()[0];t.enabled=!t.enabled;$("voiceState").textContent=t.enabled?"microphone on":"microphone muted";$("voiceBtn").textContent=t.enabled?"🎙 Microphone ON":"🔇 Microphone MUTED"}
+function disconnect(){clearInterval(poller);if(localStream)localStream.getTracks().forEach(t=>t.stop());try{dc?.close()}catch(e){}try{pc?.close()}catch(e){}dc=null;pc=null;localStream=null;remoteStream=new MediaStream();$("remoteAudio").srcObject=remoteStream;$("voiceBtn").textContent="🎙 Start microphone";$("voiceState").textContent="microphone off";setState("disconnected");log("Disconnected")}
+</script>
+</body></html>
