@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P2PChat Voice Test Client</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#eef3f8;background:#0a1017}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#0a1017,#152130);min-height:100vh}
+main{max-width:900px;margin:auto;padding:16px}.card{background:#111a24e8;border:1px solid #2b3a4b;border-radius:16px;padding:16px;margin:12px 0}
+input{width:100%;padding:11px;border-radius:10px;border:1px solid #36495b;background:#0c141d;color:#eef3f8}
+button{padding:10px 14px;margin:4px 2px;border-radius:10px;border:1px solid #405369;background:#13202d;color:#eef3f8;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}.row{display:flex;gap:6px;flex-wrap:wrap}.muted,.small{color:#9eacba;font-size:12px}.pill{padding:5px 9px;border-radius:20px;background:#1e2b39;font-size:12px}.log{height:330px;overflow:auto;background:#080d13;border:1px solid #263543;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word}
+.success{background:#173522}.warn{background:#241f17}.error{background:#3b1f26}
+</style>
+</head>
+<body>
+<main>
+<div class="card"><h1>P2PChat Voice Test Client</h1><div class="muted">Browser client for testing the native Android voice-call implementation.</div></div>
+<div class="card">
+<label>Room</label><input id="room" placeholder="e.g. hklop">
+<div class="small" style="margin-top:8px">Peer: <span class="pill" id="peer"></span> · State: <span class="pill" id="state">idle</span></div>
+<div class="row" style="margin-top:10px"><button onclick="host()">Create / Host</button><button onclick="join()">Join</button><button onclick="refresh()">Refresh</button><button onclick="disconnect()">Disconnect</button></div>
+</div>
+<div class="card">
+<h2>Voice</h2>
+<div class="row">
+<button id="callBtn" onclick="startCall()">📞 Start call</button>
+<button id="acceptBtn" onclick="acceptCall()" disabled>✅ Accept</button>
+<button id="declineBtn" onclick="declineCall()" disabled>❌ Decline</button>
+<button id="muteBtn" onclick="toggleMute()" disabled>🔇 Mute</button>
+<button id="hangupBtn" onclick="hangup()" disabled>☎ Hang up</button>
+<button id="playBtn" onclick="playRemote()" disabled>🔊 Play voice</button>
+</div>
+<div id="voiceState" class="muted">Call idle</div>
+<div id="incomingBox"></div>
+<audio id="remoteAudio" autoplay playsinline controls></audio>
+</div>
+<div class="card"><h2>Debug</h2><div id="log" class="log"></div></div>
+</main>
+<script>
+const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse";
+const CSV_URL="https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv";
+const ENTRY={room:"entry.2110898792",peer:"entry.1013260375",type:"entry.1722712182",payload:"entry.1320930057"};
+const ICE={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]};
+const peer=(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36)).slice(0,8);
+let pc=null,dc=null,role="",poller=null,seen=new Set(),localStream=null,remoteStream=new MediaStream(),audioSender=null,callActive=false,incoming=false,ringTimer=null,audioCtx=null;
+const $=id=>document.getElementById(id); $('peer').textContent=peer; $('remoteAudio').srcObject=remoteStream;
+function room(){return $('room').value.trim()} function setState(s){$('state').textContent=s}
+function log(s){const now=new Date().toLocaleTimeString();const x=$('log');x.textContent+=now+'  '+s+'\n';x.scrollTop=x.scrollHeight}
+function msg(s,cl=''){const d=document.createElement('div');d.textContent=s;d.className='small '+cl;d.style.marginTop='6px';$('incomingBox').appendChild(d)}
+function unlockAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});log('Audio context: '+audioCtx.state)}catch(e){log('Audio context error: '+e.message)}}
+function stopRing(){if(ringTimer){clearInterval(ringTimer);ringTimer=null}}
+function startRing(){stopRing();unlockAudio();if(!audioCtx)return;const beep=()=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=880;g.gain.value=.05;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.2)};beep();ringTimer=setInterval(beep,900)}
+function submit(type,payload){return new Promise(done=>{const n='gf'+Date.now()+Math.random(),i=document.createElement('iframe'),f=document.createElement('form');i.name=n;i.hidden=true;document.body.appendChild(i);f.action=FORM_URL;f.method='POST';f.target=n;f.style.display='none';[[ENTRY.room,room()],[ENTRY.peer,peer],[ENTRY.type,type],[ENTRY.payload,payload]].forEach(([k,v])=>{const x=document.createElement('input');x.name=k;x.value=v;f.appendChild(x)});document.body.appendChild(f);let finished=false;const finish=()=>{if(finished)return;finished=true;setTimeout(()=>{f.remove();i.remove()},300);done()};i.onload=finish;f.submit();setTimeout(finish,1500)})}
+async function publish(t,p){await submit(t,p);log('Published '+t)}
+function parseCSV(t){let a=[],r=[],c='',q=false;for(let i=0;i<t.length;i++){const x=t[i],n=t[i+1];if(q){if(x==='"'&&n==='"'){c+='"';i++}else if(x==='"')q=false;else c+=x}else if(x==='"')q=true;else if(x===','){r.push(c);c=''}else if(x==='\n'){r.push(c);a.push(r);r=[];c=''}else if(x!=='\r')c+=x}if(c||r.length){r.push(c);a.push(r)}return a}
+function norm(x){return String(x||'').trim().toLowerCase()}
+function col(h,names){for(const n of names){const i=h.indexOf(norm(n));if(i>=0)return i}return -1}
+async function getSignals(){const z=await fetch(CSV_URL+'&t='+Date.now(),{cache:'no-store'});if(!z.ok)throw Error('Sheet HTTP '+z.status);const rows=parseCSV(await z.text()),h=(rows.shift()||[]).map(norm),ri=col(h,['room']),pi=col(h,['peer']),ti=col(h,['type']),xi=col(h,['payload','payLoad']);if([ri,pi,ti,xi].some(x=>x<0))throw Error('Sheet columns not found');return rows.filter(r=>norm(r[ri])===norm(room())).map(r=>({peer:r[pi]||'',type:r[ti]||'',payload:r[xi]||'',timestamp:r[0]||''}))}
+function setupDC(c){dc=c;dc.binaryType='arraybuffer';dc.onopen=()=>{log('DataChannel OPEN');setState('connected');stopPolling()};dc.onclose=()=>log('DataChannel CLOSED');dc.onerror=e=>log('DataChannel ERROR '+e);dc.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.kind==='call')handleCall(m)}catch(e){log('DataChannel message parse error '+e)}}}
+function sendCall(type){if(!dc||dc.readyState!=='open'){log('DataChannel not open');return false}dc.send(JSON.stringify({kind:'call',type,from:peer,time:Date.now()}));log('CALL SEND '+type);return true}
+function createPC(){if(pc)try{pc.close()}catch(e){}pc=new RTCPeerConnection(ICE);const tr=pc.addTransceiver('audio',{direction:'sendrecv'});audioSender=tr.sender;pc.onicecandidate=e=>{if(e.candidate)log('ICE candidate '+e.candidate.candidate);else log('ICE gathering COMPLETE')};pc.onicegatheringstatechange=()=>log('ICE gathering '+pc.iceGatheringState);pc.oniceconnectionstatechange=()=>{log('ICE '+pc.iceConnectionState);setState(pc.iceConnectionState)};pc.onconnectionstatechange=()=>{log('Connection '+pc.connectionState);setState(pc.connectionState)};pc.onsignalingstatechange=()=>log('Signaling '+pc.signalingState);pc.ondatachannel=e=>setupDC(e.channel);pc.ontrack=e=>{if(e.track.kind!=='audio')return;log('REMOTE AUDIO TRACK');remoteStream=e.streams[0]||remoteStream;if(!e.streams[0])remoteStream.addTrack(e.track);const a=$('remoteAudio');a.srcObject=remoteStream;a.muted=false;a.volume=1;$('playBtn').disabled=false;a.play().then(()=>log('Remote audio playing')).catch(()=>log('Autoplay blocked; tap Play voice'))};return pc}
+async function host(){if(!room())return alert('Enter a room code');unlockAudio();role='host';seen=new Set();setState('creating');try{createPC();setupDC(pc.createDataChannel('chat'));const offer=await pc.createOffer();await pc.setLocalDescription(offer);await waitICE();await publish('offer',JSON.stringify(pc.localDescription));setState('waiting-answer');startPolling();}catch(e){log('HOST ERROR '+e.stack);setState('error')}}
+async function join(){if(!room())return alert('Enter a room code');unlockAudio();role='guest';try{setState('searching');const rows=await getSignals();log('JOIN records='+rows.length);const offers=rows.filter(x=>norm(x.type)==='offer'&&x.peer!==peer);if(!offers.length){log('No offer found');startPolling();return}const offer=offers[offers.length-1];log('Offer found peer='+offer.peer+' payloadLen='+offer.payload.length);createPC();await pc.setRemoteDescription(JSON.parse(offer.payload));const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await waitICE();await publish('answer',JSON.stringify(pc.localDescription));setState('waiting-connect');startPolling();}catch(e){log('JOIN ERROR '+e.stack);setState('error')}}
+function startPolling(){stopPolling();poller=setInterval(pollSignals,1800);pollSignals()}
+function stopPolling(){if(poller){clearInterval(poller);poller=null}}
+async function pollSignals(){if(!pc||pc.connectionState==='connected')return;try{const rows=await getSignals();for(const x of rows){const k=x.timestamp+'|'+x.peer+'|'+x.type;if(seen.has(k)||x.peer===peer)continue;seen.add(k);if(role==='host'&&norm(x.type)==='answer'&&!pc.currentRemoteDescription){try{await pc.setRemoteDescription(JSON.parse(x.payload));log('REMOTE ANSWER APPLIED');setState('connecting')}catch(e){log('REMOTE ANSWER ERROR '+e.stack)}}}}catch(e){log('POLL ERROR '+e.message)}}
+async function waitICE(){if(pc.iceGatheringState==='complete')return;await new Promise(resolve=>{const timer=setTimeout(resolve,12000),h=()=>{if(pc.iceGatheringState==='complete'){clearTimeout(timer);pc.removeEventListener('icegatheringstatechange',h);resolve()}};pc.addEventListener('icegatheringstatechange',h)})}
+function handleCall(m){if(m.from===peer)return;log('CALL RECEIVE '+m.type);if(m.type==='ring'){if(callActive){sendCall('busy');return}incoming=true;$('acceptBtn').disabled=false;$('declineBtn').disabled=false;msg('📞 Incoming voice call from '+m.from,'warn');$('voiceState').textContent='📞 Incoming voice call';startRing()}else if(m.type==='accept'){stopRing();$('voiceState').textContent='Live voice call';log('Call accepted')}else if(m.type==='decline'){stopRing();hangup(false);$('voiceState').textContent='Call declined'}else if(m.type==='busy'){stopRing();hangup(false);$('voiceState').textContent='Peer busy'}else if(m.type==='hangup'){stopRing();hangup(false);$('voiceState').textContent='Call ended'}}
+async function startCall(){unlockAudio();if(callActive)return;if(!pc||pc.connectionState!=='connected'){log('P2P connection not connected');return}try{localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});await audioSender.replaceTrack(localStream.getAudioTracks()[0]);callActive=true;$('callBtn').disabled=true;$('muteBtn').disabled=false;$('hangupBtn').disabled=false;$('voiceState').textContent='📞 Calling — ringing peer';sendCall('ring')}catch(e){log('START CALL ERROR '+e.stack)}}
+async function acceptCall(){unlockAudio();if(!incoming)return;stopRing();incoming=false;$('acceptBtn').disabled=true;$('declineBtn').disabled=true;try{localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});await audioSender.replaceTrack(localStream.getAudioTracks()[0]);callActive=true;$('callBtn').disabled=true;$('muteBtn').disabled=false;$('hangupBtn').disabled=false;$('voiceState').textContent='Live voice call';sendCall('accept')}catch(e){log('ACCEPT ERROR '+e.stack);sendCall('decline')}}
+function declineCall(){stopRing();incoming=false;$('acceptBtn').disabled=true;$('declineBtn').disabled=true;sendCall('decline');$('voiceState').textContent='Call declined'}
+function toggleMute(){if(!localStream)return;const t=localStream.getAudioTracks()[0];t.enabled=!t.enabled;$('muteBtn').textContent=t.enabled?'🔇 Mute':'🔊 Unmute';$('voiceState').textContent=t.enabled?'Live voice call':'Call muted'}
+async function hangup(notify=true){stopRing();if(notify)sendCall('hangup');if(audioSender)try{await audioSender.replaceTrack(null)}catch(e){}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}callActive=false;incoming=false;$('callBtn').disabled=false;$('muteBtn').disabled=true;$('hangupBtn').disabled=true;$('acceptBtn').disabled=true;$('declineBtn').disabled=true;$('voiceState').textContent='Call idle'}
+async function playRemote(){try{await $('remoteAudio').play();log('Remote audio playback OK')}catch(e){log('Playback failed '+e.message)}}
+function refresh(){getSignals().then(r=>log('REFRESH records='+r.length)).catch(e=>log('REFRESH ERROR '+e.message))}
+function disconnect(){stopPolling();hangup(false);try{dc?.close()}catch(e){}try{pc?.close()}catch(e){}dc=null;pc=null;audioSender=null;setState('disconnected')}
+</script>
+</body>
+</html>
