@@ -1,0 +1,471 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Permissions-Policy" content="speaker-selection=(self)">
+<title>WebRTC Voice Call</title>
+<style>body{font-family:system-ui;background:#0a1017;color:#eef3f8;margin:0}main{max-width:900px;margin:auto;padding:16px}.card{background:#111a24;border:1px solid #2b3a4b;border-radius:16px;padding:16px;margin:12px 0}.row{display:flex;gap:6px;flex-wrap:wrap}input,select{padding:10px;border-radius:10px;border:1px solid #36495b;background:#0c141d;color:#eef3f8;width:100%;box-sizing:border-box}button{padding:10px 14px;margin:4px 2px;border-radius:10px;border:1px solid #405369;background:#13202d;color:#eef3f8;cursor:pointer}.muted,.small{color:#9eacba;font-size:12px}.pill{padding:5px 9px;border-radius:20px;background:#1e2b39;font-size:12px}.log,.debug{overflow:auto;background:#080d13;border:1px solid #263543;border-radius:10px;padding:10px;white-space:pre-wrap}.log{height:240px}.debug{height:260px;font-size:11px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}.stat{background:#0c141d;border:1px solid #263543;border-radius:10px;padding:8px;font-size:12px}.rooms{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.empty{padding:8px;border:1px dashed #314252;border-radius:10px;color:#8fa0b0;font-size:12px}.outputrow{margin-top:8px}</style>
+</head>
+<body>
+<main>
+<div class="card">
+<h1>WebRTC P2P Voice Call</h1>
+<div class="muted">Google Form/Sheet is used only for initial WebRTC signaling. Call ringing, call control and realtime audio use the established WebRTC connection.</div>
+</div>
+<div class="card">
+<label>Rooms in Sheet</label>
+<div id="rooms" class="rooms">
+<div class="empty">Loading rooms from Google Sheets…</div>
+</div>
+<div class="small" id="roomInfo" style="margin-top:8px">
+</div>
+<details style="margin-top:10px">
+<summary>🔎 Discovery debug</summary>
+<div class="row">
+<button onclick="clearDiscoveryDebug()">Clear debug</button>
+<button onclick="loadActiveRooms()">↻ Refresh rooms</button>
+</div>
+<pre id="discoveryDebug" class="debug">
+</pre>
+</details>
+<label style="display:block;margin-top:10px">Room</label>
+<input id="room" placeholder="e.g. ABC-123" autocomplete="off">
+<div class="small" style="margin-top:8px">Peer: <span class="pill" id="peer">
+</span> · State: <span class="pill" id="state">idle</span>
+</div>
+<details style="margin-top:10px">
+<summary>⚙ Google signaling</summary>
+<label>Form response URL</label>
+<input id="formUrl" readonly>
+<label>Sheet CSV URL</label>
+<input id="csvUrl" readonly>
+</details>
+</div>
+<div class="card">
+<div class="row">
+<button onclick="host()">Create / Host</button>
+<button onclick="join()">Join</button>
+<button onclick="disconnect()">Disconnect</button>
+<button onclick="loadActiveRooms()">↻ Refresh rooms</button>
+</div>
+</div>
+<div class="card">
+<h2>Realtime voice</h2>
+<div class="row">
+<button id="callBtn" onclick="startCall()">📞 Start call</button>
+<button id="acceptBtn" onclick="acceptCall()" disabled>✅ Accept</button>
+<button id="declineBtn" onclick="declineCall()" disabled>❌ Decline</button>
+<button id="muteBtn" onclick="toggleMute()" disabled>🔇 Mute</button>
+<button id="hangupBtn" onclick="hangup()" disabled>☎ Hang up</button>
+<button id="playBtn" onclick="playRemote()" disabled>🔊 Play voice</button>
+<button onclick="useEarpiece()">📱 Earpiece</button>
+</div>
+<div class="outputrow">
+<select id="audioOutput" aria-label="Audio output" style="display:none">
+</select>
+</div>
+<div id="voiceState" class="muted">Call idle</div>
+<div id="incomingBox">
+</div>
+<div class="stats">
+<div class="stat">ICE: <b id="iceState">new</b>
+</div>
+<div class="stat">TX: <b id="txState">idle</b>
+</div>
+<div class="stat">RX: <b id="rxState">idle</b>
+</div>
+<div class="stat">Packets lost: <b id="lossState">0</b>
+</div>
+<div class="stat">Jitter: <b id="jitterState">0 ms</b>
+</div>
+<div class="stat">RTT: <b id="rttState">0 ms</b>
+</div>
+</div>
+<audio id="remoteAudio" autoplay playsinline>
+</audio>
+</div>
+<div class="card">
+<h2>WebRTC / ICE</h2>
+<pre id="log" class="log">
+</pre>
+</div>
+</main>
+<script>
+
+        /* ================================================================
+           CONFIGURATION AND GLOBAL STATE
+           Google Form/Sheet is used only for WebRTC SDP signaling.
+           The actual voice/media path is direct WebRTC P2P.
+        ================================================================ */
+        const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse",CSV_URL="https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv",ENTRY={room:"entry.2110898792",peer:"entry.1013260375",type:"entry.1722712182",payload:"entry.1320930057"},ICE={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}],iceCandidatePoolSize:4},peer=(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now()).slice(0,8);let pc=null,dc=null,role="",poller=null,discoveryPoller=null,discoveryBusy=false,seen=new Set(),localStream=null,remoteStream=new MediaStream(),audioSender=null,callActive=false,incoming=false,outgoingRinging=false,ringTimer=null,ringTimeout=null,audioCtx=null,statsTimer=null,audioOutputId="",callId="";
+    function $(x){return document.getElementById(x)}
+
+    function room(){return $("room").value.trim()}
+
+    function selectRoom(x){$("room").value=x;log("Selected room: "+x)}
+
+    function log(x){$("log").textContent+=x+"\n";$("log").scrollTop=$("log").scrollHeight}
+
+    function dlog(x){const p=$("discoveryDebug");if(p){p.textContent+="["+new Date().toLocaleTimeString()+"] "+x+"\n";p.scrollTop=p.scrollHeight}}
+
+    function clearDiscoveryDebug(){$("discoveryDebug").textContent=""}
+
+    window.addEventListener("error",e=>dlog("JS ERROR: "+e.message+" @ "+e.filename+":"+e.lineno));window.addEventListener("unhandledrejection",e=>dlog("PROMISE ERROR: "+(e.reason?.message||e.reason)));function setState(x){$("state").textContent=x}
+
+    function setVoice(x){$("voiceState").textContent=x}
+
+    function setIce(x){$("iceState").textContent=x}
+
+    function unlockAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume().catch(()=>{})}catch(e){log("Audio context error: "+e.message)}}
+
+    function stopRing(){if(ringTimer){clearInterval(ringTimer);ringTimer=null}if(ringTimeout){clearTimeout(ringTimeout);ringTimeout=null}}
+
+    function startRing(){stopRing();unlockAudio();if(!audioCtx)return;const beep=()=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=880;g.gain.value=.05;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.2)};beep();ringTimer=setInterval(beep,900);ringTimeout=setTimeout(()=>{if(incoming)declineCall()},45000)}
+
+        /* ================================================================
+           SIGNAL PAYLOAD / CALL ID
+           Each offer/answer carries a unique callId so an old answer
+           cannot accidentally satisfy a newer offer in the same room.
+        ================================================================ */
+        function makeId(){return crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now()+Math.random().toString(36).slice(2)}
+
+    function encodeSignal(id,sdp){return JSON.stringify({callId:id,sdp})}
+
+    function decodeSignal(payload){try{const x=JSON.parse(payload);if(x&&x.sdp)return{callId:String(x.callId||""),sdp:x.sdp}}catch(e){}return{callId:"",sdp:null}}
+
+    function randomCallId(){return makeId()}
+
+        /* ================================================================
+           GOOGLE FORM WRITE — Voice Call 2 hidden-iframe POST
+           Host: publishes an "offer" row.
+           Guest: publishes an "answer" row.
+           There is no separate "waiting" status; an unanswered offer
+           row is the waiting status.
+        ================================================================ */
+        function submitToGoogleForm(type,payload){
+    return new Promise(resolve=>{
+        const frameName="gf_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+        const iframe=document.createElement("iframe");
+        iframe.name=frameName;
+        iframe.style.display="none";
+        document.body.appendChild(iframe);
+
+        const form=document.createElement("form");
+        form.action=FORM_URL;
+        form.method="POST";
+        form.target=frameName;
+        form.style.display="none";
+
+        [[ENTRY.room,room()],[ENTRY.peer,peer],[ENTRY.type,type],[ENTRY.payload,payload]]
+          .forEach(([name,value])=>{
+              const input=document.createElement("input");
+              input.name=name;
+              input.value=value;
+              form.appendChild(input);
+          });
+
+        document.body.appendChild(form);
+
+        let done=false;
+        const finish=()=>{
+            if(done)return;
+            done=true;
+            setTimeout(()=>{
+                try{form.remove()}catch(e){}
+                try{iframe.remove()}catch(e){}
+            },500);
+            resolve();
+        };
+
+        iframe.onload=finish;
+        try{
+            form.submit();
+        }catch(e){
+            log("Google Form submit error: "+e.message);
+            finish();
+            return;
+        }
+        setTimeout(finish,1800);
+    });
+}
+
+async function submit(type,payload){
+    await submitToGoogleForm(type,payload);
+    log("Published "+type+" via Google Form");
+}
+
+async function publish(t,p){await submit(t,p)}
+
+        /* ================================================================
+           GOOGLE SHEET READ / CSV PARSING
+        ================================================================ */
+        function parseCSV(t){let a=[],r=[],c="",q=false;for(let i=0;i<t.length;i++){const x=t[i],n=t[i+1];if(q){if(x==='"'&&n==='"'){c+='"';i++}else if(x==='"')q=false;else c+=x}else if(x==='"')q=true;else if(x===','){r.push(c);c=""}else if(x==='\n'){r.push(c);a.push(r);r=[];c=""}else if(x!=='\r')c+=x}if(c||r.length){r.push(c);a.push(r)}return a}
+
+    function norm(x){return String(x??"").replace(/^\uFEFF/,"").replace(/[\u200B-\u200D\u2060]/g,"").trim().toLowerCase().replace(/\s+/g," ")}
+
+    function col(h,n){const m=h.map(norm);for(const x of n){const i=m.indexOf(norm(x));if(i>=0)return i}return-1}
+    async function readSheet(){const urls=[CSV_URL+"&t="+Date.now(),"https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/gviz/tq?tqx=out:csv&t="+Date.now()];let last=null;for(let ui=0;ui<urls.length;ui++){try{const z=await fetch(urls[ui],{cache:"no-store",redirect:"follow"});dlog("SHEET #"+(ui+1)+" HTTP "+z.status);if(!z.ok)throw Error("Sheet HTTP "+z.status);const text=await z.text();const head=text.slice(0,700).toLowerCase();if(/<html|google sheets|sign in|accounts.google.com/.test(head))throw Error("Sheet endpoint returned a Google/HTML page instead of CSV");if(!text.trim())throw Error("Sheet CSV is empty");const rows=parseCSV(text),rawHeader=rows.shift()||[],h=rawHeader.map(norm),ri=col(h,["room","room name","roomname"]),pi=col(h,["peer","peer id","peerid"]),ti=col(h,["type","message type","signal type"]),xi=col(h,["payload","payload ","payLoad"]),tsi=col(h,["timestamp","timestamp ","time","date","date/time","date time"]);if([ri,pi,ti,xi].some(x=>x<0))throw Error("Sheet columns not found: "+h.join(" | "));return{rows,ri,pi,ti,xi,tsi:tsi>=0?tsi:0}}catch(e){last=e;dlog("SHEET #"+(ui+1)+" FAILED: "+e.message)}}throw last||Error("Sheet unavailable")}
+    async function readRoomRecords(){
+        const s=await readSheet();
+        const rr=norm(room());
+        return s.rows
+            .filter(r=>norm(r[s.ri])===rr)
+            .map(r=>({
+                timestamp:r[s.tsi]||r[0]||"",
+                peer:r[s.pi]||"",
+                type:r[s.ti]||"",
+                payload:r[s.xi]||""
+            }));
+    }
+
+    function rowTime(r,s){const raw=String(r[s.tsi]||r[0]||"").trim(),t=Date.parse(raw);return Number.isFinite(t)?t:0}
+
+        /* ================================================================
+           SHEET ROOM DIRECTORY
+           Displays every distinct non-empty room present in the Sheet.
+           No recent-time filter, offer-only filter, or answered/unanswered
+           filtering is used for the room list.
+        ================================================================ */
+    async function getAllSheetRooms(sheet){
+        const s=sheet||await readSheet(),seenRooms=new Map();
+        for(let i=0;i<s.rows.length;i++){
+            const r=s.rows[i],rm=String(r[s.ri]||"").trim();
+            if(!rm)continue;
+            const key=norm(rm);
+            if(!seenRooms.has(key)){
+                seenRooms.set(key,{
+                    room:rm,
+                    row:i+2,
+                    timestamp:String(r[s.tsi]||r[0]||"")
+                });
+            }
+        }
+        return Array.from(seenRooms.values());
+    }
+
+    async function getSignals(){
+        const s=await readSheet(),rr=norm(room());
+        return s.rows
+            .filter(r=>norm(r[s.ri])===rr)
+            .map((r,i)=>({
+                peer:r[s.pi]||"",
+                type:r[s.ti]||"",
+                payload:r[s.xi]||"",
+                timestamp:r[s.tsi]||r[0]||"",
+                row:i
+            }));
+    }
+
+    async function latestOfferForRoom(code){
+        const s=await readSheet(),rr=norm(code),list=[];
+        for(let i=0;i<s.rows.length;i++){
+            const r=s.rows[i],rm=String(r[s.ri]||"").trim();
+            if(!rm||norm(rm)!==rr)continue;
+            if(norm(r[s.ti])!=="offer")continue;
+            const payload=String(r[s.xi]||"").trim();
+            if(!payload)continue;
+            const dec=decodeSignal(payload);
+            list.push({
+                room:rm,
+                peer:String(r[s.pi]||""),
+                type:String(r[s.ti]||""),
+                payload,
+                timestamp:String(r[s.tsi]||r[0]||""),
+                row:i+2,
+                callId:dec.callId||""
+            });
+        }
+        return list.length?list[list.length-1]:null;
+    }
+
+    async function latestOffer(){
+        const s=await readSheet(),list=[];
+        for(let i=0;i<s.rows.length;i++){
+            const r=s.rows[i],rm=String(r[s.ri]||"").trim();
+            if(!rm||norm(r[s.ti])!=="offer")continue;
+            const payload=String(r[s.xi]||"").trim();
+            if(!payload)continue;
+            const dec=decodeSignal(payload);
+            list.push({
+                room:rm,
+                peer:String(r[s.pi]||""),
+                type:String(r[s.ti]||""),
+                payload,
+                timestamp:String(r[s.tsi]||r[0]||""),
+                row:i+2,
+                callId:dec.callId||""
+            });
+        }
+        return list.length?list[list.length-1]:null;
+    }
+
+    async function loadActiveRooms(){
+        if(discoveryBusy)return null;
+        discoveryBusy=true;
+        const box=$("rooms"),info=$("roomInfo");
+        try{
+            const s=await readSheet(),list=await getAllSheetRooms(s);
+            box.innerHTML="";
+            if(!list.length){
+                box.innerHTML='<div class="empty">No rooms found in Google Sheets.</div>';
+                info.textContent="0 rooms";
+                return [];
+            }
+            for(const o of list){
+                const b=document.createElement("button");
+                b.textContent=o.room;
+                b.title="Sheet row "+o.row+(o.timestamp?" · "+o.timestamp:"");
+                b.onclick=async()=>{
+                    $("room").value=o.room;
+                    callId="";
+                    log("Selected room: "+o.room);
+                    dlog("Selected Sheet room "+o.room);
+                    if(typeof role!=="undefined"&&role)return;
+                    try{
+                        const offer=await latestOfferForRoom(o.room);
+                        if(offer){
+                            callId=offer.callId||"";
+                            dlog("Latest offer found for selected room; click Join to connect");
+                        }else{
+                            dlog("No offer row currently found for selected room");
+                        }
+                    }catch(e){
+                        dlog("Room offer lookup failed: "+e.message);
+                    }
+                };
+                box.appendChild(b);
+            }
+            info.textContent=list.length+" room"+(list.length===1?"":"s")+" in Google Sheets";
+            return list;
+        }catch(e){
+            box.innerHTML='<div class="empty">Could not read Google Sheets.</div>';
+            info.textContent="Sheet unavailable";
+            dlog("ROOM DIRECTORY ERROR: "+e.message);
+            log("Room directory error: "+e.message);
+            return null;
+        }finally{
+            discoveryBusy=false;
+        }
+    }
+
+    function startDiscovery(){
+        if(discoveryPoller)return;
+        loadActiveRooms();
+        discoveryPoller=setInterval(()=>{
+            if(document.visibilityState!=="hidden")loadActiveRooms();
+        },1800);
+    }
+
+    function stopDiscovery(){
+        if(discoveryPoller){
+            clearInterval(discoveryPoller);
+            discoveryPoller=null;
+        }
+    }
+
+        /* ================================================================
+           WEBRTC DATA CHANNEL / CALL CONTROL
+        ================================================================ */
+        function setupDC(c){dc=c;dc.onopen=()=>{log("DataChannel OPEN");setState("connected");stopPolling();stopDiscovery();if(outgoingRinging)setVoice("📞 Calling — ringing peer");updateCallButtons()};dc.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.kind==="call")handleCall(m)}catch(e){log("DataChannel message error: "+e.message)}};dc.onclose=()=>{log("DataChannel CLOSED");if(pc&&pc.connectionState!=="closed")setState(pc.connectionState)}}
+
+    function sendCall(type){if(!dc||dc.readyState!=="open"){log("DataChannel not open");return false}try{dc.send(JSON.stringify({kind:"call",type,from:peer,time:Date.now()}));return true}catch(e){log("Call signaling error: "+e.message);return false}}
+
+        /* ================================================================
+           RTCPeerConnection / AUDIO
+        ================================================================ */
+        function createPC(){if(pc)try{pc.close()}catch(e){}pc=new RTCPeerConnection(ICE);const tr=pc.addTransceiver("audio",{direction:"sendrecv"});audioSender=tr.sender;pc.onconnectionstatechange=()=>{const s=pc.connectionState;setState(s);if(s==="connected"){stopPolling();stopDiscovery();startStats()}if(s==="failed"||s==="closed"){setVoice("P2P connection failed");stopStats();cleanupCall(false)}};pc.oniceconnectionstatechange=()=>{const s=pc.iceConnectionState;setIce(s);if(s==="failed"||s==="disconnected"){setVoice("ICE connectivity "+s+" — check both networks")}};pc.onicegatheringstatechange=()=>log("ICE gathering: "+pc.iceGatheringState);pc.ondatachannel=e=>setupDC(e.channel);pc.ontrack=e=>{if(!remoteStream.getTracks().includes(e.track))remoteStream.addTrack(e.track);$("remoteAudio").srcObject=remoteStream;$("playBtn").disabled=false;$("remoteAudio").play().catch(()=>{})}}
+    async function enableLocalAudio(){try{if(localStream)return true;localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});const t=localStream.getAudioTracks()[0];if(!audioSender)throw Error("Audio sender unavailable");await audioSender.replaceTrack(t);log("LOCAL AUDIO ATTACHED: "+(t.label||"default microphone"));return true}catch(e){log("Microphone error: "+e.name+": "+e.message);return false}}
+    function updateCallButtons(){const ready=!!dc&&dc.readyState==="open";$("callBtn").disabled=!ready||callActive||incoming||outgoingRinging;$("acceptBtn").disabled=!incoming;$("declineBtn").disabled=!incoming;$("muteBtn").disabled=!callActive;$("hangupBtn").disabled=!callActive&&!outgoingRinging}
+
+    function startCall(){unlockAudio();if(!dc||dc.readyState!=="open"){setVoice("Connect to a peer first");return}outgoingRinging=true;setVoice("📞 Calling — ringing peer");updateCallButtons();sendCall("ring");startRing();ringTimeout=setTimeout(()=>{if(outgoingRinging){outgoingRinging=false;stopRing();setVoice("No answer");updateCallButtons()}},45000)}
+
+    function handleCall(m){if(m.from===peer)return;if(m.type==="ring"){if(callActive||incoming||outgoingRinging){sendCall("busy");return}incoming=true;setVoice("📞 Incoming call");$("incomingBox").textContent="Incoming call — press Accept or Decline";startRing();updateCallButtons()}else if(m.type==="accept"){stopRing();outgoingRinging=false;callActive=true;setVoice("Live voice call");updateCallButtons()}else if(m.type==="decline"){stopRing();outgoingRinging=false;setVoice("Call declined");updateCallButtons()}else if(m.type==="busy"){stopRing();outgoingRinging=false;setVoice("Peer busy");updateCallButtons()}else if(m.type==="hangup"){cleanupCall(false);setVoice("Peer hung up")}}
+    async function acceptCall(){unlockAudio();if(!incoming)return;stopRing();incoming=false;$("incomingBox").textContent="";setVoice("Connecting microphone…");if(await enableLocalAudio()){callActive=true;setVoice("Live voice call");sendCall("accept")}else{sendCall("decline");setVoice("Microphone unavailable")}updateCallButtons()}
+
+    function declineCall(){stopRing();incoming=false;$("incomingBox").textContent="";sendCall("decline");setVoice("Call declined");updateCallButtons()}
+
+    function toggleMute(){if(!localStream)return;const t=localStream.getAudioTracks()[0];t.enabled=!t.enabled;$("muteBtn").textContent=t.enabled?"🔇 Mute":"🔊 Unmute";setVoice(t.enabled?"Live voice call":"Call muted");$("txState").textContent=t.enabled?"audio flowing":"muted"}
+
+    function cleanupCall(notify){stopRing();if(notify)sendCall("hangup");if(audioSender)audioSender.replaceTrack(null).catch(()=>{});if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}callActive=false;incoming=false;outgoingRinging=false;$("callBtn").disabled=false;$("muteBtn").disabled=true;$("hangupBtn").disabled=true;$("acceptBtn").disabled=true;$("declineBtn").disabled=true;$("incomingBox").textContent="";$("muteBtn").textContent="🔇 Mute";$("txState").textContent="idle";stopStats();updateCallButtons()}
+
+    function hangup(notify=true){cleanupCall(notify);setVoice("Call idle")}
+
+        /* ================================================================
+           AUDIO OUTPUT / EARPIECE
+        ================================================================ */
+        async function exposeAudioOutputs(){try{const p=await navigator.mediaDevices.getUserMedia({audio:true});p.getTracks().forEach(t=>t.stop())}catch(e){}try{return(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="audiooutput")}catch(e){return[]}}
+
+    async function populateOutputs(ds){const s=$("audioOutput");s.innerHTML="";if(!ds.length){s.style.display="none";return}for(const d of ds){const o=document.createElement("option");o.value=d.deviceId;o.textContent=d.label||"Audio output";s.appendChild(o)}s.style.display="block";s.onchange=()=>applyAudioOutput(s.value)}
+
+    async function applyAudioOutput(id){const a=$("remoteAudio");if(!a.setSinkId)return false;try{await a.setSinkId(id);audioOutputId=id;await a.play().catch(()=>{});return true}catch(e){return false}}
+
+    async function playRemote(){$("remoteAudio").play().catch(()=>{})}
+
+    async function useEarpiece(){unlockAudio();const ds=await exposeAudioOutputs();await populateOutputs(ds);const p=ds.find(d=>/(earpiece|receiver|handset|phone|communications)/i.test(d.label||""));if(p&&await applyAudioOutput(p.deviceId))return;if(await applyAudioOutput("communications"))return;if(await applyAudioOutput("default"))return;setVoice("Use Android phone audio controls for earpiece")}
+
+        /* ================================================================
+           RTC STATISTICS
+        ================================================================ */
+        async function collectStats(){if(!pc)return;try{const s=await pc.getStats();let tx=null,rx=null,lost=0,jitter=0,rtt=0;s.forEach(r=>{if(r.type==="outbound-rtp"&&(r.kind==="audio"||r.mediaType==="audio"))tx=r;if(r.type==="inbound-rtp"&&(r.kind==="audio"||r.mediaType==="audio"))rx=r;if(r.type==="remote-inbound-rtp"&&(r.kind==="audio"||r.mediaType==="audio")&&r.roundTripTime!=null)rtt=r.roundTripTime});if(tx)$("txState").textContent=tx.bytesSent>0?"audio flowing":"waiting";if(rx){$("rxState").textContent=rx.bytesReceived>0?"audio flowing":"waiting";lost=rx.packetsLost||0;jitter=(rx.jitter||0)*1000}$("lossState").textContent=String(lost);$("jitterState").textContent=jitter.toFixed(1)+" ms";$("rttState").textContent=(rtt*1000).toFixed(1)+" ms"}catch(e){}}
+
+    function startStats(){stopStats();statsTimer=setInterval(collectStats,2000);collectStats()}
+
+    function stopStats(){if(statsTimer){clearInterval(statsTimer);statsTimer=null}}
+
+        /* ================================================================
+           HOST POLLING FOR THE ANSWER
+        ================================================================ */
+        function startPolling(){stopPolling();poller=setInterval(pollSignals,1800);pollSignals()}
+
+    function stopPolling(){if(poller){clearInterval(poller);poller=null;log("Google Sheet polling stopped — P2P connected")}}
+
+    async function pollSignals(){if(!pc||pc.connectionState==="connected")return;try{const rows=await getSignals();for(const x of rows){const k=x.timestamp+"|"+x.peer+"|"+x.type;if(seen.has(k)||x.peer===peer)continue;seen.add(k);if(role==="host"&&norm(x.type)==="answer"&&!pc.currentRemoteDescription){const dec=decodeSignal(x.payload);if(callId&&dec.callId&&dec.callId!==callId){dlog("Ignoring answer for different callId="+dec.callId);continue}
+
+    const sdp=dec.sdp||x.payload;await pc.setRemoteDescription(sdp);log("REMOTE ANSWER APPLIED");role="host-connected";loadActiveRooms()}}}catch(e){log("Polling error: "+e.message)}}
+
+    async function waitICE(){if(pc.iceGatheringState==="complete")return;await new Promise(resolve=>{const timer=setTimeout(resolve,12000),h=()=>{if(pc.iceGatheringState==="complete"){clearTimeout(timer);pc.removeEventListener("icegatheringstatechange",h);resolve()}};pc.addEventListener("icegatheringstatechange",h)})}
+
+        /* ================================================================
+           HOST / JOIN
+           Hosting writes the offer through the Google Form, which causes
+           a new response row to appear in the linked Google Sheet.
+        ================================================================ */
+        async function host(){unlockAudio();if(role||pc){log("Already hosting or connected");return}if(!room())return alert("Enter a room code");role="host";callId=randomCallId();seen=new Set();createPC();setupDC(pc.createDataChannel("chat"));await pc.setLocalDescription(await pc.createOffer());await waitICE();await publish("offer",encodeSignal(callId,pc.localDescription));setState("waiting-answer");startPolling();startDiscovery()}
+    async function join(offerOverride=null){unlockAudio();if(role||pc){log("Already connected/hosting");return}
+
+    let offer=offerOverride;
+    if(!offer&&room())offer=await latestOfferForRoom(room());
+    if(!offer&&!room())offer=await latestOffer();
+    if(!offer){log("No offer found for the selected room in Sheet");return}
+
+    const dec=decodeSignal(offer.payload);
+    if(!dec.sdp){log("Invalid offer payload in Sheet");return}
+    role="guest";$("room").value=offer.room;callId=offer.callId||dec.callId||"";
+    createPC();await pc.setRemoteDescription(dec.sdp);await pc.setLocalDescription(await pc.createAnswer());
+    await waitICE();await publish("answer",encodeSignal(callId,pc.localDescription));
+    setState("waiting-connect");startPolling();stopDiscovery()}
+    function disconnect(){stopPolling();stopDiscovery();cleanupCall(false);try{dc?.close()}catch(e){}try{pc?.close()}catch(e){}pc=null;dc=null;audioSender=null;role="";callId="";setState("disconnected");setIce("closed");loadActiveRooms().catch(()=>{})}
+
+        /* ================================================================
+           ROOM GENERATION / PAGE STARTUP
+        ================================================================ */
+        function makeRoomCode(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let out="";if(crypto.getRandomValues){const a=new Uint32Array(6);crypto.getRandomValues(a);for(const n of a)out+=chars[n%chars.length]}else for(let i=0;i<6;i++)out+=chars[Math.floor(Math.random()*chars.length)];return out}
+    window.addEventListener("load",async()=>{
+        $("formUrl").value=FORM_URL;$("csvUrl").value=CSV_URL;$("peer").textContent=peer;
+        $("remoteAudio").srcObject=remoteStream;
+        $("remoteAudio").addEventListener("loadedmetadata",()=>playRemote().catch(()=>{}));
+        setIce("new");
+        dlog("PAGE LOAD · displaying all rooms from Google Sheets");
+        await loadActiveRooms();
+        if(!role&&!pc&&!room()){
+            const code=makeRoomCode();
+            $("room").value=code;
+            dlog("AUTO-HOST → fresh room="+code);
+            host().catch(e=>log("Auto-host error: "+e.message));
+        }
+        startDiscovery();
+    });
+  </script>
+</body>
+</html>
