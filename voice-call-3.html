@@ -1,27 +1,1406 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Permissions-Policy" content="speaker-selection=(self)"><title>WebRTC Voice Call</title><style>body{font-family:system-ui;background:#0a1017;color:#eef3f8;margin:0}main{max-width:900px;margin:auto;padding:16px}.card{background:#111a24;border:1px solid #2b3a4b;border-radius:16px;padding:16px;margin:12px 0}.row{display:flex;gap:6px;flex-wrap:wrap}input,select{padding:10px;border-radius:10px;border:1px solid #36495b;background:#0c141d;color:#eef3f8;width:100%;box-sizing:border-box}button{padding:10px 14px;margin:4px 2px;border-radius:10px;border:1px solid #405369;background:#13202d;color:#eef3f8;cursor:pointer}.muted,.small{color:#9eacba;font-size:12px}.pill{padding:5px 9px;border-radius:20px;background:#1e2b39;font-size:12px}.log,.debug{overflow:auto;background:#080d13;border:1px solid #263543;border-radius:10px;padding:10px;white-space:pre-wrap}.log{height:240px}.debug{height:260px;font-size:11px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}.stat{background:#0c141d;border:1px solid #263543;border-radius:10px;padding:8px;font-size:12px}.rooms{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.empty{padding:8px;border:1px dashed #314252;border-radius:10px;color:#8fa0b0;font-size:12px}.outputrow{margin-top:8px}</style></head><body><main><div class="card"><h1>WebRTC P2P Voice Call</h1><div class="muted">Google Form/Sheet is used only for initial WebRTC signaling. Call ringing, call control and realtime audio use the established WebRTC connection.</div></div><div class="card"><label>Rooms awaiting answer (last 10 seconds)</label><div id="rooms" class="rooms"><div class="empty">Looking for recent calls awaiting an answer…</div></div><div class="small" id="roomInfo" style="margin-top:8px"></div><details style="margin-top:10px"><summary>🔎 Discovery debug</summary><div class="row"><button onclick="clearDiscoveryDebug()">Clear debug</button><button onclick="loadActiveRooms()">↻ Re-read recent calls</button></div><pre id="discoveryDebug" class="debug"></pre></details><label style="display:block;margin-top:10px">Room</label><input id="room" placeholder="e.g. ABC-123" autocomplete="off"><div class="small" style="margin-top:8px">Peer: <span class="pill" id="peer"></span> · State: <span class="pill" id="state">idle</span></div><details style="margin-top:10px"><summary>⚙ Google signaling</summary><label>Form response URL</label><input id="formUrl" readonly><label>Sheet CSV URL</label><input id="csvUrl" readonly></details></div><div class="card"><div class="row"><button onclick="host()">Create / Host</button><button onclick="join()">Join</button><button onclick="disconnect()">Disconnect</button><button onclick="loadActiveRooms()">↻ Refresh waiting</button></div></div><div class="card"><h2>Realtime voice</h2><div class="row"><button id="callBtn" onclick="startCall()">📞 Start call</button><button id="acceptBtn" onclick="acceptCall()" disabled>✅ Accept</button><button id="declineBtn" onclick="declineCall()" disabled>❌ Decline</button><button id="muteBtn" onclick="toggleMute()" disabled>🔇 Mute</button><button id="hangupBtn" onclick="hangup()" disabled>☎ Hang up</button><button id="playBtn" onclick="playRemote()" disabled>🔊 Play voice</button><button onclick="useEarpiece()">📱 Earpiece</button></div><div class="outputrow"><select id="audioOutput" aria-label="Audio output" style="display:none"></select></div><div id="voiceState" class="muted">Call idle</div><div id="incomingBox"></div><div class="stats"><div class="stat">ICE: <b id="iceState">new</b></div><div class="stat">TX: <b id="txState">idle</b></div><div class="stat">RX: <b id="rxState">idle</b></div><div class="stat">Packets lost: <b id="lossState">0</b></div><div class="stat">Jitter: <b id="jitterState">0 ms</b></div><div class="stat">RTT: <b id="rttState">0 ms</b></div></div><audio id="remoteAudio" autoplay playsinline></audio></div><div class="card"><h2>WebRTC / ICE</h2><pre id="log" class="log"></pre></div></main><script>
-const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg-9vINoMqoY5ynVA7twA/formResponse",CSV_URL="https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv",ENTRY={room:"entry.2110898792",peer:"entry.1013260375",type:"entry.1722712182",payload:"entry.1320930057"},ICE={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}],iceCandidatePoolSize:4},peer=(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now()).slice(0,8);let pc=null,dc=null,role="",poller=null,discoveryPoller=null,discoveryBusy=false,seen=new Set(),localStream=null,remoteStream=new MediaStream(),audioSender=null,callActive=false,incoming=false,outgoingRinging=false,ringTimer=null,ringTimeout=null,audioCtx=null,statsTimer=null,audioOutputId="",callId="";
-function $(x){return document.getElementById(x)}function room(){return $("room").value.trim()}function selectRoom(x){$("room").value=x;log("Selected room: "+x)}function log(x){$("log").textContent+=x+"\n";$("log").scrollTop=$("log").scrollHeight}function dlog(x){const p=$("discoveryDebug");if(p){p.textContent+="["+new Date().toLocaleTimeString()+"] "+x+"\n";p.scrollTop=p.scrollHeight}}function clearDiscoveryDebug(){$("discoveryDebug").textContent=""}window.addEventListener("error",e=>dlog("JS ERROR: "+e.message+" @ "+e.filename+":"+e.lineno));window.addEventListener("unhandledrejection",e=>dlog("PROMISE ERROR: "+(e.reason?.message||e.reason)));function setState(x){$("state").textContent=x}function setVoice(x){$("voiceState").textContent=x}function setIce(x){$("iceState").textContent=x}function unlockAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume().catch(()=>{})}catch(e){log("Audio context error: "+e.message)}}function stopRing(){if(ringTimer){clearInterval(ringTimer);ringTimer=null}if(ringTimeout){clearTimeout(ringTimeout);ringTimeout=null}}function startRing(){stopRing();unlockAudio();if(!audioCtx)return;const beep=()=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=880;g.gain.value=.05;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.2)};beep();ringTimer=setInterval(beep,900);ringTimeout=setTimeout(()=>{if(incoming)declineCall()},45000)}
-function makeId(){return crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now()+Math.random().toString(36).slice(2)}function encodeSignal(id,sdp){return JSON.stringify({callId:id,sdp})}function decodeSignal(payload){try{const x=JSON.parse(payload);if(x&&x.sdp)return{callId:String(x.callId||""),sdp:x.sdp}}catch(e){}return{callId:"",sdp:null}}function randomCallId(){return makeId()}
-async function submit(type,payload){const fd=new FormData;fd.append(ENTRY.room,room());fd.append(ENTRY.peer,peer);fd.append(ENTRY.type,type);fd.append(ENTRY.payload,payload);try{await fetch(FORM_URL,{method:"POST",mode:"no-cors",body:fd,cache:"no-store",keepalive:true});log("Published "+type)}catch(e){log("Publish request error: "+e.message)}}async function publish(t,p){await submit(t,p)}
-function parseCSV(t){let a=[],r=[],c="",q=false;for(let i=0;i<t.length;i++){const x=t[i],n=t[i+1];if(q){if(x==='"'&&n==='"'){c+='"';i++}else if(x==='"')q=false;else c+=x}else if(x==='"')q=true;else if(x===','){r.push(c);c=""}else if(x==='\n'){r.push(c);a.push(r);r=[];c=""}else if(x!=='\r')c+=x}if(c||r.length){r.push(c);a.push(r)}return a}function norm(x){return String(x??"").replace(/^\uFEFF/,"").replace(/[\u200B-\u200D\u2060]/g,"").trim().toLowerCase().replace(/\s+/g," ")}function col(h,n){const m=h.map(norm);for(const x of n){const i=m.indexOf(norm(x));if(i>=0)return i}return-1}
-async function readSheet(){const urls=[CSV_URL+"&t="+Date.now(),"https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/gviz/tq?tqx=out:csv&t="+Date.now()];let last=null;for(let ui=0;ui<urls.length;ui++){try{const z=await fetch(urls[ui],{cache:"no-store",redirect:"follow"});dlog("SHEET #"+(ui+1)+" HTTP "+z.status);if(!z.ok)throw Error("Sheet HTTP "+z.status);const text=await z.text();const head=text.slice(0,700).toLowerCase();if(/<html|google sheets|sign in|accounts.google.com/.test(head))throw Error("Sheet endpoint returned a Google/HTML page instead of CSV");if(!text.trim())throw Error("Sheet CSV is empty");const rows=parseCSV(text),rawHeader=rows.shift()||[],h=rawHeader.map(norm),ri=col(h,["room","room name","roomname"]),pi=col(h,["peer","peer id","peerid"]),ti=col(h,["type","message type","signal type"]),xi=col(h,["payload","payload ","payLoad"]),tsi=col(h,["timestamp","timestamp ","time","date","date/time","date time"]);if([ri,pi,ti,xi].some(x=>x<0))throw Error("Sheet columns not found: "+h.join(" | "));return{rows,ri,pi,ti,xi,tsi:tsi>=0?tsi:0}}catch(e){last=e;dlog("SHEET #"+(ui+1)+" FAILED: "+e.message)}}throw last||Error("Sheet unavailable")}
-function rowTime(r,s){const raw=String(r[s.tsi]||r[0]||"").trim(),t=Date.parse(raw);return Number.isFinite(t)?t:0}
-async function waitingOffers(sheet){const s=sheet||await readSheet(),out=[],rooms=new Set,now=Date.now(),windowMs=10000;for(let i=s.rows.length-1;i>=0;i--){const r=s.rows[i],type=norm(r[s.ti]),payload=String(r[s.xi]||"").trim(),rm=String(r[s.ri]||"").trim(),pr=String(r[s.pi]||"").trim(),ts=rowTime(r,s);if(type!=="offer"||!payload||!rm)continue;if(!ts||now-ts>windowMs||ts-now>2000){dlog("OFFER row "+(i+2)+" outside 10-second window: "+String(r[s.tsi]||r[0]||""));continue}const dec=decodeSignal(payload),oid=dec.callId;let answered=false;for(let j=i+1;j<s.rows.length;j++){const q=s.rows[j],qt=norm(q[s.ti]),qp=String(q[s.xi]||"").trim(),qrm=String(q[s.ri]||"").trim(),qpr=String(q[s.pi]||"").trim();if(qt!=="answer"||!qp||norm(qrm)!==norm(rm)||qpr===pr)continue;const ad=decodeSignal(qp);if(oid){if(ad.callId&&ad.callId===oid){answered=true;break}}else if(!ad.callId&&qpr!==pr){answered=true;break}}if(answered){dlog("OFFER row "+(i+2)+" already answered");continue}const key=norm(rm);if(rooms.has(key))continue;const o={room:rm,peer:pr,type:String(r[s.ti]||"").trim(),payload,row:i+2,timestamp:String(r[s.tsi]||r[0]||""),callId:oid};rooms.add(key);out.push(o);dlog("ANSWER-WAITING OFFER: room="+rm+" row="+o.row+(oid?" callId="+oid:" legacy"))}return out}
-async function latestWaitingOffer(){const a=await waitingOffers();const o=a[0]||null;dlog(o?"LATEST ANSWER-WAITING OFFER: room="+o.room+" row="+o.row:"LATEST ANSWER-WAITING OFFER: none");return o}async function latestOffer(){return await latestWaitingOffer()}async function offerForRoom(code){const a=await waitingOffers();return a.find(o=>norm(o.room)===norm(code))||null}
-async function getSignals(){const s=await readSheet(),rr=norm(room());return s.rows.filter(r=>norm(r[s.ri])===rr).map(r=>({peer:r[s.pi]||"",type:r[s.ti]||"",payload:r[s.xi]||"",timestamp:r[s.tsi]||r[0]||""}))}
-async function loadActiveRooms(){if(discoveryBusy)return null;discoveryBusy=true;const box=$("rooms"),info=$("roomInfo");try{const s=await readSheet(),list=await waitingOffers(s);box.innerHTML="";if(!list.length){box.innerHTML='<div class="empty">No recent call waiting for an answer.</div>';info.textContent="No unanswered offers in last 10 seconds";return null}for(const o of list){const b=document.createElement("button");b.textContent=o.room;b.title="Waiting for answer · row "+o.row+(o.timestamp?" · "+o.timestamp:"");b.onclick=()=>{$("room").value=o.room;callId=o.callId||"";log("Selected room: "+o.room);dlog("Selected callId="+(o.callId||"legacy"))};box.appendChild(b)}info.textContent=list.length+" recent call"+(list.length===1?"":"s")+" waiting for answer";return list}catch(e){box.innerHTML='<div class="empty">Could not read waiting calls.</div>';info.textContent="Sheet unavailable";dlog("DISCOVERY ERROR: "+e.message);log("Answer-waiting discovery error: "+e.message);return null}finally{discoveryBusy=false}}
-function startDiscovery(){if(discoveryPoller)return;loadActiveRooms();discoveryPoller=setInterval(()=>{if(document.visibilityState!=="hidden")loadActiveRooms()},1800)}function stopDiscovery(){if(discoveryPoller){clearInterval(discoveryPoller);discoveryPoller=null}}
-function setupDC(c){dc=c;dc.onopen=()=>{log("DataChannel OPEN");setState("connected");stopPolling();stopDiscovery();if(outgoingRinging)setVoice("📞 Calling — ringing peer");updateCallButtons()};dc.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.kind==="call")handleCall(m)}catch(e){log("DataChannel message error: "+e.message)}};dc.onclose=()=>{log("DataChannel CLOSED");if(pc&&pc.connectionState!=="closed")setState(pc.connectionState)}}function sendCall(type){if(!dc||dc.readyState!=="open"){log("DataChannel not open");return false}try{dc.send(JSON.stringify({kind:"call",type,from:peer,time:Date.now()}));return true}catch(e){log("Call signaling error: "+e.message);return false}}
-function createPC(){if(pc)try{pc.close()}catch(e){}pc=new RTCPeerConnection(ICE);const tr=pc.addTransceiver("audio",{direction:"sendrecv"});audioSender=tr.sender;pc.onconnectionstatechange=()=>{const s=pc.connectionState;setState(s);if(s==="connected"){stopPolling();stopDiscovery();startStats()}if(s==="failed"||s==="closed"){setVoice("P2P connection failed");stopStats();cleanupCall(false)}};pc.oniceconnectionstatechange=()=>{const s=pc.iceConnectionState;setIce(s);if(s==="failed"||s==="disconnected"){setVoice("ICE connectivity "+s+" — check both networks")}};pc.onicegatheringstatechange=()=>log("ICE gathering: "+pc.iceGatheringState);pc.ondatachannel=e=>setupDC(e.channel);pc.ontrack=e=>{if(!remoteStream.getTracks().includes(e.track))remoteStream.addTrack(e.track);$("remoteAudio").srcObject=remoteStream;$("playBtn").disabled=false;$("remoteAudio").play().catch(()=>{})}}
-async function enableLocalAudio(){try{if(localStream)return true;localStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});const t=localStream.getAudioTracks()[0];if(!audioSender)throw Error("Audio sender unavailable");await audioSender.replaceTrack(t);log("LOCAL AUDIO ATTACHED: "+(t.label||"default microphone"));return true}catch(e){log("Microphone error: "+e.name+": "+e.message);return false}}
-function updateCallButtons(){const ready=!!dc&&dc.readyState==="open";$("callBtn").disabled=!ready||callActive||incoming||outgoingRinging;$("acceptBtn").disabled=!incoming;$("declineBtn").disabled=!incoming;$("muteBtn").disabled=!callActive;$("hangupBtn").disabled=!callActive&&!outgoingRinging}function startCall(){unlockAudio();if(!dc||dc.readyState!=="open"){setVoice("Connect to a peer first");return}outgoingRinging=true;setVoice("📞 Calling — ringing peer");updateCallButtons();sendCall("ring");startRing();ringTimeout=setTimeout(()=>{if(outgoingRinging){outgoingRinging=false;stopRing();setVoice("No answer");updateCallButtons()}},45000)}function handleCall(m){if(m.from===peer)return;if(m.type==="ring"){if(callActive||incoming||outgoingRinging){sendCall("busy");return}incoming=true;setVoice("📞 Incoming call");$("incomingBox").textContent="Incoming call — press Accept or Decline";startRing();updateCallButtons()}else if(m.type==="accept"){stopRing();outgoingRinging=false;callActive=true;setVoice("Live voice call");updateCallButtons()}else if(m.type==="decline"){stopRing();outgoingRinging=false;setVoice("Call declined");updateCallButtons()}else if(m.type==="busy"){stopRing();outgoingRinging=false;setVoice("Peer busy");updateCallButtons()}else if(m.type==="hangup"){cleanupCall(false);setVoice("Peer hung up")}}
-async function acceptCall(){unlockAudio();if(!incoming)return;stopRing();incoming=false;$("incomingBox").textContent="";setVoice("Connecting microphone…");if(await enableLocalAudio()){callActive=true;setVoice("Live voice call");sendCall("accept")}else{sendCall("decline");setVoice("Microphone unavailable")}updateCallButtons()}function declineCall(){stopRing();incoming=false;$("incomingBox").textContent="";sendCall("decline");setVoice("Call declined");updateCallButtons()}function toggleMute(){if(!localStream)return;const t=localStream.getAudioTracks()[0];t.enabled=!t.enabled;$("muteBtn").textContent=t.enabled?"🔇 Mute":"🔊 Unmute";setVoice(t.enabled?"Live voice call":"Call muted");$("txState").textContent=t.enabled?"audio flowing":"muted"}function cleanupCall(notify){stopRing();if(notify)sendCall("hangup");if(audioSender)audioSender.replaceTrack(null).catch(()=>{});if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null}callActive=false;incoming=false;outgoingRinging=false;$("callBtn").disabled=false;$("muteBtn").disabled=true;$("hangupBtn").disabled=true;$("acceptBtn").disabled=true;$("declineBtn").disabled=true;$("incomingBox").textContent="";$("muteBtn").textContent="🔇 Mute";$("txState").textContent="idle";stopStats();updateCallButtons()}function hangup(notify=true){cleanupCall(notify);setVoice("Call idle")}
-async function exposeAudioOutputs(){try{const p=await navigator.mediaDevices.getUserMedia({audio:true});p.getTracks().forEach(t=>t.stop())}catch(e){}try{return(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="audiooutput")}catch(e){return[]}}async function populateOutputs(ds){const s=$("audioOutput");s.innerHTML="";if(!ds.length){s.style.display="none";return}for(const d of ds){const o=document.createElement("option");o.value=d.deviceId;o.textContent=d.label||"Audio output";s.appendChild(o)}s.style.display="block";s.onchange=()=>applyAudioOutput(s.value)}async function applyAudioOutput(id){const a=$("remoteAudio");if(!a.setSinkId)return false;try{await a.setSinkId(id);audioOutputId=id;await a.play().catch(()=>{});return true}catch(e){return false}}async function playRemote(){$("remoteAudio").play().catch(()=>{})}async function useEarpiece(){unlockAudio();const ds=await exposeAudioOutputs();await populateOutputs(ds);const p=ds.find(d=>/(earpiece|receiver|handset|phone|communications)/i.test(d.label||""));if(p&&await applyAudioOutput(p.deviceId))return;if(await applyAudioOutput("communications"))return;if(await applyAudioOutput("default"))return;setVoice("Use Android phone audio controls for earpiece")}
-async function collectStats(){if(!pc)return;try{const s=await pc.getStats();let tx=null,rx=null,lost=0,jitter=0,rtt=0;s.forEach(r=>{if(r.type==="outbound-rtp"&&(r.kind==="audio"||r.mediaType==="audio"))tx=r;if(r.type==="inbound-rtp"&&(r.kind==="audio"||r.mediaType==="audio"))rx=r;if(r.type==="remote-inbound-rtp"&&(r.kind==="audio"||r.mediaType==="audio")&&r.roundTripTime!=null)rtt=r.roundTripTime});if(tx)$("txState").textContent=tx.bytesSent>0?"audio flowing":"waiting";if(rx){$("rxState").textContent=rx.bytesReceived>0?"audio flowing":"waiting";lost=rx.packetsLost||0;jitter=(rx.jitter||0)*1000}$("lossState").textContent=String(lost);$("jitterState").textContent=jitter.toFixed(1)+" ms";$("rttState").textContent=(rtt*1000).toFixed(1)+" ms"}catch(e){}}function startStats(){stopStats();statsTimer=setInterval(collectStats,2000);collectStats()}function stopStats(){if(statsTimer){clearInterval(statsTimer);statsTimer=null}}
-function startPolling(){stopPolling();poller=setInterval(pollSignals,1800);pollSignals()}function stopPolling(){if(poller){clearInterval(poller);poller=null;log("Google Sheet polling stopped — P2P connected")}}async function pollSignals(){if(!pc||pc.connectionState==="connected")return;try{const rows=await getSignals();for(const x of rows){const k=x.timestamp+"|"+x.peer+"|"+x.type;if(seen.has(k)||x.peer===peer)continue;seen.add(k);if(role==="host"&&norm(x.type)==="answer"&&!pc.currentRemoteDescription){const dec=decodeSignal(x.payload);if(callId&&dec.callId&&dec.callId!==callId){dlog("Ignoring answer for different callId="+dec.callId);continue}const sdp=dec.sdp||x.payload;await pc.setRemoteDescription(sdp);log("REMOTE ANSWER APPLIED");role="host-connected";loadActiveRooms()}}}catch(e){log("Polling error: "+e.message)}}async function waitICE(){if(pc.iceGatheringState==="complete")return;await new Promise(resolve=>{const timer=setTimeout(resolve,12000),h=()=>{if(pc.iceGatheringState==="complete"){clearTimeout(timer);pc.removeEventListener("icegatheringstatechange",h);resolve()}};pc.addEventListener("icegatheringstatechange",h)})}
-async function host(){unlockAudio();if(role||pc){log("Already hosting or connected");return}if(!room())return alert("Enter a room code");role="host";callId=randomCallId();seen=new Set();createPC();setupDC(pc.createDataChannel("chat"));await pc.setLocalDescription(await pc.createOffer());await waitICE();await publish("offer",encodeSignal(callId,pc.localDescription));setState("waiting-answer");startPolling();startDiscovery()}
-async function join(offerOverride=null){unlockAudio();if(role||pc){log("Already connected/hosting");return}let offer=offerOverride;if(!offer&&room())offer=await offerForRoom(room());if(!offer&&!room())offer=await latestOffer();if(!offer){log("No recent call waiting for an answer found in Sheet");return}const dec=decodeSignal(offer.payload);if(!dec.sdp){log("Invalid offer payload in Sheet");return}role="guest";$("room").value=offer.room;callId=offer.callId||dec.callId||"";createPC();await pc.setRemoteDescription(dec.sdp);await pc.setLocalDescription(await pc.createAnswer());await waitICE();await publish("answer",encodeSignal(callId,pc.localDescription));setState("waiting-connect");startPolling();stopDiscovery()}
-function disconnect(){stopPolling();stopDiscovery();cleanupCall(false);try{dc?.close()}catch(e){}try{pc?.close()}catch(e){}pc=null;dc=null;audioSender=null;role="";callId="";setState("disconnected");setIce("closed");loadActiveRooms().catch(()=>{})}
-function makeRoomCode(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let out="";if(crypto.getRandomValues){const a=new Uint32Array(6);crypto.getRandomValues(a);for(const n of a)out+=chars[n%chars.length]}else for(let i=0;i<6;i++)out+=chars[Math.floor(Math.random()*chars.length)];return out}
-window.addEventListener("load",async()=>{$("formUrl").value=FORM_URL;$('csvUrl').value=CSV_URL;$('peer').textContent=peer;$('remoteAudio').srcObject=remoteStream;$('remoteAudio').addEventListener('loadedmetadata',()=>playRemote().catch(()=>{}));setIce("new");dlog("PAGE LOAD · show unanswered Sheet offers from last 10 seconds before auto-host");try{const waiting=await waitingOffers();if(waiting.length){const box=$("rooms"),info=$("roomInfo");box.innerHTML="";for(const o of waiting){const b=document.createElement("button");b.textContent=o.room;b.title="Waiting for answer · row "+o.row+(o.timestamp?" · "+o.timestamp:"");b.onclick=()=>{$("room").value=o.room;callId=o.callId||"";log("Selected room: "+o.room);dlog("Selected callId="+(o.callId||"legacy"))};box.appendChild(b)}$("room").value=waiting[0].room;callId=waiting[0].callId||"";info.textContent=waiting.length+" recent call"+(waiting.length===1?"":"s")+" waiting for answer";dlog("AUTO-HOST SKIPPED → "+waiting.length+" recent unanswered Sheet room(s); latest="+waiting[0].room);startDiscovery();return}}catch(e){dlog("INITIAL WAITING-CHECK FAILED: "+e.message)}if(!role&&!pc&&!room()){const code=makeRoomCode();$("room").value=code;dlog("AUTO-HOST → no recent unanswered offer; fresh room="+code);host().catch(e=>log("Auto-host error: "+e.message))}startDiscovery()});
-</script></body></html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Permissions-Policy" content="speaker-selection=(self)">
+  <title>WebRTC Voice Call</title>
+  <style>
+    body { font-family: system-ui; background: #0a1017; color: #eef3f8; margin: 0; }
+    main { max-width: 900px; margin: auto; padding: 16px; }
+    .card { background: #111a24; border: 1px solid #2b3a4b; border-radius: 16px; padding: 16px; margin: 12px 0; }
+    .row { display: flex; gap: 6px; flex-wrap: wrap; }
+    input, select { padding: 10px; border-radius: 10px; border: 1px solid #36495b; background: #0c141d; color: #eef3f8; width: 100%; box-sizing: border-box; }
+    button { padding: 10px 14px; margin: 4px 2px; border-radius: 10px; border: 1px solid #405369; background: #13202d; color: #eef3f8; cursor: pointer; }
+    .muted, .small { color: #9eacba; font-size: 12px; }
+    .pill { padding: 5px 9px; border-radius: 20px; background: #1e2b39; font-size: 12px; }
+    .log, .debug { overflow: auto; background: #080d13; border: 1px solid #263543; border-radius: 10px; padding: 10px; white-space: pre-wrap; }
+    .log { height: 240px; }
+    .debug { height: 260px; font-size: 11px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 8px; margin-top: 10px; }
+    .stat { background: #0c141d; border: 1px solid #263543; border-radius: 10px; padding: 8px; font-size: 12px; }
+    .rooms { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .empty { padding: 8px; border: 1px dashed #314252; border-radius: 10px; color: #8fa0b0; font-size: 12px; }
+    .outputrow { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h1>WebRTC P2P Voice Call</h1>
+      <div class="muted">
+        Google Form/Sheet is used only for initial WebRTC signaling.
+        Call ringing, call control and realtime audio use the established WebRTC connection.
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Rooms awaiting answer (last 10 seconds)</label>
+      <div id="rooms" class="rooms">
+        <div class="empty">Looking for recent calls awaiting an answer…</div>
+      </div>
+      <div class="small" id="roomInfo" style="margin-top:8px"></div>
+
+      <details style="margin-top:10px">
+        <summary>🔎 Discovery debug</summary>
+        <div class="row">
+          <button onclick="clearDiscoveryDebug()">Clear debug</button>
+          <button onclick="loadActiveRooms()">↻ Re-read recent calls</button>
+        </div>
+        <pre id="discoveryDebug" class="debug"></pre>
+      </details>
+
+      <label style="display:block;margin-top:10px">Room</label>
+      <input id="room" placeholder="e.g. ABC-123" autocomplete="off">
+      <div class="small" style="margin-top:8px">
+        Peer: <span class="pill" id="peer"></span> · State: <span class="pill" id="state">idle</span>
+      </div>
+
+      <details style="margin-top:10px">
+        <summary>⚙ Google signaling</summary>
+        <label>Form response URL</label>
+        <input id="formUrl" readonly>
+        <label>Sheet CSV URL</label>
+        <input id="csvUrl" readonly>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <button onclick="host()">Create / Host</button>
+        <button onclick="join()">Join</button>
+        <button onclick="disconnect()">Disconnect</button>
+        <button onclick="loadActiveRooms()">↻ Refresh waiting</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Realtime voice</h2>
+      <div class="row">
+        <button id="callBtn" onclick="startCall()">📞 Start call</button>
+        <button id="acceptBtn" onclick="acceptCall()" disabled>✅ Accept</button>
+        <button id="declineBtn" onclick="declineCall()" disabled>❌ Decline</button>
+        <button id="muteBtn" onclick="toggleMute()" disabled>🔇 Mute</button>
+        <button id="hangupBtn" onclick="hangup()" disabled>☎ Hang up</button>
+        <button id="playBtn" onclick="playRemote()" disabled>🔊 Play voice</button>
+        <button onclick="useEarpiece()">📱 Earpiece</button>
+      </div>
+      <div class="outputrow">
+        <select id="audioOutput" aria-label="Audio output" style="display:none"></select>
+      </div>
+      <div id="voiceState" class="muted">Call idle</div>
+      <div id="incomingBox"></div>
+      <div class="stats">
+        <div class="stat">ICE: <b id="iceState">new</b></div>
+        <div class="stat">TX: <b id="txState">idle</b></div>
+        <div class="stat">RX: <b id="rxState">idle</b></div>
+        <div class="stat">Packets lost: <b id="lossState">0</b></div>
+        <div class="stat">Jitter: <b id="jitterState">0 ms</b></div>
+        <div class="stat">RTT: <b id="rttState">0 ms</b></div>
+      </div>
+      <audio id="remoteAudio" autoplay playsinline></audio>
+    </div>
+
+    <div class="card">
+      <h2>WebRTC / ICE</h2>
+      <pre id="log" class="log"></pre>
+    </div>
+  </main>
+
+  <script>
+    /* ======================================================================
+       GOOGLE FORM / SHEET SIGNALING
+       ======================================================================
+
+       Google Sheets is used only as a signaling mailbox. The actual voice
+       stream is never sent through the Sheet.
+
+       HOST:
+         1. Create RTCPeerConnection.
+         2. Generate a unique callId.
+         3. Create SDP offer and finish ICE gathering.
+         4. Submit an "offer" row through Google Forms.
+         5. Google Forms writes that row into the linked Sheet.
+         6. Poll the Sheet until an "answer" row with the same callId appears.
+
+       GUEST:
+         1. Read the Sheet for unanswered offers.
+         2. Select an offer and extract its callId + SDP.
+         3. Create an SDP answer and finish ICE gathering.
+         4. Submit an "answer" row through Google Forms.
+         5. The host finds that matching answer and completes WebRTC setup.
+
+       WAITING STATUS:
+         There is no separate "waiting" status row. An unanswered "offer"
+         row itself means "this room is waiting for an answer".
+
+       IMPORTANT:
+         The Form POST uses mode:"no-cors", so the browser cannot inspect the
+         response body. Sheet discovery therefore remains eventually
+         consistent and repeatedly re-reads the public CSV endpoint.
+    ====================================================================== */
+
+    const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg-9vINoMqoY5ynVA7twA/formResponse";
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv";
+
+    const ENTRY = {
+      room: "entry.2110898792",
+      peer: "entry.1013260375",
+      type: "entry.1722712182",
+      payload: "entry.1320930057"
+    };
+
+    const ICE = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" }
+      ],
+      iceCandidatePoolSize: 4
+    };
+
+    // Short identifier for this browser/page instance.
+    const peer = (
+      crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Date.now()
+    ).slice(0, 8);
+
+    // WebRTC / signaling state.
+    let pc = null;
+    let dc = null;
+    let role = "";
+    let poller = null;
+    let discoveryPoller = null;
+    let discoveryBusy = false;
+    let seen = new Set();
+
+    // Media state.
+    let localStream = null;
+    let remoteStream = new MediaStream();
+    let audioSender = null;
+
+    // Call UI state.
+    let callActive = false;
+    let incoming = false;
+    let outgoingRinging = false;
+    let ringTimer = null;
+    let ringTimeout = null;
+    let audioCtx = null;
+    let statsTimer = null;
+    let audioOutputId = "";
+
+    // Unique identifier for the current offer/answer exchange.
+    // This prevents an answer from an older call attempt being applied to a
+    // newer offer that happens to use the same room code.
+    let callId = "";
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function room() {
+      return $("room").value.trim();
+    }
+
+    function selectRoom(value) {
+      $("room").value = value;
+      log("Selected room: " + value);
+    }
+
+    function log(message) {
+      $("log").textContent += message + "\n";
+      $("log").scrollTop = $("log").scrollHeight;
+    }
+
+    function dlog(message) {
+      const panel = $("discoveryDebug");
+      if (!panel) return;
+      panel.textContent += "[" + new Date().toLocaleTimeString() + "] " + message + "\n";
+      panel.scrollTop = panel.scrollHeight;
+    }
+
+    function clearDiscoveryDebug() {
+      $("discoveryDebug").textContent = "";
+    }
+
+    window.addEventListener("error", event => {
+      dlog("JS ERROR: " + event.message + " @ " + event.filename + ":" + event.lineno);
+    });
+
+    window.addEventListener("unhandledrejection", event => {
+      dlog("PROMISE ERROR: " + (event.reason?.message || event.reason));
+    });
+
+    function setState(value) {
+      $("state").textContent = value;
+    }
+
+    function setVoice(value) {
+      $("voiceState").textContent = value;
+    }
+
+    function setIce(value) {
+      $("iceState").textContent = value;
+    }
+
+    function unlockAudio() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume().catch(() => {});
+        }
+      } catch (error) {
+        log("Audio context error: " + error.message);
+      }
+    }
+
+    function stopRing() {
+      if (ringTimer) {
+        clearInterval(ringTimer);
+        ringTimer = null;
+      }
+      if (ringTimeout) {
+        clearTimeout(ringTimeout);
+        ringTimeout = null;
+      }
+    }
+
+    function startRing() {
+      stopRing();
+      unlockAudio();
+      if (!audioCtx) return;
+
+      const beep = () => {
+        const oscillator = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        oscillator.frequency.value = 880;
+        gain.gain.value = 0.05;
+        oscillator.connect(gain);
+        gain.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.2);
+      };
+
+      beep();
+      ringTimer = setInterval(beep, 900);
+      ringTimeout = setTimeout(() => {
+        if (incoming) declineCall();
+      }, 45000);
+    }
+
+    /* ----------------------------------------------------------------------
+       SIGNAL PAYLOAD
+       ----------------------------------------------------------------------
+
+       New rows store JSON of the form:
+
+         { "callId": "...", "sdp": "..." }
+
+       Legacy raw-SDP rows are still tolerated by decodeSignal().
+    ---------------------------------------------------------------------- */
+
+    function makeId() {
+      return crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Date.now() + Math.random().toString(36).slice(2);
+    }
+
+    function encodeSignal(id, sdp) {
+      return JSON.stringify({ callId: id, sdp });
+    }
+
+    function decodeSignal(payload) {
+      try {
+        const value = JSON.parse(payload);
+        if (value && value.sdp) {
+          return {
+            callId: String(value.callId || ""),
+            sdp: value.sdp
+          };
+        }
+      } catch (error) {
+        // Legacy entries may contain raw SDP instead of JSON.
+      }
+      return { callId: "", sdp: null };
+    }
+
+    function randomCallId() {
+      return makeId();
+    }
+
+    /* ----------------------------------------------------------------------
+       WRITE TO GOOGLE SHEETS VIA GOOGLE FORMS
+       ----------------------------------------------------------------------
+
+       The webpage POSTs to the Google Form response endpoint. The Form then
+       creates the corresponding row in the linked response Sheet.
+    ---------------------------------------------------------------------- */
+
+    async function submit(type, payload) {
+      const formData = new FormData();
+      formData.append(ENTRY.room, room());
+      formData.append(ENTRY.peer, peer);
+      formData.append(ENTRY.type, type);
+      formData.append(ENTRY.payload, payload);
+
+      try {
+        await fetch(FORM_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: formData,
+          cache: "no-store",
+          keepalive: true
+        });
+        log("Published " + type);
+      } catch (error) {
+        log("Publish request error: " + error.message);
+      }
+    }
+
+    async function publish(type, payload) {
+      await submit(type, payload);
+    }
+
+    /* ----------------------------------------------------------------------
+       CSV / SHEET READING
+    ---------------------------------------------------------------------- */
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (quoted) {
+          if (char === '"' && next === '"') {
+            cell += '"';
+            i++;
+          } else if (char === '"') {
+            quoted = false;
+          } else {
+            cell += char;
+          }
+        } else if (char === '"') {
+          quoted = true;
+        } else if (char === ',') {
+          row.push(cell);
+          cell = "";
+        } else if (char === '\n') {
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = "";
+        } else if (char !== '\r') {
+          cell += char;
+        }
+      }
+
+      if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function norm(value) {
+      return String(value ?? "")
+        .replace(/^\uFEFF/, "")
+        .replace(/[\u200B-\u200D\u2060]/g, "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+    }
+
+    function col(headers, names) {
+      const normalized = headers.map(norm);
+      for (const name of names) {
+        const index = normalized.indexOf(norm(name));
+        if (index >= 0) return index;
+      }
+      return -1;
+    }
+
+    async function readSheet() {
+      // Try two public CSV-style read endpoints. The timestamp is used as a
+      // cache-buster so discovery does not repeatedly receive old data.
+      const urls = [
+        CSV_URL + "&t=" + Date.now(),
+        "https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/gviz/tq?tqx=out:csv&t=" + Date.now()
+      ];
+
+      let lastError = null;
+
+      for (let index = 0; index < urls.length; index++) {
+        try {
+          const response = await fetch(urls[index], {
+            cache: "no-store",
+            redirect: "follow"
+          });
+
+          dlog("SHEET #" + (index + 1) + " HTTP " + response.status);
+
+          if (!response.ok) {
+            throw Error("Sheet HTTP " + response.status);
+          }
+
+          const text = await response.text();
+          const head = text.slice(0, 700).toLowerCase();
+
+          if (/<html|google sheets|sign in|accounts.google.com/.test(head)) {
+            throw Error("Sheet endpoint returned a Google/HTML page instead of CSV");
+          }
+
+          if (!text.trim()) {
+            throw Error("Sheet CSV is empty");
+          }
+
+          const rows = parseCSV(text);
+          const rawHeader = rows.shift() || [];
+          const headers = rawHeader.map(norm);
+          const roomIndex = col(headers, ["room", "room name", "roomname"]);
+          const peerIndex = col(headers, ["peer", "peer id", "peerid"]);
+          const typeIndex = col(headers, ["type", "message type", "signal type"]);
+          const payloadIndex = col(headers, ["payload", "payload ", "payLoad"]);
+          const timestampIndex = col(headers, ["timestamp", "timestamp ", "time", "date", "date/time", "date time"]);
+
+          if ([roomIndex, peerIndex, typeIndex, payloadIndex].some(index => index < 0)) {
+            throw Error("Sheet columns not found: " + headers.join(" | "));
+          }
+
+          return {
+            rows,
+            ri: roomIndex,
+            pi: peerIndex,
+            ti: typeIndex,
+            xi: payloadIndex,
+            tsi: timestampIndex >= 0 ? timestampIndex : 0
+          };
+        } catch (error) {
+          lastError = error;
+          dlog("SHEET #" + (index + 1) + " FAILED: " + error.message);
+        }
+      }
+
+      throw lastError || Error("Sheet unavailable");
+    }
+
+    function rowTime(row, sheet) {
+      const raw = String(row[sheet.tsi] || row[0] || "").trim();
+      const timestamp = Date.parse(raw);
+      return Number.isFinite(timestamp) ? timestamp : 0;
+    }
+
+    /* ----------------------------------------------------------------------
+       FIND UNANSWERED OFFERS
+
+       A room is "waiting" only while its offer has not been answered.
+       The current implementation deliberately keeps a 10-second discovery
+       window, matching the existing UI text and behavior.
+    ---------------------------------------------------------------------- */
+
+    async function waitingOffers(sheet) {
+      const s = sheet || await readSheet();
+      const output = [];
+      const rooms = new Set();
+      const now = Date.now();
+      const windowMs = 10000;
+
+      for (let i = s.rows.length - 1; i >= 0; i--) {
+        const row = s.rows[i];
+        const type = norm(row[s.ti]);
+        const payload = String(row[s.xi] || "").trim();
+        const roomName = String(row[s.ri] || "").trim();
+        const hostPeer = String(row[s.pi] || "").trim();
+        const timestamp = rowTime(row, s);
+
+        if (type !== "offer" || !payload || !roomName) continue;
+
+        // Only recent offers are displayed in the current waiting-room UI.
+        if (!timestamp || now - timestamp > windowMs || timestamp - now > 2000) {
+          dlog(
+            "OFFER row " + (i + 2) +
+            " outside 10-second window: " +
+            String(row[s.tsi] || row[0] || "")
+          );
+          continue;
+        }
+
+        const decodedOffer = decodeSignal(payload);
+        const offerCallId = decodedOffer.callId;
+        let answered = false;
+
+        // Search later rows for an answer to this exact offer.
+        for (let j = i + 1; j < s.rows.length; j++) {
+          const answerRow = s.rows[j];
+          const answerType = norm(answerRow[s.ti]);
+          const answerPayload = String(answerRow[s.xi] || "").trim();
+          const answerRoom = String(answerRow[s.ri] || "").trim();
+          const answerPeer = String(answerRow[s.pi] || "").trim();
+
+          if (
+            answerType !== "answer" ||
+            !answerPayload ||
+            norm(answerRoom) !== norm(roomName) ||
+            answerPeer === hostPeer
+          ) {
+            continue;
+          }
+
+          const decodedAnswer = decodeSignal(answerPayload);
+
+          if (offerCallId) {
+            if (decodedAnswer.callId && decodedAnswer.callId === offerCallId) {
+              answered = true;
+              break;
+            }
+          } else if (!decodedAnswer.callId && answerPeer !== hostPeer) {
+            // Legacy offer/answer matching for rows created before callId was used.
+            answered = true;
+            break;
+          }
+        }
+
+        if (answered) {
+          dlog("OFFER row " + (i + 2) + " already answered");
+          continue;
+        }
+
+        // Show only the newest unanswered offer for each room.
+        const roomKey = norm(roomName);
+        if (rooms.has(roomKey)) continue;
+
+        const offer = {
+          room: roomName,
+          peer: hostPeer,
+          type: String(row[s.ti] || "").trim(),
+          payload,
+          row: i + 2,
+          timestamp: String(row[s.tsi] || row[0] || ""),
+          callId: offerCallId
+        };
+
+        rooms.add(roomKey);
+        output.push(offer);
+
+        dlog(
+          "ANSWER-WAITING OFFER: room=" + roomName +
+          " row=" + offer.row +
+          (offerCallId ? " callId=" + offerCallId : " legacy")
+        );
+      }
+
+      return output;
+    }
+
+    async function latestWaitingOffer() {
+      const offers = await waitingOffers();
+      const offer = offers[0] || null;
+      dlog(
+        offer
+          ? "LATEST ANSWER-WAITING OFFER: room=" + offer.room + " row=" + offer.row
+          : "LATEST ANSWER-WAITING OFFER: none"
+      );
+      return offer;
+    }
+
+    async function latestOffer() {
+      return await latestWaitingOffer();
+    }
+
+    async function offerForRoom(code) {
+      const offers = await waitingOffers();
+      return offers.find(offer => norm(offer.room) === norm(code)) || null;
+    }
+
+    async function getSignals() {
+      const sheet = await readSheet();
+      const wantedRoom = norm(room());
+
+      return sheet.rows
+        .filter(row => norm(row[sheet.ri]) === wantedRoom)
+        .map(row => ({
+          peer: row[sheet.pi] || "",
+          type: row[sheet.ti] || "",
+          payload: row[sheet.xi] || "",
+          timestamp: row[sheet.tsi] || row[0] || ""
+        }));
+    }
+
+    /* ----------------------------------------------------------------------
+       WAITING-ROOM DISCOVERY
+
+       Other browsers cannot see the host's local WebRTC state. They discover
+       hosted rooms only after the offer becomes visible in the Sheet.
+
+       The Sheet is therefore re-read every 1.8 seconds while discovery is
+       active. This keeps the current behavior unchanged.
+    ---------------------------------------------------------------------- */
+
+    async function loadActiveRooms() {
+      if (discoveryBusy) return null;
+      discoveryBusy = true;
+
+      const box = $("rooms");
+      const info = $("roomInfo");
+
+      try {
+        const sheet = await readSheet();
+        const list = await waitingOffers(sheet);
+
+        box.innerHTML = "";
+
+        if (!list.length) {
+          box.innerHTML = '<div class="empty">No recent call waiting for an answer.</div>';
+          info.textContent = "No unanswered offers in last 10 seconds";
+          return null;
+        }
+
+        for (const offer of list) {
+          const button = document.createElement("button");
+          button.textContent = offer.room;
+          button.title =
+            "Waiting for answer · row " +
+            offer.row +
+            (offer.timestamp ? " · " + offer.timestamp : "");
+
+          button.onclick = () => {
+            $("room").value = offer.room;
+            callId = offer.callId || "";
+            log("Selected room: " + offer.room);
+            dlog("Selected callId=" + (offer.callId || "legacy"));
+          };
+
+          box.appendChild(button);
+        }
+
+        info.textContent =
+          list.length + " recent call" + (list.length === 1 ? "" : "s") +
+          " waiting for answer";
+
+        return list;
+      } catch (error) {
+        box.innerHTML = '<div class="empty">Could not read waiting calls.</div>';
+        info.textContent = "Sheet unavailable";
+        dlog("DISCOVERY ERROR: " + error.message);
+        log("Answer-waiting discovery error: " + error.message);
+        return null;
+      } finally {
+        discoveryBusy = false;
+      }
+    }
+
+    function startDiscovery() {
+      if (discoveryPoller) return;
+      loadActiveRooms();
+      discoveryPoller = setInterval(() => {
+        if (document.visibilityState !== "hidden") {
+          loadActiveRooms();
+        }
+      }, 1800);
+    }
+
+    function stopDiscovery() {
+      if (discoveryPoller) {
+        clearInterval(discoveryPoller);
+        discoveryPoller = null;
+      }
+    }
+
+    /* ----------------------------------------------------------------------
+       WEBRTC DATA CHANNEL / CALL CONTROL
+    ---------------------------------------------------------------------- */
+
+    function setupDC(channel) {
+      dc = channel;
+
+      dc.onopen = () => {
+        log("DataChannel OPEN");
+        setState("connected");
+        stopPolling();
+        stopDiscovery();
+        if (outgoingRinging) setVoice("📞 Calling — ringing peer");
+        updateCallButtons();
+      };
+
+      dc.onmessage = event => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.kind === "call") handleCall(message);
+        } catch (error) {
+          log("DataChannel message error: " + error.message);
+        }
+      };
+
+      dc.onclose = () => {
+        log("DataChannel CLOSED");
+        if (pc && pc.connectionState !== "closed") {
+          setState(pc.connectionState);
+        }
+      };
+    }
+
+    function sendCall(type) {
+      if (!dc || dc.readyState !== "open") {
+        log("DataChannel not open");
+        return false;
+      }
+
+      try {
+        dc.send(JSON.stringify({
+          kind: "call",
+          type,
+          from: peer,
+          time: Date.now()
+        }));
+        return true;
+      } catch (error) {
+        log("Call signaling error: " + error.message);
+        return false;
+      }
+    }
+
+    /* ----------------------------------------------------------------------
+       RTCPeerConnection
+    ---------------------------------------------------------------------- */
+
+    function createPC() {
+      if (pc) {
+        try { pc.close(); } catch (error) {}
+      }
+
+      pc = new RTCPeerConnection(ICE);
+      const transceiver = pc.addTransceiver("audio", { direction: "sendrecv" });
+      audioSender = transceiver.sender;
+
+      pc.onconnectionstatechange = () => {
+        const state = pc.connectionState;
+        setState(state);
+
+        if (state === "connected") {
+          stopPolling();
+          stopDiscovery();
+          startStats();
+        }
+
+        if (state === "failed" || state === "closed") {
+          setVoice("P2P connection failed");
+          stopStats();
+          cleanupCall(false);
+        }
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        const state = pc.iceConnectionState;
+        setIce(state);
+
+        if (state === "failed" || state === "disconnected") {
+          setVoice("ICE connectivity " + state + " — check both networks");
+        }
+      };
+
+      pc.onicegatheringstatechange = () => {
+        log("ICE gathering: " + pc.iceGatheringState);
+      };
+
+      pc.ondatachannel = event => setupDC(event.channel);
+
+      pc.ontrack = event => {
+        if (!remoteStream.getTracks().includes(event.track)) {
+          remoteStream.addTrack(event.track);
+        }
+
+        $("remoteAudio").srcObject = remoteStream;
+        $("playBtn").disabled = false;
+        $("remoteAudio").play().catch(() => {});
+      };
+    }
+
+    async function enableLocalAudio() {
+      try {
+        if (localStream) return true;
+
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+
+        const track = localStream.getAudioTracks()[0];
+        if (!audioSender) throw Error("Audio sender unavailable");
+
+        await audioSender.replaceTrack(track);
+        log("LOCAL AUDIO ATTACHED: " + (track.label || "default microphone"));
+        return true;
+      } catch (error) {
+        log("Microphone error: " + error.name + ": " + error.message);
+        return false;
+      }
+    }
+
+    function updateCallButtons() {
+      const ready = !!dc && dc.readyState === "open";
+      $("callBtn").disabled = !ready || callActive || incoming || outgoingRinging;
+      $("acceptBtn").disabled = !incoming;
+      $("declineBtn").disabled = !incoming;
+      $("muteBtn").disabled = !callActive;
+      $("hangupBtn").disabled = !callActive && !outgoingRinging;
+    }
+
+    function startCall() {
+      unlockAudio();
+
+      if (!dc || dc.readyState !== "open") {
+        setVoice("Connect to a peer first");
+        return;
+      }
+
+      outgoingRinging = true;
+      setVoice("📞 Calling — ringing peer");
+      updateCallButtons();
+      sendCall("ring");
+      startRing();
+
+      ringTimeout = setTimeout(() => {
+        if (outgoingRinging) {
+          outgoingRinging = false;
+          stopRing();
+          setVoice("No answer");
+          updateCallButtons();
+        }
+      }, 45000);
+    }
+
+    function handleCall(message) {
+      if (message.from === peer) return;
+
+      if (message.type === "ring") {
+        if (callActive || incoming || outgoingRinging) {
+          sendCall("busy");
+          return;
+        }
+
+        incoming = true;
+        setVoice("📞 Incoming call");
+        $("incomingBox").textContent = "Incoming call — press Accept or Decline";
+        startRing();
+        updateCallButtons();
+      } else if (message.type === "accept") {
+        stopRing();
+        outgoingRinging = false;
+        callActive = true;
+        setVoice("Live voice call");
+        updateCallButtons();
+      } else if (message.type === "decline") {
+        stopRing();
+        outgoingRinging = false;
+        setVoice("Call declined");
+        updateCallButtons();
+      } else if (message.type === "busy") {
+        stopRing();
+        outgoingRinging = false;
+        setVoice("Peer busy");
+        updateCallButtons();
+      } else if (message.type === "hangup") {
+        cleanupCall(false);
+        setVoice("Peer hung up");
+      }
+    }
+
+    async function acceptCall() {
+      unlockAudio();
+      if (!incoming) return;
+
+      stopRing();
+      incoming = false;
+      $("incomingBox").textContent = "";
+      setVoice("Connecting microphone…");
+
+      if (await enableLocalAudio()) {
+        callActive = true;
+        setVoice("Live voice call");
+        sendCall("accept");
+      } else {
+        sendCall("decline");
+        setVoice("Microphone unavailable");
+      }
+
+      updateCallButtons();
+    }
+
+    function declineCall() {
+      stopRing();
+      incoming = false;
+      $("incomingBox").textContent = "";
+      sendCall("decline");
+      setVoice("Call declined");
+      updateCallButtons();
+    }
+
+    function toggleMute() {
+      if (!localStream) return;
+
+      const track = localStream.getAudioTracks()[0];
+      track.enabled = !track.enabled;
+      $("muteBtn").textContent = track.enabled ? "🔇 Mute" : "🔊 Unmute";
+      setVoice(track.enabled ? "Live voice call" : "Call muted");
+      $("txState").textContent = track.enabled ? "audio flowing" : "muted";
+    }
+
+    function cleanupCall(notify) {
+      stopRing();
+      if (notify) sendCall("hangup");
+
+      if (audioSender) {
+        audioSender.replaceTrack(null).catch(() => {});
+      }
+
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+
+      callActive = false;
+      incoming = false;
+      outgoingRinging = false;
+      $("callBtn").disabled = false;
+      $("muteBtn").disabled = true;
+      $("hangupBtn").disabled = true;
+      $("acceptBtn").disabled = true;
+      $("declineBtn").disabled = true;
+      $("incomingBox").textContent = "";
+      $("muteBtn").textContent = "🔇 Mute";
+      $("txState").textContent = "idle";
+      stopStats();
+      updateCallButtons();
+    }
+
+    function hangup(notify = true) {
+      cleanupCall(notify);
+      setVoice("Call idle");
+    }
+
+    /* ----------------------------------------------------------------------
+       AUDIO OUTPUT / EARPIECE
+    ---------------------------------------------------------------------- */
+
+    async function exposeAudioOutputs() {
+      try {
+        const permissionStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        permissionStream.getTracks().forEach(track => track.stop());
+      } catch (error) {}
+
+      try {
+        return (await navigator.mediaDevices.enumerateDevices())
+          .filter(device => device.kind === "audiooutput");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    async function populateOutputs(devices) {
+      const select = $("audioOutput");
+      select.innerHTML = "";
+
+      if (!devices.length) {
+        select.style.display = "none";
+        return;
+      }
+
+      for (const device of devices) {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || "Audio output";
+        select.appendChild(option);
+      }
+
+      select.style.display = "block";
+      select.onchange = () => applyAudioOutput(select.value);
+    }
+
+    async function applyAudioOutput(id) {
+      const audio = $("remoteAudio");
+      if (!audio.setSinkId) return false;
+
+      try {
+        await audio.setSinkId(id);
+        audioOutputId = id;
+        await audio.play().catch(() => {});
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function playRemote() {
+      $("remoteAudio").play().catch(() => {});
+    }
+
+    async function useEarpiece() {
+      unlockAudio();
+      const devices = await exposeAudioOutputs();
+      await populateOutputs(devices);
+
+      const earpiece = devices.find(device =>
+        /(earpiece|receiver|handset|phone|communications)/i.test(device.label || "")
+      );
+
+      if (earpiece && await applyAudioOutput(earpiece.deviceId)) return;
+      if (await applyAudioOutput("communications")) return;
+      if (await applyAudioOutput("default")) return;
+
+      setVoice("Use Android phone audio controls for earpiece");
+    }
+
+    /* ----------------------------------------------------------------------
+       WEBRTC STATISTICS
+    ---------------------------------------------------------------------- */
+
+    async function collectStats() {
+      if (!pc) return;
+
+      try {
+        const stats = await pc.getStats();
+        let tx = null;
+        let rx = null;
+        let lost = 0;
+        let jitter = 0;
+        let rtt = 0;
+
+        stats.forEach(report => {
+          if (
+            report.type === "outbound-rtp" &&
+            (report.kind === "audio" || report.mediaType === "audio")
+          ) {
+            tx = report;
+          }
+
+          if (
+            report.type === "inbound-rtp" &&
+            (report.kind === "audio" || report.mediaType === "audio")
+          ) {
+            rx = report;
+          }
+
+          if (
+            report.type === "remote-inbound-rtp" &&
+            (report.kind === "audio" || report.mediaType === "audio") &&
+            report.roundTripTime != null
+          ) {
+            rtt = report.roundTripTime;
+          }
+        });
+
+        if (tx) {
+          $("txState").textContent = tx.bytesSent > 0 ? "audio flowing" : "waiting";
+        }
+
+        if (rx) {
+          $("rxState").textContent = rx.bytesReceived > 0 ? "audio flowing" : "waiting";
+          lost = rx.packetsLost || 0;
+          jitter = (rx.jitter || 0) * 1000;
+        }
+
+        $("lossState").textContent = String(lost);
+        $("jitterState").textContent = jitter.toFixed(1) + " ms";
+        $("rttState").textContent = (rtt * 1000).toFixed(1) + " ms";
+      } catch (error) {}
+    }
+
+    function startStats() {
+      stopStats();
+      statsTimer = setInterval(collectStats, 2000);
+      collectStats();
+    }
+
+    function stopStats() {
+      if (statsTimer) {
+        clearInterval(statsTimer);
+        statsTimer = null;
+      }
+    }
+
+    /* ----------------------------------------------------------------------
+       GOOGLE SHEET POLLING FOR ANSWER
+    ---------------------------------------------------------------------- */
+
+    function startPolling() {
+      stopPolling();
+      poller = setInterval(pollSignals, 1800);
+      pollSignals();
+    }
+
+    function stopPolling() {
+      if (poller) {
+        clearInterval(poller);
+        poller = null;
+        log("Google Sheet polling stopped — P2P connected");
+      }
+    }
+
+    async function pollSignals() {
+      if (!pc || pc.connectionState === "connected") return;
+
+      try {
+        const rows = await getSignals();
+
+        for (const signal of rows) {
+          const key = signal.timestamp + "|" + signal.peer + "|" + signal.type;
+          if (seen.has(key) || signal.peer === peer) continue;
+          seen.add(key);
+
+          if (
+            role === "host" &&
+            norm(signal.type) === "answer" &&
+            !pc.currentRemoteDescription
+          ) {
+            const decoded = decodeSignal(signal.payload);
+
+            // Never apply an answer for a different call attempt.
+            if (callId && decoded.callId && decoded.callId !== callId) {
+              dlog("Ignoring answer for different callId=" + decoded.callId);
+              continue;
+            }
+
+            const sdp = decoded.sdp || signal.payload;
+            await pc.setRemoteDescription(sdp);
+            log("REMOTE ANSWER APPLIED");
+            role = "host-connected";
+            loadActiveRooms();
+          }
+        }
+      } catch (error) {
+        log("Polling error: " + error.message);
+      }
+    }
+
+    async function waitICE() {
+      if (pc.iceGatheringState === "complete") return;
+
+      await new Promise(resolve => {
+        const timer = setTimeout(resolve, 12000);
+        const handler = () => {
+          if (pc.iceGatheringState === "complete") {
+            clearTimeout(timer);
+            pc.removeEventListener("icegatheringstatechange", handler);
+            resolve();
+          }
+        };
+        pc.addEventListener("icegatheringstatechange", handler);
+      });
+    }
+
+    /* ----------------------------------------------------------------------
+       HOST
+       ----------------------------------------------------------------------
+
+       The host writes an "offer" row. There is intentionally no separate
+       "waiting" row: waiting is inferred from the lack of a matching answer.
+    ---------------------------------------------------------------------- */
+
+    async function host() {
+      unlockAudio();
+
+      if (role || pc) {
+        log("Already hosting or connected");
+        return;
+      }
+
+      if (!room()) return alert("Enter a room code");
+
+      role = "host";
+      callId = randomCallId();
+      seen = new Set();
+
+      createPC();
+      setupDC(pc.createDataChannel("chat"));
+
+      await pc.setLocalDescription(await pc.createOffer());
+      await waitICE();
+
+      // Google Form POST -> Google Sheet "offer" row.
+      await publish("offer", encodeSignal(callId, pc.localDescription));
+
+      setState("waiting-answer");
+      startPolling();
+      startDiscovery();
+    }
+
+    /* ----------------------------------------------------------------------
+       JOIN
+       ----------------------------------------------------------------------
+
+       The guest reads an unanswered offer, creates an answer, and writes an
+       "answer" row back through the same Google Form.
+    ---------------------------------------------------------------------- */
+
+    async function join(offerOverride = null) {
+      unlockAudio();
+
+      if (role || pc) {
+        log("Already connected/hosting");
+        return;
+      }
+
+      let offer = offerOverride;
+
+      if (!offer && room()) {
+        offer = await offerForRoom(room());
+      }
+
+      if (!offer && !room()) {
+        offer = await latestOffer();
+      }
+
+      if (!offer) {
+        log("No recent call waiting for an answer found in Sheet");
+        return;
+      }
+
+      const decoded = decodeSignal(offer.payload);
+      if (!decoded.sdp) {
+        log("Invalid offer payload in Sheet");
+        return;
+      }
+
+      role = "guest";
+      $("room").value = offer.room;
+      callId = offer.callId || decoded.callId || "";
+
+      createPC();
+      await pc.setRemoteDescription(decoded.sdp);
+      await pc.setLocalDescription(await pc.createAnswer());
+      await waitICE();
+
+      // Google Form POST -> Google Sheet "answer" row.
+      await publish("answer", encodeSignal(callId, pc.localDescription));
+
+      setState("waiting-connect");
+      startPolling();
+      stopDiscovery();
+    }
+
+    function disconnect() {
+      stopPolling();
+      stopDiscovery();
+      cleanupCall(false);
+
+      try { dc?.close(); } catch (error) {}
+      try { pc?.close(); } catch (error) {}
+
+      pc = null;
+      dc = null;
+      audioSender = null;
+      role = "";
+      callId = "";
+
+      setState("disconnected");
+      setIce("closed");
+      loadActiveRooms().catch(() => {});
+    }
+
+    function makeRoomCode() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let output = "";
+
+      if (crypto.getRandomValues) {
+        const values = new Uint32Array(6);
+        crypto.getRandomValues(values);
+        for (const value of values) {
+          output += chars[value % chars.length];
+        }
+      } else {
+        for (let i = 0; i < 6; i++) {
+          output += chars[Math.floor(Math.random() * chars.length)];
+        }
+      }
+
+      return output;
+    }
+
+    /* ----------------------------------------------------------------------
+       PAGE LOAD
+
+       Existing unanswered Sheet offers are shown first. If at least one is
+       found, automatic hosting is skipped. Otherwise a new room is generated
+       and auto-hosting begins.
+    ---------------------------------------------------------------------- */
+
+    window.addEventListener("load", async () => {
+      $("formUrl").value = FORM_URL;
+      $("csvUrl").value = CSV_URL;
+      $("peer").textContent = peer;
+      $("remoteAudio").srcObject = remoteStream;
+      $("remoteAudio").addEventListener("loadedmetadata", () => playRemote().catch(() => {}));
+      setIce("new");
+
+      dlog("PAGE LOAD · show unanswered Sheet offers from last 10 seconds before auto-host");
+
+      try {
+        const waiting = await waitingOffers();
+
+        if (waiting.length) {
+          const box = $("rooms");
+          const info = $("roomInfo");
+          box.innerHTML = "";
+
+          for (const offer of waiting) {
+            const button = document.createElement("button");
+            button.textContent = offer.room;
+            button.title =
+              "Waiting for answer · row " +
+              offer.row +
+              (offer.timestamp ? " · " + offer.timestamp : "");
+
+            button.onclick = () => {
+              $("room").value = offer.room;
+              callId = offer.callId || "";
+              log("Selected room: " + offer.room);
+              dlog("Selected callId=" + (offer.callId || "legacy"));
+            };
+
+            box.appendChild(button);
+          }
+
+          $("room").value = waiting[0].room;
+          callId = waiting[0].callId || "";
+          info.textContent =
+            waiting.length +
+            " recent call" +
+            (waiting.length === 1 ? "" : "s") +
+            " waiting for answer";
+
+          dlog(
+            "AUTO-HOST SKIPPED → " +
+            waiting.length +
+            " recent unanswered Sheet room(s); latest=" +
+            waiting[0].room
+          );
+
+          startDiscovery();
+          return;
+        }
+      } catch (error) {
+        dlog("INITIAL WAITING-CHECK FAILED: " + error.message);
+      }
+
+      if (!role && !pc && !room()) {
+        const code = makeRoomCode();
+        $("room").value = code;
+        dlog("AUTO-HOST → no recent unanswered offer; fresh room=" + code);
+        host().catch(error => log("Auto-host error: " + error.message));
+      }
+
+      startDiscovery();
+    });
+  </script>
+</body>
+</html>
