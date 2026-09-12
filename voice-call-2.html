@@ -4,72 +4,22 @@ const BASE='https://raw.githubusercontent.com/psach/psach.github.io/67727a14a033
 const r=await fetch(BASE+'?auto='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('Base voice-call-2 HTTP '+r.status);let h=await r.text();
 const patch=`<script>
 (function(){
-const DISCOVER_CSV='https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv';
-const DISCOVER_WINDOW=5*60*1000;
-let discoveryTimer=null,autoHostTimer=null,discoveryBusy=false,autoHostStarted=false;
-function d$(id){return document.getElementById(id)}
-function dnorm(v){return String(v??'').replace(/^\\uFEFF/,'').trim().toLowerCase().replace(/\\s+/g,' ')}
-function dparseCSV(t){let a=[],r=[],c='',q=false;for(let i=0;i<t.length;i++){const x=t[i],n=t[i+1];if(q){if(x==='"'&&n==='"'){c+='"';i++}else if(x==='"')q=false;else c+=x}else if(x==='"')q=true;else if(x===','){r.push(c);c=''}else if(x==='\\n'){r.push(c);a.push(r);r=[];c=''}else if(x!=='\\r')c+=x}if(c||r.length){r.push(c);a.push(r)}return a}
-function dcol(h,names){for(const n of names){const i=h.indexOf(dnorm(n));if(i>=0)return i}return -1}
-async function readHosts(){
- const z=await fetch(DISCOVER_CSV+'&t='+Date.now(),{cache:'no-store'});if(!z.ok)throw Error('Google Sheet HTTP '+z.status);
- const rows=dparseCSV(await z.text());if(rows.length<2)return[];const h=rows[0].map(dnorm);
- const ri=dcol(h,['room','room name','roomname']),pi=dcol(h,['peer','peer id','peerid']),ti=dcol(h,['type','message type','signal type']),xi=dcol(h,['payload','payload ','payLoad']),tsi=dcol(h,['timestamp','time','date','date/time','date time']);
- if([ri,pi,ti,xi].some(i=>i<0))throw Error('Sheet columns not found');
- const now=Date.now(),offers=[];
- for(let i=1;i<rows.length;i++){
-   const row=rows[i],type=dnorm(row[ti]),room=String(row[ri]||'').trim(),peer=String(row[pi]||'').trim(),payload=String(row[xi]||'').trim();
-   if(type!=='offer'||!room||!payload)continue;
-   const rawTime=String((tsi>=0?row[tsi]:row[0])||'').trim(),tm=Date.parse(rawTime);
-   if(tm && (now-tm>DISCOVER_WINDOW || tm-now>15000))continue;
-   let answered=false;
-   for(let j=i+1;j<rows.length;j++){
-     const q=rows[j];if(dnorm(q[ti])!=='answer')continue;
-     if(dnorm(q[ri])!==dnorm(room))continue;
-     const qp=String(q[xi]||'').trim(),qpeer=String(q[pi]||'').trim();if(qpeer===peer||!qp)continue;
-     answered=true;break;
-   }
-   if(answered)continue;
-   if(offers.some(o=>dnorm(o.room)===dnorm(room)))continue;
-   offers.push({room,peer,payload,timestamp:rawTime});
- }
- return offers.reverse();
-}
-function addDiscoveryUI(){
- if(d$('autoDiscoveryCard'))return;
- const card=document.createElement('div');card.id='autoDiscoveryCard';card.style.cssText='background:#111a24e8;border:1px solid #2b3a4b;border-radius:16px;padding:14px;margin:12px 0;font-family:system-ui;color:#eef3f8';
- card.innerHTML='<div style="font-weight:700;margin-bottom:6px">Automatic host discovery</div><div id="autoDiscoveryStatus" style="font-size:12px;color:#9eacba">Searching Google Sheet…</div><div id="autoHosts" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>';
- const main=document.querySelector('main');if(main)main.insertBefore(card,main.firstElementChild);else document.body.insertBefore(card,document.body.firstChild);
-}
-function discoveryStatus(s){const x=d$('autoDiscoveryStatus');if(x)x.textContent=s;try{log('[Auto discovery] '+s)}catch(e){}}
-function showHosts(list){
- const box=d$('autoHosts');if(!box)return;box.innerHTML='';
- const usable=list.filter(o=>typeof peer==='undefined'||o.peer!==peer);
- if(!usable.length){box.innerHTML='<span style="font-size:12px;color:#8fa0b0">No host currently waiting.</span>';return}
- usable.forEach(o=>{const b=document.createElement('button');b.textContent='Join host '+o.room;b.style.cssText='padding:8px 11px;border-radius:9px;border:1px solid #405369;background:#13202d;color:#eef3f8;cursor:pointer';b.onclick=async()=>{try{if(typeof role!=='undefined'&&role)return;document.getElementById('room').value=o.room;discoveryStatus('Joining host '+o.room+'…');await join()}catch(e){discoveryStatus('Join failed: '+e.message)}};box.appendChild(b)});
-}
-async function refreshHosts(){if(discoveryBusy)return;discoveryBusy=true;try{const list=await readHosts();showHosts(list);if(typeof role!=='undefined'&&role){discoveryStatus(role==='host'?'Hosting room '+(typeof room==='function'?room():''):'Connected');return}if(list.length){discoveryStatus(list.length+' host'+(list.length===1?'':'s')+' waiting')}else discoveryStatus('No host found. Auto-host will start shortly.')}catch(e){discoveryStatus('Read error: '+e.message)}finally{discoveryBusy=false}}
-async function ensureAutoHost(){
- if(autoHostStarted||typeof role==='undefined'||typeof pc==='undefined'||role||pc)return;
- autoHostStarted=true;try{
-   const list=await readHosts();showHosts(list);
-   if(list.length){discoveryStatus('Host found; waiting for you to choose Join');autoHostStarted=false;return}
-   if(typeof makeRoomCode==='function')document.getElementById('room').value=makeRoomCode();
-   discoveryStatus('No host found — creating host automatically…');
-   await host();
-   discoveryStatus('Hosting room '+(typeof room==='function'?room():document.getElementById('room').value));
- }catch(e){autoHostStarted=false;discoveryStatus('Auto-host failed: '+e.message)}
-}
-function startAutoDiscovery(){
- addDiscoveryUI();
- refreshHosts();
- setTimeout(ensureAutoHost,3500);
- discoveryTimer=setInterval(()=>{if(document.visibilityState!=='hidden'){refreshHosts();if(!role&&!pc)ensureAutoHost()}},2000);
-}
-window.addEventListener('load',()=>setTimeout(startAutoDiscovery,500));
-})();
-<\/script>`;
-h=h.replace('</body>',patch+'</body>');
-document.open();document.write(h);document.close();
+const CSV='https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv';
+const WIN=10*60*1000;let busy=false,autoStarted=false;
+const $=id=>document.getElementById(id);
+const norm=v=>String(v??'').trim().toLowerCase().replace(/\\s+/g,' ');
+function csv(t){let a=[],r=[],c='',q=0;for(let i=0;i<t.length;i++){let x=t[i],n=t[i+1];if(q){if(x==='"'&&n==='"'){c+='"';i++}else if(x==='"')q=0;else c+=x}else if(x==='"')q=1;else if(x===','){r.push(c);c=''}else if(x==='\\n'){r.push(c);a.push(r);r=[];c=''}else if(x!=='\\r')c+=x}if(c||r.length){r.push(c);a.push(r)}return a}
+function col(h,n){for(const x of n){let i=h.indexOf(norm(x));if(i>=0)return i}return -1}
+async function hosts(){const z=await fetch(CSV+'&t='+Date.now(),{cache:'no-store'});if(!z.ok)throw Error('Sheet HTTP '+z.status);const rows=csv(await z.text());if(rows.length<2)return[];const h=rows[0].map(norm),ri=col(h,['room']),pi=col(h,['peer']),ti=col(h,['type']),xi=col(h,['payload','payLoad']),tsi=col(h,['timestamp','time']);if([ri,pi,ti,xi].some(x=>x<0))throw Error('Sheet columns not found');const now=Date.now(),out=[];for(let i=1;i<rows.length;i++){let a=rows[i],ty=norm(a[ti]),rm=String(a[ri]||'').trim(),p=String(a[pi]||'').trim(),pl=String(a[xi]||'').trim();if(ty!=='offer'||!rm||!pl)continue;let tm=Date.parse(String((tsi>=0?a[tsi]:a[0])||''));if(tm&&(now-tm>WIN||tm-now>15000))continue;let answered=false;for(let j=i+1;j<rows.length;j++){let q=rows[j];if(norm(q[ti])==='answer'&&norm(q[ri])===norm(rm)&&String(q[pi]||'').trim()!==p&&String(q[xi]||'').trim()){answered=true;break}}if(!answered&&!out.some(o=>norm(o.room)===norm(rm)))out.push({room:rm,peer:p})}return out.reverse()}
+function ui(){if($('autoDiscoveryCard'))return;let d=document.createElement('div');d.id='autoDiscoveryCard';d.style.cssText='background:#111a24e8;border:1px solid #2b3a4b;border-radius:16px;padding:14px;margin:12px 0;font-family:system-ui;color:#eef3f8';d.innerHTML='<b>Automatic host discovery</b><div id="autoDiscoveryStatus" style="font-size:12px;color:#9eacba;margin-top:6px">Starting…</div><div id="autoHosts" style="margin-top:8px"></div>';let m=document.querySelector('main');(m||document.body).insertBefore(d,m?m.firstElementChild:document.body.firstChild)}
+function status(s){if($('autoDiscoveryStatus'))$('autoDiscoveryStatus').textContent=s;try{log('[Auto] '+s)}catch(e){}}
+function show(a){let b=$('autoHosts');if(!b)return;b.innerHTML='';let me=typeof peer==='undefined'?null:peer,a2=a.filter(x=>x.peer!==me);if(!a2.length){b.textContent='No host currently waiting.';return}a2.forEach(x=>{let bt=document.createElement('button');bt.textContent='Join host '+x.room;bt.onclick=async()=>{if(typeof role!=='undefined'&&role)return;$('room').value=x.room;status('Joining '+x.room+'…');await join()};b.appendChild(bt)})}
+async function refresh(){if(busy)return;busy=true;try{let a=await hosts();show(a);if(typeof role!=='undefined'&&role){status(role==='host'?'Hosting '+room():'Connected');return}status(a.length?a.length+' host(s) waiting':'No host found; automatic host will start');}catch(e){status('Read error: '+e.message)}finally{busy=false}}
+function newRoom(){return 'AUTO-'+Math.random().toString(36).slice(2,8).toUpperCase()}
+async function autoHost(){if(autoStarted||typeof role==='undefined'||role||typeof pc==='undefined'||pc)return;autoStarted=true;try{let a=await hosts();show(a);if(a.length){status('Host found; tap Join');autoStarted=false;return}let r=newRoom();$('room').value=r;status('Creating host '+r+'…');await host();status('Hosting '+r)}catch(e){autoStarted=false;status('Auto-host failed: '+e.message);try{addMessage('system','Auto-host failed: '+(e.message||e))}catch(_){}}}
+function start(){ui();refresh();setTimeout(autoHost,2500);setInterval(()=>{if(document.visibilityState!=='hidden'){refresh();if(!role&&!pc)autoHost()}},2500)}
+window.addEventListener('load',()=>setTimeout(start,300));
+})();<\/script>`;
+h=h.replace('</body>',patch+'</body>');document.open();document.write(h);document.close();
 }catch(e){document.getElementById('loading').textContent='Auto-discovery loader failed: '+e.message}})();
 </script></body></html>
