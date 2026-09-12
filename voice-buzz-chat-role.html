@@ -1,61 +1,20 @@
-<!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WebRTC Voice Call</title></head><body><script>
-(async()=>{
-  const source="https://raw.githubusercontent.com/psach/psach.github.io/ece21c3bc03ab2e1a87e5d40b0a223791cfe4f8a/voice-buzz-chat-role.html";
-  try{
-    let h=await (await fetch(source,{cache:"no-store"})).text();
-    const patch=`
-<script>
-(()=>{
-  let recovering=false, intentional=false;
-  const recover=async()=>{
-    if(recovering||intentional||typeof role==="undefined"||role!=="host")return;
-    recovering=true;
-    try{
-      if(typeof stopPolling==="function")stopPolling();
-      if(typeof stopDiscovery==="function")stopDiscovery();
-      if(typeof stopStats==="function")stopStats();
-      if(typeof stopRing==="function")stopRing();
-      if(typeof setVoice==="function")setVoice("Awaiting answer");
-      try{dc?.close()}catch(e){}
-      try{pc?.close()}catch(e){}
-      dc=null;pc=null;audioSender=null;callId="";role="";
-      if(typeof setIce==="function")setIce("new");
-      if(typeof setState==="function")setState("waiting-answer");
-      await host();
-      if(typeof setVoice==="function")setVoice("Awaiting answer");
-    }catch(e){
-      try{log("Host recovery error: "+e.message)}catch(_){ }
-      try{setVoice("Host recovery failed") }catch(_){ }
-    }finally{recovering=false}
-  };
-  const origCreatePC=createPC;
-  createPC=function(){
-    origCreatePC();
-    const old=pc&&pc.onconnectionstatechange;
-    if(pc&&old){
-      pc.onconnectionstatechange=()=>{
-        old();
-        const s=pc&&pc.connectionState;
-        if((s==="failed"||s==="closed")&&!intentional)recover();
-      };
-    }
-  };
-  const origSetupDC=setupDC;
-  setupDC=function(ch){
-    origSetupDC(ch);
-    if(dc===ch){
-      const old=dc.onclose;
-      if(old)dc.onclose=()=>{old();if(!intentional&&typeof role!=="undefined"&&role==="host")recover()};
-    }
-  };
-  const origDisconnect=disconnect;
-  disconnect=function(){intentional=true;try{origDisconnect()}finally{setTimeout(()=>{intentional=false},0)}};
-})();
-</script>`;
-    h=h.replace('</script>\n</body>',patch+'</script>\n</body>');
-    if(h===await (await fetch(source,{cache:"no-store"})).text()) throw new Error("Patch insertion failed");
-    document.open();document.write(h);document.close();
-  }catch(e){document.body.textContent="Unable to load WebRTC Voice Call: "+e.message}
-})();
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WebRTC Voice Call</title></head><body><script>
+(async()=>{try{
+const u="https://raw.githubusercontent.com/psach/psach.github.io/ece21c3bc03ab2e1a87e5d40b0a223791cfe4f8a/voice-buzz-chat-role.html";
+let h=await(await fetch(u,{cache:"no-store"})).text();
+const oldDC='''            dc.onclose=()=>{\n                log("DataChannel CLOSED");\n                if(pc&&pc.connectionState!=="closed")setState(pc.connectionState);\n                addChat("system","Peer disconnected");\n            }''';
+const newDC='''            dc.onclose=()=>{\n                log("DataChannel CLOSED");\n                if(pc&&pc.connectionState!=="closed")setState(pc.connectionState);\n                addChat("system","Peer disconnected");\n                if(role==="host"&&!intentionalDisconnect)recoverHostAwaiting();\n            }''';
+h=h.replace(oldDC,newDC);
+h=h.replace('voiceRxTimers=new Map();','voiceRxTimers=new Map(),intentionalDisconnect=false,hostRecoveryBusy=false;');
+const marker='    function enableLocalAudio';
+const recovery='''    async function recoverHostAwaiting(){\n        if(intentionalDisconnect||queryRole==="client"||hostRecoveryBusy||role!=="host")return;\n        hostRecoveryBusy=true;\n        try{\n            setVoice("Awaiting answer");\n            stopPolling();stopDiscovery();stopStats();\n            try{dc?.close()}catch(e){} try{pc?.close()}catch(e){}\n            dc=null;pc=null;audioSender=null;callId="";\n            cleanupCall(false);\n            role="";setIce("new");setState("waiting-answer");\n            await host();\n            setVoice("Awaiting answer");\n        }catch(e){log("Host recovery error: "+e.message);setVoice("Host recovery failed")}\n        finally{hostRecoveryBusy=false}\n    }\n\n''';
+h=h.replace(marker,recovery+marker);
+const oldPC='''if(s==="failed"||s==="closed"){setVoice("P2P connection failed");stopStats();cleanupCall(false)}};''';
+const newPC='''if(s==="failed"||s==="closed"){stopStats();cleanupCall(false);if(role==="host"&&!intentionalDisconnect)recoverHostAwaiting();else setVoice("P2P connection failed")}};''';
+h=h.replace(oldPC,newPC);
+h=h.replace('function disconnect(){stopPolling();stopDiscovery();cleanupCall(false);','function disconnect(){intentionalDisconnect=true;stopPolling();stopDiscovery();cleanupCall(false);');
+h=h.replace('setIce("closed");loadActiveRooms().catch(()=>{})}','setIce("closed");loadActiveRooms().catch(()=>{});setTimeout(()=>{intentionalDisconnect=false},0)}');
+if(!h.includes('id="hostBtn"')||!h.includes('recoverHostAwaiting'))throw Error("patch failed");
+document.open();document.write(h);document.close();
+}catch(e){document.body.textContent="Unable to load WebRTC Voice Call: "+e.message}})();
 </script></body></html>
