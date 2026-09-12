@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voice Call</title>
+<style>
+  :root{
+    --bg:#12151a; --panel:#1b1f27; --line:#2a2f3a; --text:#e8eaed;
+    --muted:#8b93a1; --accent:#5b8def; --accent-dim:#2e3f5c;
+    --live:#3ecf8e; --warn:#e0a640; --danger:#e0555f;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex; align-items:center; justify-content:center; min-height:100%;
+    padding:24px;
+  }
+  .card{
+    width:100%; max-width:380px; background:var(--panel); border:1px solid var(--line);
+    border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:18px;
+  }
+  .role-tag{
+    align-self:flex-start; font-size:12px; letter-spacing:.02em; color:var(--muted);
+    border:1px solid var(--line); border-radius:20px; padding:3px 10px;
+  }
+  h1{font-size:20px; margin:0; font-weight:600;}
+  .room-code{
+    font-size:34px; font-weight:700; letter-spacing:.06em; font-variant-numeric:tabular-nums;
+  }
+  .row{display:flex; gap:8px;}
+  input[type=text]{
+    flex:1; background:#11141a; border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:11px 12px; font-size:15px; min-width:0;
+  }
+  input[type=text]:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  button{
+    border:none; border-radius:10px; padding:11px 16px; font-size:15px; font-weight:600;
+    cursor:pointer; color:#fff; background:var(--accent-dim); transition:filter .15s;
+  }
+  button:hover{filter:brightness(1.15);}
+  button:active{filter:brightness(.9);}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  button.primary{background:var(--accent);}
+  button.danger{background:var(--danger);}
+  button.ghost{background:transparent; border:1px solid var(--line); color:var(--text);}
+  .status{
+    display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted);
+  }
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0;}
+  .dot.live{background:var(--live);}
+  .dot.pending{background:var(--warn);}
+  .dot.down{background:var(--danger);}
+  .controls{display:flex; gap:10px;}
+  .controls button{flex:1;}
+  small.hint{color:var(--muted); font-size:12.5px; line-height:1.5;}
+  details{color:var(--muted); font-size:12px;}
+  details summary{cursor:pointer; user-select:none;}
+  #log{
+    margin-top:6px; max-height:120px; overflow-y:auto; background:#0e1116;
+    border:1px solid var(--line); border-radius:8px; padding:8px 10px;
+    font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px; line-height:1.5;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  audio{display:none;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<div class="card" id="app">
+
+  <!-- HOST VIEW -->
+  <div id="hostView" class="hidden" style="display:flex; flex-direction:column; gap:18px;">
+    <span class="role-tag">HOST</span>
+    <div>
+      <h1>Room code</h1>
+      <div class="room-code" id="hostRoomCode">——————</div>
+    </div>
+    <div class="row">
+      <input type="text" id="shareLink" readonly>
+      <button id="copyLinkBtn">Copy link</button>
+    </div>
+    <div class="status"><span class="dot" id="hostDot"></span><span id="hostStatus">Getting microphone…</span></div>
+    <div class="controls">
+      <button id="hostMuteBtn" class="ghost" disabled>Mute</button>
+      <button id="hostOutputBtn" class="ghost" disabled>Speaker</button>
+      <button id="hostHangupBtn" class="danger" disabled>Hang up</button>
+    </div>
+    <small class="hint">Send the link above to whoever you want to call. The room stays open — after a call ends, it's ready for the next person automatically.</small>
+    <details>
+      <summary>Activity log</summary>
+      <div id="hostLog"></div>
+    </details>
+  </div>
+
+  <!-- CLIENT VIEW -->
+  <div id="clientView" class="hidden" style="display:flex; flex-direction:column; gap:18px;">
+    <span class="role-tag">JOIN CALL</span>
+    <div>
+      <h1>Enter the room code</h1>
+    </div>
+    <div class="row">
+      <input type="text" id="roomInput" placeholder="e.g. AB12CD" style="text-transform:uppercase;">
+      <button id="joinBtn" class="primary">Join</button>
+    </div>
+    <div class="status"><span class="dot" id="clientDot"></span><span id="clientStatus">Not connected</span></div>
+    <div class="controls">
+      <button id="clientMuteBtn" class="ghost" disabled>Mute</button>
+      <button id="clientOutputBtn" class="ghost" disabled>Speaker</button>
+      <button id="clientHangupBtn" class="danger" disabled>Hang up</button>
+    </div>
+    <details>
+      <summary>Activity log</summary>
+      <div id="clientLog"></div>
+    </details>
+  </div>
+
+</div>
+
+<audio id="remoteAudio" autoplay playsinline></audio>
+
+<script>
+/* ============================================================
+   CONFIG — fill these in from your Google Form
+   ============================================================
+   1. Open your form's edit link in a browser.
+   2. Click the eyeball icon (Preview), or open the public "viewform" link.
+   3. Right-click each question -> "Inspect" (or View Page Source and
+      search for `name="entry.`). Each question has an input/textarea
+      with an attribute like  name="entry.1234567890"
+   4. Copy the 4 numbers below, one per field, in this order:
+      Room, Peer, Type, PayLoad  (matching your form's question order).
+   ============================================================ */
+const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse";
+const SHEET_ID = "1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc";
+
+const ENTRY = {
+  room:    "entry.2110898792",
+  peer:    "entry.1013260375",
+  type:    "entry.1722712182",
+  payload: "entry.1320930057"
+};
+
+const POLL_MS = 1500;
+const ICE_SERVERS = [
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" }
+];
+/* Public STUN only — works when at least one side isn't behind strict
+   symmetric NAT. If calls consistently fail to connect audio, add a
+   TURN server to ICE_SERVERS (turn:host:port with username/credential). */
+
+// ---------- shared helpers ----------
+const params = new URLSearchParams(location.search);
+const role = (params.get("role") || "host").toLowerCase() === "client" ? "client" : "host";
+const remoteAudioEl = document.getElementById("remoteAudio");
+
+function randId(len){
+  return Array.from({length:len}, () => "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*36)]).join("");
+}
+
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQuotes){
+      if (c === '"'){
+        if (text[i+1] === '"'){ field += '"'; i++; } else inQuotes = false;
+      } else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\r") { /* skip */ }
+      else if (c === "\n") { row.push(field); rows.push(row); row = []; field = ""; }
+      else field += c;
+    }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+async function fetchRows(){
+  const bust = Date.now();
+  const urls = [
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&_=${bust}`,
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&_=${bust}`
+  ];
+  let lastErr;
+  for (const u of urls){
+    try {
+      const res = await fetch(u, { cache: "no-store" });
+      if (res.ok) {
+        const grid = parseCSV(await res.text());
+        if (!grid.length) return [];
+        const headers = grid[0].map(h => h.trim().toLowerCase());
+        const idx = {
+          room: headers.indexOf("room"),
+          peer: headers.indexOf("peer"),
+          type: headers.indexOf("type"),
+          payload: headers.indexOf("payload")
+        };
+        return grid.slice(1)
+          .filter(r => r.length > 1)
+          .map(r => ({
+            room: r[idx.room] || "",
+            peer: r[idx.peer] || "",
+            type: r[idx.type] || "",
+            payload: r[idx.payload] || ""
+          }));
+      }
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error("Could not read the sheet");
+}
+
+async function sendSignal(room, peer, type, payload){
+  const body = new URLSearchParams();
+  body.set(ENTRY.room, room);
+  body.set(ENTRY.peer, peer);
+  body.set(ENTRY.type, type);
+  body.set(ENTRY.payload, payload || "");
+  try {
+    await fetch(FORM_ACTION, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString()
+    });
+  } catch (e) { /* no-cors gives no visibility into failure either way */ }
+}
+
+async function getMic(){
+  return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+}
+
+function createPeerConnection(onIceCandidate, onTrack, onStateChange){
+  const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  pc.onicecandidate = (e) => { if (e.candidate) onIceCandidate(e.candidate.toJSON()); };
+  pc.ontrack = (e) => {
+    remoteAudioEl.srcObject = e.streams[0];
+    remoteAudioEl.play().catch(() => {});
+    onTrack && onTrack();
+  };
+  pc.onconnectionstatechange = () => onStateChange(pc.connectionState);
+  return pc;
+}
+
+async function setupOutputToggle(button){
+  if (!("setSinkId" in HTMLMediaElement.prototype)){
+    button.textContent = "Speaker";
+    button.disabled = true;
+    button.title = "This browser doesn't support switching audio output";
+    return;
+  }
+  button.disabled = false;
+  let outputs = [];
+  let idx = 0;
+  async function refresh(){
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    outputs = devices.filter(d => d.kind === "audiooutput");
+  }
+  await refresh().catch(() => {});
+  button.textContent = "Speaker";
+  button.onclick = async () => {
+    await refresh().catch(() => {});
+    if (!outputs.length) return;
+    idx = (idx + 1) % outputs.length;
+    const dev = outputs[idx];
+    try {
+      await remoteAudioEl.setSinkId(dev.deviceId);
+      const label = (dev.label || "").toLowerCase();
+      button.textContent = label.includes("ear") ? "Earpiece" : (label.includes("speaker") ? "Speaker" : (dev.label || `Output ${idx+1}`));
+    } catch (e) { /* ignore unsupported device */ }
+  };
+}
+
+function setupMuteToggle(button, getStream){
+  let muted = false;
+  button.onclick = () => {
+    const stream = getStream();
+    if (!stream) return;
+    muted = !muted;
+    stream.getAudioTracks().forEach(t => t.enabled = !muted);
+    button.textContent = muted ? "Unmute" : "Mute";
+  };
+}
+
+function makeLogger(el){
+  return (msg) => {
+    const t = new Date().toLocaleTimeString();
+    el.textContent += `[${t}] ${msg}\n`;
+    el.scrollTop = el.scrollHeight;
+  };
+}
+
+// ============================================================
+// HOST
+// ============================================================
+async function runHost(){
+  document.getElementById("hostView").classList.remove("hidden");
+  const room = params.get("room") || randId(6);
+  const myPeer = "host";
+  const log = makeLogger(document.getElementById("hostLog"));
+  const dot = document.getElementById("hostDot");
+  const statusEl = document.getElementById("hostStatus");
+  const muteBtn = document.getElementById("hostMuteBtn");
+  const outputBtn = document.getElementById("hostOutputBtn");
+  const hangupBtn = document.getElementById("hostHangupBtn");
+
+  document.getElementById("hostRoomCode").textContent = room;
+  const link = `${location.origin}${location.pathname}?role=client&room=${room}`;
+  document.getElementById("shareLink").value = link;
+  document.getElementById("copyLinkBtn").onclick = () => {
+    navigator.clipboard.writeText(link).catch(() => {});
+  };
+
+  function setStatus(text, kind){
+    statusEl.textContent = text;
+    dot.className = "dot" + (kind ? " " + kind : "");
+  }
+
+  let localStream = null;
+  let pc = null;
+  let currentClient = null;
+  let sessionActive = false;
+
+  try {
+    localStream = await getMic();
+    setStatus("Waiting for someone to join…", "pending");
+    muteBtn.disabled = false;
+    setupMuteToggle(muteBtn, () => localStream);
+    setupOutputToggle(outputBtn);
+    log("Microphone ready.");
+  } catch (e) {
+    setStatus("Microphone access needed — check permissions and reload.", "down");
+    log("getUserMedia failed: " + e.message);
+    return;
+  }
+
+  hangupBtn.onclick = () => {
+    if (!sessionActive) return;
+    sendSignal(room, myPeer, "bye", "-");
+    endSession("You ended the call.");
+  };
+
+  function endSession(reason){
+    if (pc) { pc.close(); pc = null; }
+    sessionActive = false;
+    currentClient = null;
+    hangupBtn.disabled = true;
+    remoteAudioEl.srcObject = null;
+    setStatus(reason ? reason + " Waiting for someone to join…" : "Waiting for someone to join…", "pending");
+    log(reason || "Session ended.");
+  }
+
+  async function startSessionWith(clientId){
+    currentClient = clientId;
+    sessionActive = true;
+    hangupBtn.disabled = false;
+    setStatus(`Connecting to ${clientId}…`, "pending");
+    log(`Join request from ${clientId}. Creating offer.`);
+    pc = createPeerConnection(
+      (cand) => sendSignal(room, myPeer, "ice", JSON.stringify(cand)),
+      () => setStatus(`In call with ${clientId}`, "live"),
+      (state) => {
+        log("Connection state: " + state);
+        if (state === "connected") setStatus(`In call with ${clientId}`, "live");
+        if (["disconnected","failed","closed"].includes(state)) endSession("Call ended.");
+      }
+    );
+    localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    sendSignal(room, myPeer, "offer", pc.localDescription.sdp);
+  }
+
+  async function handleRow(r){
+    if (r.room !== room || r.peer === myPeer) return;
+    if (!sessionActive && r.type === "join"){
+      await startSessionWith(r.peer);
+      return;
+    }
+    if (sessionActive && r.peer === currentClient){
+      if (r.type === "answer" && pc && !pc.currentRemoteDescription){
+        await pc.setRemoteDescription({ type: "answer", sdp: r.payload });
+        log("Answer received.");
+      } else if (r.type === "ice" && pc){
+        try { await pc.addIceCandidate(JSON.parse(r.payload)); } catch (e) {}
+      } else if (r.type === "bye"){
+        endSession("The other person hung up.");
+      }
+    }
+  }
+
+  let cursor = 0;
+  try { cursor = (await fetchRows()).length; } catch (e) { log("Sheet read failed: " + e.message); }
+
+  setInterval(async () => {
+    try {
+      const rows = await fetchRows();
+      if (rows.length > cursor){
+        const newRows = rows.slice(cursor);
+        cursor = rows.length;
+        for (const r of newRows) await handleRow(r);
+      }
+    } catch (e) { log("Poll error: " + e.message); }
+  }, POLL_MS);
+}
+
+// ============================================================
+// CLIENT
+// ============================================================
+async function runClient(){
+  document.getElementById("clientView").classList.remove("hidden");
+  const log = makeLogger(document.getElementById("clientLog"));
+  const dot = document.getElementById("clientDot");
+  const statusEl = document.getElementById("clientStatus");
+  const roomInput = document.getElementById("roomInput");
+  const joinBtn = document.getElementById("joinBtn");
+  const muteBtn = document.getElementById("clientMuteBtn");
+  const outputBtn = document.getElementById("clientOutputBtn");
+  const hangupBtn = document.getElementById("clientHangupBtn");
+
+  const prefillRoom = params.get("room");
+  if (prefillRoom) roomInput.value = prefillRoom.toUpperCase();
+
+  function setStatus(text, kind){
+    statusEl.textContent = text;
+    dot.className = "dot" + (kind ? " " + kind : "");
+  }
+
+  let myPeer = "c" + randId(6);
+  let room = null;
+  let localStream = null;
+  let pc = null;
+  let answered = false;
+  let cursor = 0;
+  let polling = false;
+
+  hangupBtn.onclick = () => {
+    if (room) sendSignal(room, myPeer, "bye", "-");
+    endCall("You ended the call.");
+  };
+
+  function endCall(reason){
+    if (pc) { pc.close(); pc = null; }
+    answered = false;
+    hangupBtn.disabled = true;
+    remoteAudioEl.srcObject = null;
+    setStatus(reason || "Call ended.", "down");
+    joinBtn.disabled = false;
+    joinBtn.textContent = "Join";
+  }
+
+  async function handleRow(r){
+    if (r.room !== room || r.peer === myPeer) return;
+    if (r.peer !== "host") return;
+    if (r.type === "offer" && !answered){
+      answered = true;
+      log("Offer received. Answering.");
+      setStatus("Connecting…", "pending");
+      pc = createPeerConnection(
+        (cand) => sendSignal(room, myPeer, "ice", JSON.stringify(cand)),
+        () => setStatus("In call", "live"),
+        (state) => {
+          log("Connection state: " + state);
+          if (state === "connected") setStatus("In call", "live");
+          if (["disconnected","failed","closed"].includes(state)) endCall("Call ended.");
+        }
+      );
+      localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+      await pc.setRemoteDescription({ type: "offer", sdp: r.payload });
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      sendSignal(room, myPeer, "answer", pc.localDescription.sdp);
+      hangupBtn.disabled = false;
+    } else if (r.type === "ice" && pc){
+      try { await pc.addIceCandidate(JSON.parse(r.payload)); } catch (e) {}
+    } else if (r.type === "bye"){
+      endCall("The host ended the call.");
+    }
+  }
+
+  function startPolling(){
+    if (polling) return;
+    polling = true;
+    setInterval(async () => {
+      try {
+        const rows = await fetchRows();
+        if (rows.length > cursor){
+          const newRows = rows.slice(cursor);
+          cursor = rows.length;
+          for (const r of newRows) await handleRow(r);
+        }
+      } catch (e) { log("Poll error: " + e.message); }
+    }, POLL_MS);
+  }
+
+  joinBtn.onclick = async () => {
+    const val = roomInput.value.trim().toUpperCase();
+    if (!val){ roomInput.focus(); return; }
+    room = val;
+    myPeer = "c" + randId(6);
+    answered = false;
+    joinBtn.disabled = true;
+    joinBtn.textContent = "Joining…";
+    setStatus("Getting microphone…", "pending");
+    try {
+      localStream = await getMic();
+      muteBtn.disabled = false;
+      setupMuteToggle(muteBtn, () => localStream);
+      setupOutputToggle(outputBtn);
+    } catch (e) {
+      setStatus("Microphone access needed.", "down");
+      joinBtn.disabled = false;
+      joinBtn.textContent = "Join";
+      log("getUserMedia failed: " + e.message);
+      return;
+    }
+    try { cursor = (await fetchRows()).length; } catch (e) { cursor = 0; }
+    startPolling();
+    setStatus("Waiting for host to answer…", "pending");
+    log(`Joining room ${room} as ${myPeer}.`);
+    sendSignal(room, myPeer, "join", "-");
+  };
+}
+
+// ============================================================
+if (role === "host") runHost();
+else runClient();
+</script>
+</body>
+</html>
