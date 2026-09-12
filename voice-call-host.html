@@ -41,9 +41,9 @@
 <details style="margin-top:10px">
 <summary>⚙ Google signaling</summary>
 <label>Form response URL</label>
-<input id="formUrl" readonly>
+<input id="formUrl" readonly value="https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse"
 <label>Sheet CSV URL</label>
-<input id="csvUrl" readonly>
+<input id="csvUrl" readonly value="https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv"
 </details>
 </div>
 <div class="card">
@@ -114,16 +114,13 @@
 </pre>
 </div>
 </main>
-<script>window.APP_MODE='host';
+<script>
+const FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse';
+const CSV_URL='https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv';
+const SHEET_GVIZ_URL='https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/gviz/tq?tqx=out:csv';
 const ENTRY={room:"entry.2110898792",peer:"entry.1013260375",type:"entry.1722712182",payload:"entry.1320930057"};
-
-const CSV_URL="https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/export?format=csv";
-const SHEET_GVIZ_URL="https://docs.google.com/spreadsheets/d/1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc/gviz/tq?tqx=out:csv";
-
-const FORM_URL="https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse";
-
-
-        /* ================================================================
+window.APP_MODE='host';
+/* ================================================================
            CONFIGURATION AND GLOBAL STATE
            Google Form/Sheet is used only for WebRTC SDP signaling.
            The actual voice/media path is direct WebRTC P2P.
