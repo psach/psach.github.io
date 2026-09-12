@@ -44,8 +44,8 @@
 </div>
 <div class="card">
 <div class="row">
-<button onclick="host()">Create / Host</button>
-<button onclick="join()">Join</button>
+<button id="hostBtn" onclick="host()">Create / Host</button>
+<button id="joinBtn" onclick="join()">Join</button>
 <button onclick="disconnect()">Disconnect</button>
 <button onclick="loadActiveRooms()">↻ Refresh rooms</button>
 </div>
@@ -621,7 +621,7 @@ async function publish(t,p){await submit(t,p)}
            WEBRTC DATA CHANNEL / CALL CONTROL
         ================================================================ */
         function setupDC(c){
-            dc=c;
+        dc=c;
             dc.onopen=()=>{
                 log("DataChannel OPEN");
                 setState("connected");
@@ -699,7 +699,6 @@ async function publish(t,p){await submit(t,p)}
     function stopPolling(){if(poller){clearInterval(poller);poller=null;log("Google Sheet polling stopped — P2P connected")}}
 
     async function pollSignals(){if(!pc||pc.connectionState==="connected")return;try{const rows=await getSignals();for(const x of rows){const k=x.timestamp+"|"+x.peer+"|"+x.type;if(seen.has(k)||x.peer===peer)continue;seen.add(k);if(role==="host"&&norm(x.type)==="answer"&&!pc.currentRemoteDescription){const dec=decodeSignal(x.payload);if(callId&&dec.callId&&dec.callId!==callId){dlog("Ignoring answer for different callId="+dec.callId);continue}
-
     const sdp=dec.sdp||x.payload;await pc.setRemoteDescription(sdp);log("REMOTE ANSWER APPLIED");role="host-connected";loadActiveRooms()}}}catch(e){log("Polling error: "+e.message)}}
 
     async function waitICE(){if(pc.iceGatheringState==="complete")return;await new Promise(resolve=>{const timer=setTimeout(resolve,12000),h=()=>{if(pc.iceGatheringState==="complete"){clearTimeout(timer);pc.removeEventListener("icegatheringstatechange",h);resolve()}};pc.addEventListener("icegatheringstatechange",h)})}
@@ -711,12 +710,10 @@ async function publish(t,p){await submit(t,p)}
         ================================================================ */
         async function host(){unlockAudio();if(queryRole==="client"){log("Client role cannot host");return}if(role||pc){log("Already hosting or connected");return}if(!room())return alert("Enter a room code");role="host";callId=randomCallId();seen=new Set();createPC();setupDC(pc.createDataChannel("chat"));await pc.setLocalDescription(await pc.createOffer());await waitICE();await publish("offer",encodeSignal(callId,pc.localDescription));setState("waiting-answer");startPolling();startDiscovery()}
     async function join(offerOverride=null){unlockAudio();if(queryRole==="host"){log("Host role cannot join");return}if(role||pc){log("Already connected/hosting");return}
-
     let offer=offerOverride;
     if(!offer&&room())offer=await latestOfferForRoom(room());
     if(!offer&&!room())offer=await latestOffer();
     if(!offer){log("No offer found for the selected room in Sheet");return}
-
     const dec=decodeSignal(offer.payload);
     if(!dec.sdp){log("Invalid offer payload in Sheet");return}
     role="guest";$("room").value=offer.room;callId=offer.callId||dec.callId||"";
@@ -738,7 +735,6 @@ async function publish(t,p){await submit(t,p)}
         setIce("new");
         dlog("PAGE LOAD · role="+(queryRole||"auto")+" · displaying all rooms from Google Sheets");
         await loadActiveRooms();
-
         if(queryRole==="host"&&!role&&!pc){
             if(!room())$("room").value=makeRoomCode();
             dlog("ROLE=HOST → starting host");
