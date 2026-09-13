@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voice Call</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12151a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#12151a; --panel:#1b1f27; --line:#2a2f3a; --text:#e8eaed;
+    --muted:#8b93a1; --accent:#5b8def; --accent-dim:#2e3f5c;
+    --live:#3ecf8e; --warn:#e0a640; --danger:#e0555f;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex; align-items:center; justify-content:center; min-height:100%;
+    padding:24px;
+  }
+  .card{
+    width:100%; max-width:380px; background:var(--panel); border:1px solid var(--line);
+    border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:18px;
+  }
+  .role-tag{
+    align-self:flex-start; font-size:12px; letter-spacing:.02em; color:var(--muted);
+    border:1px solid var(--line); border-radius:20px; padding:3px 10px;
+  }
+  .tabbar{
+    display:flex; gap:4px; background:#11141a; border:1px solid var(--line);
+    border-radius:10px; padding:4px;
+  }
+  .tabbtn{
+    flex:1; background:transparent; color:var(--muted); border:none;
+    border-radius:8px; padding:9px; font-size:14px; font-weight:600;
+  }
+  .tabbtn.active{background:var(--accent-dim); color:#fff;}
+  h1{font-size:20px; margin:0; font-weight:600;}
+  .room-code{
+    font-size:34px; font-weight:700; letter-spacing:.06em; font-variant-numeric:tabular-nums;
+  }
+  .row{display:flex; gap:8px;}
+  input[type=text]{
+    flex:1; background:#11141a; border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:11px 12px; font-size:15px; min-width:0;
+  }
+  input[type=text]:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  button{
+    border:none; border-radius:10px; padding:11px 16px; font-size:15px; font-weight:600;
+    cursor:pointer; color:#fff; background:var(--accent-dim); transition:filter .15s;
+  }
+  button:hover{filter:brightness(1.15);}
+  button:active{filter:brightness(.9);}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  button.primary{background:var(--accent);}
+  button.danger{background:var(--danger);}
+  button.ghost{background:transparent; border:1px solid var(--line); color:var(--text);}
+  .status{
+    display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted);
+  }
+  .dot{width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0;}
+  .dot.live{background:var(--live);}
+  .dot.pending{background:var(--warn);}
+  .dot.down{background:var(--danger);}
+  .controls{display:flex; gap:10px;}
+  .controls button{flex:1;}
+  .clients-list{display:flex; flex-direction:column; gap:8px;}
+  .client-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:#11141a; border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+  }
+  .client-row .info{display:flex; flex-direction:column; gap:1px; min-width:0;}
+  .client-row .info .peer{font-weight:600; font-size:13.5px; font-family:ui-monospace,Menlo,Consolas,monospace;}
+  .client-row .info .state{color:var(--muted); font-size:12px;}
+  .client-row .actions{display:flex; gap:6px; flex-shrink:0;}
+  .client-row .actions button{flex:none; padding:7px 12px; font-size:13px;}
+  small.hint{color:var(--muted); font-size:12.5px; line-height:1.5;}
+  details{color:var(--muted); font-size:12px;}
+  details summary{cursor:pointer; user-select:none;}
+  #log{
+    margin-top:6px; max-height:120px; overflow-y:auto; background:#0e1116;
+    border:1px solid var(--line); border-radius:8px; padding:8px 10px;
+    font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px; line-height:1.5;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  audio{display:none;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<div class="card" id="app">
+
+  <div class="tabbar">
+    <button id="tabHostBtn" class="tabbtn">Host</button>
+    <button id="tabJoinBtn" class="tabbtn">Join</button>
+  </div>
+
+  <!-- HOST VIEW -->
+  <div id="hostView" class="hidden" style="display:flex; flex-direction:column; gap:18px;">
+    <span class="role-tag">HOST</span>
+    <div>
+      <h1>Room code</h1>
+      <div class="row">
+        <input type="text" id="hostRoomInput" style="text-transform:uppercase; font-size:22px; font-weight:700; letter-spacing:.06em;">
+        <button id="setRoomBtn" class="ghost">Set</button>
+      </div>
+    </div>
+    <div class="row">
+      <input type="text" id="shareLink" readonly>
+      <button id="copyLinkBtn">Copy link</button>
+    </div>
+    <div class="status"><span class="dot" id="hostDot"></span><span id="hostStatus">Getting microphone…</span></div>
+    <div id="clientsList" class="clients-list"></div>
+    <div class="controls">
+      <button id="hostMuteBtn" class="ghost" disabled>Mute</button>
+      <button id="hostOutputBtn" class="ghost" disabled>Speaker</button>
+    </div>
+    <button id="hostAgainBtn" class="ghost">Host again (new room)</button>
+    <small class="hint">Send the link above to whoever you want to call — up to 10 people can join this room at once, and everyone hears everyone else.</small>
+    <details>
+      <summary>Activity log</summary>
+      <div id="hostLog"></div>
+    </details>
+  </div>
+
+  <!-- CLIENT VIEW -->
+  <div id="clientView" class="hidden" style="display:flex; flex-direction:column; gap:18px;">
+    <span class="role-tag">JOIN CALL</span>
+    <div>
+      <h1>Enter the room code</h1>
+    </div>
+    <div class="row">
+      <input type="text" id="roomInput" placeholder="e.g. AB12CD" style="text-transform:uppercase;">
+      <button id="joinBtn" class="primary">Join</button>
+    </div>
+    <div class="status"><span class="dot" id="clientDot"></span><span id="clientStatus">Not connected</span></div>
+    <div class="controls">
+      <button id="clientMuteBtn" class="ghost" disabled>Mute</button>
+      <button id="clientOutputBtn" class="ghost" disabled>Speaker</button>
+      <button id="clientHangupBtn" class="danger" disabled>Hang up</button>
+    </div>
+    <details>
+      <summary>Activity log</summary>
+      <div id="clientLog"></div>
+    </details>
+  </div>
+
+</div>
+
+<audio id="hostRemoteAudio" autoplay playsinline></audio>
+<audio id="clientRemoteAudio" autoplay playsinline></audio>
+
+<script>
+/* ============================================================
+   CONFIG — fill these in from your Google Form
+   ============================================================
+   1. Open your form's edit link in a browser.
+   2. Click the eyeball icon (Preview), or open the public "viewform" link.
+   3. Right-click each question -> "Inspect" (or View Page Source and
+      search for `name="entry.`). Each question has an input/textarea
+      with an attribute like  name="entry.1234567890"
+   4. Copy the 4 numbers below, one per field, in this order:
+      Room, Peer, Type, PayLoad  (matching your form's question order).
+   ============================================================ */
+const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSdEjjnrVdk-FNCTWiZ7nDaPGYdFgg9-7vINoMqoY5ynVA7twA/formResponse";
+const SHEET_ID = "1Ldcjo11fSlrXcGe6FIPB606tCwc7_eTilWEe08J59Dc";
+
+const ENTRY = {
+  room:    "entry.2110898792",
+  peer:    "entry.1013260375",
+  type:    "entry.1722712182",
+  payload: "entry.1320930057"
+};
+
+const POLL_MS = 1500;
+const MAX_CLIENTS = 10;
+const ICE_SERVERS = [
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" }
+];
+/* Public STUN only — works when at least one side isn't behind strict
+   symmetric NAT. If calls consistently fail to connect audio, add a
+   TURN server to ICE_SERVERS (turn:host:port with username/credential). */
+
+// ---------- shared helpers ----------
+const params = new URLSearchParams(location.search);
+const initialTab = (params.get("role") || "host").toLowerCase() === "client" ? "join" : "host";
+const hostRemoteAudioEl = document.getElementById("hostRemoteAudio");
+const clientRemoteAudioEl = document.getElementById("clientRemoteAudio");
+
+function randId(len){
+  return Array.from({length:len}, () => "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*36)]).join("");
+}
+
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQuotes){
+      if (c === '"'){
+        if (text[i+1] === '"'){ field += '"'; i++; } else inQuotes = false;
+      } else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\r") { /* skip */ }
+      else if (c === "\n") { row.push(field); rows.push(row); row = []; field = ""; }
+      else field += c;
+    }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+async function fetchRows(){
+  const bust = Date.now();
+  const urls = [
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&_=${bust}`,
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&_=${bust}`
+  ];
+  let lastErr;
+  for (const u of urls){
+    try {
+      const res = await fetch(u, { cache: "no-store" });
+      if (res.ok) {
+        const grid = parseCSV(await res.text());
+        if (!grid.length) return [];
+        const headers = grid[0].map(h => h.trim().toLowerCase());
+        const idx = {
+          room: headers.indexOf("room"),
+          peer: headers.indexOf("peer"),
+          type: headers.indexOf("type"),
+          payload: headers.indexOf("payload")
+        };
+        return grid.slice(1)
+          .filter(r => r.length > 1)
+          .map(r => ({
+            room: r[idx.room] || "",
+            peer: r[idx.peer] || "",
+            type: r[idx.type] || "",
+            payload: r[idx.payload] || ""
+          }));
+      }
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error("Could not read the sheet");
+}
+
+async function sendSignal(room, peer, type, payload){
+  const body = new URLSearchParams();
+  body.set(ENTRY.room, room);
+  body.set(ENTRY.peer, peer);
+  body.set(ENTRY.type, type);
+  body.set(ENTRY.payload, payload || "");
+  try {
+    await fetch(FORM_ACTION, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString()
+    });
+  } catch (e) { /* no-cors gives no visibility into failure either way */ }
+}
+
+async function getMic(){
+  return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+}
+
+function createPeerConnection(onIceCandidate, onTrack, onStateChange){
+  const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+  pc.onicecandidate = (e) => { if (e.candidate) onIceCandidate(e.candidate.toJSON()); };
+  pc.ontrack = (e) => { onTrack && onTrack(e.streams[0]); };
+  pc.onconnectionstatechange = () => onStateChange(pc.connectionState);
+  return pc;
+}
+
+async function setupOutputToggle(button, audioEl){
+  if (!("setSinkId" in HTMLMediaElement.prototype)){
+    button.textContent = "Speaker";
+    button.disabled = true;
+    button.title = "This browser doesn't support switching audio output";
+    return;
+  }
+  button.disabled = false;
+  let outputs = [];
+  let idx = 0;
+  async function refresh(){
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    outputs = devices.filter(d => d.kind === "audiooutput");
+  }
+  await refresh().catch(() => {});
+  button.textContent = "Speaker";
+  button.onclick = async () => {
+    await refresh().catch(() => {});
+    if (!outputs.length) return;
+    idx = (idx + 1) % outputs.length;
+    const dev = outputs[idx];
+    try {
+      await audioEl.setSinkId(dev.deviceId);
+      const label = (dev.label || "").toLowerCase();
+      button.textContent = label.includes("ear") ? "Earpiece" : (label.includes("speaker") ? "Speaker" : (dev.label || `Output ${idx+1}`));
+    } catch (e) { /* ignore unsupported device */ }
+  };
+}
+
+function setupMuteToggle(button, getStream){
+  let muted = false;
+  button.onclick = () => {
+    const stream = getStream();
+    if (!stream) return;
+    muted = !muted;
+    stream.getAudioTracks().forEach(t => t.enabled = !muted);
+    button.textContent = muted ? "Unmute" : "Mute";
+  };
+}
+
+// ---- ringtone (synthesized, no audio file needed) ----
+let sharedAudioCtx = null;
+function ensureAudioCtx(){
+  if (!sharedAudioCtx){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (Ctx) sharedAudioCtx = new Ctx();
+  }
+  if (sharedAudioCtx && sharedAudioCtx.state === "suspended") sharedAudioCtx.resume().catch(() => {});
+  return sharedAudioCtx;
+}
+function unlockAudioOnce(){
+  const unlock = () => {
+    ensureAudioCtx();
+    document.removeEventListener("pointerdown", unlock);
+    document.removeEventListener("keydown", unlock);
+  };
+  document.addEventListener("pointerdown", unlock);
+  document.addEventListener("keydown", unlock);
+}
+
+function makeRinger(opts){
+  // opts: { tones:[f1,f2], burstMs, burstGapMs, bursts, cycleGapMs, vibrate:[ms,...] }
+  let timer = null;
+  let compressor = null;
+  function ensureCompressor(){
+    if (compressor || !sharedAudioCtx) return;
+    compressor = sharedAudioCtx.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-14, sharedAudioCtx.currentTime);
+    compressor.knee.setValueAtTime(8, sharedAudioCtx.currentTime);
+    compressor.ratio.setValueAtTime(10, sharedAudioCtx.currentTime);
+    compressor.attack.setValueAtTime(0.003, sharedAudioCtx.currentTime);
+    compressor.release.setValueAtTime(0.15, sharedAudioCtx.currentTime);
+    compressor.connect(sharedAudioCtx.destination);
+  }
+  function playCycle(){
+    if (!sharedAudioCtx) return;
+    ensureCompressor();
+    const ctx = sharedAudioCtx;
+    let t = ctx.currentTime + 0.02;
+    for (let b = 0; b < opts.bursts; b++){
+      const dur = opts.burstMs / 1000;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.6, t + 0.015);
+      gain.gain.setValueAtTime(0.6, t + dur - 0.015);
+      gain.gain.linearRampToValueAtTime(0, t + dur);
+      gain.connect(compressor);
+      // tremolo LFO gives it a buzzy "brrring" texture instead of a flat tone
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = 22;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 0.35;
+      lfo.connect(lfoGain);
+      lfoGain.connect(gain.gain);
+      lfo.start(t);
+      lfo.stop(t + dur);
+      opts.tones.forEach((freq) => {
+        const osc = ctx.createOscillator();
+        osc.type = "sawtooth";
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        osc.start(t);
+        osc.stop(t + dur);
+      });
+      t += dur + opts.burstGapMs / 1000;
+    }
+  }
+  return {
+    start(){
+      if (timer) return;
+      ensureAudioCtx();
+      const cycleLen = opts.bursts * (opts.burstMs + opts.burstGapMs) + opts.cycleGapMs;
+      const cycle = () => {
+        playCycle();
+        if ("vibrate" in navigator) { try { navigator.vibrate(opts.vibrate); } catch (e) {} }
+      };
+      cycle();
+      timer = setInterval(cycle, cycleLen);
+    },
+    stop(){
+      if (timer) { clearInterval(timer); timer = null; }
+      if ("vibrate" in navigator) { try { navigator.vibrate(0); } catch (e) {} }
+    }
+  };
+}
+// classic "brring-brring… pause…" double-burst pattern for an incoming call
+const incomingRinger = makeRinger({
+  tones: [440, 480], burstMs: 400, burstGapMs: 200, bursts: 2, cycleGapMs: 1800,
+  vibrate: [400, 150, 400, 150, 400, 1200]
+});
+// classic long ringback tone while the client waits for the host to answer
+const ringbackRinger = makeRinger({
+  tones: [440, 480], burstMs: 2000, burstGapMs: 0, bursts: 1, cycleGapMs: 4000,
+  vibrate: [300]
+});
+
+// ---- wake lock: keep the screen on while ringing/on a call ----
+let wakeLock = null;
+let wakeLockCount = 0;
+async function acquireWakeLock(){
+  if (!("wakeLock" in navigator) || wakeLock) return;
+  try { wakeLock = await navigator.wakeLock.request("screen"); } catch (e) { /* ignore */ }
+}
+function releaseWakeLockNow(){
+  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+}
+function addWakeLockWant(){
+  wakeLockCount++;
+  if (wakeLockCount === 1) acquireWakeLock();
+}
+function removeWakeLockWant(){
+  wakeLockCount = Math.max(0, wakeLockCount - 1);
+  if (wakeLockCount === 0) releaseWakeLockNow();
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && wakeLockCount > 0) acquireWakeLock();
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+unlockAudioOnce();
+
+function makeLogger(el){
+  return (msg) => {
+    const t = new Date().toLocaleTimeString();
+    el.textContent += `[${t}] ${msg}\n`;
+    el.scrollTop = el.scrollHeight;
+  };
+}
+
+// ============================================================
+// HOST
+// ============================================================
+async function runHost(){
+  let room = params.get("room") || randId(6);
+  const myPeer = "host";
+  const log = makeLogger(document.getElementById("hostLog"));
+  const dot = document.getElementById("hostDot");
+  const statusEl = document.getElementById("hostStatus");
+  const muteBtn = document.getElementById("hostMuteBtn");
+  const outputBtn = document.getElementById("hostOutputBtn");
+  const roomInput = document.getElementById("hostRoomInput");
+  const setRoomBtn = document.getElementById("setRoomBtn");
+  const hostAgainBtn = document.getElementById("hostAgainBtn");
+  const shareLinkInput = document.getElementById("shareLink");
+  const clientsListEl = document.getElementById("clientsList");
+
+  let link = "";
+  function applyRoom(newRoom, logMsg){
+    room = newRoom;
+    roomInput.value = room;
+    link = `${location.origin}${location.pathname}?role=client&room=${room}`;
+    shareLinkInput.value = link;
+    if (logMsg) log(logMsg);
+  }
+  applyRoom(room);
+
+  document.getElementById("copyLinkBtn").onclick = () => {
+    navigator.clipboard.writeText(link).catch(() => {});
+  };
+
+  function setStatus(text, kind){
+    statusEl.textContent = text;
+    dot.className = "dot" + (kind ? " " + kind : "");
+  }
+
+  let localStream = null;
+  let holdingWake = false;
+  const clients = new Map(); // peerId -> { state, pc, destNode, sourceGain }
+
+  // ---- audio mixing graph: each client gets a personal "mix of everyone
+  // else" bus; the host listens to a bus that mixes every client. ----
+  const ctx = ensureAudioCtx();
+  let hostMicGain = null;
+  let hostMonitorDest = null;
+
+  try {
+    localStream = await getMic();
+    muteBtn.disabled = false;
+    setupMuteToggle(muteBtn, () => localStream);
+    setupOutputToggle(outputBtn, hostRemoteAudioEl);
+    if (ctx){
+      const hostMicSource = ctx.createMediaStreamSource(localStream);
+      hostMicGain = ctx.createGain();
+      hostMicGain.gain.value = 1;
+      hostMicSource.connect(hostMicGain);
+      hostMonitorDest = ctx.createMediaStreamDestination();
+      hostRemoteAudioEl.srcObject = hostMonitorDest.stream;
+    } else {
+      log("This browser lacks Web Audio — multi-client mixing won't work.");
+    }
+    log("Microphone ready.");
+    renderClients();
+  } catch (e) {
+    setStatus("Microphone access needed — check permissions and reload.", "down");
+    log("getUserMedia failed: " + e.message);
+    return;
+  }
+
+  function updateRoomEditability(){
+    setRoomBtn.disabled = clients.size > 0;
+  }
+
+  function updateRinging(){
+    const anyRinging = [...clients.values()].some(c => c.state === "ringing");
+    if (anyRinging) incomingRinger.start(); else incomingRinger.stop();
+  }
+
+  function updateWakeLock(){
+    const want = clients.size > 0;
+    if (want && !holdingWake) { addWakeLockWant(); holdingWake = true; }
+    if (!want && holdingWake) { removeWakeLockWant(); holdingWake = false; }
+  }
+
+  function renderClients(){
+    clientsListEl.innerHTML = "";
+    const entries = [...clients.entries()];
+    if (entries.length === 0){
+      setStatus(`Waiting for someone to join… (0/${MAX_CLIENTS})`, "pending");
+    } else {
+      const inCall = entries.filter(([, e]) => e.state === "in-call").length;
+      const connecting = entries.filter(([, e]) => e.state === "connecting").length;
+      const ringing = entries.filter(([, e]) => e.state === "ringing").length;
+      const parts = [];
+      if (inCall) parts.push(`${inCall} in call`);
+      if (connecting) parts.push(`${connecting} connecting`);
+      if (ringing) parts.push(`${ringing} ringing`);
+      setStatus(`${parts.join(", ")} (${entries.length}/${MAX_CLIENTS})`, inCall > 0 ? "live" : "pending");
+    }
+    for (const [peerId, entry] of entries){
+      const row = document.createElement("div");
+      row.className = "client-row";
+      const info = document.createElement("div");
+      info.className = "info";
+      const nameEl = document.createElement("div");
+      nameEl.className = "peer";
+      nameEl.textContent = peerId;
+      const stateEl = document.createElement("div");
+      stateEl.className = "state";
+      stateEl.textContent = entry.state === "ringing" ? "Incoming call…" : entry.state === "connecting" ? "Connecting…" : "In call";
+      info.appendChild(nameEl);
+      info.appendChild(stateEl);
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      if (entry.state === "ringing"){
+        const declineB = document.createElement("button");
+        declineB.className = "danger";
+        declineB.textContent = "Decline";
+        declineB.onclick = () => declineClient(peerId);
+        const answerB = document.createElement("button");
+        answerB.className = "primary";
+        answerB.textContent = "Answer";
+        answerB.onclick = () => startSessionWith(peerId);
+        actions.appendChild(declineB);
+        actions.appendChild(answerB);
+      } else {
+        const hangupB = document.createElement("button");
+        hangupB.className = "danger";
+        hangupB.textContent = "Hang up";
+        hangupB.onclick = () => hangupClient(peerId);
+        actions.appendChild(hangupB);
+      }
+      row.appendChild(info);
+      row.appendChild(actions);
+      clientsListEl.appendChild(row);
+    }
+  }
+
+  setRoomBtn.onclick = () => {
+    if (clients.size > 0) { log("Room has active clients — hang up or wait for them to leave before changing the room."); return; }
+    const val = roomInput.value.trim().toUpperCase();
+    if (!val) { roomInput.focus(); return; }
+    if (val === room) return;
+    applyRoom(val, `Room changed to ${val}.`);
+  };
+
+  hostAgainBtn.onclick = () => {
+    for (const peerId of [...clients.keys()]){
+      sendSignal(room, myPeer, "bye", JSON.stringify({ to: peerId }));
+      endClientSession(peerId, "Host restarted.");
+    }
+    applyRoom(randId(6), "Hosting again with a new room.");
+  };
+
+  function declineClient(peerId){
+    const entry = clients.get(peerId);
+    if (!entry || entry.state !== "ringing") return;
+    sendSignal(room, myPeer, "bye", JSON.stringify({ to: peerId }));
+    clients.delete(peerId);
+    log(`Declined call from ${peerId}.`);
+    renderClients();
+    updateRinging();
+    updateWakeLock();
+    updateRoomEditability();
+  }
+
+  function hangupClient(peerId){
+    const entry = clients.get(peerId);
+    if (!entry) return;
+    sendSignal(room, myPeer, "bye", JSON.stringify({ to: peerId }));
+    endClientSession(peerId, "You ended the call.");
+  }
+
+  function endClientSession(peerId, reason){
+    const entry = clients.get(peerId);
+    if (!entry) return;
+    if (entry.pc) entry.pc.close();
+    if (entry.sourceGain) { try { entry.sourceGain.disconnect(); } catch (e) {} }
+    if (entry.destNode){
+      if (hostMicGain) { try { hostMicGain.disconnect(entry.destNode); } catch (e) {} }
+      for (const [otherId, otherEntry] of clients){
+        if (otherId === peerId || !otherEntry.sourceGain) continue;
+        try { otherEntry.sourceGain.disconnect(entry.destNode); } catch (e) {}
+      }
+    }
+    clients.delete(peerId);
+    log(`${peerId}: ${reason || "session ended"}.`);
+    renderClients();
+    updateRinging();
+    updateWakeLock();
+    updateRoomEditability();
+  }
+
+  function ringFor(peerId){
+    if (clients.has(peerId)) return;
+    if (clients.size >= MAX_CLIENTS){
+      sendSignal(room, myPeer, "bye", JSON.stringify({ to: peerId }));
+      log(`Room full (${MAX_CLIENTS}/${MAX_CLIENTS}) — auto-declined join from ${peerId}.`);
+      return;
+    }
+    clients.set(peerId, { state: "ringing", pc: null, destNode: null, sourceGain: null });
+    log(`Ringing for join request from ${peerId}.`);
+    renderClients();
+    updateRinging();
+    updateWakeLock();
+    updateRoomEditability();
+  }
+
+  async function startSessionWith(peerId){
+    const entry = clients.get(peerId);
+    if (!entry || entry.state !== "ringing") return;
+    entry.state = "connecting";
+    renderClients();
+    updateRoomEditability();
+    log(`Answering ${peerId}. Creating offer.`);
+
+    if (ctx){
+      entry.destNode = ctx.createMediaStreamDestination();
+      if (hostMicGain) hostMicGain.connect(entry.destNode);
+      for (const [otherId, otherEntry] of clients){
+        if (otherId === peerId) continue;
+        if (otherEntry.sourceGain) otherEntry.sourceGain.connect(entry.destNode);
+      }
+    }
+
+    entry.pc = createPeerConnection(
+      (cand) => sendSignal(room, myPeer, "ice", JSON.stringify({ to: peerId, candidate: cand })),
+      (stream) => {
+        if (!ctx) return;
+        const srcNode = ctx.createMediaStreamSource(stream);
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 1;
+        srcNode.connect(gainNode);
+        entry.sourceGain = gainNode;
+        if (hostMonitorDest) gainNode.connect(hostMonitorDest);
+        for (const [otherId, otherEntry] of clients){
+          if (otherId === peerId || !otherEntry.destNode) continue;
+          gainNode.connect(otherEntry.destNode);
+        }
+      },
+      (connState) => {
+        log(`${peerId}: ${connState}`);
+        if (connState === "connected" && entry.state !== "in-call"){
+          entry.state = "in-call";
+          renderClients();
+          updateRoomEditability();
+        }
+        if (["disconnected", "failed", "closed"].includes(connState)){
+          endClientSession(peerId, "Call ended.");
+        }
+      }
+    );
+
+    if (ctx && entry.destNode){
+      entry.pc.addTrack(entry.destNode.stream.getAudioTracks()[0], entry.destNode.stream);
+    } else {
+      localStream.getTracks().forEach(t => entry.pc.addTrack(t, localStream));
+    }
+
+    const offer = await entry.pc.createOffer();
+    await entry.pc.setLocalDescription(offer);
+    sendSignal(room, myPeer, "offer", JSON.stringify({ to: peerId, sdp: entry.pc.localDescription.sdp }));
+  }
+
+  async function handleRow(r){
+    if (r.room !== room || r.peer === myPeer) return;
+    if (r.type === "join"){
+      if (clients.has(r.peer)) return;
+      ringFor(r.peer);
+      return;
+    }
+    const entry = clients.get(r.peer);
+    if (!entry) return;
+    if (r.type === "answer" && entry.pc && !entry.pc.currentRemoteDescription){
+      await entry.pc.setRemoteDescription({ type: "answer", sdp: r.payload });
+      log(`${r.peer}: answer received.`);
+    } else if (r.type === "ice" && entry.pc){
+      try { await entry.pc.addIceCandidate(JSON.parse(r.payload)); } catch (e) {}
+    } else if (r.type === "bye"){
+      endClientSession(r.peer, "The other person hung up.");
+    }
+  }
+
+  let cursor = 0;
+  try { cursor = (await fetchRows()).length; } catch (e) { log("Sheet read failed: " + e.message); }
+
+  setInterval(async () => {
+    try {
+      const rows = await fetchRows();
+      if (rows.length > cursor){
+        const newRows = rows.slice(cursor);
+        cursor = rows.length;
+        for (const r of newRows) await handleRow(r);
+      }
+    } catch (e) { log("Poll error: " + e.message); }
+  }, POLL_MS);
+}
+
+// ============================================================
+// CLIENT
+// ============================================================
+async function runClient(){
+  const log = makeLogger(document.getElementById("clientLog"));
+  const dot = document.getElementById("clientDot");
+  const statusEl = document.getElementById("clientStatus");
+  const roomInput = document.getElementById("roomInput");
+  const joinBtn = document.getElementById("joinBtn");
+  const muteBtn = document.getElementById("clientMuteBtn");
+  const outputBtn = document.getElementById("clientOutputBtn");
+  const hangupBtn = document.getElementById("clientHangupBtn");
+
+  const prefillRoom = params.get("room");
+  if (prefillRoom) roomInput.value = prefillRoom.toUpperCase();
+
+  function setStatus(text, kind){
+    statusEl.textContent = text;
+    dot.className = "dot" + (kind ? " " + kind : "");
+  }
+
+  let myPeer = "c" + randId(6);
+  let room = null;
+  let localStream = null;
+  let pc = null;
+  let answered = false;
+  let cursor = 0;
+  let polling = false;
+  let holdingWake = false;
+
+  hangupBtn.onclick = () => {
+    if (room) sendSignal(room, myPeer, "bye", "-");
+    endCall("You ended the call.");
+  };
+
+  function endCall(reason){
+    ringbackRinger.stop();
+    if (holdingWake) { removeWakeLockWant(); holdingWake = false; }
+    if (pc) { pc.close(); pc = null; }
+    const wasAnswered = answered;
+    answered = false;
+    hangupBtn.disabled = true;
+    clientRemoteAudioEl.srcObject = null;
+    setStatus(reason || (wasAnswered ? "Call ended." : "Call declined."), "down");
+    joinBtn.disabled = false;
+    joinBtn.textContent = "Join";
+  }
+
+  async function handleRow(r){
+    if (r.room !== room || r.peer === myPeer) return;
+    if (r.peer !== "host") return;
+    let data;
+    try { data = JSON.parse(r.payload); } catch (e) { return; }
+    if (!data || data.to !== myPeer) return; // addressed to a different client sharing this room
+    if (r.type === "offer" && !answered){
+      answered = true;
+      ringbackRinger.stop();
+      log("Offer received. Answering.");
+      setStatus("Connecting…", "pending");
+      pc = createPeerConnection(
+        (cand) => sendSignal(room, myPeer, "ice", JSON.stringify(cand)),
+        (stream) => { clientRemoteAudioEl.srcObject = stream; clientRemoteAudioEl.play().catch(() => {}); },
+        (state) => {
+          log("Connection state: " + state);
+          if (state === "connected") setStatus("In call", "live");
+          if (["disconnected","failed","closed"].includes(state)) endCall("Call ended.");
+        }
+      );
+      localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+      await pc.setRemoteDescription({ type: "offer", sdp: data.sdp });
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      sendSignal(room, myPeer, "answer", pc.localDescription.sdp);
+      hangupBtn.disabled = false;
+    } else if (r.type === "ice" && pc){
+      try { await pc.addIceCandidate(data.candidate); } catch (e) {}
+    } else if (r.type === "bye"){
+      endCall("The host ended the call.");
+    }
+  }
+
+  function startPolling(){
+    if (polling) return;
+    polling = true;
+    setInterval(async () => {
+      try {
+        const rows = await fetchRows();
+        if (rows.length > cursor){
+          const newRows = rows.slice(cursor);
+          cursor = rows.length;
+          for (const r of newRows) await handleRow(r);
+        }
+      } catch (e) { log("Poll error: " + e.message); }
+    }, POLL_MS);
+  }
+
+  joinBtn.onclick = async () => {
+    const val = roomInput.value.trim().toUpperCase();
+    if (!val){ roomInput.focus(); return; }
+    room = val;
+    myPeer = "c" + randId(6);
+    answered = false;
+    joinBtn.disabled = true;
+    joinBtn.textContent = "Joining…";
+    setStatus("Getting microphone…", "pending");
+    try {
+      localStream = await getMic();
+      muteBtn.disabled = false;
+      setupMuteToggle(muteBtn, () => localStream);
+      setupOutputToggle(outputBtn, clientRemoteAudioEl);
+    } catch (e) {
+      setStatus("Microphone access needed.", "down");
+      joinBtn.disabled = false;
+      joinBtn.textContent = "Join";
+      log("getUserMedia failed: " + e.message);
+      return;
+    }
+    try { cursor = (await fetchRows()).length; } catch (e) { cursor = 0; }
+    startPolling();
+    if (!holdingWake) { addWakeLockWant(); holdingWake = true; }
+    ringbackRinger.start();
+    setStatus("Waiting for host to answer…", "pending");
+    log(`Joining room ${room} as ${myPeer}.`);
+    sendSignal(room, myPeer, "join", "-");
+  };
+}
+
+// ============================================================
+// TABS — Host and Join both run concurrently in the background;
+// the tab bar only controls which panel is visible.
+// ============================================================
+function initTabs(){
+  const hostView = document.getElementById("hostView");
+  const clientView = document.getElementById("clientView");
+  const tabHostBtn = document.getElementById("tabHostBtn");
+  const tabJoinBtn = document.getElementById("tabJoinBtn");
+
+  function showTab(tab){
+    if (tab === "host"){
+      hostView.classList.remove("hidden");
+      clientView.classList.add("hidden");
+      tabHostBtn.classList.add("active");
+      tabJoinBtn.classList.remove("active");
+    } else {
+      clientView.classList.remove("hidden");
+      hostView.classList.add("hidden");
+      tabJoinBtn.classList.add("active");
+      tabHostBtn.classList.remove("active");
+    }
+  }
+
+  tabHostBtn.onclick = () => showTab("host");
+  tabJoinBtn.onclick = () => showTab("join");
+  showTab(initialTab);
+}
+
+initTabs();
+runHost();
+runClient();
+</script>
+</body>
+</html>
