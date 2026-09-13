@@ -95,7 +95,10 @@
     <span class="role-tag">HOST</span>
     <div>
       <h1>Room code</h1>
-      <div class="room-code" id="hostRoomCode">——————</div>
+      <div class="row">
+        <input type="text" id="hostRoomInput" style="text-transform:uppercase; font-size:22px; font-weight:700; letter-spacing:.06em;">
+        <button id="setRoomBtn" class="ghost">Set</button>
+      </div>
     </div>
     <div class="row">
       <input type="text" id="shareLink" readonly>
@@ -114,6 +117,7 @@
       <button id="hostOutputBtn" class="ghost" disabled>Speaker</button>
       <button id="hostHangupBtn" class="danger" disabled>Hang up</button>
     </div>
+    <button id="hostAgainBtn" class="ghost">Host again (new room)</button>
     <small class="hint">Send the link above to whoever you want to call. The room stays open — after a call ends, it's ready for the next person automatically.</small>
     <details>
       <summary>Activity log</summary>
@@ -453,7 +457,7 @@ function makeLogger(el){
 // HOST
 // ============================================================
 async function runHost(){
-  const room = params.get("room") || randId(6);
+  let room = params.get("room") || randId(6);
   const myPeer = "host";
   const log = makeLogger(document.getElementById("hostLog"));
   const dot = document.getElementById("hostDot");
@@ -461,10 +465,21 @@ async function runHost(){
   const muteBtn = document.getElementById("hostMuteBtn");
   const outputBtn = document.getElementById("hostOutputBtn");
   const hangupBtn = document.getElementById("hostHangupBtn");
+  const roomInput = document.getElementById("hostRoomInput");
+  const setRoomBtn = document.getElementById("setRoomBtn");
+  const hostAgainBtn = document.getElementById("hostAgainBtn");
+  const shareLinkInput = document.getElementById("shareLink");
 
-  document.getElementById("hostRoomCode").textContent = room;
-  const link = `${location.origin}${location.pathname}?role=client&room=${room}`;
-  document.getElementById("shareLink").value = link;
+  let link = "";
+  function applyRoom(newRoom, logMsg){
+    room = newRoom;
+    roomInput.value = room;
+    link = `${location.origin}${location.pathname}?role=client&room=${room}`;
+    shareLinkInput.value = link;
+    if (logMsg) log(logMsg);
+  }
+  applyRoom(room);
+
   document.getElementById("copyLinkBtn").onclick = () => {
     navigator.clipboard.writeText(link).catch(() => {});
   };
@@ -504,6 +519,24 @@ async function runHost(){
     endSession("You ended the call.");
   };
 
+  function updateRoomEditability(){
+    setRoomBtn.disabled = state !== "idle";
+  }
+
+  setRoomBtn.onclick = () => {
+    if (state !== "idle") { log("Finish, decline, or hang up the current call before changing the room."); return; }
+    const val = roomInput.value.trim().toUpperCase();
+    if (!val) { roomInput.focus(); return; }
+    if (val === room) return;
+    applyRoom(val, `Room changed to ${val}.`);
+  };
+
+  hostAgainBtn.onclick = () => {
+    if (state !== "idle") sendSignal(room, myPeer, "bye", "-");
+    resetToIdle();
+    applyRoom(randId(6), "Hosting again with a new room.");
+  };
+
   declineBtn.onclick = () => {
     if (state !== "ringing") return;
     sendSignal(room, myPeer, "bye", "-");
@@ -527,6 +560,7 @@ async function runHost(){
     hangupBtn.disabled = true;
     hostRemoteAudioEl.srcObject = null;
     if (holdingWake) { removeWakeLockWant(); holdingWake = false; }
+    updateRoomEditability();
     setStatus("Waiting for someone to join…", "pending");
   }
 
@@ -543,6 +577,7 @@ async function runHost(){
     incomingCallEl.classList.remove("hidden");
     setStatus(`Incoming call from ${clientId}…`, "pending");
     if (!holdingWake) { addWakeLockWant(); holdingWake = true; }
+    updateRoomEditability();
     incomingRinger.start();
     log(`Ringing for join request from ${clientId}.`);
   }
@@ -552,15 +587,16 @@ async function runHost(){
     state = "connecting";
     hangupBtn.disabled = false;
     if (!holdingWake) { addWakeLockWant(); holdingWake = true; }
+    updateRoomEditability();
     setStatus(`Connecting to ${clientId}…`, "pending");
     log(`Answering ${clientId}. Creating offer.`);
     pc = createPeerConnection(
       hostRemoteAudioEl,
       (cand) => sendSignal(room, myPeer, "ice", JSON.stringify(cand)),
-      () => { state = "in-call"; setStatus(`In call with ${clientId}`, "live"); },
+      () => { state = "in-call"; updateRoomEditability(); setStatus(`In call with ${clientId}`, "live"); },
       (connState) => {
         log("Connection state: " + connState);
-        if (connState === "connected") { state = "in-call"; setStatus(`In call with ${clientId}`, "live"); }
+        if (connState === "connected") { state = "in-call"; updateRoomEditability(); setStatus(`In call with ${clientId}`, "live"); }
         if (["disconnected","failed","closed"].includes(connState)) endSession("Call ended.");
       }
     );
